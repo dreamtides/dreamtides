@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { Dreamsign, SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
-import { createDreamsign } from "../data/dreamsigns";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { drawDreamsignOptions } from "../dreamsign/dreamsign-pool";
 
 const MAX_DREAMSIGNS = 12;
 
@@ -13,35 +13,25 @@ interface DreamsignDraftScreenProps {
   site: SiteState;
 }
 
-/** Shuffle an array and return the first N elements. */
-function shufflePick<T>(items: readonly T[], count: number): T[] {
-  const pool = [...items];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, count);
-}
-
 /** Shows 3 (or 4 enhanced) dreamsign options. Pick 1 or skip. */
 export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
   const { state, mutations, questContent } = useQuest();
   const { dreamsigns: currentDreamsigns } = state;
 
   const optionCount = site.isEnhanced ? 4 : 3;
-
-  const options = useMemo<Dreamsign[]>(() => {
-    const templatesById = new Map(
-      questContent.dreamsignTemplates.map((template) => [template.id, template]),
-    );
-    return shufflePick(
-      state.remainingDreamsignPool
-        .map((id) => templatesById.get(id))
-        .filter((template) => template !== undefined)
-        .map((template) => createDreamsign(template)),
+  const revealedRef = useRef<ReturnType<typeof drawDreamsignOptions> | null>(null);
+  if (revealedRef.current === null) {
+    revealedRef.current = drawDreamsignOptions(
+      state.remainingDreamsignPool,
+      questContent.dreamsignTemplates,
       optionCount,
     );
-  }, [optionCount, questContent.dreamsignTemplates, state.remainingDreamsignPool]);
+  }
+  const revealed = revealedRef.current;
+  if (revealed === null) {
+    throw new Error("Failed to reveal Dreamsign draft options");
+  }
+  const options = revealed.offeredDreamsigns;
 
   const [purging, setPurging] = useState(false);
   const [pendingDreamsign, setPendingDreamsign] = useState<Dreamsign | null>(
@@ -54,7 +44,11 @@ export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
       isEnhanced: site.isEnhanced,
       optionCount,
     });
-  }, [site.isEnhanced, optionCount]);
+    mutations.setRemainingDreamsignPool(
+      revealed.remainingDreamsignPool,
+      "dreamsign_draft_revealed",
+    );
+  }, [site.isEnhanced, optionCount, mutations, revealed.remainingDreamsignPool]);
 
   const completeSite = useCallback(() => {
     logEvent("site_completed", {
@@ -209,26 +203,32 @@ export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
       </div>
 
       {/* Dreamsign options */}
-      <div className="flex max-w-4xl flex-wrap justify-center gap-5">
-        {options.map((dreamsign, index) => (
-          <motion.div
-            key={`draft-${dreamsign.name}`}
-            className="flex flex-col items-center gap-3"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.12, duration: 0.4 }}
-          >
-            <DreamsignCard dreamsign={dreamsign} />
-            <button
-              className="w-full rounded-lg px-5 py-2.5 font-bold text-white transition-opacity"
-              style={{ backgroundColor: "#7c3aed" }}
-              onClick={() => handleSelect(dreamsign)}
+      {options.length === 0 ? (
+        <p className="text-sm opacity-60">
+          The Dreamsign pool is exhausted.
+        </p>
+      ) : (
+        <div className="flex max-w-4xl flex-wrap justify-center gap-5">
+          {options.map((dreamsign, index) => (
+            <motion.div
+              key={`draft-${dreamsign.name}`}
+              className="flex flex-col items-center gap-3"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.12, duration: 0.4 }}
             >
-              Select
-            </button>
-          </motion.div>
-        ))}
-      </div>
+              <DreamsignCard dreamsign={dreamsign} />
+              <button
+                className="w-full rounded-lg px-5 py-2.5 font-bold text-white transition-opacity"
+                style={{ backgroundColor: "#7c3aed" }}
+                onClick={() => handleSelect(dreamsign)}
+              >
+                Select
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Skip */}
       <button

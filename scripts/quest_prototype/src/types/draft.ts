@@ -20,6 +20,8 @@ export interface DraftState {
   remainingCopiesByCard: Record<string, number>;
   /** Current 4-unique-card offer. */
   currentOffer: number[];
+  /** Cards drafted during the current draft site visit. */
+  draftedCardNumbers: number[];
   /** 1-indexed pick counter across the entire quest. */
   pickNumber: number;
   /** Number of player picks completed in the current draft site visit. */

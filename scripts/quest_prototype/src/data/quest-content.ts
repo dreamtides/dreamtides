@@ -49,6 +49,33 @@ export function isPackageAdjacent(
   return countPackageOverlap(candidatePackageTides, selectedPackageTides) > 0;
 }
 
+/** Returns overlap count or 1 when no package filtering is active. */
+export function packageOverlapWeight(
+  candidatePackageTides: readonly PackageTideId[],
+  selectedPackageTides: readonly PackageTideId[],
+): number {
+  if (selectedPackageTides.length === 0) {
+    return 1;
+  }
+  return countPackageOverlap(candidatePackageTides, selectedPackageTides);
+}
+
+/** Filters to package-adjacent items, falling back to the full pool if needed. */
+export function selectPackageAdjacentOrFallback<T>(
+  items: readonly T[],
+  packageTides: (item: T) => readonly PackageTideId[],
+  selectedPackageTides: readonly PackageTideId[],
+): T[] {
+  if (selectedPackageTides.length === 0) {
+    return [...items];
+  }
+
+  const adjacent = items.filter((item) =>
+    isPackageAdjacent(packageTides(item), selectedPackageTides),
+  );
+  return adjacent.length > 0 ? adjacent : [...items];
+}
+
 /** Returns a stable accent tide for Dreamcaller display surfaces. */
 export function dreamcallerAccentTide(
   dreamcaller: Pick<DreamcallerContent, "mandatoryTides">,

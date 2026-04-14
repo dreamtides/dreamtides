@@ -4,10 +4,14 @@ import type {
   SiteState,
   SiteType,
 } from "../types/quest";
-import type { CardData, Tide } from "../types/cards";
+import type { CardData } from "../types/cards";
+import type { PackageTideId } from "../types/content";
 import type { Dreamsign } from "../types/quest";
 import { BIOMES, type Biome } from "../data/biomes";
-import { cardAccentTide } from "../data/card-database";
+import {
+  packageOverlapWeight,
+  selectPackageAdjacentOrFallback,
+} from "../data/quest-content";
 import { logEvent } from "../logging";
 
 /** Parameters for site generation that require external data. */
@@ -15,7 +19,7 @@ export interface SiteGenerationContext {
   cardDatabase: Map<number, CardData>;
   dreamsignPool: ReadonlyArray<Omit<Dreamsign, "isBane">>;
   playerHasBanes: boolean;
-  excludedTides: Tide[];
+  selectedPackageTides: readonly PackageTideId[];
 }
 
 const BASE_RADIUS = 200;
@@ -121,15 +125,20 @@ function buildAdditionalSitePool(
 function generateRewardData(
   context: SiteGenerationContext,
 ): Record<string, unknown> {
-  const { cardDatabase, dreamsignPool, excludedTides } = context;
-  const excludedSet = new Set(excludedTides);
-  const cards = Array.from(cardDatabase.values()).filter(
-    (card) => !excludedSet.has(cardAccentTide(card)),
+  const { cardDatabase, dreamsignPool, selectedPackageTides } = context;
+  const cards = selectPackageAdjacentOrFallback(
+    Array.from(cardDatabase.values()),
+    (card) => card.tides,
+    selectedPackageTides,
   );
 
   // 70% chance card reward, 30% chance dreamsign reward
   if (cards.length > 0 && Math.random() < 0.7) {
-    const card = cards[Math.floor(Math.random() * cards.length)];
+    const weightedCards: Array<[CardData, number]> = cards.map((card) => [
+      card,
+      Math.max(1, packageOverlapWeight(card.tides, selectedPackageTides)),
+    ]);
+    const card = weightedPick(weightedCards);
     return {
       rewardType: "card",
       cardNumber: card.cardNumber,

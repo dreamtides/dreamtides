@@ -6,7 +6,6 @@ import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
-import { NAMED_TIDES } from "../data/card-database";
 import {
   generateSpecialtyShopInventory,
   effectivePrice,
@@ -22,12 +21,14 @@ interface SpecialtyShopScreenProps {
 export function SpecialtyShopScreen({ site }: SpecialtyShopScreenProps) {
   const { state, mutations, cardDatabase } = useQuest();
   const { essence, deck } = state;
-  const excludedTides = state.dreamcaller === null
-    ? []
-    : NAMED_TIDES.filter((tide) => tide !== state.dreamcaller?.tide);
+  const selectedPackageTides = state.resolvedPackage?.selectedTides ?? [];
 
   const [slots, setSlots] = useState<ShopSlot[]>(() => {
-    const inventory = generateSpecialtyShopInventory(cardDatabase, deck, excludedTides);
+    const inventory = generateSpecialtyShopInventory(
+      cardDatabase,
+      deck,
+      selectedPackageTides,
+    );
     if (site.isEnhanced) {
       return inventory.map((s) => ({
         ...s,

@@ -78,6 +78,7 @@ function makeDraftState(
   return {
     remainingCopiesByCard: {},
     currentOffer: [],
+    draftedCardNumbers: [],
     pickNumber: 1,
     sitePicksCompleted: 0,
     ...overrides,
@@ -106,6 +107,7 @@ describe("initializeDraftState", () => {
       "2": 1,
     });
     expect(state.currentOffer).toEqual([]);
+    expect(state.draftedCardNumbers).toEqual([]);
     expect(state.pickNumber).toBe(1);
     expect(state.sitePicksCompleted).toBe(0);
   });
@@ -172,6 +174,7 @@ describe("enterDraftSite and processPlayerPick", () => {
     expect(isComplete).toBe(false);
     expect(state.pickNumber).toBe(2);
     expect(state.sitePicksCompleted).toBe(1);
+    expect(state.draftedCardNumbers).toEqual([1]);
     expect(state.remainingCopiesByCard).toEqual({
       "1": 1,
       "5": 1,
@@ -232,13 +235,14 @@ describe("enterDraftSite and processPlayerPick", () => {
 });
 
 describe("completeDraftSite", () => {
-  it("logs the drafted cards passed by the caller", () => {
+  it("logs the drafted cards stored in draft state", () => {
     const state = makeDraftState({
       remainingCopiesByCard: { "9": 1, "10": 1 },
+      draftedCardNumbers: [4, 7],
       sitePicksCompleted: 2,
     });
 
-    completeDraftSite(state, [4, 7]);
+    completeDraftSite(state);
 
     const completionEvent = getLogEntries().find(
       (entry) => entry.event === "draft_site_completed",

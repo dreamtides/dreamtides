@@ -3,7 +3,9 @@ import {
   countPackageOverlap,
   isPackageAdjacent,
   loadQuestContent,
+  packageOverlapWeight,
   resolveDreamcallerPackage,
+  selectPackageAdjacentOrFallback,
 } from "./quest-content";
 import type { DreamcallerContent, DreamsignTemplate } from "../types/content";
 import type { CardData } from "../types/cards";
@@ -93,6 +95,37 @@ describe("countPackageOverlap", () => {
 
   it("returns false adjacency when there is no overlap", () => {
     expect(isPackageAdjacent(["alpha"], ["beta", "gamma"])).toBe(false);
+  });
+
+  it("filters to adjacent items and falls back when nothing overlaps", () => {
+    const adjacentOnly = selectPackageAdjacentOrFallback(
+      [
+        { id: "a", tides: ["alpha"] },
+        { id: "b", tides: ["beta"] },
+      ],
+      (item) => item.tides,
+      ["beta"],
+    );
+    const fallback = selectPackageAdjacentOrFallback(
+      [
+        { id: "a", tides: ["alpha"] },
+        { id: "b", tides: ["beta"] },
+      ],
+      (item) => item.tides,
+      ["gamma"],
+    );
+
+    expect(adjacentOnly).toEqual([{ id: "b", tides: ["beta"] }]);
+    expect(fallback).toEqual([
+      { id: "a", tides: ["alpha"] },
+      { id: "b", tides: ["beta"] },
+    ]);
+  });
+
+  it("treats package overlap as a weight and returns 1 when no filter is active", () => {
+    expect(packageOverlapWeight(["alpha", "beta"], ["beta", "gamma"])).toBe(1);
+    expect(packageOverlapWeight(["alpha", "beta"], ["alpha", "beta"])).toBe(2);
+    expect(packageOverlapWeight(["alpha"], [])).toBe(1);
   });
 });
 

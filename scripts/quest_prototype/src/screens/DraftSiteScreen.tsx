@@ -232,7 +232,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   const [pickedCardNumber, setPickedCardNumber] = useState<number | null>(null);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const [currentPackCards, setCurrentPackCards] = useState<CardData[]>([]);
-  const [draftedThisSite, setDraftedThisSite] = useState<number[]>([]);
+  const [draftedCardNumbers, setDraftedCardNumbers] = useState<number[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [packKey, setPackKey] = useState(0);
   const [showDeckSidebar, setShowDeckSidebar] = useState(false);
@@ -265,6 +265,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
     setCurrentPackCards(sortCardsByTide(cards));
+    setDraftedCardNumbers([...cloned.draftedCardNumbers]);
   }, [state.draftState, state.resolvedPackage, cardDatabase, mutations]);
 
   // Resolve the current pack from draft state, sorted by tide
@@ -308,11 +309,10 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
         // Add picked card to deck
         mutations.addCard(cardNumber, "draft_pick");
 
-        // Track drafted cards for this site
-        setDraftedThisSite((prev) => [...prev, cardNumber]);
+        setDraftedCardNumbers([...cloned.draftedCardNumbers]);
 
         if (siteComplete) {
-          completeDraftSite(cloned, [...draftedThisSite, cardNumber]);
+          completeDraftSite(cloned);
           setTimeout(() => {
             setIsComplete(true);
             setPickPhase("idle");
@@ -348,14 +348,14 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     // Log completion
     logEvent("draft_site_completed_ui", {
       siteId,
-      cardsDrafted: draftedThisSite,
+      cardsDrafted: draftedCardNumbers,
     });
 
     mutations.markSiteVisited(siteId);
     mutations.setScreen({ type: "dreamscape" });
-  }, [siteId, draftedThisSite, mutations]);
+  }, [siteId, draftedCardNumbers, mutations]);
 
-  const pickNumber = draftedThisSite.length + 1;
+  const pickNumber = draftedCardNumbers.length + 1;
 
   if (cardDatabase.size === 0) {
     return (
@@ -382,7 +382,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   if (isComplete) {
     return (
       <DraftSummary
-        draftedCardNumbers={draftedThisSite}
+        draftedCardNumbers={draftedCardNumbers}
         cardDatabase={cardDatabase}
         onContinue={handleContinue}
       />
@@ -425,7 +425,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
                 style={{ background: "#f97316" }}
                 initial={false}
                 animate={{
-                  width: `${String((draftedThisSite.length / SITE_PICKS) * 100)}%`,
+                  width: `${String((draftedCardNumbers.length / SITE_PICKS) * 100)}%`,
                 }}
                 transition={{ duration: 0.3 }}
               />
@@ -521,7 +521,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
         {/* Drafted cards row */}
         <DraftedCardsRow
-          cardNumbers={draftedThisSite}
+          cardNumbers={draftedCardNumbers}
           cardDatabase={cardDatabase}
         />
       </div>

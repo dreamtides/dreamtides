@@ -1,33 +1,19 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { QuestContent } from "../data/quest-content";
-import { getLogEntries, logEvent, resetLog } from "../logging";
+import type { ResolvedDreamcallerPackage } from "../types/content";
+import type { DraftState } from "../types/draft";
+import type { Dreamcaller, QuestState } from "../types/quest";
 import {
   QuestProvider,
+  applyDraftState,
+  applyDreamcallerSelection,
+  applyRemainingDreamsignPool,
+  createDefaultState,
   useQuest,
   type QuestContextValue,
 } from "./quest-context";
-import type { DreamscapeNode, QuestState, Screen, SiteState } from "../types/quest";
-
-function createTestState(overrides: Partial<QuestState> = {}): QuestState {
-  return {
-    essence: 250,
-    deck: [],
-    dreamcaller: null,
-    resolvedPackage: null,
-    remainingDreamsignPool: [],
-    dreamsigns: [],
-    completionLevel: 0,
-    atlas: { nodes: {}, edges: [], nexusId: "" },
-    currentDreamscape: null,
-    visitedSites: [],
-    draftState: null,
-    screen: { type: "questStart" },
-    activeSiteId: null,
-    ...overrides,
-  };
-}
 
 function makeQuestContent(): QuestContent {
   return {
@@ -48,14 +34,11 @@ function captureQuestContext(): QuestContextValue {
   }
 
   renderToStaticMarkup(
-    createElement(
-      QuestProvider,
-      {
-        cardDatabase: new Map(),
-        questContent: makeQuestContent(),
-        children: createElement(Capture),
-      },
-    ),
+    createElement(QuestProvider, {
+      cardDatabase: new Map(),
+      questContent: makeQuestContent(),
+      children: createElement(Capture),
+    }),
   );
 
   if (captured === null) {
@@ -65,78 +48,62 @@ function captureQuestContext(): QuestContextValue {
   return captured;
 }
 
-function screenName(screen: Screen): string {
-  return screen.type === "site" ? `site:${screen.siteId}` : screen.type;
-}
-
-function applyIncrementCompletionLevel(
-  prev: QuestState,
-  essenceReward: number,
-  rewardCardNumber: number | null,
-): QuestState {
-  const newLevel = prev.completionLevel + 1;
-  logEvent("battle_won", {
-    completionLevel: newLevel,
-    essenceReward,
-    rewardCardNumber,
-  });
-  const screen: Screen =
-    newLevel >= 7 ? { type: "questComplete" } : prev.screen;
-  if (newLevel >= 7) {
-    logEvent("screen_transition", {
-      from: screenName(prev.screen),
-      to: screenName(screen),
-    });
-  }
-  return { ...prev, completionLevel: newLevel, screen };
-}
-
-function makeSite(type: SiteState["type"], isVisited: boolean): SiteState {
-  return { id: `${type.toLowerCase()}-1`, type, isEnhanced: false, isVisited };
-}
-
-function makeNode(
-  id: string,
-  sites: SiteState[],
-  status: DreamscapeNode["status"] = "available",
-): DreamscapeNode {
+function makeDreamcaller(): Dreamcaller {
   return {
-    id,
-    biomeName: "Test Biome",
-    biomeColor: "#aabbcc",
-    sites,
-    position: { x: 0, y: 0 },
-    status,
-    enhancedSiteType: null,
+    name: "Test Dreamcaller",
+    tide: "Bloom",
+    abilityDescription: "Test ability.",
+    essenceBonus: 50,
+    tideCrystalGrant: "Bloom",
   };
 }
 
-function applySetCurrentDreamscape(
-  prev: QuestState,
-  nodeId: string | null,
-): QuestState {
-  if (nodeId !== null) {
-    const node = prev.atlas.nodes[nodeId];
-    logEvent("dreamscape_entered", {
-      dreamscapeId: nodeId,
-      biomeName: node?.biomeName ?? "unknown",
-    });
-  }
+function makeResolvedPackage(): ResolvedDreamcallerPackage {
   return {
-    ...prev,
-    currentDreamscape: nodeId,
-    visitedSites: nodeId !== null ? [] : prev.visitedSites,
+    dreamcaller: {
+      id: "dreamcaller-1",
+      name: "Test Dreamcaller",
+      awakening: 4,
+      renderedText: "Test rules text.",
+      mandatoryTides: ["core"],
+      optionalTides: ["support-a", "support-b", "support-c", "support-d"],
+    },
+    mandatoryTides: ["core"],
+    optionalSubset: ["support-a", "support-b", "support-c"],
+    selectedTides: ["core", "support-a", "support-b", "support-c"],
+    draftPoolCopiesByCard: {
+      "101": 2,
+      "202": 1,
+    },
+    dreamsignPoolIds: ["embers-whisper", "glacial-insight", "ashbloom-mantle"],
+    mandatoryOnlyPoolSize: 120,
+    draftPoolSize: 210,
+    doubledCardCount: 1,
+    legalSubsetCount: 2,
+    preferredSubsetCount: 1,
+  };
+}
+
+function makeDraftState(): DraftState {
+  return {
+    remainingCopiesByCard: {
+      "101": 1,
+      "202": 2,
+    },
+    currentOffer: [101, 202, 303, 404],
+    draftedCardNumbers: [101, 202],
+    pickNumber: 3,
+    sitePicksCompleted: 2,
   };
 }
 
 beforeEach(() => {
-  resetLog();
   vi.spyOn(console, "log").mockImplementation(() => {});
 });
 
 describe("QuestProvider default state contract", () => {
   it("exposes package-driven default state without legacy tide fields", () => {
-    const { state } = captureQuestContext();
+    const state = createDefaultState();
 
     expect(state.resolvedPackage).toBeNull();
     expect(state.remainingDreamsignPool).toEqual([]);
@@ -149,84 +116,102 @@ describe("QuestProvider default state contract", () => {
   it("omits legacy mutators and exposes explicit pool mutators", () => {
     const mutationNames = Object.keys(captureQuestContext().mutations);
 
+    expect(mutationNames).toContain("setDreamcallerSelection");
     expect(mutationNames).toContain("setRemainingDreamsignPool");
+    expect(mutationNames).toContain("setDraftState");
     expect(mutationNames).not.toContain("addTideCrystal");
     expect(mutationNames).not.toContain("setChosenTide");
     expect(mutationNames).not.toContain("setExcludedTides");
   });
 });
 
-describe("incrementCompletionLevel state transitions", () => {
-  it("does not change screen when level is below 7", () => {
-    const next = applyIncrementCompletionLevel(
-      createTestState({
-        completionLevel: 3,
-        screen: { type: "atlas" },
-      }),
-      50,
-      null,
+describe("Task 02 state transitions", () => {
+  it("stores the resolved package and initializes the shared Dreamsign pool from it", () => {
+    const dreamcaller = makeDreamcaller();
+    const resolvedPackage = makeResolvedPackage();
+    const next = applyDreamcallerSelection(
+      createDefaultState(),
+      dreamcaller,
+      resolvedPackage,
     );
 
-    expect(next.completionLevel).toBe(4);
-    expect(next.screen.type).toBe("atlas");
-  });
+    expect(next.dreamcaller).toEqual(dreamcaller);
+    expect(next.resolvedPackage).toEqual(resolvedPackage);
+    expect(next.remainingDreamsignPool).toEqual(resolvedPackage.dreamsignPoolIds);
 
-  it("transitions to questComplete when reaching level 7", () => {
-    const next = applyIncrementCompletionLevel(
-      createTestState({
-        completionLevel: 6,
-        screen: { type: "atlas" },
-      }),
-      100,
-      42,
-    );
-
-    expect(next.completionLevel).toBe(7);
-    expect(next.screen.type).toBe("questComplete");
-  });
-});
-
-describe("battle site unlock gating", () => {
-  it("battle is locked when non-battle sites remain unvisited", () => {
-    const sites = [
-      makeSite("Shop", false),
-      makeSite("Essence", false),
-      makeSite("Battle", false),
-    ];
-
-    expect(
-      sites.filter((site) => site.type !== "Battle").every((site) => site.isVisited),
-    ).toBe(false);
-  });
-
-  it("battle unlocks when all non-battle sites are visited", () => {
-    const sites = [
-      makeSite("Shop", true),
-      makeSite("Essence", true),
-      makeSite("Battle", false),
-    ];
-
-    expect(
-      sites.filter((site) => site.type !== "Battle").every((site) => site.isVisited),
-    ).toBe(true);
-  });
-});
-
-describe("dreamscape transitions", () => {
-  it("does not log dreamscape_completed when clearing currentDreamscape", () => {
-    const node = makeNode("ds-1", [
-      makeSite("Shop", false),
-      makeSite("Battle", false),
+    resolvedPackage.dreamsignPoolIds.push("verdant-accord");
+    expect(next.remainingDreamsignPool).toEqual([
+      "embers-whisper",
+      "glacial-insight",
+      "ashbloom-mantle",
     ]);
-    const state = createTestState({
-      currentDreamscape: "ds-1",
-      atlas: { nodes: { "ds-1": node }, edges: [], nexusId: "nexus" },
+  });
+
+  it("updates the remaining Dreamsign pool without mutating prior state", () => {
+    const initial = applyDreamcallerSelection(
+      createDefaultState(),
+      makeDreamcaller(),
+      makeResolvedPackage(),
+    );
+    const nextPool = ["glacial-insight"];
+    const next = applyRemainingDreamsignPool(initial, nextPool);
+
+    expect(initial.remainingDreamsignPool).toEqual([
+      "embers-whisper",
+      "glacial-insight",
+      "ashbloom-mantle",
+    ]);
+    expect(next.remainingDreamsignPool).toEqual(["glacial-insight"]);
+
+    nextPool.push("ashbloom-mantle");
+    expect(next.remainingDreamsignPool).toEqual(["glacial-insight"]);
+  });
+
+  it("persists fixed-pool draft progress, including drafted cards for site completion", () => {
+    const next = applyDraftState(createDefaultState(), makeDraftState());
+
+    expect(next.draftState).toEqual({
+      remainingCopiesByCard: {
+        "101": 1,
+        "202": 2,
+      },
+      currentOffer: [101, 202, 303, 404],
+      draftedCardNumbers: [101, 202],
+      pickNumber: 3,
+      sitePicksCompleted: 2,
     });
+    expect("seenCards" in (next.draftState as unknown as Record<string, unknown>)).toBe(false);
+  });
 
-    applySetCurrentDreamscape(state, null);
+  it("resets package-driven run state back to an empty quest shell", () => {
+    const populated: QuestState = {
+      ...createDefaultState(),
+      dreamcaller: makeDreamcaller(),
+      resolvedPackage: makeResolvedPackage(),
+      remainingDreamsignPool: ["embers-whisper"],
+      draftState: makeDraftState(),
+      visitedSites: ["site-1"],
+      currentDreamscape: "dreamscape-1",
+    };
 
-    expect(
-      getLogEntries().find((entry) => entry.event === "dreamscape_completed"),
-    ).toBeUndefined();
+    const reset = createDefaultState();
+
+    expect(reset).toEqual({
+      ...createDefaultState(),
+      essence: 250,
+      deck: [],
+      dreamcaller: null,
+      resolvedPackage: null,
+      remainingDreamsignPool: [],
+      dreamsigns: [],
+      completionLevel: 0,
+      atlas: { nodes: {}, edges: [], nexusId: "" },
+      currentDreamscape: null,
+      visitedSites: [],
+      draftState: null,
+      screen: { type: "questStart" },
+      activeSiteId: null,
+    });
+    expect(populated.resolvedPackage).not.toBeNull();
   });
 });

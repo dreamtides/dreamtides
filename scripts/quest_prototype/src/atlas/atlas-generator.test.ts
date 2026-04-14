@@ -41,7 +41,7 @@ function defaultContext(
       },
     ],
     playerHasBanes: false,
-    excludedTides: [],
+    selectedPackageTides: [],
     ...overrides,
   };
 }

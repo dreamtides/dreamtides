@@ -82,7 +82,7 @@ function countRemainingDraftCards(remainingCopiesByCard: Record<string, number>)
   );
 }
 
-function createDefaultState(): QuestState {
+export function createDefaultState(): QuestState {
   return {
     essence: 250,
     deck: [],
@@ -101,6 +101,39 @@ function createDefaultState(): QuestState {
     draftState: null,
     screen: { type: "questStart" },
     activeSiteId: null,
+  };
+}
+
+export function applyDreamcallerSelection(
+  prev: QuestState,
+  dreamcaller: Dreamcaller,
+  resolvedPackage: ResolvedDreamcallerPackage,
+): QuestState {
+  return {
+    ...prev,
+    dreamcaller,
+    resolvedPackage,
+    remainingDreamsignPool: [...resolvedPackage.dreamsignPoolIds],
+  };
+}
+
+export function applyRemainingDreamsignPool(
+  prev: QuestState,
+  remainingDreamsignPool: string[],
+): QuestState {
+  return {
+    ...prev,
+    remainingDreamsignPool: [...remainingDreamsignPool],
+  };
+}
+
+export function applyDraftState(
+  prev: QuestState,
+  draftState: DraftState,
+): QuestState {
+  return {
+    ...prev,
+    draftState,
   };
 }
 
@@ -255,12 +288,9 @@ export function QuestProvider({
         draftPoolSize: resolvedPackage.draftPoolSize,
         dreamsignPoolSize: resolvedPackage.dreamsignPoolIds.length,
       });
-      setState((prev) => ({
-        ...prev,
-        dreamcaller,
-        resolvedPackage,
-        remainingDreamsignPool: [...resolvedPackage.dreamsignPoolIds],
-      }));
+      setState((prev) =>
+        applyDreamcallerSelection(prev, dreamcaller, resolvedPackage),
+      );
     },
     [],
   );
@@ -302,10 +332,9 @@ export function QuestProvider({
         remainingDreamsignPoolSize: remainingDreamsignPool.length,
         remainingDreamsignPool,
       });
-      setState((prev) => ({
-        ...prev,
-        remainingDreamsignPool: [...remainingDreamsignPool],
-      }));
+      setState((prev) =>
+        applyRemainingDreamsignPool(prev, remainingDreamsignPool),
+      );
     },
     [],
   );
@@ -401,11 +430,12 @@ export function QuestProvider({
       source,
       pickNumber: draftState.pickNumber,
       sitePicksCompleted: draftState.sitePicksCompleted,
+      draftedCardCount: draftState.draftedCardNumbers.length,
       currentOfferSize: draftState.currentOffer.length,
       remainingCards: countRemainingDraftCards(draftState.remainingCopiesByCard),
       remainingUniqueCards: Object.keys(draftState.remainingCopiesByCard).length,
     });
-    setState((prev) => ({ ...prev, draftState }));
+    setState((prev) => applyDraftState(prev, draftState));
   }, []);
 
   const resetQuest = useCallback(() => {

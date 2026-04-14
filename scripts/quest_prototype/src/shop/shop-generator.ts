@@ -1,8 +1,13 @@
 import type { CardData, Tide, Rarity } from "../types/cards";
+import type { DreamsignTemplate, PackageTideId } from "../types/content";
 import type { DeckEntry, Dreamsign } from "../types/quest";
 
 import { cardAccentTide } from "../data/card-database";
-import { DREAMSIGNS } from "../data/dreamsigns";
+import {
+  packageOverlapWeight,
+  selectPackageAdjacentOrFallback,
+} from "../data/quest-content";
+import { drawDreamsignOptions } from "../dreamsign/dreamsign-pool";
 
 /** Prices by rarity for card items. */
 const RARITY_PRICES: Readonly<Record<Rarity, number>> = {
@@ -37,6 +42,18 @@ export interface ShopSlot {
   purchased: boolean;
 }
 
+export interface ShopGenerationOptions {
+  selectedPackageTides?: readonly PackageTideId[];
+  remainingDreamsignPoolIds?: readonly string[];
+  dreamsignTemplates?: readonly DreamsignTemplate[];
+}
+
+export interface ShopInventoryResult {
+  slots: ShopSlot[];
+  remainingDreamsignPoolIds: string[];
+  spentDreamsignPoolIds: string[];
+}
+
 /** Returns the effective price of a slot after discount. */
 export function effectivePrice(slot: ShopSlot): number {
   if (slot.discountPercent === 0) return slot.basePrice;
@@ -57,6 +74,7 @@ export function rerollCost(rerollCount: number, isEnhanced: boolean): number {
 function selectWeightedCard(
   cards: CardData[],
   deckTideCounts: Record<Tide, number>,
+  selectedPackageTides: readonly PackageTideId[] = [],
 ): CardData | null {
   if (cards.length === 0) return null;
 
@@ -69,7 +87,10 @@ function selectWeightedCard(
   const weights = cards.map((card) => {
     if (totalDeckCards === 0) return 1;
     const tideCount = deckTideCounts[cardAccentTide(card)] ?? 0;
-    return baseline + (tideCount / totalDeckCards) * 10;
+    return (
+      (baseline + (tideCount / totalDeckCards) * 10) *
+      Math.max(1, packageOverlapWeight(card.tides, selectedPackageTides))
+    );
   });
 
   const totalWeight = weights.reduce((sum, w) => sum + w, 0);
@@ -107,27 +128,25 @@ function countDeckTides(
   return counts;
 }
 
-/** Selects a random dreamsign from the synthetic pool. */
-function selectRandomDreamsign(): Dreamsign {
-  const template = DREAMSIGNS[Math.floor(Math.random() * DREAMSIGNS.length)];
-  return { ...template, isBane: false };
-}
-
 /**
  * Generates shop inventory with 6 slots. Each slot can be a card,
- * dreamsign, tide crystal, or reroll option.
+ * dreamsign, or reroll option.
  */
 export function generateShopInventory(
   cardDatabase: Map<number, CardData>,
   playerDeck: DeckEntry[],
-  excludedTides: Tide[] = [],
-): ShopSlot[] {
-  const excludedSet = new Set(excludedTides);
-  const allCards = Array.from(cardDatabase.values()).filter(
-    (card) => !excludedSet.has(cardAccentTide(card)),
+  options: ShopGenerationOptions = {},
+): ShopInventoryResult {
+  const selectedPackageTides = options.selectedPackageTides ?? [];
+  const allCards = selectPackageAdjacentOrFallback(
+    Array.from(cardDatabase.values()),
+    (card) => card.tides,
+    selectedPackageTides,
   );
   const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
   const slots: ShopSlot[] = [];
+  let remainingDreamsignPoolIds = [...(options.remainingDreamsignPoolIds ?? [])];
+  const spentDreamsignPoolIds: string[] = [];
 
   // Decide if reroll slot appears (50% chance)
   const hasRerollSlot = Math.random() < 0.5;
@@ -149,20 +168,37 @@ export function generateShopInventory(
     }
 
     // Roll for dreamsign
-    if (Math.random() < DREAMSIGN_CHANCE) {
-      slots.push({
-        itemType: "dreamsign",
-        card: null,
-        dreamsign: selectRandomDreamsign(),
-        basePrice: DREAMSIGN_PRICE,
-        discountPercent: 0,
-        purchased: false,
-      });
-      continue;
+    if (
+      Math.random() < DREAMSIGN_CHANCE &&
+      options.dreamsignTemplates !== undefined &&
+      remainingDreamsignPoolIds.length > 0
+    ) {
+      const dreamsignDraw = drawDreamsignOptions(
+        remainingDreamsignPoolIds,
+        options.dreamsignTemplates,
+        1,
+      );
+      remainingDreamsignPoolIds = dreamsignDraw.remainingDreamsignPool;
+      if (dreamsignDraw.offeredDreamsigns.length > 0) {
+        spentDreamsignPoolIds.push(...dreamsignDraw.offeredIds);
+        slots.push({
+          itemType: "dreamsign",
+          card: null,
+          dreamsign: dreamsignDraw.offeredDreamsigns[0],
+          basePrice: DREAMSIGN_PRICE,
+          discountPercent: 0,
+          purchased: false,
+        });
+        continue;
+      }
     }
 
     // Default: card slot
-    const card = selectWeightedCard(allCards, deckTideCounts);
+    const card = selectWeightedCard(
+      allCards,
+      deckTideCounts,
+      selectedPackageTides,
+    );
     if (card) {
       slots.push({
         itemType: "card",
@@ -189,7 +225,11 @@ export function generateShopInventory(
     slots[idx] = { ...slots[idx], discountPercent: discount };
   }
 
-  return slots;
+  return {
+    slots,
+    remainingDreamsignPoolIds,
+    spentDreamsignPoolIds,
+  };
 }
 
 /**
@@ -199,17 +239,22 @@ export function generateShopInventory(
 export function generateSpecialtyShopInventory(
   cardDatabase: Map<number, CardData>,
   playerDeck: DeckEntry[],
-  excludedTides: Tide[] = [],
+  selectedPackageTides: readonly PackageTideId[] = [],
 ): ShopSlot[] {
-  const excludedSet = new Set(excludedTides);
-  const rareCards = Array.from(cardDatabase.values()).filter(
-    (card) => card.rarity === "Rare" && !excludedSet.has(cardAccentTide(card)),
+  const rareCards = selectPackageAdjacentOrFallback(
+    Array.from(cardDatabase.values()).filter((card) => card.rarity === "Rare"),
+    (card) => card.tides,
+    selectedPackageTides,
   );
   const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
   const slots: ShopSlot[] = [];
 
   for (let i = 0; i < 4; i++) {
-    const card = selectWeightedCard(rareCards, deckTideCounts);
+    const card = selectWeightedCard(
+      rareCards,
+      deckTideCounts,
+      selectedPackageTides,
+    );
     if (card) {
       slots.push({
         itemType: "card",

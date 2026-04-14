@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
-import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { dreamcallerAccentTide } from "../data/quest-content";
 import { countDeckTides, selectRareRewards } from "../data/tide-weights";
 import { CardDisplay } from "../components/CardDisplay";
 import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
 import { createDreamsign } from "../data/dreamsigns";
+import { resolveDreamsignTemplates } from "../dreamsign/dreamsign-pool";
 import type { DreamcallerContent } from "../types/content";
 
 type BattlePhase = "preBattle" | "animation" | "victory";
@@ -437,9 +438,7 @@ export function BattleScreen({
   const isMiniboss = completionLevel === 3;
   const isFinalBoss = completionLevel === 6;
   const essenceReward = 100 + completionLevel * 50;
-  const excludedTides = state.dreamcaller === null
-    ? []
-    : NAMED_TIDES.filter((tide) => tide !== state.dreamcaller?.tide);
+  const selectedPackageTides = state.resolvedPackage?.selectedTides ?? [];
 
   // Generate enemy and rare card rewards once on mount and keep stable.
   const enemyRef = useRef<EnemyData | null>(null);
@@ -451,7 +450,11 @@ export function BattleScreen({
   const rareCardsRef = useRef<CardData[] | null>(null);
   if (rareCardsRef.current === null) {
     const tideCounts = countDeckTides(deck, cardDatabase);
-    rareCardsRef.current = selectRareRewards(cardDatabase, tideCounts, excludedTides);
+    rareCardsRef.current = selectRareRewards(
+      cardDatabase,
+      tideCounts,
+      selectedPackageTides,
+    );
   }
   const rareCards = rareCardsRef.current;
 
@@ -533,11 +536,12 @@ export function BattleScreen({
               completionLevel,
               {
                 cardDatabase,
-                dreamsignPool: questContent.dreamsignTemplates.map((template) =>
-                  createDreamsign(template),
-                ),
+                dreamsignPool: resolveDreamsignTemplates(
+                  state.remainingDreamsignPool,
+                  questContent.dreamsignTemplates,
+                ).map((template) => createDreamsign(template)),
                 playerHasBanes,
-                excludedTides,
+                selectedPackageTides,
               },
             );
             mutations.updateAtlas(updatedAtlas);
@@ -565,9 +569,11 @@ export function BattleScreen({
       isMiniboss,
       state.deck,
       state.dreamsigns,
+      state.remainingDreamsignPool,
       cardDatabase,
       questContent.dreamcallers,
       questContent.dreamsignTemplates,
+      selectedPackageTides,
     ],
   );
 

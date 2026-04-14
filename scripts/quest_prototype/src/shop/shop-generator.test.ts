@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { CardData } from "../types/cards";
+import type { DreamsignTemplate } from "../types/content";
 import type { DeckEntry } from "../types/quest";
 import {
   generateShopInventory,
@@ -43,6 +44,23 @@ function makeDeckEntry(cardNumber: number): DeckEntry {
     isBane: false,
   };
 }
+
+const DREAMSIGN_TEMPLATES: DreamsignTemplate[] = [
+  {
+    id: "dreamsign-1",
+    name: "Dreamsign One",
+    displayTide: "Bloom",
+    packageTides: ["alpha"],
+    effectDescription: "First effect.",
+  },
+  {
+    id: "dreamsign-2",
+    name: "Dreamsign Two",
+    displayTide: "Arc",
+    packageTides: ["beta"],
+    effectDescription: "Second effect.",
+  },
+];
 
 describe("effectivePrice", () => {
   it("returns base price when no discount", () => {
@@ -108,13 +126,13 @@ describe("generateShopInventory", () => {
   const db = makeDatabase(cards);
 
   it("generates exactly 6 slots", () => {
-    const slots = generateShopInventory(db, []);
-    expect(slots).toHaveLength(6);
+    const result = generateShopInventory(db, []);
+    expect(result.slots).toHaveLength(6);
   });
 
   it("all slots start as not purchased", () => {
-    const slots = generateShopInventory(db, []);
-    for (const slot of slots) {
+    const result = generateShopInventory(db, []);
+    for (const slot of result.slots) {
       expect(slot.purchased).toBe(false);
     }
   });
@@ -122,16 +140,16 @@ describe("generateShopInventory", () => {
   it("has at most one reroll slot", () => {
     // Run multiple times to account for randomness
     for (let i = 0; i < 20; i++) {
-      const slots = generateShopInventory(db, []);
-      const rerollSlots = slots.filter((s) => s.itemType === "reroll");
+      const result = generateShopInventory(db, []);
+      const rerollSlots = result.slots.filter((s) => s.itemType === "reroll");
       expect(rerollSlots.length).toBeLessThanOrEqual(1);
     }
   });
 
   it("applies 1-2 discounts to non-reroll slots", () => {
     for (let i = 0; i < 20; i++) {
-      const slots = generateShopInventory(db, []);
-      const discounted = slots.filter((s) => s.discountPercent > 0);
+      const result = generateShopInventory(db, []);
+      const discounted = result.slots.filter((s) => s.discountPercent > 0);
       expect(discounted.length).toBeGreaterThanOrEqual(1);
       expect(discounted.length).toBeLessThanOrEqual(2);
       for (const slot of discounted) {
@@ -144,8 +162,8 @@ describe("generateShopInventory", () => {
 
   it("card slots have correct rarity-based prices", () => {
     for (let i = 0; i < 20; i++) {
-      const slots = generateShopInventory(db, []);
-      for (const slot of slots) {
+      const result = generateShopInventory(db, []);
+      for (const slot of result.slots) {
         if (slot.itemType === "card" && slot.card) {
           const expected: Record<string, number> = {
             Common: 50,
@@ -161,8 +179,11 @@ describe("generateShopInventory", () => {
 
   it("dreamsign slots have price 150", () => {
     for (let i = 0; i < 50; i++) {
-      const slots = generateShopInventory(db, []);
-      for (const slot of slots) {
+      const result = generateShopInventory(db, [], {
+        remainingDreamsignPoolIds: ["dreamsign-1", "dreamsign-2"],
+        dreamsignTemplates: DREAMSIGN_TEMPLATES,
+      });
+      for (const slot of result.slots) {
         if (slot.itemType === "dreamsign") {
           expect(slot.basePrice).toBe(150);
           expect(slot.dreamsign).not.toBeNull();
@@ -171,15 +192,37 @@ describe("generateShopInventory", () => {
     }
   });
 
+  it("spends revealed Dreamsign ids from the shared pool", () => {
+    const result = generateShopInventory(db, [], {
+      remainingDreamsignPoolIds: ["dreamsign-1", "dreamsign-2"],
+      dreamsignTemplates: DREAMSIGN_TEMPLATES,
+    });
+
+    const dreamsignSlots = result.slots.filter((slot) => slot.itemType === "dreamsign");
+    expect(result.remainingDreamsignPoolIds.length + dreamsignSlots.length).toBe(2);
+    expect(result.spentDreamsignPoolIds).toHaveLength(dreamsignSlots.length);
+  });
+
+  it("filters cards to the selected package when adjacent cards exist", () => {
+    const result = generateShopInventory(db, [], {
+      selectedPackageTides: ["Arc"],
+    });
+
+    for (const slot of result.slots) {
+      if (slot.itemType === "card" && slot.card !== null) {
+        expect(slot.card.tides).toContain("Arc");
+      }
+    }
+  });
 });
 
 describe("generateShopInventory with empty database", () => {
   it("does not crash on an empty card database", () => {
     const emptyDb = new Map<number, CardData>();
-    const slots = generateShopInventory(emptyDb, []);
+    const result = generateShopInventory(emptyDb, []);
     // Should still produce some slots (dreamsigns, tide crystals, or rerolls)
     // but no card slots since the database is empty.
-    for (const slot of slots) {
+    for (const slot of result.slots) {
       if (slot.itemType === "card") {
         expect(slot.card).not.toBeNull();
       }
@@ -260,5 +303,13 @@ describe("generateSpecialtyShopInventory", () => {
     expect(() => generateSpecialtyShopInventory(emptyDb, [])).not.toThrow();
     const slots = generateSpecialtyShopInventory(emptyDb, []);
     expect(slots).toHaveLength(0);
+  });
+
+  it("uses package-adjacent rare cards when available", () => {
+    const slots = generateSpecialtyShopInventory(db, [], ["Arc"]);
+    expect(slots).toHaveLength(4);
+    for (const slot of slots) {
+      expect(slot.card?.tides).toContain("Arc");
+    }
   });
 });

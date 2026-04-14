@@ -1,5 +1,10 @@
 import { cardAccentTide } from "./card-database";
 import type { CardData, Tide } from "../types/cards";
+import type { PackageTideId } from "../types/content";
+import {
+  packageOverlapWeight,
+  selectPackageAdjacentOrFallback,
+} from "./quest-content";
 
 /** Counts tide occurrences in the player's deck. */
 export function countDeckTides(
@@ -76,16 +81,18 @@ export function tideWeight(
 export function selectRareRewards(
   cardDatabase: Map<number, CardData>,
   deckTideCounts: Map<Tide, number>,
-  excludedTides: Tide[] = [],
+  selectedPackageTides: readonly PackageTideId[] = [],
 ): CardData[] {
-  const excludedSet = new Set(excludedTides);
-  const rareCards = Array.from(cardDatabase.values()).filter(
-    (card) => card.rarity === "Rare" && !excludedSet.has(cardAccentTide(card)),
+  const rareCards = selectPackageAdjacentOrFallback(
+    Array.from(cardDatabase.values()).filter((card) => card.rarity === "Rare"),
+    (card) => card.tides,
+    selectedPackageTides,
   );
 
   if (rareCards.length === 0) return [];
 
   return weightedSample(rareCards, 4, (card) =>
-    tideWeight(cardAccentTide(card), deckTideCounts),
+    tideWeight(cardAccentTide(card), deckTideCounts) *
+      Math.max(1, packageOverlapWeight(card.tides, selectedPackageTides)),
   );
 }

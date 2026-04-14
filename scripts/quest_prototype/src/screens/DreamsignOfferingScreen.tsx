@@ -1,26 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { Dreamsign, SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
-import { createDreamsign } from "../data/dreamsigns";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { drawDreamsignOptions } from "../dreamsign/dreamsign-pool";
 
 const MAX_DREAMSIGNS = 12;
 
 /** Props for the DreamsignOfferingScreen component. */
 interface DreamsignOfferingScreenProps {
   site: SiteState;
-}
-
-/** Shuffle an array and return the first N elements. */
-function shufflePick<T>(items: readonly T[], count: number): T[] {
-  const pool = [...items];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, count);
 }
 
 /** Renders the Dreamsign Offering site. Normal: 1 dreamsign, Enhanced: 3 (mini-draft). */
@@ -31,19 +21,19 @@ export function DreamsignOfferingScreen({
   const { dreamsigns: currentDreamsigns } = state;
 
   const optionCount = site.isEnhanced ? 3 : 1;
-
-  const options = useMemo<Dreamsign[]>(() => {
-    const templatesById = new Map(
-      questContent.dreamsignTemplates.map((template) => [template.id, template]),
-    );
-    return shufflePick(
-      state.remainingDreamsignPool
-        .map((id) => templatesById.get(id))
-        .filter((template) => template !== undefined)
-        .map((template) => createDreamsign(template)),
+  const revealedRef = useRef<ReturnType<typeof drawDreamsignOptions> | null>(null);
+  if (revealedRef.current === null) {
+    revealedRef.current = drawDreamsignOptions(
+      state.remainingDreamsignPool,
+      questContent.dreamsignTemplates,
       optionCount,
     );
-  }, [optionCount, questContent.dreamsignTemplates, state.remainingDreamsignPool]);
+  }
+  const revealed = revealedRef.current;
+  if (revealed === null) {
+    throw new Error("Failed to reveal Dreamsign offering");
+  }
+  const options = revealed.offeredDreamsigns;
 
   const [purging, setPurging] = useState(false);
   const [pendingDreamsign, setPendingDreamsign] = useState<Dreamsign | null>(
@@ -56,7 +46,11 @@ export function DreamsignOfferingScreen({
       isEnhanced: site.isEnhanced,
       optionCount,
     });
-  }, [site.isEnhanced, optionCount]);
+    mutations.setRemainingDreamsignPool(
+      revealed.remainingDreamsignPool,
+      "dreamsign_offering_revealed",
+    );
+  }, [site.isEnhanced, optionCount, mutations, revealed.remainingDreamsignPool]);
 
   const completeSite = useCallback(() => {
     logEvent("site_completed", {
@@ -208,28 +202,34 @@ export function DreamsignOfferingScreen({
       </div>
 
       {/* Dreamsign options */}
-      <div
-        className={`flex flex-wrap justify-center gap-6 ${options.length === 1 ? "" : "max-w-3xl"}`}
-      >
-        {options.map((dreamsign, index) => (
-          <motion.div
-            key={`offer-${dreamsign.name}`}
-            className="flex flex-col items-center gap-3"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.4 }}
-          >
-            <DreamsignCard dreamsign={dreamsign} />
-            <button
-              className="w-full rounded-lg px-5 py-2.5 font-bold text-white transition-opacity"
-              style={{ backgroundColor: "#7c3aed" }}
-              onClick={() => handleAccept(dreamsign)}
+      {options.length === 0 ? (
+        <p className="text-sm opacity-60">
+          The Dreamsign pool is exhausted.
+        </p>
+      ) : (
+        <div
+          className={`flex flex-wrap justify-center gap-6 ${options.length === 1 ? "" : "max-w-3xl"}`}
+        >
+          {options.map((dreamsign, index) => (
+            <motion.div
+              key={`offer-${dreamsign.name}`}
+              className="flex flex-col items-center gap-3"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.4 }}
             >
-              Accept
-            </button>
-          </motion.div>
-        ))}
-      </div>
+              <DreamsignCard dreamsign={dreamsign} />
+              <button
+                className="w-full rounded-lg px-5 py-2.5 font-bold text-white transition-opacity"
+                style={{ backgroundColor: "#7c3aed" }}
+                onClick={() => handleAccept(dreamsign)}
+              >
+                Accept
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Reject / Skip */}
       <button

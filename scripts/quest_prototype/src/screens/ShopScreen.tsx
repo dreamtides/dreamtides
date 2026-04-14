@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { CardData } from "../types/cards";
 import type { SiteState } from "../types/quest";
@@ -6,11 +6,12 @@ import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
-import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import {
   generateShopInventory,
   effectivePrice,
   rerollCost,
+  type ShopInventoryResult,
   type ShopSlot,
 } from "../shop/shop-generator";
 
@@ -21,22 +22,39 @@ interface ShopScreenProps {
 
 /** Renders the Shop site screen with a 2x3 item grid, purchasing, and rerolling. */
 export function ShopScreen({ site }: ShopScreenProps) {
-  const { state, mutations, cardDatabase } = useQuest();
+  const { state, mutations, cardDatabase, questContent } = useQuest();
   const { essence, deck } = state;
-  const excludedTides = state.dreamcaller === null
-    ? []
-    : NAMED_TIDES.filter((tide) => tide !== state.dreamcaller?.tide);
-
-  const [slots, setSlots] = useState<ShopSlot[]>(() =>
-    generateShopInventory(cardDatabase, deck, excludedTides),
-  );
+  const selectedPackageTides = state.resolvedPackage?.selectedTides ?? [];
+  const initialInventoryRef = useRef<ShopInventoryResult | null>(null);
+  if (initialInventoryRef.current === null) {
+    initialInventoryRef.current = generateShopInventory(cardDatabase, deck, {
+      selectedPackageTides,
+      remainingDreamsignPoolIds: state.remainingDreamsignPool,
+      dreamsignTemplates: questContent.dreamsignTemplates,
+    });
+  }
+  const initialInventory = initialInventoryRef.current;
+  if (initialInventory === null) {
+    throw new Error("Failed to generate shop inventory");
+  }
+  const [slots, setSlots] = useState<ShopSlot[]>(initialInventory.slots);
   const [rerollCount, setRerollCount] = useState(0);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
+  const [remainingDreamsignPool, setRemainingDreamsignPool] = useState<string[]>(
+    initialInventory.remainingDreamsignPoolIds,
+  );
 
   const currentRerollCost = useMemo(
     () => rerollCost(rerollCount, site.isEnhanced),
     [rerollCount, site.isEnhanced],
   );
+
+  useEffect(() => {
+    mutations.setRemainingDreamsignPool(
+      initialInventory.remainingDreamsignPoolIds,
+      "shop_inventory_revealed",
+    );
+  }, [mutations, initialInventory.remainingDreamsignPoolIds]);
 
   const handleBuy = useCallback(
     (index: number) => {
@@ -89,10 +107,19 @@ export function ShopScreen({ site }: ShopScreenProps) {
       setRerollCount((prev) => prev + 1);
 
       // Regenerate unpurchased non-reroll slots
-      const newInventory = generateShopInventory(cardDatabase, deck, excludedTides);
+      const newInventory = generateShopInventory(cardDatabase, deck, {
+        selectedPackageTides,
+        remainingDreamsignPoolIds: remainingDreamsignPool,
+        dreamsignTemplates: questContent.dreamsignTemplates,
+      });
+      setRemainingDreamsignPool(newInventory.remainingDreamsignPoolIds);
+      mutations.setRemainingDreamsignPool(
+        newInventory.remainingDreamsignPoolIds,
+        "shop_reroll_revealed",
+      );
       // Collect only non-reroll replacement items to avoid introducing
       // a second reroll slot from the freshly generated inventory.
-      const replacements = newInventory.filter(
+      const replacements = newInventory.slots.filter(
         (s) => s.itemType !== "reroll",
       );
       let replacementIdx = 0;
@@ -120,7 +147,9 @@ export function ShopScreen({ site }: ShopScreenProps) {
       rerollCount,
       cardDatabase,
       deck,
-      excludedTides,
+      selectedPackageTides,
+      remainingDreamsignPool,
+      questContent.dreamsignTemplates,
       site.isEnhanced,
       mutations,
     ],

@@ -170,6 +170,7 @@ export function initializeDraftState(
   return {
     remainingCopiesByCard,
     currentOffer: [],
+    draftedCardNumbers: [],
     pickNumber: 1,
     sitePicksCompleted: 0,
   };
@@ -182,6 +183,7 @@ export function enterDraftSite(
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
   state.sitePicksCompleted = 0;
+  state.draftedCardNumbers = [];
   state.currentOffer = buildOffer({
     remainingCopiesByCard: state.remainingCopiesByCard,
     pickNumber: state.pickNumber,
@@ -245,8 +247,10 @@ export function processPlayerPick(
 
   state.pickNumber += 1;
   state.sitePicksCompleted += 1;
+  state.draftedCardNumbers.push(cardNumber);
 
   if (state.sitePicksCompleted >= SITE_PICKS) {
+    state.currentOffer = [];
     return true;
   }
 
@@ -262,10 +266,9 @@ export function processPlayerPick(
 /** Finalize a draft site visit. Log the cards drafted during this visit. */
 export function completeDraftSite(
   state: DraftState,
-  draftedCardNumbers: readonly number[] = [],
 ): void {
   logEvent("draft_site_completed", {
-    cardsDrafted: [...draftedCardNumbers],
+    cardsDrafted: [...state.draftedCardNumbers],
     picksCompleted: state.sitePicksCompleted,
     poolRemaining: countRemainingCards(state.remainingCopiesByCard),
     uniqueCardsRemaining: Object.keys(state.remainingCopiesByCard).length,

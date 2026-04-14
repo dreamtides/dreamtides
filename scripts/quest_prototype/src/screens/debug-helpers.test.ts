@@ -27,6 +27,7 @@ function makeDraftState(
   return {
     remainingCopiesByCard: {},
     currentOffer: [],
+    draftedCardNumbers: [],
     pickNumber: 1,
     sitePicksCompleted: 0,
     ...overrides,

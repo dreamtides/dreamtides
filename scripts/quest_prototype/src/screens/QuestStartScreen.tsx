@@ -2,7 +2,7 @@ import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
-import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import {
   selectDreamcallerOffer,
   toSelectedDreamcaller,
@@ -10,6 +10,7 @@ import {
 import { dreamcallerAccentTide } from "../data/quest-content";
 import { createDreamsign } from "../data/dreamsigns";
 import { initializeDraftState } from "../draft/draft-engine";
+import { resolveDreamsignTemplates } from "../dreamsign/dreamsign-pool";
 import { logEvent } from "../logging";
 import type { DreamcallerContent } from "../types/content";
 
@@ -34,8 +35,6 @@ export function QuestStartScreen() {
         throw new Error(`Missing resolved package for ${dreamcaller.id}`);
       }
 
-      const tide = selectedDreamcaller.tide;
-      const excludedTides = NAMED_TIDES.filter((namedTide) => namedTide !== tide);
       mutations.setDreamcallerSelection(selectedDreamcaller, resolvedPackage);
 
       const playerHasBanes =
@@ -43,11 +42,12 @@ export function QuestStartScreen() {
         state.dreamsigns.some((d) => d.isBane);
       const atlas = generateInitialAtlas(state.completionLevel, {
         cardDatabase,
-        dreamsignPool: questContent.dreamsignTemplates.map((template) =>
-          createDreamsign(template),
-        ),
+        dreamsignPool: resolveDreamsignTemplates(
+          resolvedPackage.dreamsignPoolIds,
+          questContent.dreamsignTemplates,
+        ).map((template) => createDreamsign(template)),
         playerHasBanes,
-        excludedTides,
+        selectedPackageTides: resolvedPackage.selectedTides,
       });
 
       const draftState = initializeDraftState(cardDatabase, resolvedPackage);
