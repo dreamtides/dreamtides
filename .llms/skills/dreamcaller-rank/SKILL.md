@@ -3,6 +3,8 @@ name: dreamcaller-rank
 description: Rank an anonymized card pool for how highly a drafter already committed to a given dreamcaller should pick each card. Uses staged subagent judgment, second-order synergy analysis, and deterministic UUID-based merge. Triggers on dreamcaller ranking, rank cards for a dreamcaller, dreamcaller pick order, card pick order for dreamcaller, or draft ranking for a dreamcaller.
 ---
 
+Run this using GPT-5.4 high subagents.
+
 # Dreamcaller Ranking
 
 Rank every card in an anonymized pool for `pack 1 pick 1 after committing to this dreamcaller`.
@@ -57,8 +59,26 @@ This is **not**:
 - "Which cards are strongest in a generic vacuum if I ignore the committed dreamcaller?"
 
 This is a committed-dreamcaller ranking, not a generic P1P1 ranking. Dreamcaller fit and
-infrastructure should matter more than standalone card quality. Premium generic removal should not
-default into the top 20 unless it is truly exceptional or also fits the dreamcaller cleanly.
+infrastructure should matter more than standalone card quality. Treat **raw power as a tie-breaker
+at most** unless a card is a true bomb or patches a structural weakness of the dreamcaller shell.
+Premium generic removal should not default into the top 20 unless it is truly exceptional or also
+fits the dreamcaller cleanly.
+
+## Archetype-First Ranking
+
+Default to this question:
+
+`Does this card increase the expected quality and reliability of the dreamcaller deck more than the alternatives?`
+
+Not this question:
+
+`Would I first-pick this card in a generic draft?`
+
+This distinction is mandatory. A card should not rank highly just because it is generically
+efficient, flexible, or rate-positive. To justify a high rank, the preferred argument should be
+about dreamcaller fit, infrastructure, shell reliability, generated resources, or anti-synergy
+avoidance. Raw power may break close ties, but it should rarely be the main reason a card climbs.
+Assume your raw power evaluations are noisy and lower-confidence than your fit evaluations.
 
 ## Inputs
 
@@ -132,12 +152,13 @@ The assistant's chat output should be a short pointer to the written file, not t
 
 Every card should be judged on the combination of these questions:
 
-1. **Raw power**
-   How strong is this card if I ignore the dreamcaller?
-2. **Direct dreamcaller fit**
+1. **Direct dreamcaller fit**
    Does this card directly exploit what the dreamcaller rewards or enables?
-3. **Infrastructure / second-order fit**
+2. **Infrastructure / second-order fit**
    Does this card make the direct-fit cards more reliable, more numerous, or more punishing?
+3. **Resource conversion**
+   What resource, timing window, body, card-flow pattern, or board pressure does the dreamcaller
+   naturally create, and how well does this card convert that into value?
 4. **Dependency**
    Is this card good now, or only after I already have several specific pieces?
 5. **Replaceability**
@@ -146,6 +167,13 @@ Every card should be judged on the combination of these questions:
    How much should this dreamcaller actually bend early picks away from generic power?
 7. **Anti-synergy**
    Does this card meaningfully push away from the dreamcaller's best path?
+8. **Raw power**
+   If the dreamcaller fit arguments are close, which card has the stronger generic floor or ceiling?
+
+Raw power belongs at the end of this lens on purpose. Do not begin from generic strength and then
+add a small synergy bonus. Begin from committed-shell value and use raw power only to resolve close
+calls or protect truly exceptional bombs. If you are unsure whether your power-level read is sound,
+default toward the card whose dreamcaller role is clearer.
 
 ### Openness Rubric
 
@@ -170,10 +198,16 @@ dreamcaller distort a rational early-pick order?"
 
 - **Bomb override:** use this rarely. A card is not a bomb just because its ceiling is huge; it
   should be strong in most plausible decks and not depend heavily on already having the right setup.
+- **Raw power is a tie-breaker:** do not promote a card mainly because it is generically strong,
+  efficient, or flexible. Prefer dreamcaller-fit arguments unless the comparison is truly close.
+- **Power-level humility:** assume your raw-rate judgments are error-prone. Treat them as weak
+  evidence unless the card is obviously exceptional across many plausible decks.
 - **No fake recursion loops:** do not keep boosting a card because it supports a card that
   supports another good card. Multi-hop synergy is real, but its weight decays quickly.
 - **Stop at generic adjacency:** once the argument becomes "this is good with good cards,"
   the second-order chain has run out.
+- **Rate is not enough:** a cheap card, high-spark body, modal effect, or efficient interaction
+  should not rise on rate alone if it does not improve the committed dreamcaller shell.
 - **Situational ceiling is not raw power:** downgrade cards whose average case depends on specific
   setup, hand composition, or support density.
 - **Generic removal is replaceable:** strong generic removal should usually trail premium payoffs,
@@ -184,6 +218,8 @@ dreamcaller distort a rational early-pick order?"
   from the card text and pool context, not from legacy rarity assumptions.
 - **Close ties break toward fit:** if two cards are close in expected-value terms, prefer the
   one that better matches the dreamcaller.
+- **Explain the shell contribution:** if you cannot state what job the card performs in the
+  committed shell, it probably should not rank highly.
 
 ## Roles To Use Internally
 
@@ -195,11 +231,14 @@ them:
 - `direct_payoff`
 - `enabler`
 - `infrastructure`
+- `resource_converter`
 - `glue`
 - `narrow_dependent`
 - `anti_synergy`
 
 Cards may have more than one internal role, but pick one dominant role when scoring.
+Use `generic_premium` sparingly. Most strong cards should still be classified in terms of what
+they do for the dreamcaller shell.
 
 ## Workflow
 
@@ -242,8 +281,14 @@ dreamcaller text to `$RUN_DIR/dreamcaller.txt`.
 ### Phase 1: Model the Dreamcaller Prior
 
 Before looking at the whole pool, write `$RUN_DIR/dreamcaller_prior.md` with:
+- a short **rules interpretation checkpoint** stating:
+  - what game event or state the dreamcaller cares about
+  - what object, resource, trigger, or permission it creates or modifies
+  - what downstream rules consequences follow from that, including timing, zones, board pressure,
+    targeting, triggerability, or once-per-turn constraints when relevant
 - the dreamcaller's direct hooks
 - what the deck is trying to assemble
+- what recurring resource or pressure the dreamcaller naturally creates
 - what classes of cards it actively wants
 - what classes it merely tolerates
 - what kinds of generic premiums should stay high anyway
@@ -329,7 +374,9 @@ Do not proceed until all stage-1 chunks validate.
 Prompt requirements for stage-1 subagents:
 - score only the assigned chunk
 - preserve `rendered_text` exactly
-- generic bombs stay high
+- use raw power only as a tie-breaker, except for true bombs
+- assume your generic power-level read may be wrong; prefer cards with clearer shell purpose
+- prefer dreamcaller-fit, infrastructure, and resource-conversion arguments over rate arguments
 - close calls break toward fit
 - ignore legacy `tide` and `rarity`
 - do not read tides, resonance, rarity, or archetype files
@@ -351,6 +398,7 @@ python3 .llms/skills/dreamcaller-rank/scripts/merge_rankings.py \
 Then write `$RUN_DIR/dreamcaller_pool.md`. This is the **final** dreamcaller model and must
 include:
 - the direct hooks and plan
+- what recurring resources, bodies, timing windows, or pressures the dreamcaller actually creates
 - what the pool actually supports well
 - what the pool supports weakly or sparsely
 - whether generic premiums are dense enough to resist synergy pulls
@@ -360,6 +408,13 @@ include:
 The openness label must be based on both dreamcaller text and pool context, not dreamcaller
 text alone.
 
+Before moving to anchors, do a short self-audit against `stage1-merged.csv`:
+- Are the top cards explainable mainly by dreamcaller fit rather than generic rate?
+- Are there cards creating or converting the dreamcaller's recurring resource that seem too low?
+- Are there generic rate cards floating high without a clear shell job?
+- Are you leaning on a power-level guess where a fit-based explanation would be more reliable?
+If the answer looks wrong, revisit the pool model before continuing.
+
 ### Phase 5: Extract Anchors
 
 Write anchors to `$RUN_DIR/anchors.json` and `$RUN_DIR/anchors.md`.
@@ -368,6 +423,7 @@ Use up to three anchor groups:
 - `bombs_or_premiums`
 - `direct_payoffs`
 - `infrastructure`
+- `resource_converters`
 
 Each group may be small or empty. Do **not** pad a bucket just to hit a quota.
 
@@ -389,6 +445,7 @@ Anchor rules:
 - a strong card is not automatically an anchor
 - every anchor needs a concrete `reason` and concrete `wants`
 - infrastructure must do real enabling work, not just generic adjacency
+- resource converters must explain what dreamcaller-created resource they cash in
 - if a card would not plausibly move any neighbor, it is not an anchor
 
 ### Phase 6: Second-Pass Refinement
@@ -423,6 +480,8 @@ Stage-2 prompt requirements:
 - let the pool-aware openness label matter
 - preserve `rendered_text` exactly
 - emit only the cards in the assigned chunk
+- use raw power only to break close calls
+- assume your power-level reads are lower-confidence than your fit reads
 - include `note`, a short explanation of the card's final-local case in this chunk
 
 Each row in `$RUN_DIR/stage2/chunk-XXX.jsonl` should therefore include:
@@ -520,6 +579,8 @@ Reconciliation prompt requirements:
 - do not reinvent the whole ranking
 - preserve `rendered_text` exactly
 - respect the score-adjustment cap
+- treat raw power as a tie-breaker, not the main argument
+- if unsure, trust the cleaner fit argument over the stronger generic-rate guess
 - include `note`, a short local-order reason such as `raw power correction`, `cleaner abandon payoff`,
   or `more replaceable than neighbors`
 - do not use legacy tide, rarity, resonance, or archetype reasoning
