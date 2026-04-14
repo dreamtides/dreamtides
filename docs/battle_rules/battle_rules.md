@@ -28,7 +28,7 @@ spark and the weaker is dissolved.
 ## Objective
 
 The first player to reach the victory point threshold wins the game. The default
-threshold is 12 points, but this is configurable per battle. Most points are
+threshold is 25 points, but this is configurable per battle. Most points are
 scored during the Judgment phase at the start of each turn, when unblocked
 attacking characters score victory points equal to their spark. If 50 turns pass
 without a winner, the game ends in a draw.
