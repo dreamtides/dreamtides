@@ -3,8 +3,8 @@
 ## Scope
 
 This spec defines the tide system for quest drafting. A Dreamcaller points at a
-curated set of tide mini-decks. The run's draft pool is built once, up front,
-by combining those tides into a multiset of about 200 cards.
+curated set of tide mini-decks. The run's draft pool is built once, up front, by
+combining those tides into a multiset of about 200 cards.
 
 Runtime data is intentionally minimal:
 
@@ -52,9 +52,8 @@ a few utility tides.
   aggressive battlefield snowball
 - `warrior_bastion`: sticky Warriors, favorable trades, attrition tools,
   defensive board control
-- `spirit_growth`: Spirit Animals, ramp, top-of-deck play, board snowball
-- `spirit_judgment`: Spirit boards that turn Judgment triggers into energy,
-  spark growth, and repeated phase value
+- `spirit_growth`: Spirit Animals, ramp, top-of-deck play, board snowball, plus
+  the Judgment-phase energy and spark payoffs that Spirit boards chain into
 - `materialize_value`: ETB/materialized value, copies, repeat triggers, steady
   advantage
 - `materialize_tempo`: bounce, blink, temporary banish, fast pressure, and
@@ -64,22 +63,21 @@ a few utility tides.
 - `fast_tempo`: dense fast cards, hand-fast enablers, opponent-turn plays, and
   explicit fast-payoff bodies
 - `event_chain`: event density, cost reduction, copying, burst sequencing,
-  spell-heavy turns
-- `play_many`: cards-played-this-turn payoff turns, cross-card burst chains,
-  sequencing rewards, and storm-style finishers that are not event-only
+  spell-heavy turns, cards-played-this-turn payoff turns, and storm-style
+  finishers driven by total cards played
 - `prevent_control`: prevent chains, counterspell pressure, taxes, reactive
-  events, and pace control
+  events, pace control, discard and hand disruption, opponent-tax effects, and
+  denial-based value engines that convert stopped cards into resources
 - `discard_velocity`: self-discard, hand churn, burst draws, and discard-fueled
   tempo
 - `void_recursion`: self-mill, reclaim, void-as-hand, recursive threats, and
   void threshold payoffs
-- `deck_ladder`: top-of-deck access, cost-step upgrades, deck-to-battlefield
-  cheats, and deck-as-a-resource combo turns
 - `abandon_furnace`: abandon outlets, sacrifice value, leave-play conversion,
-  death-for-resource turns, and sacrifice loops that are not mainly deck-ladder
-  chains
+  death-for-resource turns, sacrifice loops, and abandon-to-upgrade or
+  abandon-to-deck-cheat chains that use the deck as a resource
 - `figment_swarm`: figment generation, figment multiplication, figment-tribal
-  payoffs, and dedicated token-board finishes
+  payoffs, dedicated token-board finishes, and broader go-wide token shells
+  built around non-ally permanent counts
 - `survivor_dissolve`: Survivors, Dissolved triggers, death loops, void rebuys,
   sticky attrition, and allied-dissolve payoff shells
 - `judgment_engines`: extra Judgment phases, repeated Judgment triggers,
@@ -92,15 +90,16 @@ a few utility tides.
 
 Structural lane notes:
 
-- `ally_formation` is the generic wide-board shell. `figment_swarm` is for
-  figment-specific token decks.
-- `event_chain` is event-density. `play_many` is for cards whose main reward is
-  how many total cards you played this turn.
-- `spirit_growth` may borrow some top-of-deck texture, but `deck_ladder` owns
-  the cards whose primary job is chaining off the top of the deck or upgrading
-  bodies from deck hits.
-- `abandon_furnace` owns sacrifice and resource-conversion loops. `deck_ladder`
-  owns abandon-to-upgrade or abandon-to-deck-cheat chains.
+- `ally_formation` is the generic wide-board shell built around ally counts and
+  pair scoring. `figment_swarm` owns figment-tribal and broader non-ally
+  token-permanent shells.
+- `event_chain` absorbs cards-played-this-turn and storm-style finishers;
+- `abandon_furnace` owns both straight sacrifice loops and abandon-to-ladder
+  chains that cheat cards out of the deck. Top-of-deck access without abandon
+  chaining belongs in the `topdeck_setup` support tide.
+- `prevent_control` is the broad denial shell. It owns prevent, hand disruption,
+  taxes, and denial-as-engine cards. `fast_tempo` still owns fast cards whose
+  primary job is pressure rather than denial.
 
 Structural tide target size: 55-70 cards.
 
@@ -155,7 +154,8 @@ Support tides:
 - `spark_growth`: direct spark buffs, kindle tools, and tall-board setup without
   spark-scaling reward bodies
 - `spark_disruption`: shrink, flatten, steal, or otherwise manipulate enemy
-  spark totals
+  spark totals, including generic spark-breakpoint setup cards whose main job is
+  to make trades or removal line up
 - `go_wide_enablers`: cheap extra bodies, token makers, deployment smoothing,
   and non-scaling board support without ally-count or tribal payoff cards
 - `leave_play_enablers`: sacrifice, bounce, banish, and dissolve bridges that
@@ -170,6 +170,21 @@ Support tides:
   setup that can splash into non-Judgment decks without Judgment payoff cards
 - `event_setup`: cheap events, cost smoothing, cantrips, and sequencing tools
   without event-count, second-event, or cards-played-this-turn payoff cards
+- `copy_effects`: event copies, trigger copies, and one-shot duplication tools
+  that any shell can splash, without storm-style or cards-played-this-turn
+  payoff cards
+- `abandon_fodder`: cheap expendable bodies and generic abandon outlets that let
+  other shells convert characters into value, without abandon-count or
+  sacrifice-payoff reward cards
+- `cost_reduction`: generic rebates, one-off discounts, and flexible cost
+  smoothing that splash across curves, without type-density or
+  cards-played-this-turn payoff cards
+- `trigger_reuse`: tools that re-fire ▸ Materialized, ▸ Dissolved, or ▸ Judgment
+  abilities on allies you already control, without ability-count or
+  repeated-trigger payoff cards
+- `character_tutors`: search, reveal, and deck-to-hand fetch for characters that
+  splash into most character decks, without ladder chains or deck-cheat payoff
+  cards
 
 Support tide target size: 28-45 cards.
 
@@ -193,12 +208,13 @@ Utility tides:
 - `fast_interaction`: prevents, bounce, and combat-speed disruption
 - `hand_disruption`: discard, taxes, and card-denial pressure
 - `sweepers`: reset buttons and anti-wide punishment
-- `finishers`: top-end threats and closing tools
+- `finishers`: top-end threats, extra-turn effects, and closing tools
 - `void_denial`: banish, void hate, and anti-recursion tools
 - `discover_toolbox`: discover, flexible search, and narrow tutoring that trade
-  raw rate for access to the right card
-- `judgment_bodies`: cheap characters whose main job is to cash in a small
-  `▸ Judgment` trigger for energy, cards, foresee, or kindle
+  raw rate for access to the right card, including off-axis copy-or-borrow
+  effects whose main value is access rather than disruption
+- `judgment_bodies`: cheap characters whose main job is to cash in a small `▸
+  Judgment` trigger for energy, cards, foresee, or kindle
 - `materialized_staples`: generically playable `▸ Materialized` characters that
   provide one-shot cards, energy, or removal without needing dedicated blink
   support
@@ -213,6 +229,15 @@ Utility tide target size: 18-32 cards.
 
 Every main-pool card gets a tide membership list and nothing else: `tides =
 ["discard_velocity", "void_setup", "cheap_removal"]`
+
+Multi-tide membership is the norm, not the exception. Most cards belong to
+several packages at once, and the tide layers (structural, support, utility)
+are about what a package *is*, not about finding a card's single best home. A
+"you win if your deck is empty" card is a storm payoff for both event and
+character storm shells; a tribal-universal body splashes into every tribal
+tide; a flexible "choose N" card draw is generic utility. The assignment
+question is always "which packages would a drafter happily take this card
+in?" — often 2-5 answers — not "which tide does this card belong to?"
 
 Assignment targets:
 
