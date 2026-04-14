@@ -59,10 +59,9 @@ This is **not**:
 - "Which cards are strongest in a generic vacuum if I ignore the committed dreamcaller?"
 
 This is a committed-dreamcaller ranking, not a generic P1P1 ranking. Dreamcaller fit and
-infrastructure should matter more than standalone card quality. Treat **raw power as a tie-breaker
-at most** unless a card is a true bomb or patches a structural weakness of the dreamcaller shell.
-Premium generic removal should not default into the top 20 unless it is truly exceptional or also
-fits the dreamcaller cleanly.
+infrastructure should be the whole argument. Judge every card only by what job it performs in the
+committed dreamcaller shell, how reliably it performs that job, and how replaceable that job is
+within this pool.
 
 ## Archetype-First Ranking
 
@@ -77,8 +76,8 @@ Not this question:
 This distinction is mandatory. A card should not rank highly just because it is generically
 efficient, flexible, or rate-positive. To justify a high rank, the preferred argument should be
 about dreamcaller fit, infrastructure, shell reliability, generated resources, or anti-synergy
-avoidance. Raw power may break close ties, but it should rarely be the main reason a card climbs.
-Assume your raw power evaluations are noisy and lower-confidence than your fit evaluations.
+avoidance. If a card has no clear shell job, it should not climb on generic efficiency, size,
+floor, ceiling, or first-pick reputation.
 
 ## Inputs
 
@@ -138,9 +137,9 @@ Default delivery behavior:
 Score range: `0-100`.
 
 Interpret scores as draft-value bands, not win-rate estimates:
-- `95-100`: true format-warping bomb; expect very few of these in a full pool
-- `85-94`: premium early pick
-- `70-84`: strong pick
+- `95-100`: dreamcaller-defining cornerstone; one of the clearest possible early pulls into the shell
+- `85-94`: elite early synergy pick
+- `70-84`: strong shell card
 - `55-69`: solid role-player or narrower synergy piece
 - `40-54`: replaceable support
 - `0-39`: low-priority, weak, or meaningfully off-plan
@@ -164,16 +163,12 @@ Every card should be judged on the combination of these questions:
 5. **Replaceability**
    If this card is omitted, how easy is it to replace its job with another plausible pick?
 6. **Openness**
-   How much should this dreamcaller actually bend early picks away from generic power?
+   How much should this dreamcaller actually bend early picks toward explicit synergy pieces?
 7. **Anti-synergy**
    Does this card meaningfully push away from the dreamcaller's best path?
-8. **Raw power**
-   If the dreamcaller fit arguments are close, which card has the stronger generic floor or ceiling?
 
-Raw power belongs at the end of this lens on purpose. Do not begin from generic strength and then
-add a small synergy bonus. Begin from committed-shell value and use raw power only to resolve close
-calls or protect truly exceptional bombs. If you are unsure whether your power-level read is sound,
-default toward the card whose dreamcaller role is clearer.
+Never evaluate a card by generic floor, ceiling, efficiency, flexibility, or first-pick strength.
+If those are the main reasons a card is climbing, the ranking has drifted off-skill.
 
 ### Openness Rubric
 
@@ -182,36 +177,34 @@ Use one of these labels in the dreamcaller model and let it materially change th
 - **Narrow**
   The dreamcaller sharply rewards a specific engine, trigger family, board state, or deck
   composition. Early picks should move substantially toward payoffs, enablers, and glue that
-  make that engine real. A merely strong generic card can lose to a clearly on-plan card.
+  make that engine real. Cards without a clear shell role should fall behind clearly on-plan picks.
 - **Medium**
   The dreamcaller creates a real direction. Synergy should move cards by a meaningful tier and
-  should often beat generically strong but more situational or less structurally reliable cards.
+  should often beat looser, less structurally useful cards whose case is mostly generic efficiency.
 - **Open**
-  The dreamcaller is mostly a nudge or tie-breaker. Generic power should dominate unless a
-  card has an unusually clean synergy payoff. Do not force the ranking to look themed if the
-  dreamcaller does not actually demand that.
+  The dreamcaller is mostly a nudge. Do not force narrow engine pieces if the shell does not
+  actually need them, but still evaluate every card only in terms of its contribution to the
+  committed shell rather than generic standalone quality.
 
 The key question is not "does the dreamcaller mention this card?" It is "how much should this
 dreamcaller distort a rational early-pick order?"
 
 ### Important Judgment Rules
 
-- **Bomb override:** use this rarely. A card is not a bomb just because its ceiling is huge; it
-  should be strong in most plausible decks and not depend heavily on already having the right setup.
-- **Raw power is a tie-breaker:** do not promote a card mainly because it is generically strong,
-  efficient, or flexible. Prefer dreamcaller-fit arguments unless the comparison is truly close.
-- **Power-level humility:** assume your raw-rate judgments are error-prone. Treat them as weak
-  evidence unless the card is obviously exceptional across many plausible decks.
+- **No raw-power arguments:** do not promote a card because it is generically strong, efficient,
+  flexible, splashy, or well-statted.
+- **No bomb exceptions:** there is no bomb override in this skill. A card still needs a clear job
+  in the committed dreamcaller shell to rank highly.
 - **No fake recursion loops:** do not keep boosting a card because it supports a card that
   supports another good card. Multi-hop synergy is real, but its weight decays quickly.
 - **Stop at generic adjacency:** once the argument becomes "this is good with good cards,"
   the second-order chain has run out.
 - **Rate is not enough:** a cheap card, high-spark body, modal effect, or efficient interaction
   should not rise on rate alone if it does not improve the committed dreamcaller shell.
-- **Situational ceiling is not raw power:** downgrade cards whose average case depends on specific
+- **Situational ceiling is not synergy:** downgrade cards whose average case depends on specific
   setup, hand composition, or support density.
-- **Generic removal is replaceable:** strong generic removal should usually trail premium payoffs,
-  enablers, and infrastructure once committed to the dreamcaller, unless it patches a clear shell weakness.
+- **Interaction needs a shell job:** removal, prevention, bounce, and other stabilizers should rank
+  based on how they protect or enable the dreamcaller plan, not on generic pick-order reputation.
 - **On-plan is good:** do not talk yourself out of a strong enabler or glue card just because
   similar-looking support effects may exist somewhere else.
 - **Replaceability is real:** you may lower a card if its job is easy to fill later, but do so
@@ -226,8 +219,6 @@ dreamcaller distort a rational early-pick order?"
 Use these labels internally to keep subagents calibrated, even though the final output omits
 them:
 
-- `bomb`
-- `generic_premium`
 - `direct_payoff`
 - `enabler`
 - `infrastructure`
@@ -237,8 +228,8 @@ them:
 - `anti_synergy`
 
 Cards may have more than one internal role, but pick one dominant role when scoring.
-Use `generic_premium` sparingly. Most strong cards should still be classified in terms of what
-they do for the dreamcaller shell.
+Do not invent any raw-power role such as `bomb` or `generic_premium`. Every strong card should
+still be classified in terms of what it does for the dreamcaller shell.
 
 ## Workflow
 
@@ -291,7 +282,7 @@ Before looking at the whole pool, write `$RUN_DIR/dreamcaller_prior.md` with:
 - what recurring resource or pressure the dreamcaller naturally creates
 - what classes of cards it actively wants
 - what classes it merely tolerates
-- what kinds of generic premiums should stay high anyway
+- what kinds of non-obvious support cards may still matter despite weaker direct text matches
 - a **provisional** openness guess and why
 
 Do **not** lock the final openness label yet. The final `narrow / medium / open` call must be
@@ -374,9 +365,8 @@ Do not proceed until all stage-1 chunks validate.
 Prompt requirements for stage-1 subagents:
 - score only the assigned chunk
 - preserve `rendered_text` exactly
-- use raw power only as a tie-breaker, except for true bombs
-- assume your generic power-level read may be wrong; prefer cards with clearer shell purpose
 - prefer dreamcaller-fit, infrastructure, and resource-conversion arguments over rate arguments
+- do not use generic power, efficiency, bomb language, or first-pick heuristics
 - close calls break toward fit
 - ignore legacy `tide` and `rarity`
 - do not read tides, resonance, rarity, or archetype files
@@ -401,7 +391,6 @@ include:
 - what recurring resources, bodies, timing windows, or pressures the dreamcaller actually creates
 - what the pool actually supports well
 - what the pool supports weakly or sparsely
-- whether generic premiums are dense enough to resist synergy pulls
 - the final `narrow / medium / open` label
 - one short paragraph explaining why that label is correct **for this pool**
 
@@ -409,21 +398,21 @@ The openness label must be based on both dreamcaller text and pool context, not 
 text alone.
 
 Before moving to anchors, do a short self-audit against `stage1-merged.csv`:
-- Are the top cards explainable mainly by dreamcaller fit rather than generic rate?
+- Are the top cards explainable mainly by dreamcaller fit rather than generic card quality?
 - Are there cards creating or converting the dreamcaller's recurring resource that seem too low?
-- Are there generic rate cards floating high without a clear shell job?
-- Are you leaning on a power-level guess where a fit-based explanation would be more reliable?
+- Are there cards floating high without a clear shell job?
+- Are you leaning on a generic-card-quality guess where a fit-based explanation would be more reliable?
 If the answer looks wrong, revisit the pool model before continuing.
 
 ### Phase 5: Extract Anchors
 
 Write anchors to `$RUN_DIR/anchors.json` and `$RUN_DIR/anchors.md`.
 
-Use up to three anchor groups:
-- `bombs_or_premiums`
+Use up to four anchor groups:
 - `direct_payoffs`
 - `infrastructure`
 - `resource_converters`
+- `glue`
 
 Each group may be small or empty. Do **not** pad a bucket just to hit a quota.
 
@@ -480,8 +469,7 @@ Stage-2 prompt requirements:
 - let the pool-aware openness label matter
 - preserve `rendered_text` exactly
 - emit only the cards in the assigned chunk
-- use raw power only to break close calls
-- assume your power-level reads are lower-confidence than your fit reads
+- do not use raw power, bomb language, or generic-rate heuristics
 - include `note`, a short explanation of the card's final-local case in this chunk
 
 Each row in `$RUN_DIR/stage2/chunk-XXX.jsonl` should therefore include:
@@ -579,9 +567,9 @@ Reconciliation prompt requirements:
 - do not reinvent the whole ranking
 - preserve `rendered_text` exactly
 - respect the score-adjustment cap
-- treat raw power as a tie-breaker, not the main argument
-- if unsure, trust the cleaner fit argument over the stronger generic-rate guess
-- include `note`, a short local-order reason such as `raw power correction`, `cleaner abandon payoff`,
+- do not use raw power, bomb language, or generic-rate heuristics
+- if unsure, trust the cleaner fit argument over any vague standalone-quality intuition
+- include `note`, a short local-order reason such as `cleaner abandon payoff`,
   or `more replaceable than neighbors`
 - do not use legacy tide, rarity, resonance, or archetype reasoning
 
@@ -618,8 +606,8 @@ After the final merge, write `$RUN_DIR/final_explanations.jsonl`. One row per UU
   "summary": "one-sentence final why"
 }
 ```
-`summary` should explain why the card landed where it did, usually in terms of raw power,
-dreamcaller fit, infrastructure value, replaceability, or anti-synergy. For cards not
+`summary` should explain why the card landed where it did, usually in terms of dreamcaller fit,
+infrastructure value, replaceability, or anti-synergy. For cards not
 touched by a reconciliation window, `window_note` may be `null`.
 
 Then write the user-facing ranking file under `notes/` unless the user asked for another
@@ -647,6 +635,7 @@ Return only a short pointer to the written file unless the user explicitly asks 
 
 - **Too literal:** only direct subtype matches rise.
 - **Too generic:** the dreamcaller barely changes the ranking.
+- **Power leakage:** generic efficiency, splashiness, or first-pick reputation sneaks back into the ranking.
 - **Bad calibration:** different chunk subagents use different score temperatures.
 - **Premature openness:** the openness label is chosen before the pool is understood.
 - **Recursive hand-waving:** "good with good cards" becomes an infinite reason generator.
@@ -668,5 +657,5 @@ The run succeeds only if:
 - the run preserves enough explanation data to answer per-card and pairwise `why` questions later
 - obvious direct-fit cards rise appropriately
 - some non-obvious infrastructure cards rise for defensible reasons
-- generic bombs still stay near the top when warranted
+- cards without a clear shell job do not stay near the top on generic reputation alone
 - the final reasoning is not contaminated by tide or rarity heuristics
