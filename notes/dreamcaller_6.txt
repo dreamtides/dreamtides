@@ -1,0 +1,713 @@
+ac839892-f6bc-44c3-8306-a7f02db08679,96.00,▸ Materialized: Dissolve an enemy.
+e264a35e-7c8a-4c67-9a63-b23f3416c196,96.00,▸ Materialized: Gain 1 maximum ●. ▸ Judgment: Gain 1●.
+cc0151d5-916c-417f-be4e-38e0659d0e2f,95.00,▸ Materialized: Foresee 4. Gain 1 maximum ●.
+cc5e770a-210d-4737-8aa7-6be7328b0dbd,94.00,"▸ Materialized: Materialize a Warrior figment.
+When you materialize a Figment, draw a card."
+d8f9abc2-a864-47b9-96e6-2ced9f9ba208,94.00,"▸ Materialized, Judgment: Gain 2●."
+59859899-a531-4057-958f-9133cc52cdd4,93.00,The ▸ Materialized: ability of allies triggers an additional time.
+77820028-b9be-4348-bb48-5052c3e0c2b9,93.00,▸ Materialized: Materialize a copy of an ally.
+3581a5f9-aa26-4e52-9f60-7d9f11e38f03,92.00,▸ Materialized: Choose an ally. ▸ Judgment: Materialize a copy of it with 1 spark.
+80076dbf-efdb-4130-80b9-45ebc8b3a235,92.00,▸ Materialized: Draw a card.
+97eaacbe-bd52-4ef1-b7d2-b553a06db48b,92.00,▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less.
+987aaa03-962d-4549-8149-8dbeccfc9911,92.00,"Characters cost you 1● less.
+
+▸ Materialized: Draw 2 cards."
+e3beadd0-4248-4835-a1c5-d41f85737d4d,92.00,"▸ Materialized: Banish an enemy until this character leaves play.
+"
+a27275ba-252f-41ba-a98b-be23c0b28cba,91.00,▸ Materialized: Draw a character with spark 2 or less.
+b2ae8947-1fca-47b7-9b93-4454584fead3,91.00,▸ Materialized: Gain 1 maximum ●.
+e2a9fa5d-20c8-4aee-992c-d956e18c1e41,91.00,▸ Materialized: Draw a card with cost 2● or less and play it for 0●.
+0fc24a42-0ab3-4da0-a6bf-ff0a18203f35,90.00,▸ Materialized: Draw a character and an event from your deck.
+4bf0723b-ff81-4748-8253-a6b3540110e2,90.00,▸ Materialized: Banish an enemy with cost 3● or less until this character leaves play.
+b1eb6004-c379-4b87-93be-3fe527b830b7,90.00,▸ Materialized: Draw 2 cards.
+ad9a9b5c-6dc9-4a89-b709-786b04988d3e,90.00,▸ Materialized: Materialize a Warrior figment. ▸Judgment: Gain 1● for each allied Figment.
+194e61db-a950-42e4-b94d-67b83756103c,89.00,"▸ Materialized: Banish an ally. At end of turn, materialize it and a copy of it."
+a2a3c102-4dc9-4dc2-9058-412e877c958e,89.00,"▸ Materialized: Banish an enemy until this character leaves play.
+
+Abandon this character: Foresee 2."
+a42e3d7a-35a0-4dbc-a85d-c71b191d44a8,89.00,▸ Materialized: Draw a Warrior from your deck.
+d12cbf86-5b50-4654-8c33-ff4428537c71,89.00,▸ Materialized: Gain 3●.
+ebe77543-19bb-4281-b5e5-02a6dcaa60aa,89.00,▸ Materialized: Materialize 2 Warrior Figments. Each gains '▸ Dissolved: Dissolve a random enemy.'
+ef50eb65-e0c1-4dc9-8654-03827ff4fdb0,89.00,▸ Materialized: Banish an enemy. Add a copy of it to your hand.
+230d47b8-bc95-49d0-bbe5-a1cb5849fc05,89.00,"▸ Materialized: Materialize a Warrior figment.
+This character's spark is equal to the number of allied Figments."
+1b65c84c-6714-4f9b-a229-f1efa467a6c5,88.00,▸ Materialized: Draw a card.
+6e6fc45d-3505-4119-af15-bbed67fa059a,88.00,▸ Materialized: Draw a character with cost 2● or less.
+84eedef8-9dc9-42ef-afe8-07bc1882f7ee,88.00,"▸ Materialized, Dissolved: Draw a card."
+b964cd06-967a-4f65-95ea-46fd698713f4,88.00,"▸ Materialized, Dissolved: Gain 2●."
+d37b5344-545f-4c1c-8078-d167b1d5e90a,88.00,▸ Materialized: An enemy loses all spark. This character gains that much spark.
+d8017d8f-7855-47e5-bfe5-89ca2e7c5203,88.00,"▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it."
+77bae5b0-ad0a-4b51-b211-141e95b3862a,87.50,"▸ Materialized: Choose one:
+• Kindle 2.
+• Materialize a Celestial Figment.
+• Dissolve an enemy with spark 2 or less."
+226addd8-f09a-4237-ba75-c40635fbdb3b,87.00,"▸ Materialized: This character gains +1 spark.
+▸ Judgment: Reclaim a character with cost up to this character's spark ●."
+6a23256e-8dff-4b37-a8bd-6e6b744c74a9,87.00,▸ Materialized: Dissolve an enemy with spark 2 or less.
+21c406af-ffa1-47f6-9635-6a6d2d0571ba,87.00,"▸ Materialized: Choose an event in hand. At the beginning of each turn, play a copy of it for 0●."
+9065b009-6ae3-4138-b5a0-1204a69abc00,87.00,Costs 0● if you discarded a card this turn. ▸ Materialized: Dissolve an enemy with spark 3 or less.
+a81e4891-9545-4263-a5cf-29d44cb08dd3,87.00,▸ Materialized: Draw 2 cards. This character gains +1 spark for each card drawn this turn.
+b4877df2-cbc8-41ea-b021-c778b0c3c55a,87.00,"▸ Materialized: Draw an event from the opponent's deck, then play it for 0●."
+c4766fc9-9d67-49b6-89d1-e457aa9a415d,86.00,"▸ Materialized: Banish any number of allies, then materialize them."
+22a259a2-c721-4d98-94c0-5a9de3d7afe3,86.00,"▸ Materialized, Judgment: Materialize two Warrior figments."
+98a49295-1ad6-4c6a-bb78-659bfedeec21,86.00,"When an ally is banished, this character gains +1 spark.
+
+▸ Judgment: Banish an ally, then materialize it."
+f06932ac-6d8a-493f-b47e-9134676ea396,86.00,"Once per turn, you may play a character with cost 2● or less from your void.
+"
+ffbc62c3-4445-4b16-8829-3e7dca99ab21,85.50,▸ Materialized: Return a card from your void to your hand.
+47a7096a-946a-4715-811f-d4cb77198895,85.00,"▸ Materialized: Materialize a random 1-spark, a 2-spark, and a 3-spark character from your void."
+4d3eebd3-02b4-4016-a15a-0e8a05b6696b,84.50,▸ Materialized: Materialize a Celestial figment for each card you have played this turn.
+4e3420f2-6f0d-4381-b2b1-afb16af7549f,84.00,▸ Materialized: Disable the activated abilities of an enemy while this character is in play.
+59f826ee-55d1-499e-86bb-8266c382f5fa,84.00,"Banish an ally. Materialize it at end of turn.
+
+Reclaim 1●"
+5aea70af-2df6-411f-b513-cb9ee8b18fb4,84.00,"Abandon an ally: Play this character for 0●, then abandon it.
+
+▸ Materialized: Dissolve an enemy."
+3d9f38a4-6ae8-4e90-bc75-84d711b5fef9,84.00,"▸ Materialized: You may banish an ally, then materialize it."
+801e53f1-fa99-4ed9-abc9-2c02e07acb1e,84.00,"▸ Materialized, Judgment: The opponent abandons a character. Draw a card."
+c18a231f-7e84-4569-a492-11b6a58ebf25,84.00,▸ Materialized: Draw a card. ▸ Judgment: Gain 4●.
+977ce2e4-ef8c-48e7-a27b-83a7348fa94f,84.00,▸ Materialized: An event in your void gains reclaim equal to its cost this turn.
+7066c559-3ab1-4c89-b654-39c22dcb8603,83.80,▸ Materialized: Discover a ↯fast event.
+0bc5151d-cf48-4c15-bc44-673cb1663a52,83.50,▸ Materialized: Return an enemy to hand.
+d2306c6b-45de-4f67-8a47-ae13de98293e,83.20,▸ Materialized: Materialize a copy of an ally. Abandon this character.
+86abaf83-6880-4d33-bb2f-e3a9867cf9de,83.00,"▸ Materialized, Judgment: You may pay 2●. If you do, draw 2 cards, then discard a card."
+aa9d3cb2-84d6-4721-92fa-5c86f56c8d36,83.00,"▸ Materialized: Look at the top 3 cards of your deck. You may play one for 0●, then put the rest into your void."
+dcfd366c-169d-46d4-9714-85383bbd86dd,83.00,"▸ Materialized: The opponent chooses — you draw 2 cards, or they abandon a character."
+e7ddc96c-bc7e-4e08-92ad-1b0b21a81e31,83.00,"Banish all characters, then materialize them."
+ceb89002-9bc0-4ec0-b719-2547fea597de,82.80,"When you materialize a Figment, materialize another Figment of the same type."
+640d798d-3100-49f7-bbe2-6c18d4b818f9,82.40,▸ Materialized: Draw an event. 2●: Play an event from your hand for 0●.
+a52a502f-558b-4e33-bd33-44a866582f17,82.00,"▸ Materialized: Return a character from your void to your hand.
+"
+90e97e94-2d89-4c25-b4ab-23d469b9a723,81.90,▸ Materialized: Disable an enemy's activated and triggered abilities while this character is in play.
+2b5e7d77-c882-4d22-a4c5-9b2fc3e9b82c,81.50,▸ Materialized: Double an ally's spark.
+ec01408b-bf2e-4c0d-afed-070032e3fff9,81.00,"▸ Materialized: Reveal the top card of your deck. You may play it. If you do, this character gains +2 spark and you repeat this process."
+25ee7d34-d1b0-4164-b0c2-e07e15c8d4cd,81.00,"Banish a card from hand: Play this character for 0●, then abandon it.
+
+▸ Materialized: Dissolve an enemy with spark 2 or less."
+293416b2-9b92-4c21-bdbf-ec186739ff35,81.00,"▸ Materialized: Choose an enemy. ▸ Judgment: It loses 2 spark. At 0, dissolve it and draw 2."
+66ae76ab-13ba-473c-891d-9d53403c300e,81.00,Discover a character with a ▸ Materialized: ability.
+a4322fb3-6195-41e5-9cb2-74113f961f4d,81.00,▸ Materialized: Return an ally to hand.
+bb4990d2-7fc4-492a-88b3-12022292e0df,81.00,▸ Materialized: Draw the top character of your deck.
+05b21b36-09ff-461f-94a8-009b5140ee80,80.00,"▸ Materialized: Draw a card. With 3 allied Spirit Animals, dissolve an enemy with spark 2 or less."
+0dc21b19-b21b-4905-9a9a-113db544e587,80.00,▸ Materialized: Draw a card for each allied Spirit Animal.
+4c45be08-290c-4129-9238-897cd73b7279,80.00,"▸ Materialized: Foresee 3, then draw a card."
+5af14769-48c7-45eb-a73d-52fdea4405c4,80.00,"Banish up to 2 allies, then materialize them."
+bd202039-a261-46a6-81ad-5563b7e27de0,80.00,▸ Materialized: The spark of each enemy becomes 1.
+cb445b05-ea7b-4a1b-9484-110021e266f3,80.00,"▸ Materialized: Draw a card, then discard a card.
+
+Reclaim 3●"
+cb474c3f-1670-4e44-88d9-bef6475a4199,80.00,"When you materialize a character, trigger the ▸ Judgment: ability of each ally."
+dc1ffde8-189c-4906-8251-0a9838f6e708,80.00,"Until end of turn, when you materialize a character, materialize a copy of it."
+ec81ffdc-2f4c-4e45-8d5c-0fb7fc50b4b2,80.00,▸ Materialized: This character becomes a copy of an enemy. Disable that enemy's abilities while in play.
+fa45f327-5840-45c9-8568-a3427d2ba9b1,79.00,▸ Materialized: Choose an ally. ▸ Judgment: That ally and this character each gain +1 spark.
+2cb1defb-38d9-40fd-b7f0-43fcac173ccc,78.00,▸ Judgment: Put the top cards 2 of your deck into your void. Materialize a copy of a random character from among them with 1 spark.
+4b39e1f0-418d-45f7-923d-3ea629e55e11,78.00,Dissolve up to 2 enemies. Materialize a Shadow Figment for each enemy dissolved.
+564ef717-7898-4623-9c94-e3fc986701e4,78.00,▸ Materialized: You may discard a card to draw a character.
+715fe2e6-e2c7-4437-8eaa-dfd6e1dad1b8,78.00,▸ Materialized: You may return an ally to hand.
+d4123a89-fa76-46f9-a8b7-6a1d4ecc4c4f,78.00,"Once per turn, when you materialize a character with cost 2● or less, draw a card.
+"
+e55f98a9-2be2-4760-b527-d7edf1d8b585,78.00,▸ Judgment: Materialize a Warrior figment.
+aa0cd61a-13ce-4d61-b063-578686d1445a,78.00,"▸ Materialized: Discard 2 cards, then draw 2 cards.
+"
+a4f02e6c-1a14-4529-94a5-b2e1299f979d,78.00,▸ Materialized: The opponent discards a card. They can't play cards with that cost until your next turn.
+30e50754-0903-45ef-8569-b9032a93ed8f,77.00,Characters cost you 2● less.
+476638a3-6ed9-47bc-b129-ad8b6662f41e,77.00,"4●: Materialize a copy of an ally.
+"
+e4b6ce4c-363e-4483-8246-a4b7ac368d17,77.00,▸ Materialized: Banish an enemy until your next main phase.
+5aad0a6c-81d2-417a-8442-9490191b526e,77.00,▸ Materialized: Disable an enemy's triggered abilities. This character gains those abilities.
+05b4c64a-8eb3-4a09-a37f-5c205d734850,76.00,▸ Materialized: Each enemy loses 2 spark.
+44f4ee06-8dbd-414e-b985-4a6434975e23,76.00,▸ Materialized: Return an event with cost 3● or less from your void to your hand.
+5ed4d321-07d9-4607-9897-3a645df8c012,76.00,The '▸ Judgment:' ability of allies triggers when you materialize them.
+ca261bd3-fca9-4b96-9050-1af5546a55b3,76.00,▸ Materialized: An enemy's spark becomes 0 until your next turn. Discard a card.
+e3b7d716-2776-4469-af9c-4dc082e0083c,76.00,"Once per turn, when you materialize a Warrior, draw a card."
+e4aff892-1a6d-40b7-901d-1d57a9a21807,76.00,▸ Materialized: Gain control of an enemy with cost 2● or less.
+3f98591f-5ede-4add-9df6-536e39780ec3,76.00,Materialize two random characters with cost 3● or less from your deck.
+afee62e2-7768-47d5-87bd-eaea08400fad,76.00,▸ Materialized: Copy the next event you play this turn three times.
+1824049c-8af9-4dc3-94e6-09ac90c1ee85,75.00,▸ Materialized: You may play cards from the top of your deck this turn.
+18b1d155-a89a-4f37-87c4-644ff83c16ef,75.00,▸ Materialized: The opponent abandons 3 characters
+3169d027-ff3d-4549-9024-dbc589f21497,75.00,▸ Materialized: Each enemy loses 1 spark.
+3faa37fb-54e3-4a33-9fcd-84f9b317ad85,75.00,▸ Materialized: Gain the abilities of a chosen character in your void.
+4154a8e2-d5fc-485e-9000-65b4be547266,75.00,Materialize a 0 spark copy of each allied Warrior.
+521b912b-1dfb-4440-a1e0-7181bac6aa58,75.00,▸ Judgment: You may abandon a Warrior to discover a Warrior with cost 1● higher and materialize it.
+78e2c238-58c7-4bd7-b8f2-5415eda2f6cb,75.00,"Banish a card from hand: Play this character for 0●, then abandon it.
+
+▸ Materialized: Return an enemy to hand."
+dbac7638-7216-4e61-8f4f-2d232b46f71b,75.00,Return each ally to hand. They cost 2● less this turn.
+dce8efc8-2643-47a4-ae13-4b9a7e4ba8bb,75.00,"▸ Judgment: You may banish an ally, then materialize it.
+"
+eb5018b0-a374-4d2d-a5fa-69d0c34c89a3,75.00,"Dissolve all characters, then materialize them with 1 spark."
+0ad4ca5c-f723-4494-8dec-1e058c37a099,74.00,▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●.
+0c197dae-d3e1-4303-bc3e-907d141224cc,74.00,▸ Materialized: Draw a character with cost 5● or more. ▸ Dissolved: Materialize it from your hand.
+725cf0ad-b5d1-400e-9a55-31e0bb62f612,74.00,"Once per turn, when you materialize a character, gain 1●.
+"
+9e88669a-c0a7-4d5c-b871-d7dd1aac072f,74.00,▸ Materialized: Choose a character type. Allied characters of that type gain +1 spark.
+afbee39f-4e9a-4a7d-908c-084e8752261d,74.00,▸ Materialized: Look at the opponent's hand. Gain a copy of a card there.
+e70d155c-c561-4d0f-aff6-fc219e221017,74.00,▸ Materialized: Banish an ally or enemy until your next main phase.
+29229288-b647-4ca8-b866-f42c983269cc,73.00,▸ Materialized: The opponent discards a card. Draw a card.
+36eb38d7-c57f-4c60-8b7a-21d4e955728e,73.00,"When you play an event, you may banish an ally, then materialize it."
+71473ab1-a9c7-4d42-a5a7-163e9b31b0f5,73.00,"Draw 3 cards, then discard 3 cards. Materialize a Warrior figment for each character discarded this way."
+963064ca-b422-49c5-b2af-56a8429b4a63,73.00,▸ Materialized: Gain the ▸ Judgment: ability of a chosen ally.
+03f73699-bf4d-4f36-a811-0e1f847b55f7,72.00,▸ Materialized: Foresee 2.
+91709429-7457-4897-bde1-f9fa9d39a568,72.00,"▸ Materialized: Foresee 1.
+
+▸ Judgment: Gain 1●."
+a0fd3b74-ae21-4a07-8306-7df3645c28d9,72.00,"Reclaim all characters with cost 3● or less. At end of your next turn, abandon all reclaimed characters."
+a9c4db29-be96-467a-9b4b-b0bb0f779def,72.00,▸ Materialized: Materialize a Warrior figment. ▸ Judgment: Kindle 1 for each allied Warrior.
+f21c6100-c8de-452f-bd98-0f22b62aea71,72.00,"When you draw a Warrior, materialize a copy of it with 1 spark."
+d7d12836-b187-4f08-9043-473b1ac7fbb4,72.00,▸ Materialized: Dissolve a random enemy for each event you played this turn.
+2fe66e67-6d99-472b-9edf-982bda562df7,71.00,"▸ Materialized: Draw a card. Discard a card.
+When you discard a card, this character gains +1 spark."
+6e7c552f-23b5-431a-9d50-f7706e27166a,71.00,"▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them."
+d70473b6-ef2b-4fae-bc64-6043c7a7f2be,71.00,"When you materialize an ally, gain 1●."
+e265cb41-f7ab-436c-81e8-a4ba2f40fa86,71.00,▸ Materialized: Each enemy gains '▸ Dissolved: The opponent materializes a Warrior figment.'
+1cf26e51-dd11-4ad0-85d9-42c324a65e2e,71.00,Each player may materialize a character from their hand for 0●.
+12bdc762-59ec-481a-9936-8c5327ae7c09,70.00,Materialize 3 random characters from your deck with total cost 6● or less.
+16bb647c-ccad-443f-9947-5bf736f42f87,70.00,▸ Materialized: Choose an enemy. ▸ Dissolved: Materialize a copy of it.
+3e93788c-bae3-4fda-a94c-a387cf0f386d,70.00,"Return an enemy or ally to hand. Draw a card.
+"
+7a696093-1347-49bf-81f6-4240a59198b7,70.00,"When you play an event, materialize a random character with equal cost from your deck."
+919f4169-7a9d-4004-871f-9f36e3761e72,70.00,"▸ Materialized, Judgment: Gain 1●."
+e6ad4cf5-b8dd-4eb0-b713-2a9db71c866e,70.00,"▸ Materialized, Judgment: Foresee 1."
+3382a698-67f8-4642-9428-2547a3e03931,70.00,"▸ Materialized: Play a random event with cost 3● or less from your deck, with targets chosen randomly."
+795a060f-ef43-42e3-96b7-b5bdb7266434,69.00,Reclaim up to 3 characters with cost 2● or less.
+c84bf4e3-7cb5-4825-927a-3b87fcc5e92a,69.00,"▸ Judgment: With 4+ cards in your void, trigger an additional Judgment phase."
+e1c49dfb-d84b-440e-80ef-029719c172d3,69.00,▸ Judgment: Gain 1● for each allied character.
+ff0fc84e-5d40-4317-820d-76d2a660c453,69.00,Discover a Warrior.
+16853a85-1211-462e-9ca4-8a0ba0890657,68.00,All cards currently in your void gain reclaim equal to their cost this turn.
+30363d50-516a-4784-aa55-1eeb5e7be508,68.00,▸ Materialized: Choose an enemy. This character gains spark equal to its spark. Its spark becomes 0.
+560ad530-9ad9-452c-b80e-902d9a76af0c,68.00,"▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.
+"
+91a34bf7-a856-498d-ba6a-c866494176ce,68.00,"When you materialize a Figment, materialize an additional Figment."
+c9862d86-5a1f-46c1-b45a-0c2549eb5b25,68.00,"Banish a card from hand: Play this character for 0●, then abandon it.
+
+▸ Materialized: Discard a chosen card from the opponent's hand."
+cf12f551-e084-43ed-97e7-d7d54b21bc2d,68.00,"When you discard a character, materialize it."
+885a7b29-82de-400b-b961-aff3df3c6ee0,68.00,"▸ Materialized: Put the top 3 cards of your deck into your void.
+
+▸ Dissolved: Return another character from your void to your hand."
+3a7a69c5-eb6d-4874-a016-97a9a618ee03,67.00,▸ Judgment: Return a character from your void to your hand.
+3c3871cb-190d-435f-b35f-fcd5d88228e7,67.00,▸ Materialized: Swap this character's spark with an enemy's spark.
+4737eeb2-c564-4ae3-a409-ae3472f9fc11,67.00,"▸ Judgment: Gain 1●. With 4 or more allies, gain 3● instead."
+5bfed3c9-cd1b-4fe7-a40b-dcec654db206,67.00,▸ Materialized: Banish a chosen card from the opponent's hand until this character leaves play.
+63136b8b-a58e-4c06-92d9-633c77358241,67.00,▸ Materialized: Trigger the ▸ Dissolved: ability of each ally.
+a5275ef5-2896-4a0a-89de-96b241e05472,67.00,"▸ Materialized, Judgment: With 2 allied Warriors, gain 1●. "
+ddde23e7-939c-4b0f-be6a-ecc1e38c92f0,67.00,"You may return a character from your void to your hand, then draw a card."
+45914018-3210-4b1b-81a5-0a819e04df1a,67.00,▸ Judgment: Gain 1 maximum ●.
+a3f91057-ef7a-44e7-8183-d3a06d5e2884,67.00,Pay X●: Discover a Spirit Animal with cost X● or less and materialize it.
+35cc788c-b7f1-46ae-b398-7ad37a624247,66.00,An event in your void gains reclaim 0● this turn.
+9daf5b3e-76e4-4e7e-aa74-1b4b9f5d9e3e,66.00,Return an ally to hand: Play this event for 0●. Prevent a played card unless the opponent pays 2●.
+4c8e736b-312f-4196-9106-1f8983ee9fff,66.00,"Until end of turn, gain 2● whenever you play a card."
+60da36da-c426-43e0-9f2f-d891b442e199,66.00,Costs 1● less for each card you discarded this turn. ▸ Materialized: The opponent discards a card and you draw a card.
+3df2dd36-dd51-4355-87f2-b5ae197bb4dc,65.00,"Reclaim a character with cost 3● or less.
+
+Reclaim 3●"
+7eef114a-af13-43bf-b562-0b6ee3326027,65.00,"▸ Materialized: Banish each ally. For each, materialize a character with cost 1● higher from your deck."
+6a96b4ba-892c-4ee7-86d3-83bccb8dd66d,64.00,"▸ Judgment: Materialize a Shadow Figment, then put the top card of your deck into your void.
+"
+13be5284-0a7c-4894-ba59-5559841ec9ae,64.00,▸ Materialized: Each character in your deck gains +2 spark.
+2ff0d711-4202-4dca-983d-96622849b76a,64.00,"▸ Materialized, Judgment: Kindle 1.
+"
+94e9b5d7-d583-4d6b-8362-d3664dd3b353,64.00,▸ Materialized: Choose an ally. Each other ally's spark becomes equal to that ally's spark.
+c77ead7a-e7a4-4c92-819c-558bc26773f3,64.00,▸ Judgment: You may pay 2● to have each ally gain +2 spark.
+e1e7c403-251e-4db1-bd3b-5ee03124e681,64.00,"▸ Materialized: Put the top 3 cards of your deck into your void.
+2●, Abandon an ally: Reclaim a character with cost 3● or less."
+ec5a996e-6d43-48ca-adba-01fee6a64d4d,64.00,Foresee 3. Gain 1 maximum ●.
+214169c7-dc03-487f-bd85-d560f68031a1,63.00,"Take an extra turn after this one.
+"
+5ce29518-6ccd-420c-9fbf-c4b882266593,63.00,"Copy the next event you play this turn three times.
+
+Reclaim 2●"
+7d1b1516-f89a-4a27-b9b6-54afaa85c217,63.00,"Draw 2 cards. Discard 2 cards. Gain 2●.
+"
+89084e83-a934-4fda-9178-f6a371ccac13,63.00,Prevent a played event which could dissolve an ally.
+dfcf69cb-c569-484a-8a98-b673a5c47899,63.00,"Once per turn, when you discard a card, gain 1●, then kindle 2."
+f6ccb2d8-663e-4c9b-830b-79b2ddc89f79,63.00,"▸ Judgment: With a non-Warrior ally, draw a Warrior and materialize it."
+3ab4dd0d-28c6-42e7-ab47-691781d458c5,63.00,"When you play a character, materialize a Celestial figment."
+e71ac2d1-8d45-479d-81db-3127860ba498,63.00,▸ Materialized: Gain 4●. Lose 1 maximum ●.
+c27871a8-5256-4505-bdd1-8f5c8c222153,62.00,"Gain 2●. Draw a card.
+"
+cf62737a-9bee-44f4-8e26-8c7d0387f39b,62.00,▸ Judgment: Choose — gain 1● or gain 1 maximum ●.
+04de0d16-6ff1-45c1-8590-88a5923935ff,62.00,"When you materialize a Warrior, materialize a Halcyon Figment."
+a374adac-d42d-4635-b68b-d2e55e65df3c,62.00,"Until end of turn, when you materialize a character, that character gains +3 spark.
+
+Reclaim 3●"
+a99a5101-0fe3-43cd-a63b-44f6aba62682,62.00,This event costs 1● less for each ally. Dissolve an enemy. Draw a card.
+19aac5e2-357c-4a50-8ef1-f40aa880a4c4,61.00,▸ Judgment: You may pay 1● to materialize a character from the opponent's void.
+2529d712-3e11-449e-a389-6dadd49cc145,61.00,Discover an event.
+2df6ba84-9aec-451d-80e6-f14d743a6db6,61.00,"When you play an event, gain 1●."
+6d7969d2-9d18-4a38-8c26-c900aca5f1d4,61.00,Discover a card with cost 2●.
+76435ef9-18df-4c2d-bf5a-c92d997e86b5,61.00,"To play this card, return an ally with cost 3● or more to hand.
+
+▸ Judgment: Draw a card."
+e1578a76-1238-4e52-b51c-7e378cc31f1b,61.00,▸ Materialized: Put 3 characters from your void into your deck. They cost 0●.
+44a4ab1a-ed1f-418a-8866-3c4b5642492f,61.00,Reclaim a character. Banish it at end of turn.
+53a957e9-d35b-45ac-bb61-4394e9bb403c,61.00,Materialize a random character from your deck with cost equal to the number of cards in your hand.
+c37964f0-153d-417e-8651-bbd043c5e118,61.00,Materialize three Warrior figments.
+f44fabc0-b239-423d-b602-a70a9da38479,61.00,"When you materialize an allied Spirit Animal, gain 1●."
+02e4db99-f7f6-42f3-b317-345938e43a10,60.00,"Until end of turn, when you discard a character, materialize it."
+2c037f79-f049-4f19-b73a-50231ad7e751,60.00,▸ Judgment: Gain 1●.
+33d83d81-0d4e-40ab-aaeb-daa820ffbde3,60.00,"When you discard a card, it gains reclaim equal to its cost this turn."
+58719d39-a9da-498f-a756-cfe82576d834,60.00,"When you draw a character, materialize a Warrior figment."
+b7bc4166-8763-44b4-9bf0-4307362bf509,60.00,Events cost you 1● less.
+c7511a4c-503d-48bd-b196-c78998c0ffa6,60.00,▸ Judgment: Gain +1 spark. You may abandon this character to gain maximum ● equal to its spark.
+44c678e4-1a58-448c-83c1-70711bc92f38,60.00,Choose one: • Gain 3 maximum ●. • Your ● becomes your maximum ●.
+5a596f0b-8bb8-4d00-bf41-1d2fd272b86e,60.00,"When you materialize an ally, that ally gains +1 spark."
+98db4d6d-842c-401f-8037-699a518f96d5,60.00,Reclaim a character. Lose 1 maximum ●.
+c4d6affd-7608-415d-8a22-d0ccf86681d6,60.00,"▸ Judgment: Gain 3●. When you materialize another character, abandon this one."
+ec80cc3c-a23d-465e-a2cf-4eed6fb89e1d,60.00,"When you play a Spirit Animal, draw a card.
+"
+ae1ff27e-c14f-4938-a9e5-2201343f555b,59.00,Each ally gains '▸ Dissolved: Materialize a character with equal cost from your deck.'
+fb285715-af52-4358-94de-b40256916f9b,59.00,"When the opponent plays an event which could dissolve an ally, prevent that card."
+08daba86-8d26-416c-ac16-4c7c2185951f,59.00,▸ Judgment: Gain 2●.
+3a80421b-735a-4a15-bbe0-ff82bdb6d7fc,59.00,"When you materialize an ally, kindle 1."
+4413a3c5-ef54-4253-b6fa-e8da64baf63f,59.00,▸ Judgment: You may return a character to hand to gain 3●.
+46634b47-e83c-4eda-a0ff-7f1ba4e1ce89,59.00,"When you discard this character, materialize it.
+"
+53b9b423-156b-4e70-888b-107fe7ecce5b,59.00,"Gain N maximum ●, where N is the number of characters in your void."
+7b22f49a-04a3-4ed9-9834-841883c2b14d,59.00,"Gain 4●.
+"
+8cc1a7da-42f8-4ab8-a41a-b9c8867f2dc4,58.00,"Draw 2 cards. Discard 2 cards.
+
+Reclaim 2●"
+07dea7d2-6d3b-40f6-9740-cfefd44aaaaf,58.00,Allied Warriors have +1 spark.
+18c03e07-50e2-4305-9cb8-6cab55481ca6,58.00,▸ Materialized: Abandon an ally. Each other ally gains that ally's spark.
+1b663176-e4e1-4b27-ac54-4918f01bb107,58.00,"For the rest of the game, your Figments have +2 spark."
+6897e6d5-2ab6-4faa-a221-dfa5ffe0a0a7,58.00,Dissolve an enemy with cost less than the number of cards in your void.
+6d7c5ef9-14ed-4301-8aa5-a07944d1918f,58.00,This character's spark is equal to the number of allied Warriors.
+85eaf1ac-bcb4-4266-84be-844965bce25d,58.00,"Until end of turn, when you play a character, draw a card."
+8c2de60e-1e06-4563-acf9-beb76a2620c2,58.00,▸ Judgment: Each ally gains +1 spark.
+c85de002-4b55-4975-b800-a627fb699615,58.00,"When an ally is banished, kindle 1.
+"
+c8ad42f8-39d4-4bd4-9100-d9afeb31c11c,58.00,Allied Warriors cost you 1● less.
+daa1eaa3-6504-4669-b4f2-50f1e2494dcc,58.00,"Until end of turn, characters in hand cost 1● and have 1 spark."
+e4b1aa60-eb33-4926-8c3b-97b8cb302388,58.00,"▸ Materialized, Judgment: Each character in your void gains +2 spark."
+eb8f817b-ca18-4edd-b278-05b54b890364,58.00,"When an ally is ▸ Dissolved:, gain 1●.
+"
+1a25ed29-5681-4d13-9752-aeb3628c190c,57.00,↯fast -- Abandon an ally: Prevent a played event which could dissolve an ally.
+540cd70f-4fc8-417b-ac0d-3b337bfe8f01,57.00,Put the top 3 cards of your deck into your void. Draw a card.
+a43133a1-ad75-4685-a5dd-9e94b249e463,57.00,"Gain 6●.
+"
+b6c8065c-ddc0-4eb1-9243-a3dcdcc870a4,57.00,"When you discard a card, gain 1✪.
+"
+b8bc35ae-4a4a-402e-a570-707bedceb5ce,57.00,Abandon an ally: You may dissolve an enemy with spark less than that ally's spark.
+ff0bdb02-7d2b-448d-98e3-f360f39aafc3,57.00,Return all but one ally to hand: Draw a card for each ally returned.
+177f4f38-2265-459d-a0a5-db196f32c6e1,56.00,"▸ Judgment: Draw a card, then discard a card.
+"
+24388863-1b0b-477d-aa06-faf33cba6176,56.00,"Dissolve an enemy with cost 2● or less.
+
+Reclaim -- Abandon an ally"
+2910484b-ecfe-445d-92b7-2f7d246b17fd,56.00,"Until end of turn, when you play an event, copy it.
+"
+4136f5f0-478b-45a7-aeae-4dd0b001f1c9,56.00,"When you play an event, reclaim a character with cost 3● or less."
+45eaba8d-8f3e-4f65-9c31-30565988e804,56.00,"▸ Judgment: Materialize two Shadow Figments.
+
+Abandon an ally: Draw a card."
+59f14f33-3aff-45d2-9492-fb06c0ef7fea,56.00,"When you play a Warrior, reclaim a random character with cost 3● or less."
+fec40d51-abbe-49b2-bed3-ad4f7f8069a1,56.00,▸ Judgment: Put the top 2 cards of your deck into your void. You may return a character from your void to your hand.
+62bf2eb8-4afb-42b1-a8c5-5423eed96545,55.00,"Foresee 1. Draw a card.
+
+Reclaim 3●"
+a23df796-03d2-4082-9c30-fe6958e65ffe,55.00,"Gain 3●.
+"
+04f44172-4877-476e-aa91-36a6eb50b53c,55.00,"When you discard a card, kindle 1."
+2cf1bea9-6136-4626-a76e-39481978283a,55.00,"When you play an event, materialize a Radiant Figment."
+5ddbb693-5fc3-4e5a-8040-944fa9e9755d,55.00,Draw a card for each card you have played this turn.
+5de09339-b7de-45bd-abc0-1ab3a09e859d,55.00,"Until end of turn, when an ally leaves play, gain 2●."
+5ed8b4b4-abd4-410b-8c41-e94ac7609567,55.00,Abandon an ally: You may put a character from your void on top of your deck.
+b3c35d35-8410-42c7-86b7-a310a2557383,55.00,"▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment."
+baae7f70-226f-48af-94c8-b8b211fd5087,55.00,"When you materialize a character, this character gains +1 spark."
+e4196e79-c4f1-406c-8b9e-90a7323ae85e,55.00,Return a character from your void to your hand. The opponent discards a card.
+f5f60506-b4a2-4743-92f5-b460518e127a,55.00,Discard a character: Play this character for 0● and it gains that character's spark.
+3dde9a28-fd02-48fd-82d6-24467f698bbb,54.00,"▸ Materialized: For the rest of the game, ▸ Judgment: abilities trigger twice."
+61c9fa98-dda1-4f45-976e-b3fc89987b11,54.00,"Abandon an ally, once per turn: Reclaim a Warrior."
+6c405dbe-5eed-48a7-99ed-1425fa7b8d33,54.00,▸ Materialized: Return a character dissolved this turn from your void to your hand.
+84f1d31e-149f-4ab8-ac67-de35b0ad97a9,54.00,Draw 3 cards.
+8b88a03f-ac7c-40ab-b692-1420402f586b,54.00,▸ Dissolved: Materialize a Warrior from hand. It gains +3 spark.
+b8b55ef4-2f79-4c62-b347-e91bea3a40bd,54.00,"When you materialize an allied Spirit Animal, that character gains +1 spark.
+"
+cd3d7b81-de72-4668-b505-e09848a477be,54.00,Dissolve an enemy with cost less than the number of allied Warriors.
+ee0aa963-6b13-4dbe-adb4-314390c5c9b5,54.00,"Once per turn, when you materialize a Warrior, materialize a Radiant Figment."
+41b097e9-44b5-4c61-8977-6a05a8e61dee,53.00,▸ Judgment: You may abandon this character to gain 5●.
+48578752-91df-44dd-a9ac-1f46fe4454ed,53.00,Discard a card. Draw 2 cards.
+5dd8c16c-e8ed-4591-83c1-bdd610bed5a2,53.00,"When you materialize an allied Warrior, this character gains +1 spark.
+"
+62c9493d-6810-4cff-bd9d-2f8c65473ec7,53.00,▸ Judgment: Gain 1●. 4●: Gain 1 maximum ●.
+64b5552f-1fc3-4aee-a79c-cebc19792044,53.00,"Reveal the top card of your deck.
+
+You may play characters from the top of your deck."
+bb439fb1-1335-4f33-b6e3-9a95e2f2e596,53.00,▸ Judgment: Become a copy of a random character in your void.
+cd0d7da1-d3bc-4978-860d-42ce4bd38772,53.00,This character costs 1● less for each ally.
+dfd2523a-ff26-4c8c-9197-ba60f492d819,53.00,"Dissolve an enemy. Draw a card.
+
+This event costs 0● if a character dissolved this turn."
+1a6babbe-c0fe-47ed-8ad3-4cdbf0585b10,52.00,Double the amount of ● you have.
+3d9919e3-de73-43a9-9168-573be50a7479,52.00,Banish an enemy. Materialize a copy of it.
+3dfcc8bd-a91e-4ac5-851a-f280a413a580,52.00,"When you kindle, each other allied character also gains +1 spark."
+57fb24df-bedf-414d-b190-03e831570fda,52.00,Draw 3 cards. Discard 2 cards.
+5fc8b425-5170-4281-bcef-230d82af20f9,52.00,▸ Materialized: Put the top 3 cards of your deck into your void.
+9c02bbbb-8c55-486a-9742-4d3a14f90545,52.00,"When a non-Figment ally is dissolved, materialize a Warrior figment."
+ef905bc3-6602-4b61-83bd-1b223cd5c5a2,52.00,"▸ Judgment: If the opponent has more ✪ than you, materialize a Warrior figment and draw a card."
+f453990c-934d-42c6-a12c-2a7d50689909,52.00,The opponent's events cost 1● more.
+f83a0657-f55a-4ee6-8630-c2ca2d8429ac,52.00,Abandon an ally or discard a card: Dissolve an enemy.
+62e920a2-4b5d-4236-837d-ec02bc2e14bd,52.00,Abandon any number of allies. Materialize a random character from your deck for each ally abandoned.
+1980e1bb-0c85-4e5f-8cac-66bd27d76499,51.00,"2●, Banish a card from your void: Materialize a Warrior Figment."
+810764f4-fda3-414a-9364-9ce3f2092710,51.00,"Dissolve an enemy with cost 3● or more.
+
+Reclaim 1●"
+c5785c16-b3bf-4b85-af06-5b719c6d9891,51.00,Choose a number: Dissolve all enemies with cost equal to that number.
+d02cc851-4c89-463a-b988-a94dfefef797,51.00,"Lose 1 maximum ●: Play this event for 0●.
+
+Prevent a played card."
+d8d6cd28-141d-4bab-b0cb-bac4d7423e4a,51.00,Characters with cost 5● or more cost you 2● less.
+72d3cda9-1140-4427-8e16-093226f7ac1b,50.00,▸ Judgment: You may pay 1● to trigger the ▸ Judgment: ability of an ally.
+9e15951e-c144-45de-9347-c054c58a74d1,50.00,Draw 2 cards. Discard 2 cards. Gain 3●.
+b0ee552a-3a4f-434f-903d-165ebfe3d072,50.00,▸ Materialized: Draw a card for each ally abandoned this turn.
+b2689ff9-eab8-4df1-a449-a396c1f76c61,50.00,▸ Materialized: Choose an enemy. It cannot gain spark while this character is in play.
+b7bc3d79-3c83-4015-92c5-1984c37830f3,50.00,"▸ Judgment: Gain 1● for each allied Spirit Animal.
+"
+e1a60439-1741-4f27-971f-986a16130bf7,50.00,▸ Judgment: Kindle 1. 5●: Each allied character gains +1 spark.
+129ec84c-6423-466f-ad75-c83b50bab09f,49.00,"When you play an event, foresee 1.
+"
+36c2a4e1-3212-4933-979a-73f109f9b256,49.00,"Dissolve an enemy.
+"
+6370c96d-741c-4642-904d-0e5c8ab1421d,49.00,"▸ Materialized: If you drew this character this turn, banish an enemy."
+b461e967-7ff3-4f99-898e-67c33ad1e723,49.00,Reclaim the character with the lowest cost in your void.
+c3c85607-f0fb-4c66-ab98-6dbdc7c8d5ef,49.00,Gain 1 maximum ●.
+cb77c2ab-e325-4c6c-90c1-4bc8f03a6e66,49.00,Look at the top four cards of your deck. Put one of them into your hand and the rest into your void.
+06e86fc5-b501-49eb-bdbe-0445fc56fa65,48.00,"When you abandon a character, draw a card."
+44701519-e4f1-431e-bb7d-5e76ae75fe35,48.00,Prevent a played card. Put it on top of the opponent's deck.
+522368e5-38cc-480c-930a-f8e1bc5a1f68,48.00,"When an ally is banished, this character gains +1 spark."
+70306c8a-a77c-4d07-a4f8-abb51704be8c,48.00,"When you play a card, draw a card."
+c2a48aa4-c818-4551-af44-f29b865f5d1c,48.00,▸ Judgment: You may discard a card to draw a character.
+1f5024e3-aa36-4a44-b257-0caf35484cf8,47.00,"Characters in your hand have ↯fast.
+
+Once per turn, when you play a ↯fast character, gain 1●. "
+90a624db-d288-4856-afc9-f9222e67d3bd,47.00,Double the amount of ● you gain from card effects this turn.
+a1a7dbe9-a5b7-42cc-ab4f-615fa4edcbff,47.00,▸ Judgment: Gain 2●. The opponent gains 1●.
+adfd1cfe-459b-4a9b-bc90-203847082a03,47.00,▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less.
+d50d357a-8a8d-4da4-bf19-d29b8163e3c5,47.00,"When the opponent would dissolve an ally, dissolve this character instead. ▸ Dissolved: Kindle 2."
+eb85b69a-3771-4148-83cf-a7ddb0caee98,47.00,Prevent a played card.
+ef6c27d3-e55f-4107-b2fd-69ad00994351,47.00,"Once per turn, when you play a ↯fast card, draw a card."
+ff10c460-125f-4f77-b9e2-4c4f33adff3e,47.00,"Banish a card from hand: Play this event for 0●.
+
+Dissolve an enemy."
+1894cb9f-e46b-4f1a-9c2e-9486f9abd084,46.00,"When an allied Warrior is dissolved, reclaim it with 1 spark."
+2530adcc-5ae2-486a-94b2-f40dd62f3755,46.00,"While you have 7 or more cards in your void, they have reclaim equal to their cost."
+37422a69-3f8c-4953-abe9-bf6742eb6e2e,46.00,"▸ Judgment: Draw a card, then discard a card. With 5 cards in your void, draw 2 instead."
+4666416e-5f12-47a3-9e7e-56943c0d6e44,46.00,"Banish a card from hand: Play this event for 0●.
+
+Prevent a played card."
+511e8751-95d0-4d09-9f60-48fa53f14a13,46.00,"When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1● this turn."
+56f1e5d2-f15e-40e4-85de-f18607f4de4e,46.00,Return 2 allies to hand: Play this event for 0●. Draw 2 cards.
+82f87087-9da1-401d-aab1-8c5fcda03338,46.00,"When you materialize a Spirit Animal, gain 1●. When you materialize 2 Spirit Animals in a turn, draw a Spirit Animal."
+b3908e49-4a7a-4034-8a25-5e592246c5e5,46.00,"When the opponent materializes a character, materialize a Celestial Figment."
+c8f4f3d4-78e0-4ce3-af63-783f6aeb652f,46.00,"▸ Materialized: Events cost you 2● less this turn. For the rest of the game after that, events cost you 1● more."
+e79d484f-d564-4429-9eca-0f90d2af5ef5,46.00,An ally gains +1 spark for each allied Warrior.
+eb84ba88-8352-45e8-8cf9-d160227db3ad,46.00,"2●, Abandon an ally with spark 1 or less: Draw 2 cards."
+fa780152-23dd-4138-8ff7-3083e46fc2bb,46.00,"3●: Until end of turn, this character becomes a copy of an ally or enemy."
+2621f88d-3207-40ec-840a-3d45fb5ed10f,46.00,"▸ Judgment: With 2 allied Spirit Animals, gain 2●."
+0a2993a3-d624-4c3c-b562-ea93b28e619d,45.00,▸ Judgment: You may swap a card in your hand with a card in your void.
+39bbbc92-34d0-4699-8ac6-99805a1248fb,45.00,Abandon any number of allies: Draw a card for each ally abandoned.
+5aee5a0d-c22a-4c09-9612-248d28c3df2f,45.00,"▸ Judgment: You may draw 2 cards, then discard 3 cards.
+"
+7163d032-c2db-44c0-b9d4-624994a0e648,45.00,4●: This character gains +1 spark for each allied Warrior.
+8e3f53c6-bd60-4f2a-8891-195d8ab10ad7,45.00,"When you play an event, draw an event with lower cost."
+a98e776a-e10f-4341-8333-c8a7fc43861a,45.00,▸ Judgment: Banish an enemy until this character leaves play.
+f649bc96-1d35-4665-97d9-799208558ff3,45.00,▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card.
+0381499a-bae2-48ff-9fca-b16d188ded6f,44.00,▸ Judgment: Each enemy loses 1 spark.
+1105e04f-a048-4ac3-a144-632995663865,44.00,Discard a card or abandon an ally: Draw 2 cards.
+37c39729-f5f9-45ac-a01a-9f65c09c731c,44.00,Abandon an ally: Kindle 1.
+38147bfd-8410-4293-a952-e348258c0542,44.00,Prevent a played card. Gain ● equal to that card's cost.
+46736de7-6b44-4d3e-90a7-c7c9146c521f,44.00,▸ Dissolved: Return a character with cost 2● or less from your void to your hand.
+6014454b-9fdc-4f6a-9dcf-20f908bc90f9,44.00,"Put the top 3 cards of your deck into your void, plus 1 more for each card you have played this turn."
+73d0d323-bf47-4d73-9c17-6bebe8b3622e,44.00,This character's spark is equal to your maximum ●.
+9e29bb8c-2faf-4964-be86-006883c8d539,44.00,"Dissolve an enemy with cost 3● or less.
+
+Reclaim -- Banish a card from hand."
+bd9ec464-fac5-4f42-85f5-2c61e2f04636,44.00,▸ Judgment: You may discard a card to draw a card and gain 1✪.
+c52b81bb-a07f-4936-b044-4ac1aa5cc67d,44.00,"When you play an event, the enemy with the most spark loses 1 spark."
+e2e378cd-f599-40fc-93a5-2b95318a85a4,44.00,▸ Materialized: Return each event played last turn from your void to hand.
+eb47dd55-748f-44f8-9edc-3476182c4396,44.00,"Gain 3●. If you have 7 or more cards in your void, gain 5● instead."
+fba9d90d-3e44-417e-bf25-1d1d4a2e81ce,44.00,"Return up to 2 characters from your void to your hand.
+
+Reclaim -- Put the top 3 cards of your deck into your void."
+83fc9336-c5a4-4a6e-bf90-be84f3535d34,44.00,3●: The spark of each allied Spirit Animal becomes 5.
+0242717d-a6ba-42b6-9bf5-325191a1a2da,43.00,"When you reclaim a character, it gains +3 spark."
+03e86c76-2aaf-4dde-a635-3c12693d1d89,43.00,Each ally becomes a copy of the ally with the most spark.
+0dba538b-f05a-4c30-8342-e61725cfb6cb,43.00,"▸ Judgment: The opponent discards a card. If they can't, gain 2✪."
+17c95d25-fdc4-477c-ac98-92b2b2c1829b,43.00,Return all characters to their owners' hands.
+2f932c14-02cb-4c93-be06-03e067496cb6,43.00,Reclaim each character dissolved this turn.
+4b4da6ef-d0e6-43dc-962d-44d8447e84c1,43.00,You may only play this character from your void.
+56d74dc7-c88c-4039-bedf-9f38bcee0538,43.00,"▸ Judgment: Lose 1 spark. If this has 0 spark, dissolve all enemies."
+8fb2e9d0-28e5-4253-a61c-59f7d4044d59,43.00,This character costs 1● if you have discarded a card this turn.
+9509756c-1033-4cfc-8bd5-df1d6f3afb5c,43.00,Dissolve an enemy with spark 4 or more.
+958b9c00-bdbf-4bad-974e-baf57357c3a5,43.00,"Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards."
+e89e3b97-984b-40a2-a74b-3c0489511eba,43.00,"When you abandon an ally, kindle 2.
+"
+fe13ba87-8935-4740-b762-23c8ccd89ff9,43.00,"When an event is put into your void, this character gains +1 spark."
+c08ffd90-ef79-48f7-9aa2-22875acbeba4,43.00,"▸ Materialized, Judgment: With 2 allied Survivors, draw a card. "
+29a1b50f-2dce-480b-841f-528a6817b462,42.00,The opponent cannot play fast cards on your turn.
+521f2592-3539-47fc-b0c9-f236ad06b29c,42.00,"If this card is in your void, when you abandon an ally, materialize a Shadow Figment."
+5a90acb3-a769-4369-8ef5-2cdc3ebc7c2d,42.00,"Draw 2 cards. If you played no other events this turn, discard a card."
+86e7ff73-90bf-4e3d-9069-d6533f4407b8,42.00,This character's spark is equal to the number of cards in your void.
+ab07f1aa-ca7a-4716-988e-281ab871baf4,42.00,"At the end of this turn, trigger an additional Judgment phase."
+ac83cf04-f3c8-4c0d-aa05-98c142d2c322,42.00,"▸ Judgment: If the opponent has more cards in hand, draw a card."
+acaa0368-51d9-4ccf-a133-73e074c0b399,42.00,"At end of turn, play a random event with cost 2● or less from your void for 0●."
+cf339e0b-685a-4a06-abb2-2fad01916ca7,42.00,↯fast -- Abandon this character: Prevent a played event.
+daa30155-1b40-42ff-b5b6-0745ad9d4277,42.00,▸ Judgment: You may abandon an ally to gain 2●.
+e0c88a46-b85f-4497-ab19-850acc868863,42.00,Banish a non-Warrior enemy.
+ecd53ca5-f250-4402-a686-c51148e1e3b8,42.00,Return an enemy character to the top of the opponenet's deck.
+43a98fa2-a4e6-4e89-ae69-6fa794970aa4,41.00,"When you discard this character, materialize it.
+
+▸ Judgment: Kindle 2."
+716aa6ec-ddac-488c-aafe-e9a997335c58,41.00,Prevent a played character.
+789c2aa7-5d72-421d-b136-286701fb6074,41.00,▸ Judgment: Each enemy loses 1 spark. This character gains +1 spark for each.
+a9d5a6b0-e6fe-4f34-b955-4e5129c1ab0f,41.00,▸ Dissolved: Return all enemies to hand.
+d72f7664-b7e2-45bf-8979-59237bc36889,41.00,"When another ally gains spark, this character gains +1 spark."
+eef822ee-7226-4b70-85ce-d0d61780e186,41.00,▸ Judgment: You may pay 2● to foresee 2 and draw a card.
+bca1b98b-729b-480b-8375-04db7b1be6f1,41.00,"When you play a ↯fast card, gain 1✪."
+2555ec68-c322-42f6-9fba-27a09e59c7c9,40.00,Abandon this character: Return an ally dissolved this turn from your void to play.
+28868166-7f79-4019-9960-b478397689a0,40.00,Dissolve an enemy. Each other enemy loses spark equal to the dissolved character's cost.
+2b5af1ab-76f4-48f7-894f-5e99f0c58a34,40.00,▸ Dissolved: The ally with the most spark gains +3 spark and this ability.
+435a6ac4-58a6-4d63-acc7-17377496acf4,40.00,Return an enemy to hand. Gain 2●.
+4ed375e4-0bab-48da-83bc-c3bf7617ff25,40.00,▸ Materialized: Reorder your deck from highest cost to lowest cost.
+86eed140-60b0-4e69-b868-332fcf25b8b3,40.00,"When you abandon a second ally in a turn, dissolve an enemy."
+c85edc15-ff74-45d5-aed5-7ca488b6d100,40.00,▸ Dissolved: You may pay 1● to return this character to your hand.
+6e757f74-08e4-4f4e-ab27-70106b93a159,40.00,"▸ Materialized: Prevent a played card with cost 2● or less.
+"
+86e31227-afab-4eb3-a53f-53e08c7ff227,40.00,▸ Judgment: You may pay 4● to have each allied Spirit Animal gain +2 spark.
+262a8632-a40e-4dda-bf3e-aaebbe96b190,39.00,▸ Judgment: Double this character's spark.
+56020364-cbe8-4500-900f-33510a95ff10,39.00,Dissolve an enemy with spark 1 or less.
+af812604-b2c6-4fd1-8c8f-767d766af463,39.00,"When you materialize a Figment, this character gains +2 spark."
+c589cabf-bc08-4527-9ab8-d9d9a622ad8c,39.00,Foresee 5. Draw 2 cards.
+f0079658-f08f-4d85-979c-63c9f75cffa1,39.00,Banish an enemy until your next main phase.
+f04e32b3-d897-4c24-9999-3f0557482ba1,39.00,▸ Judgment: Draw a card.
+be92ff6f-a468-4545-8ea2-cd8c3c53cb9a,39.00,Double the number of cards you draw from card effects this turn.
+d0396d8f-e880-4176-be09-c3c7434f3c02,39.00,▸ Judgment: This character gains +2 spark.
+d31723e7-8faa-41e3-89b6-c30d8fdf9cca,39.00,"When you play 2 cards in a turn, reclaim this character."
+10ad7a9e-401d-494e-b4f3-5580b8d850d0,38.00,"When you materialize a Survivor, reclaim this character."
+2280b92e-4444-4655-b398-f5bfa458dc62,38.00,Discard 2 cards: Materialize a Shadow Figment.
+4a4db2a7-0d00-4762-8dad-18648ddbc4fc,38.00,Banish an enemy with cost 2● or less.
+5fe5a1ea-a98d-4332-9eaf-eabc627bc8e8,38.00,"Gain 3●. If you have played another event this turn, draw a card."
+b8b94c40-108d-4beb-9e71-6c8e9d00554e,38.00,
+e5ac026b-a397-47ee-929d-46de1177784c,38.00,▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less. 
+93b22bea-429b-4008-afc1-921a88a07630,38.00,▸ Materialized: Each character in your hand gains +2 spark.
+26c452e9-b296-47b5-8f79-998369062487,37.00,▸ Judgment: Each character in your hand gains +1 spark.
+57e41821-b153-4a0a-9b25-3c77e773fede,37.00,Gain 1●.
+6e94b4a6-4164-4572-91c1-e74de3e75188,37.00,"Choose One:
+• 2●: Return an enemy to hand.
+• 3●: Draw 2 cards."
+c0f7a075-a5a5-4383-8487-07f9788a623c,37.00,"When you return an ally to hand, draw a card."
+e0889e66-ab8c-4851-a909-b2bf9fc8ae55,37.00,"Foresee X, where X is your current energy. Draw a card."
+2c884a99-3597-42fb-a2ea-e89d885c7afd,37.00,"When an enemy is dissolved, banish it. ▸ Dissolved: Materialize each enemy banished this way."
+80495b0d-de40-4ed5-b731-530b9b38b91e,37.00,"Draw 2 cards.
+
+Reclaim -- Lose 1 maximum ●"
+8ace6dbe-f2cd-4a5c-b56d-6ea01d60985b,37.00,"When you play a ↯fast card, this character gains +2 spark."
+9ea29478-57f1-46a7-beb1-f5fae483eb98,37.00,Abandon this character: Dissolve an enemy.
+a2381225-b97f-4a38-845b-cefd8b86d499,37.00,Gain 1✪ for each card you have played this turn.
+a6e4bc2e-8f67-411f-9c21-94b625156af1,37.00,Lose 2 maximum ●: Dissolve an enemy.
+c7840f3b-3297-4409-b124-4309ed93e542,37.00,▸ Judgment: Each ally gains spark equal to this character's spark.
+cb30a53c-fce2-4048-b808-6ef106c9e054,37.00,▸ Materialized: Abandon an ally. Materialize a Shadow figment.
+0fb45922-4d27-4d01-9372-86e991164006,36.00,"When you abandon an ally, this character gains +1 spark."
+238a405b-1eb9-4f0e-9904-4da39a7c810e,36.00,"Copy the next event you play this turn. If this event was reclaimed, copy it twice instead.
+
+Reclaim 3●"
+6c44da89-75f8-48a7-a1be-d4a6cc3fd66e,36.00,▸ Judgment: Look at the top 3 cards of your deck. You may put a character into your hand. Put the rest into your void.
+b9b26dbb-0384-4839-bff2-3b25c4c26518,36.00,"2●, Banish another card in your void: Reclaim this character."
+f0e4b898-a39e-403e-a153-c97baa809e90,36.00,"Return each event in your void to your hand. At end of turn, banish them."
+ded25ef2-3c3f-4012-8717-8dec3def1854,36.00,Draw 3 cards.
+42fceb59-96a6-4053-bbfb-dcd841b0e196,35.00,The cost of a random character in your hand becomes 0●.
+abb94289-9bb4-4adc-aea4-375fba2d38e9,35.00,"When you discard a character, it gains +3 spark and is put into your deck instead."
+d09f9ec0-02e0-4ce3-9281-b6d833e208c5,35.00,"At the end of your turn, if an ally left play this turn, materialize a Warrior figment."
+f709eab8-c2e5-4e0e-b45f-f311a17f32bc,35.00,▸ Materialized: Banish the top card of your deck. ▸ Banished: Play the card you banished for 0●.
+0ebb38a7-5a30-40b3-b2f0-b6516a53303c,35.00,"When an ally is ▸ Dissolved, gain 1✪."
+2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d,35.00,Dissolve an enemy with spark 3 or more.
+36c59908-aae7-42fb-9419-4a6aa1255211,35.00,Abandon an ally: Gain ● equal to that character's cost.
+e8aa4af2-99d5-4933-a211-ff103cdd18ea,35.00,"▸ Judgment: Play the top event of your deck for 0●, with targets chosen randomly."
+0976c959-0ac6-4fb1-a8e5-2d82470d32bb,34.00,"When you discard a card, reveal the top of your deck. If it costs less, play it for 0●."
+0da0f7c9-7175-4944-ac27-8d3ba5653c79,34.00,"▸ Dissolved: For the rest of the game, your first character each turn costs 2● less."
+7263c37a-85c2-403a-8254-8ebd4b42a60d,34.00,"Abandon an ally, once per turn: Gain 1✪."
+72b9b786-c098-4e96-95f2-e9eabfd010a0,34.00,Discard a card: Gain 2●.
+c996cacb-1d18-4281-b695-42cee67278a8,34.00,Your cards have ↯fast.
+cab4266f-6671-4170-8ef3-6aea5054c452,34.00,"▸ Judgment: This character gains +1 spark.
+
+When a card leaves your void, kindle 2."
+e7057f6a-4c54-429b-93d8-ea9eb77c3692,34.00,"▸ Materialized: Return each other ally to hand, they gain +2 spark."
+efc06a7e-08ec-483f-a8ab-368c8b44fc43,34.00,Copy the next event you play this turn once for each card you have played this turn.
+67cc1fd0-e41d-44d8-9d62-1150ba0e6148,34.00,2●: This character gains +1 spark.
+0ebeb891-3c28-4f3e-8389-b3b8e2eb3684,33.00,▸ Dissolved: You may put this card on top of your deck with +3 spark.
+102c3047-58d9-4b2b-bea9-10739e84b9cd,33.00,Dissolve an enemy with spark 3 or less.
+3b3d3beb-5678-4649-9fc2-066a5c7a9d62,33.00,"Banish your hand. For the rest of the game, cards you draw cost 1● less."
+b5d3ce4f-2587-47a6-b8c2-d73204d4c05a,33.00,▸ Judgment: You may pay 1● to return this character from your void to your hand.
+c23462ee-cbc8-4c19-8013-b3bbef5beffb,33.00,"Each player draws 2 cards, then discards 2 cards."
+c9ec2950-f87e-4041-a50d-cd0fb85217f0,33.00,"▸ Judgment: Draw a card, then put the top 2 cards of your deck into your void."
+fdb9bb58-df8b-47ac-9d53-89d2ba4d0969,33.00,Discard 2 cards: Draw 3 cards.
+2246466d-341e-4fe2-a804-5bc4ed3541e2,33.00,▸ Materialized: Each player discards a card.
+77b5e881-9a2c-47d8-9058-c9c2597385be,32.00,Banish an enemy until your next main phase. Draw a card.
+8bd6ece5-5273-4829-90b0-3d529dd8d42e,32.00,"When you play your second event each turn, copy it."
+a04cb59f-1ce6-48e7-9a2d-5e3b09613e6a,32.00,"▸ Judgment: Return this character from your void to your hand.
+"
+ac9dbb02-de06-4977-a2eb-0ac839ab4c90,32.00,Prevent a played character. Draw a card.
+c9531521-b8ae-4ce0-8857-474e60aa814a,32.00,▸ Judgment: Foresee 1.
+dd75b7d9-0861-4fa8-a882-8d0b4e104111,32.00,"When an ally is dissolved, materialize a Shadow Figment.
+
+With 5 or more Shadow Figments, each gains +2 spark."
+e1853b83-8b3f-4f90-96aa-19cc45f696fe,32.00,▸ Dissolved: You may pay 3● to return this character to the battlefield with +3 spark.
+029e7b87-fa96-4c0c-abdd-1c8b532f0477,32.00,▸ Judgment: You may abandon 2 allies to gain 2● and draw 2 cards.
+d792412c-7d06-4ef3-b587-3b171792d45d,32.00,▸ Materialized: This character gains +2 spark for each card you played this turn.
+fc294a5d-7239-4fd2-9d5e-e1760d342f60,32.00,"When you abandon a character, gain 1✪."
+7f86ffd5-f527-40ac-b8d2-f8559aa6082c,31.00,"When you play an event from your void, copy it."
+d593a1be-dfb4-407c-8196-fabeff1782b7,31.00,"When you play a card from your void, reclaim this character."
+018c304f-90b1-4365-8568-8f527279b703,31.00,Abandon an ally: Gain 1 maximum ●.
+3baa112c-951f-4552-bc9e-0a3ee61543fa,31.00,Abandon an ally: This character gains +1 spark.
+5aaf63a3-e682-44d6-af47-20ad4329df23,31.00,"Until end of turn, your events cost 1●."
+9c605a08-dac4-4c3e-8aff-437b79809937,31.00,"Prevent a played event unless the opponent pays 2●.
+"
+a6e8e100-9aa6-4a53-82ec-4ab161829533,31.00,Pay 1 or more ●: Draw a card for each ● spent.
+0ec9bbca-a3de-43b0-b64a-4b94c4b14e2c,30.00,▸ Judgment: You may discard a character to draw a character with cost 1● higher.
+5e112441-745e-4d4f-b8ac-417b6d658f67,30.00,▸ Judgment: Banish the top card of your deck. ▸ Dissolved: Play each card banished this way for 0●.
+77934da6-b3d1-42aa-9c8f-3fade22da8ea,30.00,"Secretly choose 1, 2, or 3. After that many turns, gain that many ✪ and draw that many cards."
+945a1ebb-4e22-462c-8db4-a3fe445dcc8d,30.00,▸ Judgment: You may discard a card to banish the top 2 cards of your deck. You may play those cards this turn.
+0382ee13-69bc-4e2a-b9da-e85d2f124779,30.00,▸ Judgment: You may abandon a character to materialize a random character from your deck.
+11f31879-cc52-44ee-bbdf-74fb2d830dab,30.00,▸ Dissolved: Materialize three Warrior figments.
+d41a0c56-ca67-4626-90b6-c7fadeadfc4a,30.00,"With an allied Survivor, you may play this card from your hand or void for 1●."
+dcc4834d-292e-4239-b77b-1425402800c6,30.00,Events you reclaim cost 0●.
+f956944b-32c7-48da-b113-eb01e7ed0d62,30.00,Play a copy of the last event the opponent played.
+1ce137cb-4234-45f7-abd2-d0ce97549885,29.00,"Return up to 2 events from your void to your hand.
+"
+437fc66b-c0eb-46fd-82fa-ebbb16939e66,29.00,Discover a Survivor.
+74a58f68-7ee0-4a29-9a9c-9ae2e8c1d287,29.00,Swap your hand with the top 5 cards of your deck.
+79cdd40b-26d0-457d-9af2-bd15bfa88806,29.00,Return an enemy with cost 2● or less to hand. Draw a card.
+a9d7abc1-c290-49c6-8153-83f097942b45,29.00,Banish an enemy until your next main phase.
+f2b7ec1f-8878-4658-a4ca-1277e02f01a5,29.00,▸ Dissolved: Materialize a Warrior figment.
+084cfbdf-1263-4be2-b56a-ff5dbc801ba0,29.00,"Each player draws 5 cards, then discards 2 cards."
+81008e3a-e2d1-4d7e-a13a-1583ef75b2ff,29.00,▸ Judgment: Gain 2✪.
+91a32fb4-5bb2-4f8d-b24a-22a8963b3302,29.00,"Disable the ▸ Materialized: abilities of enemies.
+"
+9787a2fc-9f92-489d-b5a4-63f777356eda,29.00,"▸ Materialized: Banish the opponent's void.
+"
+9c9892a6-b472-497c-83b8-fe3460349743,29.00,"When you abandon an ally, this character gains +1 spark. ▸ Dissolved: Kindle X where X is this character's spark."
+ed201264-ec95-4ca2-a8b8-2c69282fa29d,29.00,Allied ▸ Dissolved: abilities trigger an additional time.
+7d1820ef-80c4-415e-bc36-7d361259225c,28.00,▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void.
+7e4ecad0-7688-4144-aef3-abf9adc0d2e6,28.00,▸ Dissolved: Materialize a Warrior figment for each spark this character has.
+8751e259-6e46-4b1d-a6a0-0df5421e1054,28.00,Foresee 3. Draw a card.
+148b0926-705b-44a4-8ea9-2867458ac88c,28.00,"When you abandon an ally, this character becomes a copy of that ally. It keeps this ability."
+16771c40-46a9-4122-b5e1-a80f3912d99e,28.00,"Abandon an ally: Foresee 1.
+
+Reclaim 4●"
+89d54c43-ffd6-4e0f-94ec-9e08f59e8891,28.00,Discard a chosen character from the opponent's hand.
+d124e9cc-407f-4288-9a09-78e426c00761,28.00,"▸ Judgment: Gain 1✪.
+"
+e394838a-5473-46d5-a45c-62aa6b502bc9,28.00,▸ Dissolved: Dissolve each enemy with spark less than this character's spark.
+fb3029e1-7f43-4284-bcdd-11dfe6711f96,28.00,▸ Dissolved: A Survivor in your void gains reclaim equal to its cost.
+3002b466-fe0e-4237-b686-bd1c98235fad,27.00,▸ Judgment: Banish a card from the top of the opponent's deck. You may play it this turn.
+9979e005-3a9e-4c98-ae7b-d8a25307c959,27.00,"When you play a Survivor, put the top 2 cards of your deck into your void."
+f35d60ff-da13-4abb-87ab-5fd27874e9bf,27.00,"Discover a character with an activated ability.
+"
+378061fa-6376-48d9-afd7-1463a8305194,27.00,Return 3 random events from your void to your hand.
+678733f0-1685-40fe-84c4-629bb07fcb55,27.00,"When an ally is abandoned this turn, gain 1✪."
+74e46c28-ea43-4b2a-9672-5e718d09f772,27.00,Abandon an ally: This character gains spark equal to that ally's cost.
+ad04efcb-158b-4ac7-a48f-7d15d7e9daff,27.00,Abandon an ally: Gain 1●.
+bd99da06-6591-4458-a4f6-d372a2def6bb,27.00,"Has all character types.
+
+▸ Judgment: With 3 allies that share a character type, draw a card."
+5f0cd400-31d7-4321-aae2-dd970758c99a,27.00,"When you play this character from hand, take an extra turn after this one."
+37711e14-b1b6-47e4-8f40-4293c1a49429,26.00,Draw a card. Foresee 2.
+0bf69801-fab9-4459-9eef-4c57eae90b02,26.00,▸ Judgment: You may abandon an ally to put cards from your deck into your void equal to that ally's spark.
+9d3a63f7-68b0-490d-a521-321dfeb8a05e,26.00,Look at the top 5 cards of the opponent's deck. Play one for 0●. Put the rest on the bottom.
+a916abc5-97ad-49dc-8d61-5f68f739d44b,26.00,"At the end of your turn, gain 2●."
+31d222f7-40c8-480d-82b0-d235f57d53c2,25.00,"Prevent a played card. The opponent draws a card, then discards a card."
+6a95e4f6-75c7-435b-ae21-35a01e58c0b1,25.00,▸ Judgment: You may banish a card from the opponent's void to gain 1●.
+801864d7-de84-44ee-b225-ded9ac7c6233,25.00,"▸ Dissolved: Materialize a Shadow figment.
+
+When you abandon a figment, kindle 2."
+581e3324-8692-4edb-9f4e-411496928c09,25.00,▸ Judgment: You may abandon an ally to play the top card of the opponent's deck for 0●.
+91b9b0ad-af62-439f-9b68-15eaa0221fe9,25.00,"▸ Judgment: With exactly 5 cards in your hand, draw a card."
+b6864d2c-b922-4aa3-ad55-643ca4b88d9e,25.00,Discard a card: This character gains +2 spark.
+766c488b-039c-4177-a8f7-135836e3294c,24.00,"When the opponent plays an event, draw a card."
+b98869d1-3498-4c00-a140-1c305ad86b5f,24.00,"When you reclaim a character, if this card is in your void, reclaim this character."
+d52909bf-0278-4e8a-b869-34399501c442,24.00,▸ Dissolved: Return this character to your hand.
+d610b91d-61c3-494f-8cf5-ab37847fa171,24.00,"▸ Judgment: With 3 cards in your void, this character gains +2 spark."
+129bd326-ec4d-4da6-aff6-f1c2b78f10e4,24.00,Discard a chosen card with cost 3● or less from the opponent's hand.
+350285d8-d986-49f9-9f33-db4bb661d4ce,24.00,▸ Dissolved: Materialize each character abandoned this turn from your void with +3 spark.
+3a15b27d-6274-4228-81f1-9e0e8ba295f3,24.00,▸ Materialized: Materialize each Spirit Animal in your hand.
+51c13279-34a3-4dce-8396-8c639d4b0aad,24.00,"When you discard a card, this character gains +1 spark. With 4 or more spark, the opponent's characters cost 2● more."
+6b756f16-aa6d-4ec7-9588-65526e286acd,24.00,Put 5 random events from your deck into your void.
+7d20f2bb-50b5-418a-a435-da13a13ad257,24.00,"If this card is in your void, allied Survivors have +2 spark."
+b93e0cef-e543-4229-a7b4-243e652dd31e,24.00,Look at the opponent's hand. You may play an event from it for 0●.
+dae4d76c-eb57-4775-ba66-105bd813ac76,24.00,"When you prevent a character, materialize a copy of it."
+ef74faa0-b550-4134-9afc-c6898f7af44c,24.00,"When an ally is ▸ Dissolved:, draw a card."
+4950a8cd-85d5-402a-8a2d-efdd250764b7,24.00,Each player may shuffle their hand and void into their deck and then draw 5 cards.
+e4c24242-619c-4dd1-862f-edf988e1d6cc,23.00,"▸ Judgment: You may discard up to 2 cards, then draw that many cards. This character gains +1 spark per card discarded."
+1dd2d90c-b597-462b-aaf5-75b9c9cea47b,23.00,This character's spark is equal to the highest enemy's spark.
+8c16cd05-1925-4df1-ac08-86c3d84c45ee,23.00,▸ Judgment: Kindle 1.
+4c1b4afa-6ae8-4966-b9c2-66f483485245,22.00,"When a non-figment ally is abandoned, materialize a Shadow figment."
+97466d3a-452c-4991-8d6a-5ee3dae64d3e,22.00,▸ Dissolved: You may pay 1● to return this character to hand.
+33b9ce2d-dd18-4213-a4bd-0e14bb42a9ce,22.00,"When a character enters your void from your deck, add it to your hand."
+7d499e79-df6a-47e1-9f1a-7f9b7ad9d8a8,22.00,"While in hand, when you discard another card, this gains +2 spark."
+99720e39-6bad-4c6c-867c-7bc5c326195e,22.00,Banish your void with 8 or more cards: Reclaim this character.
+8fad0360-df91-4c08-8e48-298a07a4c3f3,22.00,"Events cost you 2● more.
+
+When you play an event from your hand, copy it."
+a370f303-8fe2-4748-9b0b-f24fcde9b1a9,22.00,▸ Judgment: You may pay 2● to draw a card.
+f841dd11-102c-42b2-b85a-492930189fbd,22.00,Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid.
+bb1fbd5e-511f-4e58-9ad6-967a3ea1a2e7,21.00,"At the end of your turn, this character gains +1 spark for each unspent ● you have."
+233f67e8-2715-4b30-8985-2b5b15f851ac,21.00,"▸ Dissolved: Draw a card.
+
+When an allied Survivor is ▸ Dissolved:, draw a card. "
+7285732f-7460-4544-8c74-9300a078a337,21.00,3●: Draw a card.
+cb47502c-6251-42e3-9104-e879b90d06ae,21.00,Prevent a played ↯fast card.
+13f442b2-2bf2-4305-87a3-9dcd141cf578,20.00,"When you play an event, this character gains +1 spark. ▸ Judgment: If this character has 5 or more spark, draw a card."
+0fde6cd3-4879-41c9-8ec0-3b3bb178b0b3,20.00,↯fast -- Abandon this character: The opponent can't play events this turn.
+36ca76ae-0202-495f-bf99-d0ce98da6352,20.00,"▸ Dissolved: Kindle 2.
+
+When an allied Survivor is ▸ Dissolved:, kindle 2."
+d02caa3e-5eb6-4ba8-a931-9b967e88ab01,20.00,"When you prevent a card, draw a card and gain 2●."
+5511b4b5-a7e3-48df-978d-c09673b39f42,19.00,Abandon an ally: Put the top 2 cards of your deck into your void.
+2a446c01-a791-4a4a-9d19-5b84dd6d9582,18.00,"▸ Judgment: Discard your hand, then draw 3 cards."
+063190f6-7723-44f3-bdb4-59f4037faea3,18.00,Dissolve all characters. Gain 1● for each of your characters dissolved this way.
+a1df8763-d714-4cfe-8290-a63dbe2c6871,18.00,"When you abandon a figment, gain 1✪."
+1b69b697-4829-4e25-8d53-7462572cbb55,18.00,"2●, Abandon a character, Discard your hand: Draw 3 cards."
+44cb7de5-4d8a-479e-af0e-b88e47f60cee,18.00,"To play this character, lose 1 maximum ●."
+4a558573-ddf0-478e-b5ac-75401cbc74f7,18.00,"1●, Discard a card: Kindle 2."
+662d39fb-f5f3-4323-a19e-2ff572cd3ebb,18.00,"▸ Judgment: With no allies, gain 1✪ and draw a card."
+754a3d7d-24e8-40e0-9ed8-f99672bc76eb,18.00,Dissolve an enemy. The opponent gains 3✪.
+af6f9e09-7b56-4d81-9b2c-6777497720e3,18.00,Put your deck into your void.
+e06f42fb-b7ec-401f-b374-76c889f697f2,18.00,"▸ Materialized, Judgment: Gain 2●. The opponent gains 1✪."
+e8dcb92a-4ee6-4dc7-86c2-a9092a9bf7c7,18.00,An ally gains the total spark of your other allies. Abandon them.
+fb2661ee-387c-4a8f-965e-dd89be65cfe0,18.00,Abandon 2 allies: Reclaim this character.
+a62ff9de-81ca-43b4-a37f-1b2b558e1cfb,17.00,▸ Judgment: You may reclaim an event with cost up to this character's spark.
+f4205a7a-16db-4886-a094-06f974a01111,17.00,"▸ Judgment: If you have fewer ✪ than the opponent, this character gains +2 spark."
+dce9ebda-da62-4304-a4e9-21170c98e2a6,17.00,"When an ally is ▸ Dissolved, this card gains reclaim 1● this turn."
+e4087594-d3b3-42eb-9db3-07274f767eda,16.00,Enemies may not be reclaimed.
+a9b87c5d-ff66-4a19-8ff6-f20774e0e80a,16.00,"For the rest of the game, when you prevent a card, gain 1✪ and draw a card."
+d5a6959b-6829-4fc1-a1b0-547bb92733b2,16.00,"While in hand, when an ally is dissolved, this character gains +2 spark."
+12a59f07-7ff4-4a3b-9e9f-4f9b524d26af,15.00,"Abandon a character, Discard your hand: Gain 5●."
+be97e5e0-eebb-4b90-a676-fcf909b35600,15.00,"▸ Judgment: Draw a card, then the opponent gains 2✪."
+aa399f47-2025-4539-ac69-a6bca90e2786,14.00,Each player abandons characters until they have as many as the player with fewest.
+c038e4b2-ae16-4981-bc63-c13e6276b034,14.00,Banish a card from hand: Play this event for 0●. Banish an enemy with cost 3● or less.
+cc474374-2538-4e5d-9b84-15ed70b0c774,14.00,▸ Judgment: Each player abandons a character.
+12aedbb7-c14d-4a89-a9d9-ca4d7c557676,13.00,Abandon an ally: Draw a character with cost equal to that ally's cost.
+ba78c3e2-eb94-49db-8c54-ae1fcfae26aa,13.00,▸ Materialized: Dissolve all other characters. Discard a card for each ally dissolved.
+634c3afc-64f5-4203-8b53-4316dcc42bc0,12.00,"When you discard a card, this character gains +2 spark."
+1f600865-4f4d-4d3a-82ed-b4b37a8bedb6,12.00,Abandon an ally: Draw a character.
+04be5c1e-20ab-475e-b02f-e78b82ca2e8d,12.00,"When you play a card during the opponent's turn, this character gains +1 spark."
+1396e9c8-5719-42bc-8ef6-98d2777cc069,12.00,Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals. 
+47c59376-dc4b-46d7-ba97-44db55e9d523,12.00,▸ Judgment: Dissolve a random enemy or ally among those with the lowest spark.
+fe663f4c-593d-42a2-9fa2-a2bf3560eb46,12.00,"▸ Materialized, Judgment: Gain 2●. Lose 1✪."
+5b2c6dca-8bb0-412e-87ef-d98ad31ad986,10.00,Prevent a played card. The opponent draws 2 cards.
+187870b3-165c-41ea-8126-abb096f5d6ab,10.00,Dissolve an enemy. You lose 4✪.
+ff8a3548-f00b-4724-928a-fdbe886bbbf5,10.00,Abandon all allies. Gain 2● and draw a card for each ally dissolved.
+2eefb602-7236-4256-b2c8-5be725c0c2a0,9.00,8●: Draw 8 cards.
+528ac63c-9928-4c8e-bfea-610b33c8b0d7,9.00,"Dissolve all characters with spark 2 or less. When you reclaim this card, dissolve all characters instead.
+
+Reclaim 6●"
+0cce3648-d2a8-481c-8521-8565853f664a,8.00,Abandon an ally: Foresee 2.
+d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6,8.00,"Dissolve all characters.
+"
+b696de0b-420a-4e2b-b1e7-adf9644a18e6,7.00,Abandon an ally: Draw a card.
+cd398e35-fd5d-46df-8adb-5d2595df612d,4.00,"When you have no cards in your deck, you win the game."
+aba94351-4486-4710-ac3d-ae9e29279ac0,0.00,"To play this card, abandon all allies."
