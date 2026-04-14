@@ -19,8 +19,7 @@ function QuestApp({
   const [deckViewerOpen, setDeckViewerOpen] = useState(false);
   const [debugScreenOpen, setDebugScreenOpen] = useState(false);
 
-  const hasDraftData = state.draftState !== null &&
-    state.draftState.draftedCards.length > 0;
+  const hasDraftData = state.resolvedPackage !== null;
 
   const handleOpenDeckViewer = useCallback(() => {
     setDeckViewerOpen(true);
@@ -58,7 +57,8 @@ function QuestApp({
         onClose={handleCloseDebugScreen}
         draftState={state.draftState}
         cardDatabase={cardDatabase}
-        chosenTide={state.chosenTide}
+        resolvedPackage={state.resolvedPackage}
+        remainingDreamsignPool={state.remainingDreamsignPool}
       />
     </div>
   );

@@ -6,7 +6,7 @@ import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import {
   generateShopInventory,
   effectivePrice,
@@ -23,9 +23,12 @@ interface ShopScreenProps {
 export function ShopScreen({ site }: ShopScreenProps) {
   const { state, mutations, cardDatabase } = useQuest();
   const { essence, deck } = state;
+  const excludedTides = state.dreamcaller === null
+    ? []
+    : NAMED_TIDES.filter((tide) => tide !== state.dreamcaller?.tide);
 
   const [slots, setSlots] = useState<ShopSlot[]>(() =>
-    generateShopInventory(cardDatabase, deck, state.excludedTides),
+    generateShopInventory(cardDatabase, deck, excludedTides),
   );
   const [rerollCount, setRerollCount] = useState(0);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
@@ -86,7 +89,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
       setRerollCount((prev) => prev + 1);
 
       // Regenerate unpurchased non-reroll slots
-      const newInventory = generateShopInventory(cardDatabase, deck, state.excludedTides);
+      const newInventory = generateShopInventory(cardDatabase, deck, excludedTides);
       // Collect only non-reroll replacement items to avoid introducing
       // a second reroll slot from the freshly generated inventory.
       const replacements = newInventory.filter(
@@ -117,6 +120,7 @@ export function ShopScreen({ site }: ShopScreenProps) {
       rerollCount,
       cardDatabase,
       deck,
+      excludedTides,
       site.isEnhanced,
       mutations,
     ],

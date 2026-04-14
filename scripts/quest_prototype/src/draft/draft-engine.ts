@@ -24,20 +24,8 @@ const TIDE_ORDER: Readonly<Record<string, number>> = {
   Neutral: 7,
 };
 
-/** Weight applied to cards that have appeared in previous packs but were not picked. */
-const SEEN_CARD_WEIGHT = 0.3;
-
-/** Fisher-Yates shuffle of an array in place. */
-function shuffle<T>(arr: T[]): T[] {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
 /**
- * Sample cards from weighted entries without replacement.
+ * Sample unique card numbers from weighted entries without replacement.
  * Returns the selected card numbers.
  */
 function weightedSample(
@@ -48,33 +36,47 @@ function weightedSample(
   const selected: number[] = [];
 
   for (let i = 0; i < packSize; i++) {
-    const totalWeight = entries.reduce((sum, e) => sum + e.weight, 0);
-    if (totalWeight <= 0) break;
+    const totalWeight = entries.reduce((sum, entry) => sum + entry.weight, 0);
+    if (totalWeight <= 0) {
+      break;
+    }
 
     let roll = Math.random() * totalWeight;
-    let chosenIdx = entries.length - 1;
-    for (let j = 0; j < entries.length; j++) {
-      roll -= entries[j].weight;
+    let chosenIndex = entries.length - 1;
+    for (let index = 0; index < entries.length; index += 1) {
+      roll -= entries[index].weight;
       if (roll <= 0) {
-        chosenIdx = j;
+        chosenIndex = index;
         break;
       }
     }
 
-    selected.push(entries[chosenIdx].cardNumber);
-    entries.splice(chosenIdx, 1);
+    selected.push(entries[chosenIndex].cardNumber);
+    entries.splice(chosenIndex, 1);
   }
 
   return selected;
 }
 
-/** Generate a pack using depletion-weighted random sampling. */
-function depletionPack(ctx: PackContext, seenCards: Set<number>): number[] {
+/** Build a 4-unique-card offer weighted by remaining copies. */
+function buildOffer(ctx: PackContext): number[] {
   const entries: Array<{ cardNumber: number; weight: number }> = [];
-  for (const cardNumber of ctx.pool) {
-    const weight = seenCards.has(cardNumber) ? SEEN_CARD_WEIGHT : 1.0;
-    entries.push({ cardNumber, weight });
+
+  for (const [cardNumberText, copies] of Object.entries(
+    ctx.remainingCopiesByCard,
+  )) {
+    const cardNumber = Number(cardNumberText);
+    if (!Number.isInteger(cardNumber) || copies <= 0) {
+      continue;
+    }
+
+    entries.push({ cardNumber, weight: copies });
   }
+
+  if (entries.length < ctx.packSize) {
+    return [];
+  }
+
   return weightedSample(entries, ctx.packSize);
 }
 
@@ -93,37 +95,57 @@ function countByTide(
   cardDatabase: Map<number, CardData>,
 ): Record<string, number> {
   const counts: Record<string, number> = {};
+
   for (const tide of [...NAMED_TIDES, "Neutral" as Tide]) {
     counts[tide] = 0;
   }
-  for (const num of cardNumbers) {
-    const card = cardDatabase.get(num);
-    if (card) {
-      const accentTide = cardAccentTide(card);
-      counts[accentTide] = (counts[accentTide] ?? 0) + 1;
-    }
-  }
-  return counts;
-}
 
-function expandDraftPool(
-  cardDatabase: Map<number, CardData>,
-  draftPoolCopiesByCard: Record<string, number>,
-): number[] {
-  const pool: number[] = [];
-
-  for (const [cardNumberText, copies] of Object.entries(draftPoolCopiesByCard)) {
-    const cardNumber = Number(cardNumberText);
-    if (!Number.isInteger(cardNumber) || !cardDatabase.has(cardNumber)) {
+  for (const cardNumber of cardNumbers) {
+    const card = cardDatabase.get(cardNumber);
+    if (card === undefined) {
       continue;
     }
 
-    for (let copyIndex = 0; copyIndex < copies; copyIndex += 1) {
-      pool.push(cardNumber);
-    }
+    const accentTide = cardAccentTide(card);
+    counts[accentTide] = (counts[accentTide] ?? 0) + 1;
   }
 
-  return pool;
+  return counts;
+}
+
+function sanitizeDraftPoolCopies(
+  cardDatabase: Map<number, CardData>,
+  draftPoolCopiesByCard: Record<string, number>,
+): Record<string, number> {
+  const remainingCopiesByCard: Record<string, number> = {};
+
+  for (const [cardNumberText, copies] of Object.entries(draftPoolCopiesByCard)) {
+    const cardNumber = Number(cardNumberText);
+    if (
+      !Number.isInteger(cardNumber) ||
+      !cardDatabase.has(cardNumber) ||
+      copies <= 0
+    ) {
+      continue;
+    }
+
+    remainingCopiesByCard[String(cardNumber)] = copies;
+  }
+
+  return remainingCopiesByCard;
+}
+
+function expandRemainingCopies(remainingCopiesByCard: Record<string, number>): number[] {
+  return Object.entries(remainingCopiesByCard).flatMap(([cardNumberText, copies]) =>
+    Array.from({ length: copies }, () => Number(cardNumberText)),
+  );
+}
+
+function countRemainingCards(remainingCopiesByCard: Record<string, number>): number {
+  return Object.values(remainingCopiesByCard).reduce(
+    (total, copies) => total + copies,
+    0,
+  );
 }
 
 /** Create initial DraftState from the resolved Dreamcaller package. */
@@ -131,66 +153,56 @@ export function initializeDraftState(
   cardDatabase: Map<number, CardData>,
   resolvedPackage: ResolvedDreamcallerPackage,
 ): DraftState {
-  const pool = expandDraftPool(
+  const remainingCopiesByCard = sanitizeDraftPoolCopies(
     cardDatabase,
     resolvedPackage.draftPoolCopiesByCard,
   );
+  const expandedPool = expandRemainingCopies(remainingCopiesByCard);
 
   logEvent("draft_pool_initialized", {
-    poolSize: pool.length,
-    chosenTide: cardAccentTide({ tides: resolvedPackage.selectedTides }),
+    poolSize: countRemainingCards(remainingCopiesByCard),
+    uniqueCardCount: Object.keys(remainingCopiesByCard).length,
     dreamcallerId: resolvedPackage.dreamcaller.id,
     selectedPackageTides: resolvedPackage.selectedTides,
-    cardCountByTide: countByTide(pool, cardDatabase),
-    packStrategy: { type: "depletion" },
+    cardCountByTide: countByTide(expandedPool, cardDatabase),
   });
 
   return {
-    pool: shuffle([...pool]),
-    draftedCards: [],
-    currentPack: [],
+    remainingCopiesByCard,
+    currentOffer: [],
     pickNumber: 1,
     sitePicksCompleted: 0,
-    packStrategy: { type: "depletion" },
-    seenCards: [],
   };
 }
 
 /** Prepare the state for a draft site visit. Draws the first pack. */
 export function enterDraftSite(
   state: DraftState,
-  cardDatabase: Map<number, CardData>,
+  _cardDatabase: Map<number, CardData>,
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
   state.sitePicksCompleted = 0;
-  const seenSet = new Set(state.seenCards);
-  state.currentPack = depletionPack(
-    {
-      pool: state.pool,
-      cardDatabase,
-      draftedCards: state.draftedCards,
-      pickNumber: state.pickNumber,
-      packSize: config.packSize,
-    },
-    seenSet,
-  );
+  state.currentOffer = buildOffer({
+    remainingCopiesByCard: state.remainingCopiesByCard,
+    pickNumber: state.pickNumber,
+    packSize: config.packSize,
+  });
 
   logEvent("draft_site_entered", {
     pickNumber: state.pickNumber,
-    poolSize: state.pool.length,
-    packCards: state.currentPack,
+    poolSize: countRemainingCards(state.remainingCopiesByCard),
+    offerCards: state.currentOffer,
   });
 }
 
 /** Return the current pack for display. */
 export function getPlayerPack(state: DraftState): number[] {
-  return state.currentPack;
+  return state.currentOffer;
 }
 
 /**
- * Process a player pick. The picked card is added to draftedCards,
- * and all pack cards are removed from the pool. Returns whether
- * the site visit is complete.
+ * Process a player pick. The shown cards are spent from the fixed pool.
+ * Returns whether the site visit is complete.
  */
 export function processPlayerPick(
   cardNumber: number,
@@ -198,36 +210,37 @@ export function processPlayerPick(
   cardDatabase: Map<number, CardData>,
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): boolean {
-  const packIndex = state.currentPack.indexOf(cardNumber);
-  if (packIndex === -1) {
+  const offerIndex = state.currentOffer.indexOf(cardNumber);
+  if (offerIndex === -1) {
     throw new Error(
-      `Card ${String(cardNumber)} is not in the current pack`,
+      `Card ${String(cardNumber)} is not in the current offer`,
     );
   }
 
   const card = cardDatabase.get(cardNumber);
 
-  // Add picked card to drafted cards (newest first)
-  state.draftedCards.unshift(cardNumber);
+  for (const offeredCardNumber of state.currentOffer) {
+    const key = String(offeredCardNumber);
+    const remainingCopies = state.remainingCopiesByCard[key];
+    if (remainingCopies === undefined) {
+      continue;
+    }
 
-  // Track unpicked cards as seen for depletion weighting
-  for (const packCard of state.currentPack) {
-    if (packCard !== cardNumber) {
-      state.seenCards.push(packCard);
+    if (remainingCopies <= 1) {
+      delete state.remainingCopiesByCard[key];
+    } else {
+      state.remainingCopiesByCard[key] = remainingCopies - 1;
     }
   }
-
-  // Remove all pack cards from the pool
-  const packSet = new Set(state.currentPack);
-  state.pool = state.pool.filter((num) => !packSet.has(num));
 
   logEvent("draft_pick_player", {
     pickNumber: state.pickNumber,
     cardNumber,
     cardName: card?.name ?? "Unknown",
     cardTide: card === undefined ? "Neutral" : cardAccentTide(card),
-    packCards: state.currentPack,
-    poolRemaining: state.pool.length,
+    offerCards: state.currentOffer,
+    poolRemaining: countRemainingCards(state.remainingCopiesByCard),
+    uniqueCardsRemaining: Object.keys(state.remainingCopiesByCard).length,
   });
 
   state.pickNumber += 1;
@@ -237,29 +250,24 @@ export function processPlayerPick(
     return true;
   }
 
-  // Draw the next pack
-  const seenSet = new Set(state.seenCards);
-  state.currentPack = depletionPack(
-    {
-      pool: state.pool,
-      cardDatabase,
-      draftedCards: state.draftedCards,
-      pickNumber: state.pickNumber,
-      packSize: config.packSize,
-    },
-    seenSet,
-  );
+  state.currentOffer = buildOffer({
+    remainingCopiesByCard: state.remainingCopiesByCard,
+    pickNumber: state.pickNumber,
+    packSize: config.packSize,
+  });
 
-  return false;
+  return state.currentOffer.length < config.packSize;
 }
 
 /** Finalize a draft site visit. Log the cards drafted during this visit. */
-export function completeDraftSite(state: DraftState): void {
-  const sitePicks = state.draftedCards.slice(0, state.sitePicksCompleted);
-
+export function completeDraftSite(
+  state: DraftState,
+  draftedCardNumbers: readonly number[] = [],
+): void {
   logEvent("draft_site_completed", {
-    cardsDrafted: sitePicks,
-    totalDrafted: state.draftedCards.length,
-    poolRemaining: state.pool.length,
+    cardsDrafted: [...draftedCardNumbers],
+    picksCompleted: state.sitePicksCompleted,
+    poolRemaining: countRemainingCards(state.remainingCopiesByCard),
+    uniqueCardsRemaining: Object.keys(state.remainingCopiesByCard).length,
   });
 }

@@ -1,52 +1,36 @@
-import type { Tide, CardData } from "../types/cards";
-import type { DraftState, PackStrategy } from "../types/draft";
-import { cardAccentTide, NAMED_TIDES } from "../data/card-database";
+import type { CardData } from "../types/cards";
+import type { DraftState } from "../types/draft";
 
-/** Debug info for the player's draft state. */
+/** Debug info for the player's fixed draft pool state. */
 export interface DraftDebugInfo {
-  draftedCards: CardData[];
-  cardsByTide: Record<string, number>;
-  totalCards: number;
+  currentOffer: CardData[];
+  currentOfferSize: number;
   pickNumber: number;
-  poolSize: number;
-  seenCards: number;
-  packStrategy: PackStrategy;
-  chosenTide: Tide | null;
+  sitePicksCompleted: number;
+  remainingCards: number;
+  remainingUniqueCards: number;
 }
 
 /** Extract debug info from the current draft state. */
 export function extractDraftDebugInfo(
   draftState: DraftState | null,
   cardDatabase: Map<number, CardData>,
-  chosenTide: Tide | null = null,
 ): DraftDebugInfo | null {
   if (draftState === null) {
     return null;
   }
 
-  const draftedCards: CardData[] = [];
-  const cardsByTide: Record<string, number> = {};
-  for (const tide of [...NAMED_TIDES, "Neutral" as Tide]) {
-    cardsByTide[tide] = 0;
-  }
-
-  for (const cardNum of draftState.draftedCards) {
-    const card = cardDatabase.get(cardNum);
-    if (card) {
-      draftedCards.push(card);
-      const accentTide = cardAccentTide(card);
-      cardsByTide[accentTide] = (cardsByTide[accentTide] ?? 0) + 1;
-    }
-  }
-
   return {
-    draftedCards,
-    cardsByTide,
-    totalCards: draftedCards.length,
+    currentOffer: draftState.currentOffer
+      .map((cardNumber) => cardDatabase.get(cardNumber))
+      .filter((card): card is CardData => card !== undefined),
+    currentOfferSize: draftState.currentOffer.length,
     pickNumber: draftState.pickNumber,
-    poolSize: draftState.pool.length,
-    seenCards: draftState.seenCards.length,
-    packStrategy: draftState.packStrategy,
-    chosenTide,
+    sitePicksCompleted: draftState.sitePicksCompleted,
+    remainingCards: Object.values(draftState.remainingCopiesByCard).reduce(
+      (total, copies) => total + copies,
+      0,
+    ),
+    remainingUniqueCards: Object.keys(draftState.remainingCopiesByCard).length,
   };
 }

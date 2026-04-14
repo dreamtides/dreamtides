@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { dreamcallerAccentTide } from "../data/quest-content";
 import { countDeckTides, selectRareRewards } from "../data/tide-weights";
 import { CardDisplay } from "../components/CardDisplay";
@@ -437,6 +437,9 @@ export function BattleScreen({
   const isMiniboss = completionLevel === 3;
   const isFinalBoss = completionLevel === 6;
   const essenceReward = 100 + completionLevel * 50;
+  const excludedTides = state.dreamcaller === null
+    ? []
+    : NAMED_TIDES.filter((tide) => tide !== state.dreamcaller?.tide);
 
   // Generate enemy and rare card rewards once on mount and keep stable.
   const enemyRef = useRef<EnemyData | null>(null);
@@ -448,7 +451,7 @@ export function BattleScreen({
   const rareCardsRef = useRef<CardData[] | null>(null);
   if (rareCardsRef.current === null) {
     const tideCounts = countDeckTides(deck, cardDatabase);
-    rareCardsRef.current = selectRareRewards(cardDatabase, tideCounts, state.excludedTides);
+    rareCardsRef.current = selectRareRewards(cardDatabase, tideCounts, excludedTides);
   }
   const rareCards = rareCardsRef.current;
 
@@ -534,7 +537,7 @@ export function BattleScreen({
                   createDreamsign(template),
                 ),
                 playerHasBanes,
-                excludedTides: state.excludedTides,
+                excludedTides,
               },
             );
             mutations.updateAtlas(updatedAtlas);

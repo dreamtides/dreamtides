@@ -94,17 +94,13 @@ export interface QuestState {
   deck: DeckEntry[];
   dreamcaller: Dreamcaller | null;
   resolvedPackage: ResolvedDreamcallerPackage | null;
+  remainingDreamsignPool: string[];
   dreamsigns: Dreamsign[];
-  tideCrystals: Record<Tide, number>;
   completionLevel: number;
   atlas: DreamAtlas;
   currentDreamscape: string | null;
   visitedSites: string[];
   draftState: DraftState | null;
-  /** The tide chosen by the player at quest start. */
-  chosenTide: Tide | null;
-  /** Core tides excluded from the draft pool for this quest (derived from chosenTide). */
-  excludedTides: Tide[];
   screen: Screen;
   activeSiteId: string | null;
 }

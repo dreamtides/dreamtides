@@ -29,11 +29,9 @@ function describeOfferEffect(effect: OfferEffect): string {
     case "addRandomCards":
       return `+${String(effect.count)} ${effect.rarity} card${effect.count === 1 ? "" : "s"}`;
     case "addTideCrystal":
-      return `+${String(effect.count)} ${effect.tide} crystal${effect.count === 1 ? "" : "s"}`;
+      return "crystal reward removed";
     case "addMultipleTideCrystals":
-      return effect.crystals
-        .map((c) => `+${String(c.count)} ${c.tide}`)
-        .join(", ");
+      return "crystal rewards removed";
     case "addBaneCards":
       return `+${String(effect.count)} bane card${effect.count === 1 ? "" : "s"}`;
     case "removeEssence":
@@ -135,11 +133,19 @@ export function TemptingOfferScreen({ site }: TemptingOfferScreenProps) {
           addRandomCards(effect.count, effect.rarity);
           break;
         case "addTideCrystal":
-          mutations.addTideCrystal(effect.tide, effect.count);
+          logEvent("legacy_crystal_reward_skipped", {
+            sourceSiteType: "TemptingOffer",
+            tide: effect.tide,
+            count: effect.count,
+          });
           break;
         case "addMultipleTideCrystals":
           for (const crystal of effect.crystals) {
-            mutations.addTideCrystal(crystal.tide, crystal.count);
+            logEvent("legacy_crystal_reward_skipped", {
+              sourceSiteType: "TemptingOffer",
+              tide: crystal.tide,
+              count: crystal.count,
+            });
           }
           break;
         case "addBaneCards":

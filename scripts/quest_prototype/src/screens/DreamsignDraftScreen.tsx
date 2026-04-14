@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import type { Dreamsign, SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
-import { DREAMSIGNS } from "../data/dreamsigns";
+import { createDreamsign } from "../data/dreamsigns";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 
 const MAX_DREAMSIGNS = 12;
@@ -25,22 +25,23 @@ function shufflePick<T>(items: readonly T[], count: number): T[] {
 
 /** Shows 3 (or 4 enhanced) dreamsign options. Pick 1 or skip. */
 export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
-  const { state, mutations } = useQuest();
+  const { state, mutations, questContent } = useQuest();
   const { dreamsigns: currentDreamsigns } = state;
 
   const optionCount = site.isEnhanced ? 4 : 3;
 
   const options = useMemo<Dreamsign[]>(() => {
-    const filtered = state.chosenTide
-      ? DREAMSIGNS.filter(
-          (d) => d.tide === state.chosenTide || d.tide === "Neutral",
-        )
-      : [...DREAMSIGNS];
-    return shufflePick(filtered, optionCount).map((t) => ({
-      ...t,
-      isBane: false,
-    }));
-  }, [optionCount, state.chosenTide]);
+    const templatesById = new Map(
+      questContent.dreamsignTemplates.map((template) => [template.id, template]),
+    );
+    return shufflePick(
+      state.remainingDreamsignPool
+        .map((id) => templatesById.get(id))
+        .filter((template) => template !== undefined)
+        .map((template) => createDreamsign(template)),
+      optionCount,
+    );
+  }, [optionCount, questContent.dreamsignTemplates, state.remainingDreamsignPool]);
 
   const [purging, setPurging] = useState(false);
   const [pendingDreamsign, setPendingDreamsign] = useState<Dreamsign | null>(

@@ -51,7 +51,7 @@ export function QuestStartScreen() {
       });
 
       const draftState = initializeDraftState(cardDatabase, resolvedPackage);
-      mutations.setDraftState(draftState);
+      mutations.setDraftState(draftState, "quest_start");
       mutations.updateAtlas(atlas);
 
       // Auto-enter the first available dreamscape

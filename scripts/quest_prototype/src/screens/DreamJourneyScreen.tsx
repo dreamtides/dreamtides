@@ -32,11 +32,11 @@ function describeEffect(effect: JourneyEffect): string {
     case "removeCardsAndAddRandomCards":
       return `Lost ${String(effect.removeCount)} cards, gained ${String(effect.addCount)} ${effect.rarity} card${effect.addCount === 1 ? "" : "s"}`;
     case "removeCardsAndAddTideCrystal":
-      return `Lost ${String(effect.removeCount)} cards, gained ${String(effect.crystalCount)} ${effect.tide} crystal${effect.crystalCount === 1 ? "" : "s"}`;
+      return `Lost ${String(effect.removeCount)} cards, crystal reward removed`;
     case "upgradeRandomCards":
       return `Upgraded ${String(effect.count)} cards`;
     case "addTideCrystal":
-      return `Gained ${String(effect.count)} ${effect.tide} crystal${effect.count === 1 ? "" : "s"}`;
+      return "Crystal reward removed";
   }
 }
 
@@ -125,7 +125,11 @@ export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
           break;
         case "removeCardsAndAddTideCrystal":
           removeRandomCards(effect.removeCount);
-          mutations.addTideCrystal(effect.tide, effect.crystalCount);
+          logEvent("legacy_crystal_reward_skipped", {
+            sourceSiteType: "DreamJourney",
+            tide: effect.tide,
+            count: effect.crystalCount,
+          });
           break;
         case "upgradeRandomCards":
           // Upgrade simulated as transfiguration: pick random cards
@@ -148,7 +152,11 @@ export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
           }
           break;
         case "addTideCrystal":
-          mutations.addTideCrystal(effect.tide, effect.count);
+          logEvent("legacy_crystal_reward_skipped", {
+            sourceSiteType: "DreamJourney",
+            tide: effect.tide,
+            count: effect.count,
+          });
           break;
       }
     },

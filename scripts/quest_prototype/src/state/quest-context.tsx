@@ -8,8 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { QuestContent } from "../data/quest-content";
-import type { CardData, Tide } from "../types/cards";
-import { NAMED_TIDES } from "../data/card-database";
+import type { CardData } from "../types/cards";
 import type { ResolvedDreamcallerPackage } from "../types/content";
 import type {
   DeckEntry,
@@ -44,7 +43,10 @@ export interface QuestMutations {
   ) => void;
   addDreamsign: (dreamsign: Dreamsign, sourceSiteType: string) => void;
   removeDreamsign: (index: number, reason: string) => void;
-  addTideCrystal: (tide: Tide, count: number) => void;
+  setRemainingDreamsignPool: (
+    remainingDreamsignPool: string[],
+    source: string,
+  ) => void;
   incrementCompletionLevel: (
     essenceReward: number,
     rewardCardNumber: number | null,
@@ -55,9 +57,7 @@ export interface QuestMutations {
   markSiteVisited: (siteId: string) => void;
   setCurrentDreamscape: (nodeId: string | null) => void;
   updateAtlas: (atlas: DreamAtlas) => void;
-  setDraftState: (draftState: DraftState) => void;
-  setChosenTide: (tide: Tide) => void;
-  setExcludedTides: (tides: Tide[]) => void;
+  setDraftState: (draftState: DraftState, source: string) => void;
   resetQuest: () => void;
 }
 
@@ -75,23 +75,21 @@ function screenName(screen: Screen): string {
   return screen.type === "site" ? `site:${screen.siteId}` : screen.type;
 }
 
+function countRemainingDraftCards(remainingCopiesByCard: Record<string, number>): number {
+  return Object.values(remainingCopiesByCard).reduce(
+    (total, copies) => total + copies,
+    0,
+  );
+}
+
 function createDefaultState(): QuestState {
   return {
     essence: 250,
     deck: [],
     dreamcaller: null,
     resolvedPackage: null,
+    remainingDreamsignPool: [],
     dreamsigns: [],
-    tideCrystals: {
-      Bloom: 0,
-      Arc: 0,
-      Ignite: 0,
-      Pact: 0,
-      Umbra: 0,
-      Rime: 0,
-      Surge: 0,
-      Neutral: 0,
-    },
     completionLevel: 0,
     atlas: {
       nodes: {},
@@ -101,8 +99,6 @@ function createDefaultState(): QuestState {
     currentDreamscape: null,
     visitedSites: [],
     draftState: null,
-    chosenTide: null,
-    excludedTides: [],
     screen: { type: "questStart" },
     activeSiteId: null,
   };
@@ -250,8 +246,6 @@ export function QuestProvider({
       dreamcaller: Dreamcaller,
       resolvedPackage: ResolvedDreamcallerPackage,
     ) => {
-      const excludedTides = NAMED_TIDES.filter((t) => t !== dreamcaller.tide);
-
       logEvent("dreamcaller_selected", {
         name: dreamcaller.name,
         tide: dreamcaller.tide,
@@ -261,13 +255,11 @@ export function QuestProvider({
         draftPoolSize: resolvedPackage.draftPoolSize,
         dreamsignPoolSize: resolvedPackage.dreamsignPoolIds.length,
       });
-      logEvent("tide_chosen", { chosenTide: dreamcaller.tide, excludedTides });
       setState((prev) => ({
         ...prev,
         dreamcaller,
         resolvedPackage,
-        chosenTide: dreamcaller.tide,
-        excludedTides,
+        remainingDreamsignPool: [...resolvedPackage.dreamsignPoolIds],
       }));
     },
     [],
@@ -303,16 +295,20 @@ export function QuestProvider({
     });
   }, []);
 
-  const addTideCrystal = useCallback((tide: Tide, count: number) => {
-    logEvent("tide_crystal_added", { tide, count });
-    setState((prev) => ({
-      ...prev,
-      tideCrystals: {
-        ...prev.tideCrystals,
-        [tide]: prev.tideCrystals[tide] + count,
-      },
-    }));
-  }, []);
+  const setRemainingDreamsignPool = useCallback(
+    (remainingDreamsignPool: string[], source: string) => {
+      logEvent("dreamsign_pool_updated", {
+        source,
+        remainingDreamsignPoolSize: remainingDreamsignPool.length,
+        remainingDreamsignPool,
+      });
+      setState((prev) => ({
+        ...prev,
+        remainingDreamsignPool: [...remainingDreamsignPool],
+      }));
+    },
+    [],
+  );
 
   const incrementCompletionLevel = useCallback(
     (
@@ -400,24 +396,26 @@ export function QuestProvider({
     setState((prev) => ({ ...prev, atlas }));
   }, []);
 
-  const setDraftState = useCallback((draftState: DraftState) => {
+  const setDraftState = useCallback((draftState: DraftState, source: string) => {
+    logEvent("draft_state_updated", {
+      source,
+      pickNumber: draftState.pickNumber,
+      sitePicksCompleted: draftState.sitePicksCompleted,
+      currentOfferSize: draftState.currentOffer.length,
+      remainingCards: countRemainingDraftCards(draftState.remainingCopiesByCard),
+      remainingUniqueCards: Object.keys(draftState.remainingCopiesByCard).length,
+    });
     setState((prev) => ({ ...prev, draftState }));
-  }, []);
-
-  const setChosenTide = useCallback((tide: Tide) => {
-    const excludedTides = NAMED_TIDES.filter((t) => t !== tide);
-    logEvent("tide_chosen", { chosenTide: tide, excludedTides });
-    setState((prev) => ({ ...prev, chosenTide: tide, excludedTides }));
-  }, []);
-
-  const setExcludedTides = useCallback((tides: Tide[]) => {
-    logEvent("tides_excluded", { excludedTides: tides });
-    setState((prev) => ({ ...prev, excludedTides: tides }));
   }, []);
 
   const resetQuest = useCallback(() => {
     resetLog();
     entryIdCounter.current = 0;
+    logEvent("quest_reset", {
+      remainingDreamsignPoolSize: 0,
+      hasResolvedPackage: false,
+      hasDraftState: false,
+    });
     setState(createDefaultState());
   }, []);
 
@@ -432,15 +430,13 @@ export function QuestProvider({
       setDreamcallerSelection,
       addDreamsign,
       removeDreamsign,
-      addTideCrystal,
+      setRemainingDreamsignPool,
       incrementCompletionLevel,
       setScreen,
       markSiteVisited,
       setCurrentDreamscape,
       updateAtlas,
       setDraftState,
-      setChosenTide,
-      setExcludedTides,
       resetQuest,
     }),
     [
@@ -453,15 +449,13 @@ export function QuestProvider({
       setDreamcallerSelection,
       addDreamsign,
       removeDreamsign,
-      addTideCrystal,
+      setRemainingDreamsignPool,
       incrementCompletionLevel,
       setScreen,
       markSiteVisited,
       setCurrentDreamscape,
       updateAtlas,
       setDraftState,
-      setChosenTide,
-      setExcludedTides,
       resetQuest,
     ],
   );

@@ -257,7 +257,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     const cloned = JSON.parse(JSON.stringify(ds)) as DraftState;
     enterDraftSite(cloned, cardDatabase);
     draftStateRef.current = cloned;
-    mutations.setDraftState(cloned);
+    mutations.setDraftState(cloned, "draft_site_enter");
 
     // Load initial pack, sorted by tide
     const packNums = getPlayerPack(cloned);
@@ -303,7 +303,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
           cardDatabase,
         );
         draftStateRef.current = cloned;
-        mutations.setDraftState(cloned);
+        mutations.setDraftState(cloned, "draft_pick");
 
         // Add picked card to deck
         mutations.addCard(cardNumber, "draft_pick");
@@ -312,7 +312,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
         setDraftedThisSite((prev) => [...prev, cardNumber]);
 
         if (siteComplete) {
-          completeDraftSite(cloned);
+          completeDraftSite(cloned, [...draftedThisSite, cardNumber]);
           setTimeout(() => {
             setIsComplete(true);
             setPickPhase("idle");
