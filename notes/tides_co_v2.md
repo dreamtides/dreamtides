@@ -44,8 +44,8 @@ real play pattern, not just a keyword pile.
 This revision expands the library because the current card pool supports more
 meaningful packages than the original 30-tide proposal. The target is:
 
-- 42 tides total
-- 16 structural tides
+- 43 tides total
+- 17 structural tides
 - 13 support tides
 - 13 utility tides
 - mean tide size about 40-44 cards
@@ -73,9 +73,12 @@ a few utility tides.
   advantage
 - `materialize_tempo`: bounce, blink, temporary banish, fast pressure, and
   replay timing
+- `fast_tempo`: dense fast cards, hand-fast enablers, opponent-turn plays, and
+  explicit fast-payoff bodies
 - `event_chain`: event density, cost reduction, copying, burst sequencing,
   spell-heavy turns
-- `event_control`: reactive events, prevents, taxes, denial, and pace control
+- `prevent_control`: prevent chains, counterspell pressure, taxes, reactive
+  events, and pace control
 - `discard_velocity`: self-discard, hand churn, burst draws, and discard-fueled
   tempo
 - `void_recursion`: self-mill, reclaim, void-as-hand, recursive threats, and
@@ -380,7 +383,7 @@ Warrior control Dreamcaller:
 
 - mandatory: `warrior_bastion`, `defensive_curve`, `cheap_removal`, `card_flow`
 - optional: `warrior_pressure`, `spark_tall`, `go_wide_enablers`,
-  `figment_swarm`, `event_control`, `premium_removal`, `sweepers`, `finishers`,
+  `figment_swarm`, `prevent_control`, `premium_removal`, `sweepers`, `finishers`,
   `resource_burst`
 
 Result: some runs stay pure attrition-control, while others branch into wider
