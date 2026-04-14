@@ -9,6 +9,8 @@ import { OverlayPrompt } from "./OverlayPrompt";
 import { DebugPanel } from "./DebugPanel";
 import { CardDisplay } from "./CardDisplay";
 
+type CardOrderTarget = "Deck" | "Void";
+
 interface BattleScreenProps {
   battle: BattleView;
   onAction: (action: GameAction) => void;
@@ -58,11 +60,22 @@ function cardOrderCards(cards: CardView[]): CardView[] {
   });
 }
 
+function cardOrderTarget(card: CardView): CardOrderTarget {
+  const pos = card.position.position;
+  if (typeof pos !== "string" && "CardOrderSelector" in pos) {
+    return (pos as { CardOrderSelector: string }).CardOrderSelector === "Void"
+      ? "Void"
+      : "Deck";
+  }
+  return "Deck";
+}
+
 export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, events, disabled, yourTurnCounter, judgmentPause, onContinueFromJudgment }: BattleScreenProps) {
   const [showDebug, setShowDebug] = useState(false);
   const [showVoid, setShowVoid] = useState<DisplayPlayer | null>(null);
   const [showLog, setShowLog] = useState(false);
   const [yourTurnVisible, setYourTurnVisible] = useState(false);
+  const [optimisticCardOrderTargets, setOptimisticCardOrderTargets] = useState<Record<string, CardOrderTarget>>({});
   const ui = battle.interface;
 
   useEffect(() => {
@@ -80,7 +93,49 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
     }
   }, [judgmentPause, ui.card_order_selector, ui.screen_overlay, onContinueFromJudgment]);
 
+  useEffect(() => {
+    if (!ui.card_order_selector) {
+      setOptimisticCardOrderTargets({});
+      return;
+    }
+    const selectorIds = new Set(cardOrderCards(battle.cards).map((card) => card.id));
+    setOptimisticCardOrderTargets((current) => {
+      let changed = false;
+      const next: Record<string, CardOrderTarget> = {};
+      for (const [cardId, target] of Object.entries(current)) {
+        if (selectorIds.has(cardId)) {
+          next[cardId] = target;
+        } else {
+          changed = true;
+        }
+      }
+      return changed ? next : current;
+    });
+  }, [battle.cards, ui.card_order_selector]);
+
   const isGameOver = battle.game_over;
+  const selectorCards = cardOrderCards(battle.cards)
+    .sort((a, b) => a.position.sorting_key - b.position.sorting_key);
+
+  const effectiveCardOrderTarget = (card: CardView): CardOrderTarget =>
+    optimisticCardOrderTargets[card.id] ?? cardOrderTarget(card);
+
+  const selectCardOrderTarget = (card: CardView, target: CardOrderTarget) => {
+    const cardId = card.revealed?.actions.can_select_order;
+    if (disabled || cardId == null) return;
+    setOptimisticCardOrderTargets((current) => ({ ...current, [card.id]: target }));
+    onAction({
+      BattleAction: {
+        SelectOrderForDeckCard: {
+          card_id: cardId,
+          target: target === "Void" ? "Void" : { Deck: 0 },
+        },
+      },
+    });
+  };
+
+  const deckOrderCards = selectorCards.filter((card) => effectiveCardOrderTarget(card) === "Deck");
+  const voidOrderCards = selectorCards.filter((card) => effectiveCardOrderTarget(card) === "Void");
 
   return (
     <div className="flex flex-col h-screen overflow-y-auto" style={{ paddingBottom: 48 }}>
@@ -415,7 +470,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
       )}
 
       {/* Card order selector (Foresee) */}
-      {ui.card_order_selector && cardOrderCards(battle.cards).length > 0 && (
+      {ui.card_order_selector && selectorCards.length > 0 && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50"
           style={{ background: "rgba(0, 0, 0, 0.7)" }}
@@ -433,72 +488,143 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
             <p className="text-xs mb-3" style={{ color: "var(--color-text-dim)" }}>
               Choose a destination for each card.
             </p>
-            <div className="flex flex-col gap-3">
-              {cardOrderCards(battle.cards)
-                .sort((a, b) => a.position.sorting_key - b.position.sorting_key)
-                .map((card) => {
-                  const cardId = card.revealed?.actions.can_select_order;
-                  return (
-                    <div
-                      key={card.id}
-                      className="flex items-center gap-3 p-2 rounded"
-                      style={{ background: "var(--color-surface-light)" }}
-                    >
-                      <CardDisplay card={card} compact disabled />
-                      <div className="flex gap-2">
-                        {ui.card_order_selector!.include_deck && (
-                          <button
-                            onClick={() =>
-                              onAction({
-                                BattleAction: {
-                                  SelectOrderForDeckCard: {
-                                    card_id: cardId,
-                                    target: { Deck: 0 },
-                                  },
-                                },
-                              })
-                            }
-                            disabled={disabled || cardId == null}
-                            className="px-3 py-1 rounded text-xs font-bold"
-                            style={{
-                              background: "var(--color-primary)",
-                              color: "var(--color-text)",
-                              cursor: cardId != null ? "pointer" : "not-allowed",
-                              opacity: cardId != null ? 1 : 0.5,
-                            }}
-                          >
-                            {"\u2192"} Top of Deck
-                          </button>
-                        )}
-                        {ui.card_order_selector!.include_void && (
-                          <button
-                            onClick={() =>
-                              onAction({
-                                BattleAction: {
-                                  SelectOrderForDeckCard: {
-                                    card_id: cardId,
-                                    target: "Void",
-                                  },
-                                },
-                              })
-                            }
-                            disabled={disabled || cardId == null}
-                            className="px-3 py-1 rounded text-xs font-bold"
-                            style={{
-                              background: "var(--color-surface)",
-                              color: "var(--color-text)",
-                              border: "1px solid var(--color-border)",
-                              cursor: cardId != null ? "pointer" : "not-allowed",
-                              opacity: cardId != null ? 1 : 0.5,
-                            }}
-                          >
-                            {"\u2192"} Void
-                          </button>
-                        )}
-                      </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              {ui.card_order_selector!.include_deck && (
+                <div
+                  className="rounded-lg p-3"
+                  style={{
+                    background: "rgba(59, 130, 246, 0.08)",
+                    border: "1px solid rgba(59, 130, 246, 0.25)",
+                  }}
+                >
+                  <div className="mb-2">
+                    <div className="font-bold text-sm" style={{ color: "var(--color-primary-light)" }}>
+                      Top of Deck
                     </div>
-                  );
-                })}
+                    <div className="text-xs" style={{ color: "var(--color-text-dim)" }}>
+                      Cards that will stay on top of your deck.
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    {deckOrderCards.length === 0 && (
+                      <div className="rounded p-3 text-xs text-center" style={{ background: "rgba(15, 23, 42, 0.35)", color: "var(--color-text-dim)" }}>
+                        No cards assigned here yet.
+                      </div>
+                    )}
+                    {deckOrderCards.map((card) => {
+                      const cardId = card.revealed?.actions.can_select_order;
+                      return (
+                        <div
+                          key={card.id}
+                          className="flex items-center gap-3 p-2 rounded"
+                          style={{ background: "var(--color-surface-light)" }}
+                        >
+                          <CardDisplay card={card} compact disabled />
+                          <div className="flex gap-2 flex-wrap">
+                            <button
+                              onClick={() => selectCardOrderTarget(card, "Deck")}
+                              disabled={disabled || cardId == null}
+                              className="px-3 py-1 rounded text-xs font-bold"
+                              style={{
+                                background: "var(--color-primary)",
+                                color: "var(--color-text)",
+                                cursor: cardId != null ? "pointer" : "not-allowed",
+                                opacity: cardId != null ? 1 : 0.5,
+                              }}
+                            >
+                              {"\u2192"} Top of Deck
+                            </button>
+                            {ui.card_order_selector!.include_void && (
+                              <button
+                                onClick={() => selectCardOrderTarget(card, "Void")}
+                                disabled={disabled || cardId == null}
+                                className="px-3 py-1 rounded text-xs font-bold"
+                                style={{
+                                  background: "var(--color-surface)",
+                                  color: "var(--color-text)",
+                                  border: "1px solid var(--color-border)",
+                                  cursor: cardId != null ? "pointer" : "not-allowed",
+                                  opacity: cardId != null ? 1 : 0.5,
+                                }}
+                              >
+                                {"\u2192"} Void
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {ui.card_order_selector!.include_void && (
+                <div
+                  className="rounded-lg p-3"
+                  style={{
+                    background: "rgba(168, 85, 247, 0.08)",
+                    border: "1px solid rgba(168, 85, 247, 0.25)",
+                  }}
+                >
+                  <div className="mb-2">
+                    <div className="font-bold text-sm" style={{ color: "#d8b4fe" }}>
+                      Void
+                    </div>
+                    <div className="text-xs" style={{ color: "var(--color-text-dim)" }}>
+                      Cards that will be put into your void.
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    {voidOrderCards.length === 0 && (
+                      <div className="rounded p-3 text-xs text-center" style={{ background: "rgba(15, 23, 42, 0.35)", color: "var(--color-text-dim)" }}>
+                        No cards assigned here yet.
+                      </div>
+                    )}
+                    {voidOrderCards.map((card) => {
+                      const cardId = card.revealed?.actions.can_select_order;
+                      return (
+                        <div
+                          key={card.id}
+                          className="flex items-center gap-3 p-2 rounded"
+                          style={{ background: "var(--color-surface-light)" }}
+                        >
+                          <CardDisplay card={card} compact disabled />
+                          <div className="flex gap-2 flex-wrap">
+                            {ui.card_order_selector!.include_deck && (
+                              <button
+                                onClick={() => selectCardOrderTarget(card, "Deck")}
+                                disabled={disabled || cardId == null}
+                                className="px-3 py-1 rounded text-xs font-bold"
+                                style={{
+                                  background: "var(--color-primary)",
+                                  color: "var(--color-text)",
+                                  cursor: cardId != null ? "pointer" : "not-allowed",
+                                  opacity: cardId != null ? 1 : 0.5,
+                                }}
+                              >
+                                {"\u2192"} Top of Deck
+                              </button>
+                            )}
+                            <button
+                              onClick={() => selectCardOrderTarget(card, "Void")}
+                              disabled={disabled || cardId == null}
+                              className="px-3 py-1 rounded text-xs font-bold"
+                              style={{
+                                background: "var(--color-surface)",
+                                color: "var(--color-text)",
+                                border: "1px solid var(--color-border)",
+                                cursor: cardId != null ? "pointer" : "not-allowed",
+                                opacity: cardId != null ? 1 : 0.5,
+                              }}
+                            >
+                              {"\u2192"} Void
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
             <ActionBar
               primaryButton={ui.primary_action_button ?? undefined}
