@@ -10,8 +10,8 @@ RARITY_MAP = {"Common": "C", "Uncommon": "U", "Rare": "R", "Legendary": "L"}
 
 
 def format_card(card):
-    tide = card["tide"]
-    tide_cost = card["tide-cost"]
+    tides = card.get("tides", [])
+    tide_text = "[" + ", ".join(tides) + "]" if tides else "-"
     energy_cost = card["energy-cost"]
     card_type = card["card-type"]
     subtype = card.get("subtype", "")
@@ -27,10 +27,10 @@ def format_card(card):
             spark = 0
         type_col = subtype if subtype else "Character"
         text = f"↯fast -- {rendered_text}" if is_fast else rendered_text
-        return f"{tide}{tide_cost} | {energy_cost}●/{spark}✦ | {type_col} | {rarity} | {text}"
+        return f"{tide_text} | {energy_cost}●/{spark}✦ | {type_col} | {rarity} | {text}"
     else:
         type_col = "Fast Event" if is_fast else card_type
-        return f"{tide}{tide_cost} | {energy_cost}● | {type_col} | {rarity} | {rendered_text}"
+        return f"{tide_text} | {energy_cost}● | {type_col} | {rarity} | {rendered_text}"
 
 
 def main():

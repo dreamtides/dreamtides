@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Reorder fields in rendered-cards.toml to match desired column display order.
 
-Also updates metadata: adds tide/tide-cost columns, tide dropdown colors,
-changes tide-cost validation to integer, moves rarity before is-fast.
+Also updates metadata for the multi-tide schema by replacing legacy tide fields
+with array-backed tide columns and preserving the rarity-before-fast layout.
 
 TV displays columns in TOML key discovery order, so reordering the keys
 in the data entries controls visual column order.
@@ -17,8 +17,7 @@ from pathlib import Path
 FIELD_ORDER = [
     "name",
     "id",
-    "tide",
-    "tide-cost",
+    "tides",
     "rendered-text",
     "energy-cost",
     "card-type",
@@ -184,49 +183,71 @@ def process_file(filepath: Path) -> str:
 
 
 def rewrite_metadata(metadata_lines: list[str]) -> list[str]:
-    """Rewrite the metadata section with updated validation and columns."""
+    """Rewrite the metadata section for the multi-tide column layout."""
     result = []
     i = 0
+    inserted_tides_rule = False
 
     while i < len(metadata_lines):
         line = metadata_lines[i]
 
-        # Replace tide-cost validation rule
+        # Replace legacy tide validation rules with the new array-backed rule.
         if (
             line.strip() == "[[metadata.validation_rules]]"
             and i + 1 < len(metadata_lines)
-            and 'column = "tide-cost"' in metadata_lines[i + 1]
+            and metadata_lines[i + 1].strip()
+            in {'column = "tide"', 'column = "tide-cost"'}
         ):
-            result.append(line)
-            result.append('column = "tide-cost"')
-            result.append('type = "type"')
-            result.append('value_type = "integer"')
-            # Skip old rule lines
-            i += 2
+            if not inserted_tides_rule:
+                result.append("[[metadata.validation_rules]]")
+                result.append('column = "tides"')
+                result.append('type = "enum"')
+                result.append(
+                    'enum = ["warrior_pressure", "warrior_bastion",'
+                    ' "spirit_growth", "materialize_value",'
+                    ' "materialize_tempo", "ally_formation", "fast_tempo",'
+                    ' "event_chain", "prevent_control", "discard_velocity",'
+                    ' "void_recursion", "abandon_furnace", "figment_swarm",'
+                    ' "survivor_dissolve", "judgment_engines",'
+                    ' "character_velocity", "spark_tall", "big_energy",'
+                    ' "fast_setup", "hand_cycling", "reclaim_characters",'
+                    ' "reclaim_events", "spark_growth",'
+                    ' "spark_disruption", "go_wide_enablers",'
+                    ' "leave_play_enablers", "bounce_blink_tools",'
+                    ' "topdeck_setup", "void_setup",'
+                    ' "judgment_repeaters", "event_setup", "copy_effects",'
+                    ' "abandon_fodder", "cost_reduction", "trigger_reuse",'
+                    ' "character_tutors", "cheap_curve",'
+                    ' "defensive_curve", "midcurve_glue", "card_flow",'
+                    ' "foresee_selection", "resource_burst",'
+                    ' "cheap_removal", "premium_removal",'
+                    ' "fast_interaction", "hand_disruption", "sweepers",'
+                    ' "finishers", "void_denial", "discover_toolbox",'
+                    ' "judgment_bodies", "materialized_staples",'
+                    ' "tempo_resets", "point_pressure"]'
+                )
+                result.append("")
+                inserted_tides_rule = True
             while i < len(metadata_lines) and metadata_lines[i].strip() != "":
+                i += 1
+            while i < len(metadata_lines) and metadata_lines[i].strip() == "":
                 i += 1
             continue
 
-        # Add colors to tide validation rule
         if (
             line.strip() == "[[metadata.validation_rules]]"
             and i + 1 < len(metadata_lines)
-            and 'column = "tide"' in metadata_lines[i + 1]
+            and metadata_lines[i + 1].strip() == 'column = "tides"'
         ):
-            result.append(line)
-            i += 1
-            # Copy existing lines until blank
-            while i < len(metadata_lines) and metadata_lines[i].strip() != "":
-                result.append(metadata_lines[i])
+            if inserted_tides_rule:
                 i += 1
-            # Add colors before the blank line
-            # Wild=Brown, Bloom=Green, Arc=Yellow, Ignite=Red,
-            # Pact=Orange, Umbra=Purple, Rime=Turquoise, Surge=Gray
-            result.append(
-                'colors = ["#DEC4A0", "#A8DDA8", "#F0E88A", "#F0A0A0",'
-                ' "#F0C88A", "#CDA8F0", "#8AE0E0", "#D0D0D0"]'
-            )
-            continue
+                while i < len(metadata_lines) and metadata_lines[i].strip() != "":
+                    i += 1
+                while i < len(metadata_lines) and metadata_lines[i].strip() == "":
+                    i += 1
+                continue
+
+            inserted_tides_rule = True
 
         # Replace columns section
         if line.strip() == "[[metadata.columns]]":
@@ -247,8 +268,11 @@ def rewrite_metadata(metadata_lines: list[str]) -> list[str]:
             columns = [
                 ("name", 200, True),
                 ("id", 140, False),
-                ("tide", 120, False),
-                ("tide-cost", 100, False),
+                ("tides[0]", 180, False),
+                ("tides[1]", 180, False),
+                ("tides[2]", 180, False),
+                ("tides[3]", 180, False),
+                ("tides[4]", 180, False),
                 ("rendered-text", 320, False),
                 ("energy-cost", 100, False),
                 ("card-type", 150, False),
@@ -263,6 +287,19 @@ def rewrite_metadata(metadata_lines: list[str]) -> list[str]:
                 if bold:
                     result.append("bold = true")
                 result.append("")
+            continue
+
+        # Drop the old single-tide statistic.
+        if (
+            line.strip() == "[[metadata.statistics]]"
+            and i + 1 < len(metadata_lines)
+            and metadata_lines[i + 1].strip() == 'column = "tide"'
+        ):
+            i += 1
+            while i < len(metadata_lines) and metadata_lines[i].strip() != "":
+                i += 1
+            while i < len(metadata_lines) and metadata_lines[i].strip() == "":
+                i += 1
             continue
 
         result.append(line)

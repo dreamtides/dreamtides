@@ -1,594 +1,594 @@
-Umbra2 | 6●/4✦ | Ancient | R | When you play 2 cards in a turn, reclaim this character.
-Neutral1 | 2● | Event | U | Discover a card with cost 2●.
-Umbra1 | 4●/0✦ | Tinkerer | R | ▸ Judgment: Return this character from your void to your hand.
-Rime1 | 2●/0✦ | Trooper | R | ▸ Judgment: You may draw 2 cards, then discard 3 cards.
-Rime1 | 2● | Event | C | Draw 2 cards. Discard 2 cards. Reclaim 2●
-Rime1 | 3●/2✦ | Explorer | U | When you discard this character, materialize it.
-Rime1 | 2●/0✦ | Child | R | ▸ Judgment: You may discard a card to draw a card and gain 1✪.
-Rime2 | 3●/1✦ | Explorer | R | When you discard a card, it gains reclaim equal to its cost this turn.
-Neutral1 | 3●/2✦ | Agent | C | ↯fast -- ▸ Judgment: Foresee 1.
-Pact3 | 9●/6✦ | Ancient | U | Abandon 2 allies: Reclaim this character.
-Rime2 | 3●/1✦ | Character | R | When you discard a card, gain 1✪.
-Neutral1 | 0●/0✦ | Warrior | L | ▸ Judgment: Gain 1●.
-Neutral1 | 0● | Event | L | Gain 3●.
-Neutral1 | 2● | Event | U | Dissolve an enemy. You lose 4✪.
-Rime2 | 5●/3✦ | Ancient | C | This character costs 1● if you have discarded a card this turn.
-Ignite1 | 2●/1✦ | Warrior | U | ▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less.
-Neutral1 | 2●/1✦ | Hacker | C | ▸ Judgment: Draw a card, then discard a card.
-Neutral1 | 6● | Event | R | Dissolve all characters.
-Rime1 | 2●/1✦ | Renegade | R | When you discard a card, kindle 1.
-Neutral1 | 2●/2✦ | Visitor | R | ▸ Judgment: Draw a card, then the opponent gains 2✪.
-Umbra1 | 4●/2✦ | Explorer | R | Once per turn, you may play a character with cost 2● or less from your void.
-Rime1 | 4●/3✦ | Detective | C | ▸ Materialized: Discard 2 cards, then draw 2 cards.
-Umbra1 | 2● | Event | C | You may return a character from your void to your hand, then draw a card.
-Neutral1 | 3● | Fast Event | C | Dissolve an enemy.
-Rime1 | 2●/1✦ | Survivor | U | ▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less.
-Rime2 | 4●/3✦ | Visitor | R | Once per turn, when you discard a card, gain 1●, then kindle 2.
-Umbra2 | 8●/8✦ | Ancient | R | Banish your void with 8 or more cards: Reclaim this character.
-Umbra1 | 3●/2✦ | Child | C | ▸ Materialized: Draw a card, then discard a card. Reclaim 3●
-Umbra2 | 5●/*✦ | Ancient | U | This character's spark is equal to the number of cards in your void.
-Ignite1 | 0●/1✦ | Warrior | C | 
-Ignite1 | 3●/1✦ | Ancient | R | ▸ Judgment: You may abandon a Warrior to discover a Warrior with cost 1● higher and materialize it.
-Ignite1 | 3●/1✦ | Warrior | C | ▸ Materialized, Dissolved: Draw a card.
-Bloom1 | 2●/1✦ | Synth | R | When the opponent plays an event which could dissolve an ally, prevent that card.
-Ignite1 | 3●/2✦ | Warrior | U | 4●: This character gains +1 spark for each allied Warrior.
-Ignite1 | 2● | Fast Event | U | An ally gains +1 spark for each allied Warrior.
-Ignite1 | 2●/0✦ | Warrior | C | When you materialize an allied Warrior, this character gains +1 spark.
-Ignite1 | 4●/2✦ | Explorer | R | Once per turn, when you materialize a character with cost 2● or less, draw a card.
-Neutral1 | 2● | Event | U | Banish an enemy with cost 2● or less.
-Neutral1 | 1● | Event | U | Banish a non-Warrior enemy.
-Neutral1 | 2● | Fast Event | C | Dissolve an enemy with spark 1 or less.
-Ignite1 | 1● | Event | C | Dissolve an enemy with cost less than the number of allied Warriors.
-Ignite1 | 1● | Event | U | Discover a Warrior.
-Umbra1 | 3●/1✦ | Warrior | C | 2●, Banish another card in your void: Reclaim this character.
-Pact1 | 2●/1✦ | Warrior | R | 2●, Abandon an ally with spark 1 or less: Draw 2 cards.
-Ignite1 | 0●/0✦ | Warrior | C | ▸ Materialized, Judgment: With 2 allied Warriors, gain 1●.
-Neutral1 | 1●/0✦ | Warrior | L | ▸ Materialized, Judgment: Gain 2●.
-Bloom1 | 1●/1✦ | Warrior | C | Once per turn, when you materialize a character, gain 1●.
-Ignite1 | 3●/2✦ | Warrior | C | ▸ Materialized: Draw a Warrior from your deck.
-Pact1 | 2●/1✦ | Warrior | R | 2●, Abandon a character, Discard your hand: Draw 3 cards.
-Rime1 | 2●/2✦ | Warrior | U | Disable the ▸ Materialized: abilities of enemies.
-Ignite1 | 2●/1✦ | Warrior | C | Allied Warriors have +1 spark.
-Rime1 | 2●/0✦ | Warrior | R | ▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void.
-Rime1 | 3●/2✦ | Mage | U | The opponent's events cost 1● more.
-Rime1 | 3●/2✦ | Warrior | U | ▸ Materialized: Disable the activated abilities of an enemy while this character is in play.
-Ignite1 | 2●/2✦ | Warrior | C | ▸ Materialized: Draw a card.
-Pact1 | 4●/2✦ | Warrior | C | Abandon an ally: This character gains +1 spark.
-Ignite1 | 2●/*✦ | Warrior | C | This character's spark is equal to the number of allied Warriors.
-Ignite2 | 4●/2✦ | Mage | U | Once per turn, when you materialize a Warrior, draw a card.
-Ignite2 | 5●/3✦ | Mage | R | When you play a Warrior, reclaim a random character with cost 3● or less.
-Surge1 | 2● | Fast Event | U | Lose 1 maximum ●: Play this event for 0●. Prevent a played card.
-Surge1 | 5● | Fast Event | U | Banish a card from hand: Play this event for 0●. Prevent a played card.
-Surge1 | 1● | Fast Event | C | Prevent a played event unless the opponent pays 2●.
-Rime1 | 1● | Event | U | Discard a chosen card with cost 3● or less from the opponent's hand.
-Rime1 | 1● | Event | U | Discard a chosen character from the opponent's hand.
-Neutral1 | 4● | Fast Event | R | Banish a card from hand: Play this event for 0●. Dissolve an enemy.
-Neutral1 | 0● | Fast Event | R | Dissolve an enemy. The opponent gains 3✪.
-Surge1 | 2● | Fast Event | C | Prevent a played card.
-Surge1 | 1● | Fast Event | C | Foresee 1. Draw a card. Reclaim 3●
-Pact1 | 1● | Fast Event | U | Abandon an ally or discard a card: Dissolve an enemy.
-Arc1 | 3●/1✦ | Synth | U | ↯fast -- ▸ Materialized: Prevent a played card with cost 2● or less.
-Arc1 | 5●/2✦ | Ancient | R | ↯fast -- ▸ Materialized: Gain control of an enemy with cost 2● or less.
-Pact1 | 6●/2✦ | Ancient | R | Abandon an ally: Play this character for 0●, then abandon it. ▸ Materialized: Dissolve an enemy.
-Neutral1 | 2●/1✦ | Visitor | U | ↯fast -- ▸ Judgment: Gain 1✪.
-Neutral1 | 3●/2✦ | Robot | C | ↯fast -- ▸ Materialized: Foresee 2.
-Neutral1 | 2●/2✦ | * | C | Has all character types. ▸ Judgment: With 3 allies that share a character type, draw a card.
-Arc1 | 2●/1✦ | Musician | C | ↯fast -- Once per turn, when you play a ↯fast card, draw a card.
-Arc1 | 3●/2✦ | Musician | C | ↯fast -- When you play a ↯fast card, this character gains +2 spark.
-Arc2 | 4●/2✦ | Musician | R | ↯fast -- When you play a ↯fast card, gain 1✪.
-Arc1 | 5●/3✦ | Ancient | R | To play this card, return an ally with cost 3● or more to hand. ▸ Judgment: Draw a card.
-Arc1 | 2●/2✦ | Musician | C | At the end of your turn, gain 2●.
-Arc1 | 3●/2✦ | Visitor | R | Characters in your hand have ↯fast. Once per turn, when you play a ↯fast character, gain 1●.
-Rime1 | 0● | Fast Event | C | Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards.
-Arc1 | 4●/1✦ | Outsider | C | ↯fast -- ▸ Materialized: Return an enemy to hand.
-Neutral1 | 4●/0✦ | Visitor | C | ↯fast -- ▸ Judgment: Gain 2✪.
-Umbra1 | 3●/1✦ | Survivor | U | ↯fast -- ▸ Materialized: An event in your void gains reclaim equal to its cost this turn.
-Umbra1 | 4●/2✦ | Survivor | U | ↯fast -- When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1● this turn.
-Neutral1 | 1● | Fast Event | L | Draw 3 cards.
-Arc1 | 3● | Fast Event | C | Return an enemy or ally to hand. Draw a card.
-Arc1 | 2●/1✦ | Visitor | R | ↯fast -- ▸ Materialized: Discover a ↯fast event.
-Surge2 | 5● | Event | R | Gain 1✪ for each card you have played this turn.
-Surge1 | 3● | Event | U | Draw a card for each card you have played this turn.
-Surge1 | 4●/2✦ | Tinkerer | U | Events cost you 2● more. When you play an event from your hand, copy it.
-Surge1 | 3● | Event | U | Until end of turn, when you play an event, copy it.
-Surge2 | 5● | Event | C | Copy the next event you play this turn three times. Reclaim 2●
-Surge2 | 6● | Event | R | All cards currently in your void gain reclaim equal to their cost this turn.
-Rime1 | 2● | Event | C | Discard a card. Draw 2 cards.
-Surge1 | 1● | Event | U | Double the number of cards you draw from card effects this turn.
-Surge1 | 3● | Event | C | An event in your void gains reclaim 0● this turn.
-Surge1 | 1● | Event | U | At the end of this turn, trigger an additional Judgment phase.
-Neutral1 | 3● | Event | L | Take an extra turn after this one.
-Surge1 | 3●/1✦ | Visitor | C | Events cost you 1● less.
-Surge1 | 4●/2✦ | Visitor | U | When you play an event, gain 1●.
-Surge1 | 4● | Event | U | Gain 6●.
-Surge1 | 2● | Event | U | Double the amount of ● you have.
-Surge1 | 2● | Event | U | Double the amount of ● you gain from card effects this turn.
-Surge1 | 2● | Event | C | Gain 2●. Draw a card.
-Rime1 | 3● | Event | C | Draw 2 cards. Discard 2 cards. Gain 2●.
-Surge2 | 6●/3✦ | Outsider | R | ▸ Materialized: Copy the next event you play this turn three times.
-Surge1 | 4● | Event | R | Each player may shuffle their hand and void into their deck and then draw 5 cards.
-Surge1 | 2● | Event | C | Gain 4●.
-Pact1 | 1● | Event | U | Abandon an ally: Gain ● equal to that character's cost.
-Umbra1 | 0● | Event | U | Dissolve an enemy with cost less than the number of cards in your void.
-Neutral1 | 5● | Event | L | Draw 3 cards.
-Umbra1 | 1● | Event | C | Put the top 3 cards of your deck into your void. Draw a card.
-Surge1 | 1● | Event | U | Prevent a played ↯fast card.
-Neutral1 | 2● | Event | U | Discover an event.
-Rime1 | 3● | Event | C | Draw 3 cards. Discard 2 cards.
-Surge1 | 2●/1✦ | Visionary | C | When you play an event, foresee 1.
-Surge1 | 1● | Event | U | Prevent a played card. Put it on top of the opponent's deck.
-Surge2 | 4●/*✦ | Ancient | U | When an event is put into your void, this character gains +1 spark.
-Bloom2 | 5●/2✦ | Explorer | R | Characters cost you 2● less.
-Bloom2 | 5●/2✦ | Super | R | When you materialize a character, trigger the ▸ Judgment: ability of each ally.
-Bloom1 | 1● | Event | U | Until end of turn, when you play a character, draw a card.
-Bloom1 | 3●/1✦ | Spirit Animal | C | ▸ Judgment: Gain 1● for each allied Spirit Animal.
-Arc1 | 3●/1✦ | Spirit Animal | C | ▸ Materialized: You may return an ally to hand.
-Arc1 | 2●/1✦ | Explorer | U | ↯fast -- ▸ Materialized: Return an ally to hand.
-Bloom1 | 3●/2✦ | Spirit Animal | R | The '▸ Judgment:' ability of allies triggers when you materialize them.
-Bloom1 | 1●/1✦ | Spirit Animal | C | When you materialize an allied Spirit Animal, gain 1●.
-Bloom1 | 1●/1✦ | Spirit Animal | C | ▸ Judgment: With 2 allied Spirit Animals, gain 2●.
-Bloom1 | 3●/1✦ | Spirit Animal | U | ▸ Judgment: Gain 1● for each allied character.
-Bloom3 | 12● | Event | R | Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals.
-Surge2 | 2●/2✦ | Spirit Animal | R | When you have no cards in your deck, you win the game.
-Arc1 | 3● | Event | U | Return all but one ally to hand: Draw a card for each ally returned.
-Ignite1 | 3●/1✦ | Visitor | C | When you materialize a character, this character gains +1 spark.
-Bloom1 | 3●/1✦ | Spirit Animal | U | When you play a Spirit Animal, draw a card.
-Bloom2 | 2●/1✦ | Spirit Animal | U | ▸ Judgment: You may pay 4● to have each allied Spirit Animal gain +2 spark.
-Bloom1 | 3●/1✦ | Spirit Animal | C | When you materialize an allied Spirit Animal, that character gains +1 spark.
-Bloom1 | 1●/1✦ | Spirit Animal | C | ▸ Materialized, Judgment: Kindle 1.
-Bloom1 | 3●/1✦ | Spirit Animal | U | ▸ Materialized: Return a character from your void to your hand.
-Bloom1 | 2●/1✦ | Spirit Animal | C | ▸ Materialized: Draw a card.
-Bloom1 | 1●/1✦ | Spirit Animal | C | ▸ Materialized, Judgment: Gain 1●.
-Bloom1 | 3●/1✦ | Spirit Animal | C | ▸ Judgment: Gain 2●.
-Bloom1 | 4●/2✦ | Spirit Animal | U | Reveal the top card of your deck. You may play characters from the top of your deck.
-Bloom1 | 3●/1✦ | Spirit Animal | U | ↯fast -- ▸ Materialized: Banish the opponent's void.
-Bloom2 | 2●/1✦ | Visitor | U | ▸ Materialized: Draw a card for each allied Spirit Animal.
-Bloom2 | 1●/1✦ | Spirit Animal | U | 3●: The spark of each allied Spirit Animal becomes 5.
-Arc1 | 5●/1✦ | Guide | U | ↯fast -- ▸ Materialized: You may banish an ally, then materialize it.
-Arc2 | 4●/1✦ | Mage | R | ▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it.
-Umbra1 | 4●/1✦ | Survivor | U | ▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●.
-Arc2 | 6●/3✦ | Ancient | R | ▸ Materialized: Banish any number of allies, then materialize them.
-Rime1 | 3●/2✦ | Outsider | R | ▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card.
-Arc1 | 6●/2✦ | Ancient | U | ▸ Materialized: Draw 2 cards.
-Arc1 | 5●/2✦ | Outsider | U | ▸ Materialized: Banish an enemy until this character leaves play.
-Arc1 | 1● | Event | C | Banish an ally. Materialize it at end of turn. Reclaim 1●
-Surge1 | 1●/1✦ | Visitor | U | ↯fast -- Abandon this character: Prevent a played event.
-Arc1 | 2● | Event | R | Discover a character with a ▸ Materialized: ability.
-Arc2 | 3●/1✦ | Explorer | U | ▸ Judgment: You may banish an ally, then materialize it.
-Arc2 | 4●/0✦ | Explorer | U | When an ally is banished, this character gains +1 spark.
-Arc1 | 4●/2✦ | Avatar | C | When an ally is banished, kindle 1.
-Arc2 | 5● | Event | R | Materialize two random characters with cost 3● or less from your deck.
-Surge1 | 2● | Fast Event | U | Prevent a played character.
-Neutral1 | 2● | Event | C | Dissolve an enemy with spark 3 or more.
-Umbra1 | 3● | Event | R | Dissolve an enemy with cost 3● or more. Reclaim 1●
-Neutral1 | 2● | Event | R | Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid.
-Arc2 | 3●/2✦ | Explorer | U | ▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them.
-Arc1 | 5●/2✦ | Synth | R | ▸ Materialized: Banish an enemy until your next main phase.
-Arc1 | 3● | Event | U | Banish up to 2 allies, then materialize them.
-Arc1 | 4●/1✦ | Explorer | C | ▸ Materialized: Gain 3●.
-Arc1 | 1●/1✦ | Synth | R | 4●: Materialize a copy of an ally.
-Arc1 | 1● | Event | C | Until end of turn, when an ally leaves play, gain 2●.
-Umbra2 | 5●/2✦ | Survivor | C | With an allied Survivor, you may play this card from your hand or void for 1●.
-Rime1 | 1●/0✦ | Survivor | C | 1●, Discard a card: Kindle 2.
-Umbra1 | 2●/1✦ | Survivor | C | ▸ Materialized, Judgment: With 2 allied Survivors, draw a card.
-Umbra1 | 3●/2✦ | Survivor | R | ▸ Dissolved: Kindle 2. When an allied Survivor is ▸ Dissolved:, kindle 2.
-Pact1 | 3●/0✦ | Synth | U | Abandon an ally: Gain 1●.
-Umbra1 | 2●/1✦ | Survivor | U | ▸ Dissolved: Draw a card. When an allied Survivor is ▸ Dissolved:, draw a card.
-Pact1 | 4●/2✦ | Outsider | C | Abandon an ally: Put the top 2 cards of your deck into your void.
-Pact1 | 4●/1✦ | Survivor | U | When an ally is ▸ Dissolved:, draw a card.
-Rime1 | 1●/1✦ | Survivor | R | ↯fast -- ▸ Materialized: Each player discards a card.
-Pact1 | 3●/1✦ | Survivor | U | When an ally is ▸ Dissolved, this card gains reclaim 1● this turn.
-Pact1 | 6●/2✦ | Ancient | R | When an ally is ▸ Dissolved, gain 1✪.
-Pact1 | 2●/1✦ | Survivor | U | ▸ Dissolved: You may pay 1● to return this character to your hand.
-Umbra1 | 1●/1✦ | Survivor | R | ▸ Dissolved: A Survivor in your void gains reclaim equal to its cost.
-Umbra1 | 3●/1✦ | Survivor | U | ▸ Judgment: You may pay 1● to return this character from your void to your hand.
-Umbra1 | 2●/6✦ | Ancient | U | You may only play this character from your void.
-Umbra1 | 2●/1✦ | Survivor | U | If this card is in your void, allied Survivors have +2 spark.
-Pact1 | 3●/1✦ | Survivor | C | Abandon an ally: Kindle 1.
-Neutral1 | 1●/0✦ | Survivor | U | ▸ Judgment: You may banish a card from the opponent's void to gain 1●.
-Ignite1 | 2● | Event | R | Dissolve an enemy with cost 2● or less. Reclaim -- Abandon an ally
-Umbra1 | 2●/1✦ | Survivor | R | ▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.
-Umbra1 | 3●/1✦ | Survivor | R | When you materialize a Survivor, reclaim this character.
-Umbra1 | 1● | Event | R | Discover a Survivor.
-Umbra1 | 2●/1✦ | Survivor | C | When you play a Survivor, put the top 2 cards of your deck into your void.
-Pact1 | 3●/1✦ | Ancient | C | When you abandon an ally, this character gains +1 spark.
-Pact1 | 2●/1✦ | Warrior | U | When you abandon a second ally in a turn, dissolve an enemy.
-Pact1 | 4●/2✦ | Ancient | R | When you abandon a character, gain 1✪.
-Pact1 | 2●/1✦ | Renegade | R | ↯fast -- Abandon an ally, once per turn: Gain 1✪.
-Pact1 | 3●/1✦ | Monster | C | When you abandon an ally, kindle 2.
-Pact1 | 2●/1✦ | Survivor | C | Abandon an ally: You may put a character from your void on top of your deck.
-Pact1 | 3●/1✦ | Ancient | R | Abandon an ally: You may dissolve an enemy with spark less than that ally's spark.
-Pact1 | 4●/2✦ | Mage | C | When an ally is ▸ Dissolved:, gain 1●.
-Pact1 | 2●/1✦ | Outsider | U | Abandon an ally, once per turn: Reclaim a Warrior.
-Arc1 | 4●/3✦ | Musician | U | When you materialize an ally, gain 1●.
-Surge1 | 1●/1✦ | Mage | U | ▸ Materialized: Materialize a Celestial figment for each card you have played this turn.
-Ignite1 | 3● | Event | C | Materialize three Warrior figments.
-Bloom1 | 4●/1✦ | Visitor | U | When you play a character, materialize a Celestial figment.
-Pact1 | 3●/1✦ | Synth | U | ▸ Materialized: Draw a card for each ally abandoned this turn.
-Pact1 | 4●/2✦ | Outsider | C | When you abandon a character, draw a card.
-Pact1 | 2● | Event | C | Abandon any number of allies: Draw a card for each ally abandoned.
-Neutral1 | 2● | Event | R | Discover a character with an activated ability.
-Umbra1 | 2●/1✦ | Synth | R | While you have 7 or more cards in your void, they have reclaim equal to their cost.
-Pact1 | 4● | Event | R | Dissolve an enemy. Draw a card. This event costs 0● if a character dissolved this turn.
-Surge1 | 0● | Event | R | Abandon a character, Discard your hand: Gain 5●.
-Pact1 | 1●/1✦ | Ancient | U | ▸ Judgment: Each player abandons a character.
-Neutral1 | 2● | Fast Event | U | Pay 1 or more ●: Draw a card for each ● spent.
-Neutral1 | 2●/2✦ | Musician | C | 3●: Draw a card.
-Arc1 | 2●/1✦ | Visitor | U | ↯fast -- When you play a card during the opponent's turn, this character gains +1 spark.
-Surge1 | 4● | Event | R | Return up to 2 events from your void to your hand.
-Neutral1 | *● | Fast Event | U | Choose One: • 2●: Return an enemy to hand. • 3●: Draw 2 cards.
-Bloom1 | 1● | Fast Event | C | Prevent a played event which could dissolve an ally.
- | 0● | Event | Special | 
- | 2● | Event | Special | Draw a card.
-Arc1 | 3●/2✦ | Spirit Animal | U | ▸ Materialized: Banish an enemy with cost 3● or less until this character leaves play.
-Pact1 | 5●/0✦ | Warrior | R | ▸ Dissolved: Return all enemies to hand.
-Rime1 | 2●/1✦ | Detective | U | ▸ Materialized: Banish a chosen card from the opponent's hand until this character leaves play.
-Arc1 | 3●/1✦ | Warrior | R | ↯fast -- ▸ Materialized: Banish an enemy until this character leaves play. Abandon this character: Foresee 2.
-Arc1 | 4●/2✦ | Renegade | R | ↯fast -- Banish a card from hand: Play this character for 0●, then abandon it. ▸ Materialized: Return an enemy to hand.
-Rime1 | 4●/3✦ | Outsider | R | Banish a card from hand: Play this character for 0●, then abandon it. ▸ Materialized: Discard a chosen card from the opponent's hand.
-Rime1 | 5●/3✦ | Ancient | R | Banish a card from hand: Play this character for 0●, then abandon it. ▸ Materialized: Dissolve an enemy with spark 2 or less.
-Neutral1 | 1●/0✦ | Warrior | U | ↯fast -- Abandon an ally: Prevent a played event which could dissolve an ally.
-Neutral1 | 1●/1✦ | Child | C | ▸ Judgment: You may pay 2● to draw a card.
-Neutral1 | 1●/1✦ | Child | C | ▸ Materialized, Judgment: Foresee 1.
-Bloom1 | 2●/0✦ | Explorer | R | ▸ Materialized: Foresee 1. ▸ Judgment: Gain 1●.
-Ignite1 | 2●/1✦ | Child | C | When you materialize an ally, kindle 1.
-Ignite1 | 3●/2✦ | Ancient | C | When you materialize an ally, that ally gains +1 spark.
-Neutral1 | 2●/1✦ | Warrior | C | ▸ Judgment: Kindle 1.
-Rime2 | 3●/1✦ | Monster | R | When you discard this character, materialize it. ▸ Judgment: Kindle 2.
-Umbra2 | 5●/2✦ | Warrior | R | ▸ Judgment: This character gains +1 spark. When a card leaves your void, kindle 2.
-Ignite1 | 2●/2✦ | Warrior | C | Allied Warriors cost you 1● less.
-Bloom1 | 5●/2✦ | Explorer | R | Characters cost you 1● less. ▸ Materialized: Draw 2 cards.
-Ignite1 | 3●/2✦ | Warrior | C | When you materialize a Warrior, materialize a Halcyon Figment.
-Ignite1 | 3●/3✦ | Warrior | C | ▸ Materialized: Draw a character with cost 2● or less.
-Ignite1 | 3●/2✦ | Warrior | C | ▸ Materialized: Draw a character with spark 2 or less.
-Surge1 | 2●/2✦ | Warrior | U | ↯fast -- ↯fast -- Abandon this character: The opponent can't play events this turn.
-Umbra1 | 4●/2✦ | Explorer | C | When you play an event, reclaim a character with cost 3● or less.
-Umbra2 | 5●/0✦ | Explorer | R | ▸ Materialized: This character gains +1 spark. ▸ Judgment: Reclaim a character with cost up to this character's spark ●.
-Surge1 | 3● | Fast Event | C | Prevent a played character. Draw a card.
-Surge1 | 1● | Fast Event | U | Return an ally to hand: Play this event for 0●. Prevent a played card unless the opponent pays 2●.
-Neutral1 | 3● | Fast Event | U | Banish a card from hand: Play this event for 0●. Banish an enemy with cost 3● or less.
-Arc1 | 3● | Fast Event | C | Banish an enemy until your next main phase.
-Arc1 | 5● | Fast Event | U | Banish an enemy until your next main phase. Draw a card.
-Pact1 | 4● | Event | R | Reclaim all characters with cost 3● or less. At end of your next turn, abandon all reclaimed characters.
-Umbra1 | 4● | Event | R | Reclaim up to 3 characters with cost 2● or less.
-Umbra1 | 3● | Event | U | Reclaim a character with cost 3● or less. Reclaim 3●
-Pact1 | 2● | Fast Event | U | Reclaim a character. Banish it at end of turn.
-Umbra1 | 1● | Event | C | Reclaim a character. Lose 1 maximum ●.
-Umbra1 | 4●/1✦ | Child | U | When you reclaim a character, it gains +3 spark.
-Rime1 | 3●/1✦ | Explorer | C | ▸ Materialized: You may discard a card to draw a character.
-Umbra1 | 2●/1✦ | Child | U | ▸ Judgment: Draw a card, then discard a card. With 5 cards in your void, draw 2 instead.
-Rime1 | 3●/1✦ | Explorer | U | ▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment.
-Neutral1 | 5●/2✦ | Explorer | C | ▸ Judgment: Draw a card.
-Surge1 | 3● | Event | R | Copy the next event you play this turn. If this event was reclaimed, copy it twice instead. Reclaim 3●
-Neutral1 | 2● | Fast Event | C | Foresee 3. Draw a card.
-Neutral1 | 1● | Event | C | Draw a card. Foresee 2.
-Arc1 | 2● | Fast Event | C | Return an enemy with cost 2● or less to hand. Draw a card.
-Arc1 | 3● | Fast Event | C | Return an enemy to hand. Gain 2●.
-Surge1 | 2● | Event | U | Put the top 3 cards of your deck into your void, plus 1 more for each card you have played this turn.
-Umbra1 | 2●/1✦ | Explorer | R | ▸ Materialized: Put the top 3 cards of your deck into your void. ▸ Dissolved: Return another character from your void to your hand.
-Pact1 | 2●/1✦ | Tinkerer | R | ▸ Materialized: Put the top 3 cards of your deck into your void. 2●, Abandon an ally: Reclaim a character with cost 3● or less.
-Umbra1 | 2●/1✦ | Child | C | ▸ Materialized: Put the top 3 cards of your deck into your void.
-Umbra1 | 3●/1✦ | Survivor | U | ▸ Materialized: Return a card from your void to your hand.
-Umbra1 | 4●/2✦ | Spirit Animal | U | ▸ Judgment: Put the top 2 cards of your deck into your void. You may return a character from your void to your hand.
-Umbra1 | 2● | Event | R | Return up to 2 characters from your void to your hand. Reclaim -- Put the top 3 cards of your deck into your void.
-Surge1 | 2● | Fast Event | C | Prevent a played card. Gain ● equal to that card's cost.
-Surge1 | 2● | Fast Event | U | Prevent a played card. The opponent draws a card, then discards a card.
-Surge1 | 0● | Fast Event | C | Prevent a played card. The opponent draws 2 cards.
-Rime1 | 2● | Event | C | Draw 2 cards. Discard 2 cards. Gain 3●.
-Rime1 | 2● | Event | C | Discard 2 cards: Draw 3 cards.
-Umbra1 | 2●/1✦ | Survivor | U | ↯fast -- ▸ Dissolved: You may pay 1● to return this character to hand.
-Umbra1 | 2●/2✦ | Survivor | C | ▸ Dissolved: Return this character to your hand.
-Rime1 | 2●/1✦ | Survivor | C | Discard 2 cards: Materialize a Shadow Figment.
-Ignite1 | 2●/2✦ | Warrior | C | 2●, Banish a card from your void: Materialize a Warrior Figment.
-Ignite1 | 1●/1✦ | Survivor | U | ▸ Dissolved: Materialize a Warrior figment for each spark this character has.
-Pact2 | 5●/1✦ | Warrior | R | When an ally is dissolved, materialize a Shadow Figment. With 5 or more Shadow Figments, each gains +2 spark.
-Ignite1 | 2●/1✦ | Warrior | C | ▸ Dissolved: Materialize a Warrior figment.
-Pact1 | 1●/1✦ | Explorer | C | Abandon an ally: Foresee 2.
-Surge1 | 1● | Event | C | Gain 3●. If you have played another event this turn, draw a card.
-Surge1 | 2● | Event | C | Gain 3●. If you have 7 or more cards in your void, gain 5● instead.
-Pact1 | 2● | Event | C | Abandon an ally: Draw a character.
-Pact1 | 1● | Fast Event | U | Abandon an ally: Draw a character with cost equal to that ally's cost.
-Pact1 | 1●/0✦ | Survivor | C | Abandon an ally: Draw a card.
-Rime1 | 2●/1✦ | Renegade | C | ↯fast -- When you discard a card, this character gains +2 spark.
-Umbra1 | 2●/1✦ | Mage | R | ▸ Judgment: You may reclaim an event with cost up to this character's spark.
-Arc1 | 4●/2✦ | Explorer | U | ▸ Materialized: Return an event with cost 3● or less from your void to your hand.
-Rime1 | 3●/2✦ | Explorer | U | ▸ Judgment: Discard your hand, then draw 3 cards.
-Surge1 | 2●/1✦ | Musician | C | When you play an event, materialize a Radiant Figment.
-Neutral1 | 1● | Fast Event | C | Dissolve an enemy with spark 3 or less.
-Neutral1 | 4● | Event | R | Dissolve all characters with spark 2 or less. When you reclaim this card, dissolve all characters instead. Reclaim 6●
-Bloom1 | 1●/1✦ | Child | U | ▸ Judgment: Gain 1●. 4●: Gain 1 maximum ●.
-Bloom1 | 2●/1✦ | Spirit Animal | U | ▸ Materialized, Judgment: Gain 2●. The opponent gains 1✪.
-Bloom1 | 1●/1✦ | Spirit Animal | U | ▸ Judgment: You may return a character to hand to gain 3●.
-Ignite1 | 2●/2✦ | Warrior | U | Once per turn, when you materialize a Warrior, materialize a Radiant Figment.
-Ignite1 | 3●/2✦ | Warrior | R | When you materialize a Figment, materialize another Figment of the same type.
-Bloom1 | 2●/1✦ | Explorer | C | ▸ Judgment: Gain 1 maximum ●.
-Bloom1 | 2● | Event | C | Foresee 3. Gain 1 maximum ●.
-Arc1 | 5● | Fast Event | C | Banish an enemy until your next main phase.
-Arc1 | 2●/0✦ | Tinkerer | R | ▸ Materialized: Materialize a copy of an ally. Abandon this character.
-Arc1 | 3●/0✦ | Synth | U | ▸ Materialized: Materialize a copy of an ally.
-Rime1 | 3● | Event | C | Each player draws 2 cards, then discards 2 cards.
-Bloom1 | 2●/2✦ | Spirit Animal | U | ▸ Materialized: Gain 1 maximum ●. ▸ Judgment: Gain 1●.
-Rime1 | 1●/1✦ | Explorer | C | When the opponent plays an event, draw a card.
-Surge1 | 5●/2✦ | Musician | R | ▸ Materialized: Draw an event. 2●: Play an event from your hand for 0●.
-Ignite1 | 3●/1✦ | Warrior | R | ▸ Judgment: You may pay 2● to have each ally gain +2 spark.
-Pact1 | 4● | Event | U | Reclaim each character dissolved this turn.
-Ignite2 | 3●/1✦ | Survivor | R | ▸ Materialized: Materialize a Warrior figment. When you materialize a Figment, draw a card.
-Ignite2 | 5●/2✦ | Warrior | R | ▸ Materialized: Materialize a Warrior figment. ▸Judgment: Gain 1● for each allied Figment.
-Arc1 | 4● | Fast Event | C | Return 2 allies to hand: Play this event for 0●. Draw 2 cards.
-Surge1 | 2● | Event | C | Until end of turn, gain 2● whenever you play a card.
-Rime1 | 3● | Event | U | Draw 3 cards, then discard 3 cards. Materialize a Warrior figment for each character discarded this way.
-Umbra1 | 2● | Event | C | Look at the top four cards of your deck. Put one of them into your hand and the rest into your void.
-Surge1 | 2● | Event | C | Draw 2 cards. If you played no other events this turn, discard a card.
-Surge1 | 4● | Event | U | Draw 2 cards. Reclaim -- Lose 1 maximum ●
-Surge2 | 6● | Event | R | Copy the next event you play this turn once for each card you have played this turn.
-Ignite1 | 6●/5✦ | Ancient | C | This character costs 1● less for each ally.
-Ignite1 | 5●/1✦ | Warrior | R | ▸ Judgment: Materialize a Warrior figment.
-Pact1 | 3●/1✦ | Mage | R | ▸ Judgment: You may abandon 2 allies to gain 2● and draw 2 cards.
-Umbra1 | 3●/2✦ | Survivor | C | When you play a card from your void, reclaim this character.
-Ignite1 | 5● | Event | C | This event costs 1● less for each ally. Dissolve an enemy. Draw a card.
-Pact1 | 3●/0✦ | Ancient | R | If this card is in your void, when you abandon an ally, materialize a Shadow Figment.
-Pact1 | 3● | Event | C | When an ally is abandoned this turn, gain 1✪.
-Rime1 | 2● | Event | C | Discard a card or abandon an ally: Draw 2 cards.
-Surge1 | 4● | Event | C | Return 3 random events from your void to your hand.
-Arc1 | 1●/0✦ | Tinkerer | R | ▸ Materialized: You may play cards from the top of your deck this turn.
-Bloom1 | 1●/0✦ | Explorer | U | ▸ Materialized: Gain 1 maximum ●.
-Ignite1 | 1●/1✦ | Warrior | U | ▸ Judgment: With 3 cards in your void, this character gains +2 spark.
-Pact1 | 2● | Event | C | Abandon an ally: Gain 1 maximum ●.
-Rime1 | 2●/2✦ | Explorer | U | ▸ Judgment: You may discard a card to draw a character.
-Bloom1 | 2●/1✦ | Explorer | U | ▸ Materialized: Foresee 4. Gain 1 maximum ●.
-Bloom2 | 3●/2✦ | Child | R | When you materialize a Spirit Animal, gain 1●. When you materialize 2 Spirit Animals in a turn, draw a Spirit Animal.
-Pact1 | 2●/5✦ | Ancient | R | ▸ Materialized: Abandon an ally. Materialize a Shadow figment.
-Bloom2 | *● | Event | U | Pay X●: Discover a Spirit Animal with cost X● or less and materialize it.
-Neutral1 | 4● | Event | R | Dissolve up to 2 enemies. Materialize a Shadow Figment for each enemy dissolved.
-Rime2 | 3●/1✦ | Tinkerer | R | ▸ Judgment: You may discard a character to draw a character with cost 1● higher.
-Pact1 | 1●/5✦ | Explorer | C | To play this character, lose 1 maximum ●.
-Surge1 | 2●/2✦ | Spirit Animal | U | ▸ Judgment: You may abandon this character to gain 5●.
-Ignite1 | 2●/1✦ | Synth | R | ▸ Materialized: Choose a character type. Allied characters of that type gain +1 spark.
-Ignite2 | 5●/0✦ | Synth | R | ▸ Judgment: Each ally gains +1 spark.
-Umbra1 | 3●/2✦ | Tinkerer | U | ▸ Dissolved: Return a character with cost 2● or less from your void to your hand.
-Neutral1 | 3● | Event | U | Choose a number: Dissolve all enemies with cost equal to that number.
-Neutral1 | 0● | Event | C | Gain 1●.
-Bloom1 | 2●/0✦ | Explorer | R | ▸ Materialized, Judgment: Gain 2●. Lose 1✪.
-Surge1 | 1●/0✦ | Synth | U | ▸ Materialized: Gain 4●. Lose 1 maximum ●.
-Pact1 | 1●/0✦ | Tinkerer | U | ▸ Judgment: You may abandon an ally to gain 2●.
-Pact1 | 2●/1✦ | Explorer | R | ▸ Judgment: You may abandon an ally to put cards from your deck into your void equal to that ally's spark.
-Ignite1 | 3●/0✦ | Tinkerer | R | When the opponent materializes a character, materialize a Celestial Figment.
-Ignite2 | 3●/0✦ | Warrior | R | ▸ Materialized: Materialize a Warrior figment. This character's spark is equal to the number of allied Figments.
-Arc2 | 5●/2✦ | Tinkerer | R | ▸ Materialized: Disable an enemy's triggered abilities. This character gains those abilities.
-Arc2 | 3●/1✦ | Spirit Animal | R | When an ally is banished, this character gains +1 spark. ▸ Judgment: Banish an ally, then materialize it.
-Rime2 | 4●/2✦ | Synth | R | Costs 0● if you discarded a card this turn. ▸ Materialized: Dissolve an enemy with spark 3 or less.
-Pact1 | 2●/1✦ | Outsider | R | When you abandon an ally, this character gains +1 spark. ▸ Dissolved: Kindle X where X is this character's spark.
-Rime1 | 3● | Fast Event | U | Return a character from your void to your hand. The opponent discards a card.
-Bloom1 | 1● | Event | R | Until end of turn, when you materialize a character, that character gains +3 spark. Reclaim 3●
-Ignite1 | 2●/1✦ | Warrior | U | At the end of your turn, if an ally left play this turn, materialize a Warrior figment.
-Neutral1 | 3● | Fast Event | R | Dissolve an enemy with cost 3● or less. Reclaim -- Banish a card from hand.
-Umbra1 | 5●/4✦ | Explorer | R | ▸ Judgment: Draw a card, then put the top 2 cards of your deck into your void.
-Bloom1 | 2●/1✦ | Spirit Animal | R | ↯fast -- ▸ Materialized: Draw a card. With 3 allied Spirit Animals, dissolve an enemy with spark 2 or less.
-Neutral1 | 3●/2✦ | Child | R | ▸ Materialized: Draw a card with cost 2● or less and play it for 0●.
-Pact1 | 5●/2✦ | Ancient | U | When a non-figment ally is abandoned, materialize a Shadow figment.
-Pact1 | 3●/2✦ | Survivor | R | Abandon an ally: Foresee 1. Reclaim 4●
-Neutral1 | 4●/1✦ | Warrior | U | ▸ Materialized: Dissolve an enemy.
-Pact2 | 6●/1✦ | Warrior | R | ▸ Judgment: Materialize two Shadow Figments. Abandon an ally: Draw a card.
-Bloom2 | 7● | Event | R | Materialize 3 random characters from your deck with total cost 6● or less.
-Arc2 | 5●/0✦ | Explorer | C | Your cards have ↯fast.
-Pact1 | 3●/1✦ | Renegade | U | Abandon this character: Return an ally dissolved this turn from your void to play.
-Rime1 | 2●/0✦ | Survivor | R | ▸ Materialized, Judgment: You may pay 2●. If you do, draw 2 cards, then discard a card.
-Neutral1 | 2●/0✦ | Synth | U | ▸ Materialized, Dissolved: Gain 2●.
-Neutral1 | 3●/2✦ | Monster | R | ▸ Judgment: Dissolve a random enemy or ally among those with the lowest spark.
-Neutral1 | 4●/0✦ | Synth | U | 3●: Until end of turn, this character becomes a copy of an ally or enemy.
-Arc1 | 4●/2✦ | Explorer | C | When you return an ally to hand, draw a card.
-Umbra1 | 3●/3✦ | Outsider | U | When you reclaim a character, if this card is in your void, reclaim this character.
-Umbra1 | 4●/2✦ | Child | R | ▸ Judgment: Look at the top 3 cards of your deck. You may put a character into your hand. Put the rest into your void.
-Neutral2 | 5●/2✦ | Ancient | R | ▸ Judgment: You may pay 1● to materialize a character from the opponent's void.
-Bloom1 | 3●/2✦ | Spirit Animal | R | ▸ Dissolved: You may pay 3● to return this character to the battlefield with +3 spark.
-Pact1 | 4●/2✦ | Synth | R | ▸ Dissolved: Materialize a Shadow figment. When you abandon a figment, kindle 2.
-Pact1 | 4●/2✦ | Explorer | U | When you abandon a figment, gain 1✪.
-Rime1 | 4●/0✦ | Survivor | C | Discard a card: Gain 2●.
-Ignite2 | 5●/3✦ | Warrior | R | ▸ Judgment: With a non-Warrior ally, draw a Warrior and materialize it.
-Bloom1 | 2●/1✦ | Child | U | ▸ Judgment: You may pay 1● to trigger the ▸ Judgment: ability of an ally.
-Pact2 | 4●/10✦ | Ancient | R | To play this card, abandon all allies.
-Ignite1 | 3●/1✦ | Warrior | R | ▸ Materialized: Materialize a Warrior figment. ▸ Judgment: Kindle 1 for each allied Warrior.
-Neutral1 | 2●/2✦ | Synth | C | ↯fast -- Enemies may not be reclaimed.
-Umbra1 | 2●/1✦ | Survivor | U | ↯fast -- ▸ Materialized: Return a character dissolved this turn from your void to your hand.
-Arc1 | 6●/2✦ | Spirit Animal | U | ▸ Materialized: Banish an ally or enemy until your next main phase.
-Ignite2 | 7●/4✦ | Ancient | R | ▸ Materialized, Judgment: Materialize two Warrior figments.
-Arc1 | 4●/1✦ | Warrior | R | ↯fast -- ▸ Materialized: Choose one: • Kindle 2. • Materialize a Celestial Figment. • Dissolve an enemy with spark 2 or less.
-Ignite2 | 4●/3✦ | Explorer | C | When you materialize a Figment, materialize an additional Figment.
-Neutral1 | 3● | Fast Event | U | Return an enemy character to the top of the opponenet's deck.
-Pact1 | 4● | Event | R | Each player abandons characters until they have as many as the player with fewest.
-Neutral1 | 6● | Event | R | Dissolve all characters. Gain 1● for each of your characters dissolved this way.
-Arc1 | 4●/1✦ | Tinkerer | U | ▸ Materialized: Foresee 3, then draw a card.
-Arc1 | 5●/2✦ | Explorer | R | ↯fast -- ▸ Materialized: Draw 2 cards. This character gains +1 spark for each card drawn this turn.
-Neutral1 | 3●/1✦ | Explorer | U | ▸ Judgment: You may pay 2● to foresee 2 and draw a card.
-Arc1 | 3●/2✦ | Mage | R | ↯fast -- ▸ Materialized: Disable an enemy's activated and triggered abilities while this character is in play.
-Arc2 | 4●/1✦ | Warrior | R | When you play an event, you may banish an ally, then materialize it.
-Neutral1 | 2● | Event | C | Foresee X, where X is your current energy. Draw a card.
-Bloom1 | 2● | Event | C | Each player may materialize a character from their hand for 0●.
-Neutral1 | 3● | Event | C | Foresee 5. Draw 2 cards.
-Neutral1 | 6● | Event | C | Return all characters to their owners' hands.
-Surge1 | 2●/1✦ | Musician | U | When you play an event, this character gains +1 spark. ▸ Judgment: If this character has 5 or more spark, draw a card.
-Ignite1 | 2●/2✦ | Warrior | U | ▸ Judgment: If you have fewer ✪ than the opponent, this character gains +2 spark.
-Ignite1 | 3●/2✦ | Warrior | R | ▸ Judgment: If the opponent has more ✪ than you, materialize a Warrior figment and draw a card.
-Neutral1 | 5●/3✦ | Warrior | R | ▸ Materialized: Each enemy loses 2 spark.
-Umbra2 | 8●/4✦ | Ancient | R | ▸ Materialized, Judgment: The opponent abandons a character. Draw a card.
-Neutral1 | 8●/5✦ | Ancient | C | 8●: Draw 8 cards.
-Umbra1 | 1● | Event | C | Reclaim the character with the lowest cost in your void.
-Rime1 | 1●/1✦ | Tinkerer | U | ▸ Judgment: You may discard up to 2 cards, then draw that many cards. This character gains +1 spark per card discarded.
-Rime2 | 4●/2✦ | Renegade | R | ↯fast -- ▸ Judgment: Banish a card from the top of the opponent's deck. You may play it this turn.
-Rime2 | 5●/1✦ | Survivor | C | ▸ Materialized: The opponent discards a card. Draw a card.
-Umbra1 | 3●/2✦ | Survivor | R | ▸ Judgment: With 4+ cards in your void, trigger an additional Judgment phase.
-Bloom1 | 2●/2✦ | Explorer | U | ▸ Judgment: Gain 2●. The opponent gains 1●.
-Rime1 | 2●/1✦ | Explorer | U | ▸ Materialized: Draw a card. Discard a card. When you discard a card, this character gains +1 spark.
-Rime1 | 2●/1✦ | Explorer | U | ▸ Judgment: You may discard a card to banish the top 2 cards of your deck. You may play those cards this turn.
-Rime1 | 2●/2✦ | Visitor | R | ↯fast -- ▸ Judgment: If the opponent has more cards in hand, draw a card.
-Neutral2 | 4●/5✦ | Explorer | R | ▸ Materialized: Draw an event from the opponent's deck, then play it for 0●.
-Neutral1 | 1●/0✦ | Warrior | C | ▸ Materialized: Dissolve an enemy with spark 2 or less.
-Bloom1 | 1●/1✦ | Child | U | Characters with cost 5● or more cost you 2● less.
-Ignite1 | 2●/1✦ | Warrior | R | ▸ Judgment: Kindle 1. 5●: Each allied character gains +1 spark.
-Bloom1 | 2●/1✦ | Spirit Animal | U | ▸ Judgment: Gain 1●. With 4 or more allies, gain 3● instead.
-Ignite1 | 2●/1✦ | Warrior | U | ▸ Judgment: This character gains +2 spark.
-Bloom1 | 6●/*✦ | Spirit Animal | R | This character's spark is equal to your maximum ●.
-Ignite2 | 5●/1✦ | Visionary | R | ▸ Judgment: Each ally gains spark equal to this character's spark.
-Ignite1 | 5●/3✦ | Survivor | U | When a non-Figment ally is dissolved, materialize a Warrior figment.
-Ignite2 | 10●/8✦ | Ancient | R | ▸ Dissolved: Materialize three Warrior figments.
-Umbra1 | 4● | Event | C | Gain N maximum ●, where N is the number of characters in your void.
-Pact2 | 4● | Event | R | ▸ Judgment: You may abandon a character to materialize a random character from your deck.
-Neutral2 | 13●/10✦ | Ancient | L | When you play this character from hand, take an extra turn after this one.
-Bloom1 | 1● | Event | C | Gain 1 maximum ●.
-Bloom1 | 3●/1✦ | Explorer | U | ▸ Judgment: Choose — gain 1● or gain 1 maximum ●.
-Rime2 | 3● | Event | R | Each player draws 5 cards, then discards 2 cards.
-Surge2 | 6●/2✦ | Spirit Animal | C | When you play a card, draw a card.
-Umbra2 | 9●/4✦ | Visionary | R | ▸ Materialized: The opponent abandons 3 characters
-Rime1 | 3●/2✦ | Survivor | C | The opponent cannot play fast cards on your turn.
-Neutral1 | 6● | Event | C | Banish an enemy. Materialize a copy of it.
-Rime1 | 5●/1✦ | Spirit Animal | C | Discard a card: This character gains +2 spark.
-Umbra1 | 2●/1✦ | Survivor | U | ▸ Judgment: Return a character from your void to your hand.
-Surge1 | 4●/3✦ | Explorer | R | ▸ Materialized: Play a random event with cost 3● or less from your deck, with targets chosen randomly.
-Bloom1 | 4●/5✦ | Explorer | R | ▸ Materialized: Draw the top character of your deck.
-Bloom1 | 1● | Event | C | Lose 2 maximum ●: Dissolve an enemy.
-Umbra1 | 3●/1✦ | Outsider | R | ▸ Judgment: Materialize a Shadow Figment, then put the top card of your deck into your void.
-Ignite1 | 1●/1✦ | Warrior | C | 2●: This character gains +1 spark.
-Neutral2 | 7●/3✦ | Ancient | R | ↯fast -- ▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less.
-Bloom2 | 8●/3✦ | Spirit Animal | R | ▸ Materialized: Draw a card. ▸ Judgment: Gain 4●.
-Neutral1 | 7●/4✦ | Synth | R | ▸ Materialized: Draw a character and an event from your deck.
-Surge1 | 0●/0✦ | Child | R | ▸ Judgment: Gain 3●. When you materialize another character, abandon this one.
-Rime1 | 3●/1✦ | Visionary | R | ▸ Judgment: With exactly 5 cards in your hand, draw a card.
-Bloom1 | 3●/1✦ | Explorer | R | ▸ Materialized: Gain the ▸ Judgment: ability of a chosen ally.
-Surge2 | 2●/0✦ | Explorer | R | ▸ Materialized: This character gains +2 spark for each card you played this turn.
-Surge2 | 3●/2✦ | Musician | R | ▸ Judgment: With no allies, gain 1✪ and draw a card.
-Rime1 | 1●/0✦ | Outsider | R | When you discard a card, this character gains +1 spark. With 4 or more spark, the opponent's characters cost 2● more.
-Neutral1 | 3●/1✦ | Detective | R | ↯fast -- ▸ Materialized: Look at the opponent's hand. Gain a copy of a card there.
-Arc2 | 4●/1✦ | Synth | R | The ▸ Materialized: ability of allies triggers an additional time.
-Pact1 | 5●/2✦ | Ancient | R | ▸ Materialized: Trigger the ▸ Dissolved: ability of each ally.
-Rime2 | 5●/2✦ | Tinkerer | R | When you discard a character, materialize it.
-Rime2 | 8●/5✦ | Ancient | R | Costs 1● less for each card you discarded this turn. ▸ Materialized: The opponent discards a card and you draw a card.
-Bloom1 | 4●/2✦ | Explorer | R | ▸ Materialized: Each character in your hand gains +2 spark.
-Ignite2 | 4● | Event | R | For the rest of the game, your Figments have +2 spark.
-Bloom1 | 5● | Event | R | Choose one: • Gain 3 maximum ●. • Your ● becomes your maximum ●.
-Rime1 | 4●/2✦ | Outsider | R | ▸ Judgment: The opponent discards a card. If they can't, gain 2✪.
-Rime2 | 3●/0✦ | Explorer | R | While in hand, when you discard another card, this gains +2 spark.
-Umbra2 | 5●/2✦ | Explorer | R | ▸ Materialized: Look at the top 3 cards of your deck. You may play one for 0●, then put the rest into your void.
-Surge1 | 3● | Event | R | Until end of turn, your events cost 1●.
-Surge2 | 3●/1✦ | Warrior | R | When you prevent a card, draw a card and gain 2●.
-Arc1 | 4●/0✦ | Mage | R | ▸ Materialized: This character becomes a copy of an enemy. Disable that enemy's abilities while in play.
-Neutral1 | 6●/2✦ | Ancient | R | ▸ Materialized: The spark of each enemy becomes 1.
-Bloom2 | 7●/3✦ | Spirit Animal | R | ▸ Materialized: Materialize each Spirit Animal in your hand.
-Surge2 | 5●/2✦ | Warrior | R | ▸ Judgment: Play the top event of your deck for 0●, with targets chosen randomly.
-Surge2 | 5●/1✦ | Tinkerer | R | When you play an event, draw an event with lower cost.
-Pact1 | 5●/2✦ | Ancient | R | ▸ Dissolved: Dissolve each enemy with spark less than this character's spark.
-Bloom1 | 4●/2✦ | Explorer | R | ▸ Materialized: Draw a character with cost 5● or more. ▸ Dissolved: Materialize it from your hand.
-Umbra2 | 6● | Event | R | Put your deck into your void.
-Surge1 | 1● | Fast Event | R | Play a copy of the last event the opponent played.
-Pact1 | 4●/1✦ | Ancient | R | While in hand, when an ally is dissolved, this character gains +2 spark.
-Pact1 | 4●/2✦ | Warrior | R | When an enemy is dissolved, banish it. ▸ Dissolved: Materialize each enemy banished this way.
-Pact1 | 4● | Event | R | Dissolve all characters, then materialize them with 1 spark.
-Arc1 | 6●/1✦ | Warrior | R | ▸ Materialized: Swap this character's spark with an enemy's spark.
-Bloom1 | 4●/2✦ | Spirit Animal | R | ▸ Dissolved: The ally with the most spark gains +3 spark and this ability.
-Surge2 | 4● | Event | R | For the rest of the game, when you prevent a card, gain 1✪ and draw a card.
-Umbra1 | 4●/2✦ | Tinkerer | R | ▸ Materialized: Gain the abilities of a chosen character in your void.
-Surge2 | 3●/1✦ | Tinkerer | R | When you play an event from your void, copy it.
-Umbra1 | 3●/1✦ | Survivor | R | ▸ Judgment: Become a copy of a random character in your void.
-Pact2 | 4●/1✦ | Ancient | R | Allied ▸ Dissolved: abilities trigger an additional time.
-Surge2 | 3●/1✦ | Musician | R | When you play your second event each turn, copy it.
-Arc2 | 6●/2✦ | Ancient | R | ▸ Judgment: Banish an enemy until this character leaves play.
-Pact1 | 4● | Event | R | Each ally gains '▸ Dissolved: Materialize a character with equal cost from your deck.'
-Bloom1 | 3●/1✦ | Spirit Animal | R | ▸ Judgment: Gain +1 spark. You may abandon this character to gain maximum ● equal to its spark.
-Arc1 | 5●/2✦ | Outsider | R | ▸ Materialized: If you drew this character this turn, banish an enemy.
-Rime1 | 3●/2✦ | Outsider | R | ▸ Materialized: The opponent discards a card. They can't play cards with that cost until your next turn.
-Surge2 | 4●/1✦ | Tinkerer | R | At end of turn, play a random event with cost 2● or less from your void for 0●.
-Surge2 | 5●/2✦ | Outsider | R | When you prevent a character, materialize a copy of it.
-Ignite1 | 3●/1✦ | Warrior | R | When you draw a character, materialize a Warrior figment.
-Ignite1 | 5●/2✦ | Warrior | R | When you draw a Warrior, materialize a copy of it with 1 spark.
-Pact1 | 5●/2✦ | Ancient | R | ▸ Materialized: Abandon an ally. Each other ally gains that ally's spark.
-Ignite1 | 4● | Event | R | Materialize a 0 spark copy of each allied Warrior.
-Rime2 | 3●/0✦ | Outsider | R | Discard a character: Play this character for 0● and it gains that character's spark.
-Surge2 | 5●/2✦ | Warrior | R | When you play an event, materialize a random character with equal cost from your deck.
-Ignite1 | 3● | Event | R | Until end of turn, characters in hand cost 1● and have 1 spark.
-Ignite1 | 4●/2✦ | Monster | R | ▸ Materialized: Materialize 2 Warrior Figments. Each gains '▸ Dissolved: Dissolve a random enemy.'
-Ignite1 | 4●/2✦ | Warrior | R | ▸ Materialized: Each enemy gains '▸ Dissolved: The opponent materializes a Warrior figment.'
-Arc1 | 5●/1✦ | Warrior | R | ▸ Materialized: Banish an ally. At end of turn, materialize it and a copy of it.
-Pact1 | 4●/2✦ | Ancient | R | Abandon an ally: This character gains spark equal to that ally's cost.
-Rime2 | 7●/3✦ | Ancient | R | ▸ Materialized: Dissolve all other characters. Discard a card for each ally dissolved.
-Umbra2 | 4●/2✦ | Survivor | R | ▸ Judgment: Put the top cards 2 of your deck into your void. Materialize a copy of a random character from among them with 1 spark.
-Umbra2 | 5●/2✦ | Survivor | R | ▸ Materialized: Put 3 characters from your void into your deck. They cost 0●.
-Ignite1 | 3●/2✦ | Warrior | R | ▸ Dissolved: Materialize a Warrior from hand. It gains +3 spark.
-Surge2 | 5●/2✦ | Spirit Animal | R | ▸ Materialized: Return each event played last turn from your void to hand.
-Ignite2 | 6●/2✦ | Ancient | R | ▸ Materialized: Materialize a random 1-spark, a 2-spark, and a 3-spark character from your void.
-Bloom1 | 3●/0✦ | Spirit Animal | R | When the opponent would dissolve an ally, dissolve this character instead. ▸ Dissolved: Kindle 2.
-Ignite1 | 4●/2✦ | Explorer | R | ▸ Materialized: Choose an ally. Each other ally's spark becomes equal to that ally's spark.
-Rime2 | 5●/2✦ | Warrior | R | ▸ Judgment: Each enemy loses 1 spark.
-Ignite1 | 4●/2✦ | Warrior | R | When you kindle, each other allied character also gains +1 spark.
-Umbra1 | 4●/0✦ | Survivor | R | ▸ Materialized: Choose an enemy. This character gains spark equal to its spark. Its spark becomes 0.
-Ignite2 | 6●/2✦ | Guide | R | ▸ Materialized: Each character in your deck gains +2 spark.
-Bloom1 | 4●/1✦ | Warrior | R | ▸ Judgment: Double this character's spark.
-Pact1 | 3●/1✦ | Monster | R | ▸ Materialized: Choose an enemy. ▸ Dissolved: Materialize a copy of it.
-Neutral2 | 3● | Event | R | Secretly choose 1, 2, or 3. After that many turns, gain that many ✪ and draw that many cards.
-Arc1 | 3●/0✦ | Explorer | R | ▸ Materialized: Banish the top card of your deck. ▸ Banished: Play the card you banished for 0●.
-Bloom1 | 4●/1✦ | Spirit Animal | R | ▸ Judgment: Each character in your hand gains +1 spark.
-Umbra2 | 4●/2✦ | Ancient | R | ▸ Materialized: The opponent chooses — you draw 2 cards, or they abandon a character.
-Neutral1 | 4●/3✦ | Ancient | R | ▸ Judgment: Lose 1 spark. If this has 0 spark, dissolve all enemies.
-Bloom1 | 2●/2✦ | Spirit Animal | R | ▸ Dissolved: You may put this card on top of your deck with +3 spark.
-Umbra2 | 6●/2✦ | Ancient | R | ▸ Materialized: Each enemy loses 1 spark.
-Bloom2 | 5●/0✦ | Outsider | R | This character's spark is equal to the highest enemy's spark.
-Arc2 | 4●/1✦ | Explorer | R | At the end of your turn, this character gains +1 spark for each unspent ● you have.
-Bloom1 | 5●/2✦ | Spirit Animal | R | ▸ Materialized: Return each other ally to hand, they gain +2 spark.
-Arc2 | 5●/2✦ | Explorer | R | ▸ Materialized: Banish each ally. For each, materialize a character with cost 1● higher from your deck.
-Surge2 | 5●/1✦ | Explorer | R | ▸ Materialized: Reveal the top card of your deck. You may play it. If you do, this character gains +2 spark and you repeat this process.
-Rime2 | 4●/2✦ | Tinkerer | R | When you discard a character, it gains +3 spark and is put into your deck instead.
-Rime2 | 4●/2✦ | Outsider | R | When you discard a card, reveal the top of your deck. If it costs less, play it for 0●.
-Arc2 | 4●/2✦ | Explorer | R | ▸ Materialized: Choose an enemy. It cannot gain spark while this character is in play.
-Rime2 | 3●/2✦ | Warrior | R | ▸ Materialized: Choose an enemy. ▸ Judgment: It loses 2 spark. At 0, dissolve it and draw 2.
-Bloom2 | 7●/7✦ | Ancient | L | ▸ Materialized: For the rest of the game, ▸ Judgment: abilities trigger twice.
-Umbra2 | 7●/3✦ | Ancient | R | ▸ Judgment: Each enemy loses 1 spark. This character gains +1 spark for each.
-Neutral1 | 4●/1✦ | Tinkerer | R | ▸ Judgment: Banish the top card of your deck. ▸ Dissolved: Play each card banished this way for 0●.
-Arc1 | 4●/1✦ | Spirit Animal | R | ▸ Materialized: Choose an ally. ▸ Judgment: Materialize a copy of it with 1 spark.
-Umbra1 | 5●/2✦ | Ancient | R | ▸ Materialized, Judgment: Each character in your void gains +2 spark.
-Rime1 | 3●/1✦ | Synth | R | ▸ Materialized: An enemy's spark becomes 0 until your next turn. Discard a card.
-Pact1 | 4●/2✦ | Ancient | R | ▸ Judgment: You may abandon an ally to play the top card of the opponent's deck for 0●.
-Bloom1 | 2●/1✦ | Spirit Animal | R | ▸ Materialized: Choose an ally. ▸ Judgment: That ally and this character each gain +1 spark.
-Pact1 | 4●/1✦ | Ancient | R | When you abandon an ally, this character becomes a copy of that ally. It keeps this ability.
-Surge2 | 4●/2✦ | Explorer | R | ▸ Materialized: Choose an event in hand. At the beginning of each turn, play a copy of it for 0●.
-Umbra1 | 3●/1✦ | Child | R | When a character enters your void from your deck, add it to your hand.
-Pact1 | 4●/2✦ | Warrior | R | ▸ Dissolved: For the rest of the game, your first character each turn costs 2● less.
-Pact1 | 7●/4✦ | Synth | R | ▸ Dissolved: Materialize each character abandoned this turn from your void with +3 spark.
-Ignite1 | 4●/1✦ | Warrior | R | ▸ Materialized: An enemy loses all spark. This character gains that much spark.
-Rime1 | 3●/2✦ | Explorer | U | ▸ Judgment: You may swap a card in your hand with a card in your void.
-Ignite2 | 5●/1✦ | Synth | R | When you materialize a Figment, this character gains +2 spark.
-Pact1 | 4●/2✦ | Warrior | R | Abandon this character: Dissolve an enemy.
-Surge1 | 4●/2✦ | Renegade | R | When you play an event, the enemy with the most spark loses 1 spark.
-Surge1 | 5●/2✦ | Warrior | R | ▸ Materialized: Dissolve a random enemy for each event you played this turn.
-Surge1 | 3●/1✦ | Survivor | R | ▸ Materialized: Events cost you 2● less this turn. For the rest of the game after that, events cost you 1● more.
-Ignite1 | 4●/2✦ | Warrior | R | When an allied Warrior is dissolved, reclaim it with 1 spark.
-Arc1 | 6●/3✦ | Monster | R | ▸ Materialized: Banish an enemy. Add a copy of it to your hand.
-Bloom1 | 4●/2✦ | Spirit Animal | R | When another ally gains spark, this character gains +1 spark.
-Neutral1 | 3●/2✦ | Visionary | R | ▸ Materialized: Reorder your deck from highest cost to lowest cost.
-Bloom1 | 5●/2✦ | Tinkerer | R | ▸ Materialized: Double an ally's spark.
-Umbra1 | 4●/2✦ | Synth | R | Events you reclaim cost 0●.
-Rime1 | 3● | Event | R | Swap your hand with the top 5 cards of your deck.
-Surge2 | 4● | Event | R | Banish your hand. For the rest of the game, cards you draw cost 1● less.
-Arc1 | 3● | Event | R | Return each ally to hand. They cost 2● less this turn.
-Arc1 | 3● | Event | R | Banish all characters, then materialize them.
-Pact1 | 4● | Event | R | An ally gains the total spark of your other allies. Abandon them.
-Umbra2 | 4● | Event | R | Return each event in your void to your hand. At end of turn, banish them.
-Bloom1 | 2● | Event | R | Materialize a random character from your deck with cost equal to the number of cards in your hand.
-Rime1 | 4● | Event | R | Look at the top 5 cards of the opponent's deck. Play one for 0●. Put the rest on the bottom.
-Arc1 | 5● | Event | R | Until end of turn, when you materialize a character, materialize a copy of it.
-Neutral1 | 5● | Event | R | Dissolve an enemy. Each other enemy loses spark equal to the dissolved character's cost.
-Neutral1 | 2● | Fast Event | C | Dissolve an enemy with spark 4 or more.
-Umbra1 | 2● | Event | C | Put 5 random events from your deck into your void.
-Pact1 | 4● | Event | R | Abandon all allies. Gain 2● and draw a card for each ally dissolved.
-Pact1 | 5● | Event | R | Abandon any number of allies. Materialize a random character from your deck for each ally abandoned.
-Rime1 | 3● | Event | R | Until end of turn, when you discard a character, materialize it.
-Bloom1 | 2● | Event | R | The cost of a random character in your hand becomes 0●.
-Rime1 | 4● | Event | R | Look at the opponent's hand. You may play an event from it for 0●.
-Ignite1 | 6● | Event | R | Each ally becomes a copy of the ally with the most spark.
-Neutral0 | 2●/1✦ | Musician | Starter | Supported allies have +2 spark.
-Neutral0 | 3●/1✦ | Visionary | Starter | ▸ Materialized: Foresee 1.
-Neutral0 | 4●/4✦ | Spirit Animal | Starter | 
-Neutral0 | 5●/3✦ | Warrior | Starter | ▸ Judgment: Gain 1 point.
-Neutral0 | 3●/2✦ | Visitor | Starter | ▸ Dissolved: Draw a card.
-Neutral0 | 6●/6✦ | Synth | Starter | This character has +2 spark per supporting ally.
-Neutral0 | 2● | Event | Starter | Dissolve a character with cost 3● or less.
-Neutral0 | 1● | Event | Starter | Draw a card. Foresee 1.
-Neutral0 | 2● | Event | Starter | Discover a character.
-Neutral0 | 1● | Event | Starter | An ally gains +3 spark.
+[event_chain, character_velocity] | 6●/4✦ | Ancient | R | When you play 2 cards in a turn, reclaim this character.
+[discover_toolbox] | 2● | Event | U | Discover a card with cost 2●.
+[judgment_engines, void_recursion, reclaim_characters] | 4●/0✦ | Tinkerer | R | ▸ Judgment: Return this character from your void to your hand.
+[discard_velocity, void_recursion, void_setup, judgment_engines, hand_cycling] | 2●/0✦ | Trooper | R | ▸ Judgment: You may draw 2 cards, then discard 3 cards.
+[discard_velocity, hand_cycling, void_recursion, void_setup, reclaim_events] | 2● | Event | C | Draw 2 cards. Discard 2 cards. Reclaim 2●
+[discard_velocity, character_velocity] | 3●/2✦ | Explorer | U | When you discard this character, materialize it.
+[judgment_bodies, hand_cycling, discard_velocity, point_pressure] | 2●/0✦ | Child | R | ▸ Judgment: You may discard a card to draw a card and gain 1✪.
+[discard_velocity, void_recursion] | 3●/1✦ | Explorer | R | When you discard a card, it gains reclaim equal to its cost this turn.
+[fast_setup, foresee_selection, judgment_bodies, fast_tempo] | 3●/2✦ | Agent | C | ↯fast -- ▸ Judgment: Foresee 1.
+[abandon_furnace] | 9●/6✦ | Ancient | U | Abandon 2 allies: Reclaim this character.
+[discard_velocity] | 3●/1✦ | Character | R | When you discard a card, gain 1✪.
+[judgment_bodies, warrior_pressure, warrior_bastion, judgment_engines, cheap_curve] | 0●/0✦ | Warrior | L | ▸ Judgment: Gain 1●.
+[resource_burst, big_energy, event_chain, event_setup] | 0● | Event | L | Gain 3●.
+[cheap_removal] | 2● | Event | U | Dissolve an enemy. You lose 4✪.
+[discard_velocity, character_velocity] | 5●/3✦ | Ancient | C | This character costs 1● if you have discarded a card this turn.
+[warrior_bastion, judgment_engines] | 2●/1✦ | Warrior | U | ▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less.
+[hand_cycling, discard_velocity, judgment_engines, judgment_bodies, void_setup] | 2●/1✦ | Hacker | C | ▸ Judgment: Draw a card, then discard a card.
+[sweepers, prevent_control, warrior_bastion, survivor_dissolve] | 6● | Event | R | Dissolve all characters.
+[discard_velocity, spark_tall] | 2●/1✦ | Renegade | R | When you discard a card, kindle 1.
+[judgment_bodies, card_flow, judgment_engines, cheap_curve] | 2●/2✦ | Visitor | R | ▸ Judgment: Draw a card, then the opponent gains 2✪.
+[void_recursion, character_velocity] | 4●/2✦ | Explorer | R | Once per turn, you may play a character with cost 2● or less from your void.
+[materialize_value, materialize_tempo, discard_velocity, hand_cycling, void_setup] | 4●/3✦ | Detective | C | ▸ Materialized: Discard 2 cards, then draw 2 cards.
+[reclaim_characters, void_recursion, card_flow, event_setup] | 2● | Event | C | You may return a character from your void to your hand, then draw a card.
+[fast_interaction, premium_removal, fast_tempo] | 3● | Fast Event | C | Dissolve an enemy.
+[survivor_dissolve, discard_velocity, judgment_engines] | 2●/1✦ | Survivor | U | ▸ Judgment: You may discard a card to dissolve an enemy with spark 1 or less.
+[discard_velocity, spark_tall] | 4●/3✦ | Visitor | R | Once per turn, when you discard a card, gain 1●, then kindle 2.
+[void_recursion] | 8●/8✦ | Ancient | R | Banish your void with 8 or more cards: Reclaim this character.
+[materialize_value, materialize_tempo, reclaim_characters, void_recursion, hand_cycling] | 3●/2✦ | Child | C | ▸ Materialized: Draw a card, then discard a card. Reclaim 3●
+[void_recursion] | 5●/*✦ | Ancient | U | This character's spark is equal to the number of cards in your void.
+[warrior_pressure, character_velocity, go_wide_enablers, abandon_fodder] | 0●/1✦ | Warrior | C | 
+[abandon_furnace, warrior_pressure, warrior_bastion] | 3●/1✦ | Ancient | R | ▸ Judgment: You may abandon a Warrior to discover a Warrior with cost 1● higher and materialize it.
+[materialize_value, warrior_bastion, materialized_staples, card_flow, survivor_dissolve] | 3●/1✦ | Warrior | C | ▸ Materialized, Dissolved: Draw a card.
+[prevent_control] | 2●/1✦ | Synth | R | When the opponent plays an event which could dissolve an ally, prevent that card.
+[warrior_pressure, warrior_bastion] | 3●/2✦ | Warrior | U | 4●: This character gains +1 spark for each allied Warrior.
+[warrior_pressure, warrior_bastion] | 2● | Fast Event | U | An ally gains +1 spark for each allied Warrior.
+[warrior_pressure, warrior_bastion] | 2●/0✦ | Warrior | C | When you materialize an allied Warrior, this character gains +1 spark.
+[materialize_tempo, materialize_value, character_velocity] | 4●/2✦ | Explorer | R | Once per turn, when you materialize a character with cost 2● or less, draw a card.
+[cheap_removal, void_denial] | 2● | Event | U | Banish an enemy with cost 2● or less.
+[cheap_removal, void_denial] | 1● | Event | U | Banish a non-Warrior enemy.
+[fast_interaction, cheap_removal, fast_tempo] | 2● | Fast Event | C | Dissolve an enemy with spark 1 or less.
+[warrior_pressure, warrior_bastion] | 1● | Event | C | Dissolve an enemy with cost less than the number of allied Warriors.
+[warrior_pressure, warrior_bastion] | 1● | Event | U | Discover a Warrior.
+[void_recursion, warrior_pressure, warrior_bastion] | 3●/1✦ | Warrior | C | 2●, Banish another card in your void: Reclaim this character.
+[abandon_fodder, abandon_furnace, warrior_pressure] | 2●/1✦ | Warrior | R | 2●, Abandon an ally with spark 1 or less: Draw 2 cards.
+[warrior_pressure, warrior_bastion] | 0●/0✦ | Warrior | C | ▸ Materialized, Judgment: With 2 allied Warriors, gain 1●.
+[big_energy, judgment_bodies, materialized_staples, warrior_pressure, warrior_bastion] | 1●/0✦ | Warrior | L | ▸ Materialized, Judgment: Gain 2●.
+[materialize_tempo, materialize_value] | 1●/1✦ | Warrior | C | Once per turn, when you materialize a character, gain 1●.
+[warrior_pressure, warrior_bastion, materialize_value] | 3●/2✦ | Warrior | C | ▸ Materialized: Draw a Warrior from your deck.
+[abandon_furnace, discard_velocity] | 2●/1✦ | Warrior | R | 2●, Abandon a character, Discard your hand: Draw 3 cards.
+[warrior_bastion, prevent_control] | 2●/2✦ | Warrior | U | Disable the ▸ Materialized: abilities of enemies.
+[warrior_pressure, warrior_bastion] | 2●/1✦ | Warrior | C | Allied Warriors have +1 spark.
+[warrior_bastion, void_denial, judgment_engines, spark_tall] | 2●/0✦ | Warrior | R | ▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void.
+[prevent_control, hand_disruption, midcurve_glue] | 3●/2✦ | Mage | U | The opponent's events cost 1● more.
+[warrior_bastion, prevent_control, materialize_tempo] | 3●/2✦ | Warrior | U | ▸ Materialized: Disable the activated abilities of an enemy while this character is in play.
+[warrior_pressure, warrior_bastion, materialized_staples, materialize_value, card_flow] | 2●/2✦ | Warrior | C | ▸ Materialized: Draw a card.
+[abandon_furnace, warrior_pressure, spark_tall] | 4●/2✦ | Warrior | C | Abandon an ally: This character gains +1 spark.
+[warrior_pressure, warrior_bastion, spark_tall] | 2●/*✦ | Warrior | C | This character's spark is equal to the number of allied Warriors.
+[warrior_pressure, materialize_value, warrior_bastion] | 4●/2✦ | Mage | U | Once per turn, when you materialize a Warrior, draw a card.
+[warrior_bastion, warrior_pressure, void_recursion] | 5●/3✦ | Mage | R | When you play a Warrior, reclaim a random character with cost 3● or less.
+[prevent_control, fast_interaction, fast_setup, fast_tempo] | 2● | Fast Event | U | Lose 1 maximum ●: Play this event for 0●. Prevent a played card.
+[prevent_control, fast_interaction, fast_setup, fast_tempo] | 5● | Fast Event | U | Banish a card from hand: Play this event for 0●. Prevent a played card.
+[prevent_control, fast_interaction, fast_setup] | 1● | Fast Event | C | Prevent a played event unless the opponent pays 2●.
+[hand_disruption, prevent_control] | 1● | Event | U | Discard a chosen card with cost 3● or less from the opponent's hand.
+[hand_disruption, prevent_control] | 1● | Event | U | Discard a chosen character from the opponent's hand.
+[fast_interaction, premium_removal, prevent_control, fast_tempo] | 4● | Fast Event | R | Banish a card from hand: Play this event for 0●. Dissolve an enemy.
+[cheap_removal, fast_interaction, fast_tempo] | 0● | Fast Event | R | Dissolve an enemy. The opponent gains 3✪.
+[prevent_control, fast_interaction, fast_setup, fast_tempo] | 2● | Fast Event | C | Prevent a played card.
+[reclaim_events, event_setup, card_flow, foresee_selection] | 1● | Fast Event | C | Foresee 1. Draw a card. Reclaim 3●
+[abandon_furnace, discard_velocity, leave_play_enablers] | 1● | Fast Event | U | Abandon an ally or discard a card: Dissolve an enemy.
+[materialize_tempo, prevent_control, materialized_staples, fast_tempo] | 3●/1✦ | Synth | U | ↯fast -- ▸ Materialized: Prevent a played card with cost 2● or less.
+[materialize_tempo, materialize_value, materialized_staples] | 5●/2✦ | Ancient | R | ↯fast -- ▸ Materialized: Gain control of an enemy with cost 2● or less.
+[abandon_furnace, materialize_value, leave_play_enablers] | 6●/2✦ | Ancient | R | Abandon an ally: Play this character for 0●, then abandon it. ▸ Materialized: Dissolve an enemy.
+[judgment_bodies, point_pressure, cheap_curve, judgment_engines] | 2●/1✦ | Visitor | U | ↯fast -- ▸ Judgment: Gain 1✪.
+[materialized_staples, materialize_value, materialize_tempo, foresee_selection] | 3●/2✦ | Robot | C | ↯fast -- ▸ Materialized: Foresee 2.
+[ally_formation, warrior_pressure, warrior_bastion, spirit_growth, survivor_dissolve] | 2●/2✦ | * | C | Has all character types. ▸ Judgment: With 3 allies that share a character type, draw a card.
+[fast_tempo] | 2●/1✦ | Musician | C | ↯fast -- Once per turn, when you play a ↯fast card, draw a card.
+[fast_tempo] | 3●/2✦ | Musician | C | ↯fast -- When you play a ↯fast card, this character gains +2 spark.
+[fast_tempo] | 4●/2✦ | Musician | R | ↯fast -- When you play a ↯fast card, gain 1✪.
+[materialize_value, judgment_engines, materialize_tempo] | 5●/3✦ | Ancient | R | To play this card, return an ally with cost 3● or more to hand. ▸ Judgment: Draw a card.
+[big_energy, resource_burst, cheap_curve] | 2●/2✦ | Musician | C | At the end of your turn, gain 2●.
+[character_velocity, fast_tempo] | 3●/2✦ | Visitor | R | Characters in your hand have ↯fast. Once per turn, when you play a ↯fast character, gain 1●.
+[discard_velocity, big_energy, card_flow, event_chain] | 0● | Fast Event | C | Pay 1 or more ●: Draw a card for each ● spent, then discard 2 cards.
+[materialize_tempo, tempo_resets, materialized_staples, fast_tempo] | 4●/1✦ | Outsider | C | ↯fast -- ▸ Materialized: Return an enemy to hand.
+[point_pressure, judgment_engines] | 4●/0✦ | Visitor | C | ↯fast -- ▸ Judgment: Gain 2✪.
+[reclaim_events, materialize_value, void_recursion] | 3●/1✦ | Survivor | U | ↯fast -- ▸ Materialized: An event in your void gains reclaim equal to its cost this turn.
+[void_recursion, discard_velocity, survivor_dissolve] | 4●/2✦ | Survivor | U | ↯fast -- When you draw 2 cards in a turn, if this card is in your void, it gains reclaim 1● this turn.
+[card_flow, event_chain, event_setup, fast_setup] | 1● | Fast Event | L | Draw 3 cards.
+[bounce_blink_tools, materialize_tempo, tempo_resets, fast_interaction, fast_setup] | 3● | Fast Event | C | Return an enemy or ally to hand. Draw a card.
+[fast_tempo, materialize_value] | 2●/1✦ | Visitor | R | ↯fast -- ▸ Materialized: Discover a ↯fast event.
+[event_chain, character_velocity] | 5● | Event | R | Gain 1✪ for each card you have played this turn.
+[event_chain, character_velocity] | 3● | Event | U | Draw a card for each card you have played this turn.
+[event_chain] | 4●/2✦ | Tinkerer | U | Events cost you 2● more. When you play an event from your hand, copy it.
+[copy_effects, event_chain] | 3● | Event | U | Until end of turn, when you play an event, copy it.
+[event_chain] | 5● | Event | C | Copy the next event you play this turn three times. Reclaim 2●
+[void_recursion, reclaim_events, reclaim_characters] | 6● | Event | R | All cards currently in your void gain reclaim equal to their cost this turn.
+[hand_cycling, discard_velocity, card_flow, void_setup] | 2● | Event | C | Discard a card. Draw 2 cards.
+[event_chain] | 1● | Event | U | Double the number of cards you draw from card effects this turn.
+[reclaim_events, void_recursion, event_chain] | 3● | Event | C | An event in your void gains reclaim 0● this turn.
+[judgment_repeaters, judgment_engines] | 1● | Event | U | At the end of this turn, trigger an additional Judgment phase.
+[finishers, event_chain, judgment_engines] | 3● | Event | L | Take an extra turn after this one.
+[cost_reduction, event_chain] | 3●/1✦ | Visitor | C | Events cost you 1● less.
+[event_chain] | 4●/2✦ | Visitor | U | When you play an event, gain 1●.
+[resource_burst, big_energy, event_chain] | 4● | Event | U | Gain 6●.
+[big_energy, event_chain] | 2● | Event | U | Double the amount of ● you have.
+[big_energy, event_chain] | 2● | Event | U | Double the amount of ● you gain from card effects this turn.
+[resource_burst, big_energy, event_setup, card_flow, event_chain] | 2● | Event | C | Gain 2●. Draw a card.
+[hand_cycling, discard_velocity, big_energy, card_flow, resource_burst] | 3● | Event | C | Draw 2 cards. Discard 2 cards. Gain 2●.
+[event_chain, materialize_value] | 6●/3✦ | Outsider | R | ▸ Materialized: Copy the next event you play this turn three times.
+[card_flow, tempo_resets] | 4● | Event | R | Each player may shuffle their hand and void into their deck and then draw 5 cards.
+[resource_burst, big_energy, event_chain] | 2● | Event | C | Gain 4●.
+[abandon_fodder, abandon_furnace, leave_play_enablers, big_energy] | 1● | Event | U | Abandon an ally: Gain ● equal to that character's cost.
+[void_recursion] | 0● | Event | U | Dissolve an enemy with cost less than the number of cards in your void.
+[card_flow, event_chain] | 5● | Event | L | Draw 3 cards.
+[void_setup, void_recursion, reclaim_events, reclaim_characters] | 1● | Event | C | Put the top 3 cards of your deck into your void. Draw a card.
+[prevent_control, fast_interaction] | 1● | Event | U | Prevent a played ↯fast card.
+[discover_toolbox, event_chain, event_setup] | 2● | Event | U | Discover an event.
+[hand_cycling, discard_velocity, card_flow, void_setup] | 3● | Event | C | Draw 3 cards. Discard 2 cards.
+[event_chain] | 2●/1✦ | Visionary | C | When you play an event, foresee 1.
+[prevent_control, fast_interaction, tempo_resets] | 1● | Event | U | Prevent a played card. Put it on top of the opponent's deck.
+[event_chain] | 4●/*✦ | Ancient | U | When an event is put into your void, this character gains +1 spark.
+[cost_reduction, character_velocity] | 5●/2✦ | Explorer | R | Characters cost you 2● less.
+[judgment_engines, materialize_value] | 5●/2✦ | Super | R | When you materialize a character, trigger the ▸ Judgment: ability of each ally.
+[character_velocity] | 1● | Event | U | Until end of turn, when you play a character, draw a card.
+[spirit_growth, judgment_engines] | 3●/1✦ | Spirit Animal | C | ▸ Judgment: Gain 1● for each allied Spirit Animal.
+[materialize_tempo, bounce_blink_tools, spirit_growth] | 3●/1✦ | Spirit Animal | C | ▸ Materialized: You may return an ally to hand.
+[materialize_tempo, bounce_blink_tools, fast_setup] | 2●/1✦ | Explorer | U | ↯fast -- ▸ Materialized: Return an ally to hand.
+[judgment_engines, spirit_growth] | 3●/2✦ | Spirit Animal | R | The '▸ Judgment:' ability of allies triggers when you materialize them.
+[spirit_growth, materialize_value] | 1●/1✦ | Spirit Animal | C | When you materialize an allied Spirit Animal, gain 1●.
+[spirit_growth, judgment_engines] | 1●/1✦ | Spirit Animal | C | ▸ Judgment: With 2 allied Spirit Animals, gain 2●.
+[ally_formation, spirit_growth, judgment_engines] | 3●/1✦ | Spirit Animal | U | ▸ Judgment: Gain 1● for each allied character.
+[spirit_growth] | 12● | Event | R | Each allied Spirit Animal gains spark equal to the number of allied Spirit Animals.
+[event_chain, character_velocity] | 2●/2✦ | Spirit Animal | R | When you have no cards in your deck, you win the game.
+[materialize_value, materialize_tempo] | 3● | Event | U | Return all but one ally to hand: Draw a card for each ally returned.
+[materialize_tempo, materialize_value] | 3●/1✦ | Visitor | C | When you materialize a character, this character gains +1 spark.
+[spirit_growth, character_velocity] | 3●/1✦ | Spirit Animal | U | When you play a Spirit Animal, draw a card.
+[spirit_growth, judgment_engines] | 2●/1✦ | Spirit Animal | U | ▸ Judgment: You may pay 4● to have each allied Spirit Animal gain +2 spark.
+[spirit_growth, materialize_tempo] | 3●/1✦ | Spirit Animal | C | When you materialize an allied Spirit Animal, that character gains +1 spark.
+[judgment_bodies, spark_growth, spirit_growth, spark_tall] | 1●/1✦ | Spirit Animal | C | ▸ Materialized, Judgment: Kindle 1.
+[reclaim_characters, spirit_growth, void_recursion, materialize_value] | 3●/1✦ | Spirit Animal | U | ▸ Materialized: Return a character from your void to your hand.
+[materialized_staples, spirit_growth, materialize_value, card_flow] | 2●/1✦ | Spirit Animal | C | ▸ Materialized: Draw a card.
+[judgment_bodies, spirit_growth, materialized_staples, resource_burst] | 1●/1✦ | Spirit Animal | C | ▸ Materialized, Judgment: Gain 1●.
+[judgment_bodies, spirit_growth, resource_burst, judgment_engines] | 3●/1✦ | Spirit Animal | C | ▸ Judgment: Gain 2●.
+[spirit_growth, character_velocity] | 4●/2✦ | Spirit Animal | U | Reveal the top card of your deck. You may play characters from the top of your deck.
+[void_denial, spirit_growth, fast_setup] | 3●/1✦ | Spirit Animal | U | ↯fast -- ▸ Materialized: Banish the opponent's void.
+[spirit_growth, materialize_value] | 2●/1✦ | Visitor | U | ▸ Materialized: Draw a card for each allied Spirit Animal.
+[spirit_growth] | 1●/1✦ | Spirit Animal | U | 3●: The spark of each allied Spirit Animal becomes 5.
+[materialize_tempo, bounce_blink_tools, fast_setup, materialize_value] | 5●/1✦ | Guide | U | ↯fast -- ▸ Materialized: You may banish an ally, then materialize it.
+[materialize_value, judgment_engines, bounce_blink_tools, trigger_reuse] | 4●/1✦ | Mage | R | ▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it.
+[void_recursion, materialize_value, reclaim_characters] | 4●/1✦ | Survivor | U | ▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●.
+[materialize_value, materialize_tempo] | 6●/3✦ | Ancient | R | ▸ Materialized: Banish any number of allies, then materialize them.
+[prevent_control, hand_disruption, materialize_value] | 3●/2✦ | Outsider | R | ▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card.
+[materialized_staples, materialize_value, card_flow] | 6●/2✦ | Ancient | U | ▸ Materialized: Draw 2 cards.
+[premium_removal, materialize_value, materialized_staples] | 5●/2✦ | Outsider | U | ▸ Materialized: Banish an enemy until this character leaves play.
+[bounce_blink_tools, materialize_tempo, materialize_value, leave_play_enablers] | 1● | Event | C | Banish an ally. Materialize it at end of turn. Reclaim 1●
+[prevent_control, fast_interaction, cheap_curve, abandon_fodder] | 1●/1✦ | Visitor | U | ↯fast -- Abandon this character: Prevent a played event.
+[character_tutors, discover_toolbox, materialize_value, materialize_tempo] | 2● | Event | R | Discover a character with a ▸ Materialized: ability.
+[judgment_engines, materialize_value, bounce_blink_tools, trigger_reuse] | 3●/1✦ | Explorer | U | ▸ Judgment: You may banish an ally, then materialize it.
+[materialize_tempo, materialize_value] | 4●/0✦ | Explorer | U | When an ally is banished, this character gains +1 spark.
+[materialize_tempo, spark_tall, materialize_value] | 4●/2✦ | Avatar | C | When an ally is banished, kindle 1.
+[character_velocity, ally_formation, materialize_value] | 5● | Event | R | Materialize two random characters with cost 3● or less from your deck.
+[prevent_control, fast_interaction, fast_setup] | 2● | Fast Event | U | Prevent a played character.
+[cheap_removal, spark_disruption] | 2● | Event | C | Dissolve an enemy with spark 3 or more.
+[cheap_removal, reclaim_events, event_chain] | 3● | Event | R | Dissolve an enemy with cost 3● or more. Reclaim 1●
+[sweepers, spark_disruption, big_energy, resource_burst] | 2● | Event | R | Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid.
+[judgment_engines, materialize_value, bounce_blink_tools, trigger_reuse, big_energy] | 3●/2✦ | Explorer | U | ▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them.
+[tempo_resets, materialize_tempo, materialized_staples] | 5●/2✦ | Synth | R | ▸ Materialized: Banish an enemy until your next main phase.
+[bounce_blink_tools, materialize_value, materialize_tempo, leave_play_enablers] | 3● | Event | U | Banish up to 2 allies, then materialize them.
+[materialized_staples, materialize_value, resource_burst, big_energy] | 4●/1✦ | Explorer | C | ▸ Materialized: Gain 3●.
+[materialize_value, ally_formation] | 1●/1✦ | Synth | R | 4●: Materialize a copy of an ally.
+[leave_play_enablers, abandon_furnace, materialize_tempo, materialize_value] | 1● | Event | C | Until end of turn, when an ally leaves play, gain 2●.
+[survivor_dissolve, void_recursion, reclaim_characters] | 5●/2✦ | Survivor | C | With an allied Survivor, you may play this card from your hand or void for 1●.
+[discard_velocity, spark_tall] | 1●/0✦ | Survivor | C | 1●, Discard a card: Kindle 2.
+[survivor_dissolve, judgment_engines] | 2●/1✦ | Survivor | C | ▸ Materialized, Judgment: With 2 allied Survivors, draw a card.
+[survivor_dissolve, spark_tall, void_recursion] | 3●/2✦ | Survivor | R | ▸ Dissolved: Kindle 2. When an allied Survivor is ▸ Dissolved:, kindle 2.
+[abandon_furnace, abandon_fodder, leave_play_enablers] | 3●/0✦ | Synth | U | Abandon an ally: Gain 1●.
+[survivor_dissolve, void_recursion] | 2●/1✦ | Survivor | U | ▸ Dissolved: Draw a card. When an allied Survivor is ▸ Dissolved:, draw a card.
+[abandon_furnace, leave_play_enablers, void_setup] | 4●/2✦ | Outsider | C | Abandon an ally: Put the top 2 cards of your deck into your void.
+[survivor_dissolve, abandon_furnace] | 4●/1✦ | Survivor | U | When an ally is ▸ Dissolved:, draw a card.
+[prevent_control, hand_disruption, discard_velocity] | 1●/1✦ | Survivor | R | ↯fast -- ▸ Materialized: Each player discards a card.
+[survivor_dissolve, abandon_furnace, void_recursion] | 3●/1✦ | Survivor | U | When an ally is ▸ Dissolved, this card gains reclaim 1● this turn.
+[survivor_dissolve, abandon_furnace] | 6●/2✦ | Ancient | R | When an ally is ▸ Dissolved, gain 1✪.
+[survivor_dissolve, abandon_furnace] | 2●/1✦ | Survivor | U | ▸ Dissolved: You may pay 1● to return this character to your hand.
+[survivor_dissolve] | 1●/1✦ | Survivor | R | ▸ Dissolved: A Survivor in your void gains reclaim equal to its cost.
+[judgment_engines, void_recursion, survivor_dissolve] | 3●/1✦ | Survivor | U | ▸ Judgment: You may pay 1● to return this character from your void to your hand.
+[void_recursion] | 2●/6✦ | Ancient | U | You may only play this character from your void.
+[survivor_dissolve] | 2●/1✦ | Survivor | U | If this card is in your void, allied Survivors have +2 spark.
+[abandon_furnace, spark_tall] | 3●/1✦ | Survivor | C | Abandon an ally: Kindle 1.
+[judgment_bodies, judgment_engines, void_denial] | 1●/0✦ | Survivor | U | ▸ Judgment: You may banish a card from the opponent's void to gain 1●.
+[cheap_removal, abandon_furnace] | 2● | Event | R | Dissolve an enemy with cost 2● or less. Reclaim -- Abandon an ally
+[void_setup, void_recursion, survivor_dissolve] | 2●/1✦ | Survivor | R | ▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.
+[survivor_dissolve, materialize_value, void_recursion] | 3●/1✦ | Survivor | R | When you materialize a Survivor, reclaim this character.
+[character_tutors, survivor_dissolve] | 1● | Event | R | Discover a Survivor.
+[survivor_dissolve, void_setup, void_recursion] | 2●/1✦ | Survivor | C | When you play a Survivor, put the top 2 cards of your deck into your void.
+[abandon_furnace, spark_tall] | 3●/1✦ | Ancient | C | When you abandon an ally, this character gains +1 spark.
+[abandon_furnace] | 2●/1✦ | Warrior | U | When you abandon a second ally in a turn, dissolve an enemy.
+[abandon_furnace] | 4●/2✦ | Ancient | R | When you abandon a character, gain 1✪.
+[abandon_furnace] | 2●/1✦ | Renegade | R | ↯fast -- Abandon an ally, once per turn: Gain 1✪.
+[abandon_furnace, spark_tall] | 3●/1✦ | Monster | C | When you abandon an ally, kindle 2.
+[abandon_furnace, void_recursion, topdeck_setup] | 2●/1✦ | Survivor | C | Abandon an ally: You may put a character from your void on top of your deck.
+[abandon_furnace] | 3●/1✦ | Ancient | R | Abandon an ally: You may dissolve an enemy with spark less than that ally's spark.
+[abandon_furnace, survivor_dissolve] | 4●/2✦ | Mage | C | When an ally is ▸ Dissolved:, gain 1●.
+[abandon_furnace, warrior_bastion] | 2●/1✦ | Outsider | U | Abandon an ally, once per turn: Reclaim a Warrior.
+[materialize_value, materialize_tempo] | 4●/3✦ | Musician | U | When you materialize an ally, gain 1●.
+[event_chain, figment_swarm] | 1●/1✦ | Mage | U | ▸ Materialized: Materialize a Celestial figment for each card you have played this turn.
+[figment_swarm, go_wide_enablers] | 3● | Event | C | Materialize three Warrior figments.
+[figment_swarm, character_velocity] | 4●/1✦ | Visitor | U | When you play a character, materialize a Celestial figment.
+[abandon_furnace] | 3●/1✦ | Synth | U | ▸ Materialized: Draw a card for each ally abandoned this turn.
+[abandon_furnace] | 4●/2✦ | Outsider | C | When you abandon a character, draw a card.
+[abandon_furnace] | 2● | Event | C | Abandon any number of allies: Draw a card for each ally abandoned.
+[discover_toolbox, character_tutors] | 2● | Event | R | Discover a character with an activated ability.
+[void_recursion] | 2●/1✦ | Synth | R | While you have 7 or more cards in your void, they have reclaim equal to their cost.
+[premium_removal, card_flow, survivor_dissolve, abandon_furnace] | 4● | Event | R | Dissolve an enemy. Draw a card. This event costs 0● if a character dissolved this turn.
+[abandon_furnace, discard_velocity] | 0● | Event | R | Abandon a character, Discard your hand: Gain 5●.
+[abandon_furnace, judgment_engines, leave_play_enablers] | 1●/1✦ | Ancient | U | ▸ Judgment: Each player abandons a character.
+[card_flow, resource_burst, fast_setup, event_chain] | 2● | Fast Event | U | Pay 1 or more ●: Draw a card for each ● spent.
+[card_flow, resource_burst] | 2●/2✦ | Musician | C | 3●: Draw a card.
+[fast_tempo] | 2●/1✦ | Visitor | U | ↯fast -- When you play a card during the opponent's turn, this character gains +1 spark.
+[reclaim_events, event_chain] | 4● | Event | R | Return up to 2 events from your void to your hand.
+[fast_interaction, tempo_resets, card_flow] | *● | Fast Event | U | Choose One: • 2●: Return an enemy to hand. • 3●: Draw 2 cards.
+[prevent_control, fast_interaction] | 1● | Fast Event | C | Prevent a played event which could dissolve an ally.
+- | 0● | Event | Special | 
+- | 2● | Event | Special | Draw a card.
+[spirit_growth, materialize_tempo, materialized_staples] | 3●/2✦ | Spirit Animal | U | ▸ Materialized: Banish an enemy with cost 3● or less until this character leaves play.
+[warrior_bastion, abandon_furnace] | 5●/0✦ | Warrior | R | ▸ Dissolved: Return all enemies to hand.
+[prevent_control, hand_disruption, materialize_tempo] | 2●/1✦ | Detective | U | ▸ Materialized: Banish a chosen card from the opponent's hand until this character leaves play.
+[materialize_tempo, fast_tempo, foresee_selection] | 3●/1✦ | Warrior | R | ↯fast -- ▸ Materialized: Banish an enemy until this character leaves play. Abandon this character: Foresee 2.
+[fast_tempo, materialize_tempo, character_velocity, tempo_resets] | 4●/2✦ | Renegade | R | ↯fast -- Banish a card from hand: Play this character for 0●, then abandon it. ▸ Materialized: Return an enemy to hand.
+[prevent_control, hand_disruption, character_velocity] | 4●/3✦ | Outsider | R | Banish a card from hand: Play this character for 0●, then abandon it. ▸ Materialized: Discard a chosen card from the opponent's hand.
+[cheap_removal, character_velocity, materialized_staples] | 5●/3✦ | Ancient | R | Banish a card from hand: Play this character for 0●, then abandon it. ▸ Materialized: Dissolve an enemy with spark 2 or less.
+[prevent_control, abandon_furnace] | 1●/0✦ | Warrior | U | ↯fast -- Abandon an ally: Prevent a played event which could dissolve an ally.
+[judgment_bodies, judgment_engines, card_flow] | 1●/1✦ | Child | C | ▸ Judgment: You may pay 2● to draw a card.
+[judgment_bodies, foresee_selection, materialized_staples, judgment_engines] | 1●/1✦ | Child | C | ▸ Materialized, Judgment: Foresee 1.
+[judgment_bodies, materialized_staples, foresee_selection, judgment_engines] | 2●/0✦ | Explorer | R | ▸ Materialized: Foresee 1. ▸ Judgment: Gain 1●.
+[materialize_value, spark_tall] | 2●/1✦ | Child | C | When you materialize an ally, kindle 1.
+[materialize_tempo, materialize_value, spark_tall] | 3●/2✦ | Ancient | C | When you materialize an ally, that ally gains +1 spark.
+[spark_tall, judgment_bodies, spark_growth, warrior_pressure] | 2●/1✦ | Warrior | C | ▸ Judgment: Kindle 1.
+[discard_velocity, spark_tall] | 3●/1✦ | Monster | R | When you discard this character, materialize it. ▸ Judgment: Kindle 2.
+[void_recursion] | 5●/2✦ | Warrior | R | ▸ Judgment: This character gains +1 spark. When a card leaves your void, kindle 2.
+[warrior_pressure, warrior_bastion] | 2●/2✦ | Warrior | C | Allied Warriors cost you 1● less.
+[character_velocity, cost_reduction, materialize_value, materialized_staples] | 5●/2✦ | Explorer | R | Characters cost you 1● less. ▸ Materialized: Draw 2 cards.
+[warrior_pressure, warrior_bastion, figment_swarm] | 3●/2✦ | Warrior | C | When you materialize a Warrior, materialize a Halcyon Figment.
+[character_velocity, character_tutors, materialize_value, warrior_pressure, warrior_bastion] | 3●/3✦ | Warrior | C | ▸ Materialized: Draw a character with cost 2● or less.
+[character_velocity, character_tutors, materialize_value, warrior_pressure, warrior_bastion] | 3●/2✦ | Warrior | C | ▸ Materialized: Draw a character with spark 2 or less.
+[prevent_control, fast_tempo, fast_interaction] | 2●/2✦ | Warrior | U | ↯fast -- ↯fast -- Abandon this character: The opponent can't play events this turn.
+[event_chain, void_recursion] | 4●/2✦ | Explorer | C | When you play an event, reclaim a character with cost 3● or less.
+[judgment_engines, void_recursion, materialize_value] | 5●/0✦ | Explorer | R | ▸ Materialized: This character gains +1 spark. ▸ Judgment: Reclaim a character with cost up to this character's spark ●.
+[prevent_control, fast_interaction, event_setup] | 3● | Fast Event | C | Prevent a played character. Draw a card.
+[prevent_control, materialize_tempo, bounce_blink_tools] | 1● | Fast Event | U | Return an ally to hand: Play this event for 0●. Prevent a played card unless the opponent pays 2●.
+[cheap_removal, fast_interaction] | 3● | Fast Event | U | Banish a card from hand: Play this event for 0●. Banish an enemy with cost 3● or less.
+[tempo_resets, fast_interaction, materialize_tempo, fast_tempo] | 3● | Fast Event | C | Banish an enemy until your next main phase.
+[tempo_resets, fast_interaction, materialize_tempo] | 5● | Fast Event | U | Banish an enemy until your next main phase. Draw a card.
+[void_recursion, character_velocity, abandon_furnace] | 4● | Event | R | Reclaim all characters with cost 3● or less. At end of your next turn, abandon all reclaimed characters.
+[void_recursion, reclaim_characters, character_velocity] | 4● | Event | R | Reclaim up to 3 characters with cost 2● or less.
+[void_recursion, reclaim_characters, reclaim_events] | 3● | Event | U | Reclaim a character with cost 3● or less. Reclaim 3●
+[void_recursion, reclaim_characters, fast_tempo] | 2● | Fast Event | U | Reclaim a character. Banish it at end of turn.
+[void_recursion, reclaim_characters, character_velocity] | 1● | Event | C | Reclaim a character. Lose 1 maximum ●.
+[void_recursion] | 4●/1✦ | Child | U | When you reclaim a character, it gains +3 spark.
+[hand_cycling, discard_velocity, character_tutors, materialize_value] | 3●/1✦ | Explorer | C | ▸ Materialized: You may discard a card to draw a character.
+[judgment_bodies, hand_cycling, void_setup, judgment_engines] | 2●/1✦ | Child | U | ▸ Judgment: Draw a card, then discard a card. With 5 cards in your void, draw 2 instead.
+[figment_swarm, go_wide_enablers, judgment_engines, hand_cycling] | 3●/1✦ | Explorer | U | ▸ Judgment: Draw a card, then discard a card. 2●: Materialize a Shadow Figment.
+[judgment_engines] | 5●/2✦ | Explorer | C | ▸ Judgment: Draw a card.
+[event_chain, copy_effects] | 3● | Event | R | Copy the next event you play this turn. If this event was reclaimed, copy it twice instead. Reclaim 3●
+[foresee_selection, card_flow, event_setup, fast_setup, event_chain] | 2● | Fast Event | C | Foresee 3. Draw a card.
+[foresee_selection, card_flow, event_setup, event_chain] | 1● | Event | C | Draw a card. Foresee 2.
+[tempo_resets, fast_interaction, fast_tempo] | 2● | Fast Event | C | Return an enemy with cost 2● or less to hand. Draw a card.
+[tempo_resets, fast_interaction, resource_burst, fast_tempo] | 3● | Fast Event | C | Return an enemy to hand. Gain 2●.
+[void_setup, void_recursion, event_chain] | 2● | Event | U | Put the top 3 cards of your deck into your void, plus 1 more for each card you have played this turn.
+[void_recursion, void_setup, survivor_dissolve, abandon_furnace] | 2●/1✦ | Explorer | R | ▸ Materialized: Put the top 3 cards of your deck into your void. ▸ Dissolved: Return another character from your void to your hand.
+[void_recursion, abandon_furnace, void_setup] | 2●/1✦ | Tinkerer | R | ▸ Materialized: Put the top 3 cards of your deck into your void. 2●, Abandon an ally: Reclaim a character with cost 3● or less.
+[void_setup, void_recursion] | 2●/1✦ | Child | C | ▸ Materialized: Put the top 3 cards of your deck into your void.
+[void_recursion, materialize_value] | 3●/1✦ | Survivor | U | ▸ Materialized: Return a card from your void to your hand.
+[spirit_growth, void_recursion, reclaim_characters] | 4●/2✦ | Spirit Animal | U | ▸ Judgment: Put the top 2 cards of your deck into your void. You may return a character from your void to your hand.
+[void_recursion, reclaim_characters, void_setup] | 2● | Event | R | Return up to 2 characters from your void to your hand. Reclaim -- Put the top 3 cards of your deck into your void.
+[prevent_control, fast_interaction, resource_burst, big_energy] | 2● | Fast Event | C | Prevent a played card. Gain ● equal to that card's cost.
+[prevent_control, fast_interaction, fast_setup] | 2● | Fast Event | U | Prevent a played card. The opponent draws a card, then discards a card.
+[prevent_control, fast_interaction, fast_setup] | 0● | Fast Event | C | Prevent a played card. The opponent draws 2 cards.
+[discard_velocity, hand_cycling, resource_burst, card_flow, event_chain] | 2● | Event | C | Draw 2 cards. Discard 2 cards. Gain 3●.
+[discard_velocity, hand_cycling, void_setup, card_flow] | 2● | Event | C | Discard 2 cards: Draw 3 cards.
+[survivor_dissolve, defensive_curve] | 2●/1✦ | Survivor | U | ↯fast -- ▸ Dissolved: You may pay 1● to return this character to hand.
+[survivor_dissolve, defensive_curve, cheap_curve] | 2●/2✦ | Survivor | C | ▸ Dissolved: Return this character to your hand.
+[discard_velocity, figment_swarm] | 2●/1✦ | Survivor | C | Discard 2 cards: Materialize a Shadow Figment.
+[figment_swarm, warrior_pressure, warrior_bastion] | 2●/2✦ | Warrior | C | 2●, Banish a card from your void: Materialize a Warrior Figment.
+[survivor_dissolve, figment_swarm] | 1●/1✦ | Survivor | U | ▸ Dissolved: Materialize a Warrior figment for each spark this character has.
+[figment_swarm, survivor_dissolve, abandon_furnace] | 5●/1✦ | Warrior | R | When an ally is dissolved, materialize a Shadow Figment. With 5 or more Shadow Figments, each gains +2 spark.
+[survivor_dissolve, figment_swarm, warrior_bastion] | 2●/1✦ | Warrior | C | ▸ Dissolved: Materialize a Warrior figment.
+[abandon_furnace, abandon_fodder, topdeck_setup] | 1●/1✦ | Explorer | C | Abandon an ally: Foresee 2.
+[event_chain, resource_burst, big_energy] | 1● | Event | C | Gain 3●. If you have played another event this turn, draw a card.
+[resource_burst, big_energy, void_setup] | 2● | Event | C | Gain 3●. If you have 7 or more cards in your void, gain 5● instead.
+[abandon_furnace, abandon_fodder, character_tutors] | 2● | Event | C | Abandon an ally: Draw a character.
+[abandon_furnace, abandon_fodder, character_tutors, fast_setup] | 1● | Fast Event | U | Abandon an ally: Draw a character with cost equal to that ally's cost.
+[abandon_furnace, abandon_fodder] | 1●/0✦ | Survivor | C | Abandon an ally: Draw a card.
+[discard_velocity, fast_tempo] | 2●/1✦ | Renegade | C | ↯fast -- When you discard a card, this character gains +2 spark.
+[reclaim_events, judgment_engines, event_chain] | 2●/1✦ | Mage | R | ▸ Judgment: You may reclaim an event with cost up to this character's spark.
+[reclaim_events, materialize_value, event_chain] | 4●/2✦ | Explorer | U | ▸ Materialized: Return an event with cost 3● or less from your void to your hand.
+[hand_cycling, discard_velocity, judgment_engines] | 3●/2✦ | Explorer | U | ▸ Judgment: Discard your hand, then draw 3 cards.
+[event_chain, figment_swarm] | 2●/1✦ | Musician | C | When you play an event, materialize a Radiant Figment.
+[cheap_removal, fast_interaction, fast_setup, fast_tempo] | 1● | Fast Event | C | Dissolve an enemy with spark 3 or less.
+[sweepers, premium_removal, void_recursion] | 4● | Event | R | Dissolve all characters with spark 2 or less. When you reclaim this card, dissolve all characters instead. Reclaim 6●
+[judgment_bodies, big_energy, resource_burst, judgment_engines] | 1●/1✦ | Child | U | ▸ Judgment: Gain 1●. 4●: Gain 1 maximum ●.
+[spirit_growth, big_energy, judgment_engines, materialized_staples] | 2●/1✦ | Spirit Animal | U | ▸ Materialized, Judgment: Gain 2●. The opponent gains 1✪.
+[spirit_growth, bounce_blink_tools, big_energy, judgment_engines, materialize_tempo] | 1●/1✦ | Spirit Animal | U | ▸ Judgment: You may return a character to hand to gain 3●.
+[warrior_pressure, warrior_bastion, figment_swarm] | 2●/2✦ | Warrior | U | Once per turn, when you materialize a Warrior, materialize a Radiant Figment.
+[figment_swarm] | 3●/2✦ | Warrior | R | When you materialize a Figment, materialize another Figment of the same type.
+[big_energy, judgment_bodies, judgment_engines, resource_burst] | 2●/1✦ | Explorer | C | ▸ Judgment: Gain 1 maximum ●.
+[topdeck_setup, big_energy, foresee_selection, spirit_growth, resource_burst] | 2● | Event | C | Foresee 3. Gain 1 maximum ●.
+[fast_interaction, tempo_resets, fast_setup, fast_tempo, prevent_control] | 5● | Fast Event | C | Banish an enemy until your next main phase.
+[materialize_value, trigger_reuse, leave_play_enablers, abandon_furnace] | 2●/0✦ | Tinkerer | R | ▸ Materialized: Materialize a copy of an ally. Abandon this character.
+[materialize_value, trigger_reuse] | 3●/0✦ | Synth | U | ▸ Materialized: Materialize a copy of an ally.
+[hand_cycling, discard_velocity, void_setup] | 3● | Event | C | Each player draws 2 cards, then discards 2 cards.
+[spirit_growth, big_energy, judgment_bodies, materialized_staples, resource_burst] | 2●/2✦ | Spirit Animal | U | ▸ Materialized: Gain 1 maximum ●. ▸ Judgment: Gain 1●.
+[card_flow, cheap_curve] | 1●/1✦ | Explorer | C | When the opponent plays an event, draw a card.
+[event_chain, event_setup, cost_reduction, materialize_value] | 5●/2✦ | Musician | R | ▸ Materialized: Draw an event. 2●: Play an event from your hand for 0●.
+[ally_formation, warrior_pressure, figment_swarm] | 3●/1✦ | Warrior | R | ▸ Judgment: You may pay 2● to have each ally gain +2 spark.
+[survivor_dissolve, abandon_furnace] | 4● | Event | U | Reclaim each character dissolved this turn.
+[figment_swarm] | 3●/1✦ | Survivor | R | ▸ Materialized: Materialize a Warrior figment. When you materialize a Figment, draw a card.
+[figment_swarm, warrior_pressure] | 5●/2✦ | Warrior | R | ▸ Materialized: Materialize a Warrior figment. ▸Judgment: Gain 1● for each allied Figment.
+[materialize_tempo, bounce_blink_tools, fast_setup, card_flow, ally_formation] | 4● | Fast Event | C | Return 2 allies to hand: Play this event for 0●. Draw 2 cards.
+[event_chain] | 2● | Event | C | Until end of turn, gain 2● whenever you play a card.
+[discard_velocity, figment_swarm, void_setup] | 3● | Event | U | Draw 3 cards, then discard 3 cards. Materialize a Warrior figment for each character discarded this way.
+[void_setup, foresee_selection, topdeck_setup, discover_toolbox] | 2● | Event | C | Look at the top four cards of your deck. Put one of them into your hand and the rest into your void.
+[card_flow, event_setup, hand_cycling, discard_velocity] | 2● | Event | C | Draw 2 cards. If you played no other events this turn, discard a card.
+[card_flow, reclaim_events, void_recursion] | 4● | Event | U | Draw 2 cards. Reclaim -- Lose 1 maximum ●
+[event_chain] | 6● | Event | R | Copy the next event you play this turn once for each card you have played this turn.
+[ally_formation, figment_swarm, finishers] | 6●/5✦ | Ancient | C | This character costs 1● less for each ally.
+[figment_swarm, warrior_bastion, judgment_engines] | 5●/1✦ | Warrior | R | ▸ Judgment: Materialize a Warrior figment.
+[abandon_furnace, ally_formation, figment_swarm] | 3●/1✦ | Mage | R | ▸ Judgment: You may abandon 2 allies to gain 2● and draw 2 cards.
+[void_recursion, survivor_dissolve] | 3●/2✦ | Survivor | C | When you play a card from your void, reclaim this character.
+[ally_formation, figment_swarm, premium_removal] | 5● | Event | C | This event costs 1● less for each ally. Dissolve an enemy. Draw a card.
+[abandon_furnace, figment_swarm] | 3●/0✦ | Ancient | R | If this card is in your void, when you abandon an ally, materialize a Shadow Figment.
+[abandon_furnace] | 3● | Event | C | When an ally is abandoned this turn, gain 1✪.
+[hand_cycling, discard_velocity, abandon_furnace, void_setup] | 2● | Event | C | Discard a card or abandon an ally: Draw 2 cards.
+[reclaim_events, event_chain] | 4● | Event | C | Return 3 random events from your void to your hand.
+[topdeck_setup, spirit_growth] | 1●/0✦ | Tinkerer | R | ▸ Materialized: You may play cards from the top of your deck this turn.
+[big_energy, materialized_staples, cheap_curve, resource_burst] | 1●/0✦ | Explorer | U | ▸ Materialized: Gain 1 maximum ●.
+[warrior_pressure, warrior_bastion, void_recursion] | 1●/1✦ | Warrior | U | ▸ Judgment: With 3 cards in your void, this character gains +2 spark.
+[abandon_furnace, abandon_fodder, big_energy, leave_play_enablers] | 2● | Event | C | Abandon an ally: Gain 1 maximum ●.
+[character_tutors, hand_cycling, discard_velocity, judgment_engines] | 2●/2✦ | Explorer | U | ▸ Judgment: You may discard a card to draw a character.
+[topdeck_setup, big_energy, materialized_staples, foresee_selection, spirit_growth] | 2●/1✦ | Explorer | U | ▸ Materialized: Foresee 4. Gain 1 maximum ●.
+[spirit_growth] | 3●/2✦ | Child | R | When you materialize a Spirit Animal, gain 1●. When you materialize 2 Spirit Animals in a turn, draw a Spirit Animal.
+[abandon_furnace, figment_swarm, leave_play_enablers] | 2●/5✦ | Ancient | R | ▸ Materialized: Abandon an ally. Materialize a Shadow figment.
+[spirit_growth] | *● | Event | U | Pay X●: Discover a Spirit Animal with cost X● or less and materialize it.
+[premium_removal, figment_swarm, survivor_dissolve] | 4● | Event | R | Dissolve up to 2 enemies. Materialize a Shadow Figment for each enemy dissolved.
+[character_tutors, hand_cycling, discard_velocity, character_velocity] | 3●/1✦ | Tinkerer | R | ▸ Judgment: You may discard a character to draw a character with cost 1● higher.
+[spark_tall] | 1●/5✦ | Explorer | C | To play this character, lose 1 maximum ●.
+[spirit_growth, big_energy, abandon_furnace, judgment_engines] | 2●/2✦ | Spirit Animal | U | ▸ Judgment: You may abandon this character to gain 5●.
+[warrior_pressure, warrior_bastion, spirit_growth, survivor_dissolve] | 2●/1✦ | Synth | R | ▸ Materialized: Choose a character type. Allied characters of that type gain +1 spark.
+[ally_formation, figment_swarm, judgment_engines, finishers] | 5●/0✦ | Synth | R | ▸ Judgment: Each ally gains +1 spark.
+[survivor_dissolve, reclaim_characters, void_recursion] | 3●/2✦ | Tinkerer | U | ▸ Dissolved: Return a character with cost 2● or less from your void to your hand.
+[sweepers, premium_removal] | 3● | Event | U | Choose a number: Dissolve all enemies with cost equal to that number.
+[resource_burst, big_energy, event_setup, event_chain] | 0● | Event | C | Gain 1●.
+[big_energy, judgment_bodies, materialized_staples, resource_burst] | 2●/0✦ | Explorer | R | ▸ Materialized, Judgment: Gain 2●. Lose 1✪.
+[big_energy, materialized_staples, resource_burst, bounce_blink_tools, materialize_value] | 1●/0✦ | Synth | U | ▸ Materialized: Gain 4●. Lose 1 maximum ●.
+[abandon_furnace, abandon_fodder, judgment_engines] | 1●/0✦ | Tinkerer | U | ▸ Judgment: You may abandon an ally to gain 2●.
+[abandon_furnace, void_setup, void_recursion] | 2●/1✦ | Explorer | R | ▸ Judgment: You may abandon an ally to put cards from your deck into your void equal to that ally's spark.
+[figment_swarm, go_wide_enablers] | 3●/0✦ | Tinkerer | R | When the opponent materializes a character, materialize a Celestial Figment.
+[figment_swarm, warrior_pressure] | 3●/0✦ | Warrior | R | ▸ Materialized: Materialize a Warrior figment. This character's spark is equal to the number of allied Figments.
+[materialize_value, prevent_control, materialize_tempo] | 5●/2✦ | Tinkerer | R | ▸ Materialized: Disable an enemy's triggered abilities. This character gains those abilities.
+[materialize_tempo, materialize_value, spirit_growth] | 3●/1✦ | Spirit Animal | R | When an ally is banished, this character gains +1 spark. ▸ Judgment: Banish an ally, then materialize it.
+[discard_velocity, materialized_staples, materialize_value] | 4●/2✦ | Synth | R | Costs 0● if you discarded a card this turn. ▸ Materialized: Dissolve an enemy with spark 3 or less.
+[abandon_furnace, spark_tall] | 2●/1✦ | Outsider | R | When you abandon an ally, this character gains +1 spark. ▸ Dissolved: Kindle X where X is this character's spark.
+[reclaim_characters, prevent_control, hand_disruption, void_recursion] | 3● | Fast Event | U | Return a character from your void to your hand. The opponent discards a card.
+[materialize_tempo, materialize_value] | 1● | Event | R | Until end of turn, when you materialize a character, that character gains +3 spark. Reclaim 3●
+[figment_swarm, abandon_furnace, warrior_pressure] | 2●/1✦ | Warrior | U | At the end of your turn, if an ally left play this turn, materialize a Warrior figment.
+[cheap_removal, fast_interaction] | 3● | Fast Event | R | Dissolve an enemy with cost 3● or less. Reclaim -- Banish a card from hand.
+[judgment_engines, void_recursion, void_setup, card_flow] | 5●/4✦ | Explorer | R | ▸ Judgment: Draw a card, then put the top 2 cards of your deck into your void.
+[spirit_growth, materialized_staples, materialize_value, fast_tempo] | 2●/1✦ | Spirit Animal | R | ↯fast -- ▸ Materialized: Draw a card. With 3 allied Spirit Animals, dissolve an enemy with spark 2 or less.
+[materialize_value, character_velocity] | 3●/2✦ | Child | R | ▸ Materialized: Draw a card with cost 2● or less and play it for 0●.
+[abandon_furnace, figment_swarm] | 5●/2✦ | Ancient | U | When a non-figment ally is abandoned, materialize a Shadow figment.
+[abandon_fodder, abandon_furnace, void_recursion, survivor_dissolve] | 3●/2✦ | Survivor | R | Abandon an ally: Foresee 1. Reclaim 4●
+[warrior_bastion, materialized_staples, materialize_value] | 4●/1✦ | Warrior | U | ▸ Materialized: Dissolve an enemy.
+[figment_swarm, judgment_engines, abandon_furnace] | 6●/1✦ | Warrior | R | ▸ Judgment: Materialize two Shadow Figments. Abandon an ally: Draw a card.
+[ally_formation, materialize_value] | 7● | Event | R | Materialize 3 random characters from your deck with total cost 6● or less.
+[fast_tempo, fast_setup, prevent_control, event_chain] | 5●/0✦ | Explorer | C | Your cards have ↯fast.
+[survivor_dissolve, abandon_furnace, reclaim_characters, leave_play_enablers] | 3●/1✦ | Renegade | U | Abandon this character: Return an ally dissolved this turn from your void to play.
+[judgment_bodies, materialized_staples, hand_cycling, card_flow, judgment_engines] | 2●/0✦ | Survivor | R | ▸ Materialized, Judgment: You may pay 2●. If you do, draw 2 cards, then discard a card.
+[materialized_staples, abandon_furnace, survivor_dissolve, resource_burst] | 2●/0✦ | Synth | U | ▸ Materialized, Dissolved: Gain 2●.
+[judgment_engines, survivor_dissolve] | 3●/2✦ | Monster | R | ▸ Judgment: Dissolve a random enemy or ally among those with the lowest spark.
+[copy_effects, discover_toolbox] | 4●/0✦ | Synth | U | 3●: Until end of turn, this character becomes a copy of an ally or enemy.
+[materialize_tempo, materialize_value, card_flow] | 4●/2✦ | Explorer | C | When you return an ally to hand, draw a card.
+[void_recursion] | 3●/3✦ | Outsider | U | When you reclaim a character, if this card is in your void, reclaim this character.
+[character_tutors, topdeck_setup, void_setup, judgment_engines] | 4●/2✦ | Child | R | ▸ Judgment: Look at the top 3 cards of your deck. You may put a character into your hand. Put the rest into your void.
+[judgment_engines, void_denial, prevent_control] | 5●/2✦ | Ancient | R | ▸ Judgment: You may pay 1● to materialize a character from the opponent's void.
+[survivor_dissolve, spark_tall, spirit_growth] | 3●/2✦ | Spirit Animal | R | ▸ Dissolved: You may pay 3● to return this character to the battlefield with +3 spark.
+[figment_swarm, abandon_furnace, spark_tall] | 4●/2✦ | Synth | R | ▸ Dissolved: Materialize a Shadow figment. When you abandon a figment, kindle 2.
+[figment_swarm, abandon_furnace] | 4●/2✦ | Explorer | U | When you abandon a figment, gain 1✪.
+[discard_velocity, resource_burst, void_setup] | 4●/0✦ | Survivor | C | Discard a card: Gain 2●.
+[warrior_pressure, warrior_bastion, character_velocity, judgment_engines] | 5●/3✦ | Warrior | R | ▸ Judgment: With a non-Warrior ally, draw a Warrior and materialize it.
+[judgment_repeaters, judgment_engines] | 2●/1✦ | Child | U | ▸ Judgment: You may pay 1● to trigger the ▸ Judgment: ability of an ally.
+[abandon_furnace] | 4●/10✦ | Ancient | R | To play this card, abandon all allies.
+[warrior_pressure, figment_swarm, spark_tall] | 3●/1✦ | Warrior | R | ▸ Materialized: Materialize a Warrior figment. ▸ Judgment: Kindle 1 for each allied Warrior.
+[void_denial, fast_interaction] | 2●/2✦ | Synth | C | ↯fast -- Enemies may not be reclaimed.
+[reclaim_characters, survivor_dissolve, fast_tempo, void_recursion] | 2●/1✦ | Survivor | U | ↯fast -- ▸ Materialized: Return a character dissolved this turn from your void to your hand.
+[materialize_tempo, tempo_resets, bounce_blink_tools, leave_play_enablers] | 6●/2✦ | Spirit Animal | U | ▸ Materialized: Banish an ally or enemy until your next main phase.
+[warrior_bastion, figment_swarm, judgment_engines] | 7●/4✦ | Ancient | R | ▸ Materialized, Judgment: Materialize two Warrior figments.
+[warrior_pressure, materialized_staples, figment_swarm, spark_tall] | 4●/1✦ | Warrior | R | ↯fast -- ▸ Materialized: Choose one: • Kindle 2. • Materialize a Celestial Figment. • Dissolve an enemy with spark 2 or less.
+[figment_swarm] | 4●/3✦ | Explorer | C | When you materialize a Figment, materialize an additional Figment.
+[tempo_resets, fast_interaction, prevent_control, fast_tempo] | 3● | Fast Event | U | Return an enemy character to the top of the opponenet's deck.
+[sweepers, abandon_furnace, survivor_dissolve] | 4● | Event | R | Each player abandons characters until they have as many as the player with fewest.
+[sweepers, survivor_dissolve, resource_burst] | 6● | Event | R | Dissolve all characters. Gain 1● for each of your characters dissolved this way.
+[materialized_staples, materialize_value, foresee_selection, topdeck_setup] | 4●/1✦ | Tinkerer | U | ▸ Materialized: Foresee 3, then draw a card.
+[materialized_staples, materialize_value, card_flow, spark_tall] | 5●/2✦ | Explorer | R | ↯fast -- ▸ Materialized: Draw 2 cards. This character gains +1 spark for each card drawn this turn.
+[judgment_bodies, foresee_selection, card_flow, judgment_engines] | 3●/1✦ | Explorer | U | ▸ Judgment: You may pay 2● to foresee 2 and draw a card.
+[prevent_control, materialize_tempo, fast_interaction] | 3●/2✦ | Mage | R | ↯fast -- ▸ Materialized: Disable an enemy's activated and triggered abilities while this character is in play.
+[materialize_value, materialize_tempo, event_chain] | 4●/1✦ | Warrior | R | When you play an event, you may banish an ally, then materialize it.
+[foresee_selection, card_flow, big_energy] | 2● | Event | C | Foresee X, where X is your current energy. Draw a card.
+[cost_reduction, character_velocity, go_wide_enablers] | 2● | Event | C | Each player may materialize a character from their hand for 0●.
+[foresee_selection, card_flow, topdeck_setup] | 3● | Event | C | Foresee 5. Draw 2 cards.
+[tempo_resets, materialize_tempo, prevent_control] | 6● | Event | C | Return all characters to their owners' hands.
+[event_chain, spark_tall] | 2●/1✦ | Musician | U | When you play an event, this character gains +1 spark. ▸ Judgment: If this character has 5 or more spark, draw a card.
+[warrior_bastion, warrior_pressure, judgment_bodies, cheap_curve] | 2●/2✦ | Warrior | U | ▸ Judgment: If you have fewer ✪ than the opponent, this character gains +2 spark.
+[warrior_pressure, figment_swarm, judgment_engines] | 3●/2✦ | Warrior | R | ▸ Judgment: If the opponent has more ✪ than you, materialize a Warrior figment and draw a card.
+[warrior_bastion, spark_disruption, materialize_value] | 5●/3✦ | Warrior | R | ▸ Materialized: Each enemy loses 2 spark.
+[prevent_control, judgment_engines, premium_removal, finishers, materialize_value] | 8●/4✦ | Ancient | R | ▸ Materialized, Judgment: The opponent abandons a character. Draw a card.
+[big_energy, card_flow, finishers] | 8●/5✦ | Ancient | C | 8●: Draw 8 cards.
+[reclaim_characters, void_recursion, survivor_dissolve] | 1● | Event | C | Reclaim the character with the lowest cost in your void.
+[discard_velocity, void_setup] | 1●/1✦ | Tinkerer | U | ▸ Judgment: You may discard up to 2 cards, then draw that many cards. This character gains +1 spark per card discarded.
+[fast_tempo, judgment_engines, prevent_control] | 4●/2✦ | Renegade | R | ↯fast -- ▸ Judgment: Banish a card from the top of the opponent's deck. You may play it this turn.
+[prevent_control, materialize_value, hand_disruption, survivor_dissolve] | 5●/1✦ | Survivor | C | ▸ Materialized: The opponent discards a card. Draw a card.
+[judgment_engines, void_recursion, survivor_dissolve] | 3●/2✦ | Survivor | R | ▸ Judgment: With 4+ cards in your void, trigger an additional Judgment phase.
+[judgment_bodies, big_energy, cheap_curve, resource_burst] | 2●/2✦ | Explorer | U | ▸ Judgment: Gain 2●. The opponent gains 1●.
+[discard_velocity, void_setup, materialize_value] | 2●/1✦ | Explorer | U | ▸ Materialized: Draw a card. Discard a card. When you discard a card, this character gains +1 spark.
+[discard_velocity, topdeck_setup, event_chain] | 2●/1✦ | Explorer | U | ▸ Judgment: You may discard a card to banish the top 2 cards of your deck. You may play those cards this turn.
+[fast_setup, fast_tempo, cheap_curve, card_flow] | 2●/2✦ | Visitor | R | ↯fast -- ▸ Judgment: If the opponent has more cards in hand, draw a card.
+[materialize_value, event_chain, discover_toolbox] | 4●/5✦ | Explorer | R | ▸ Materialized: Draw an event from the opponent's deck, then play it for 0●.
+[cheap_removal, warrior_pressure, warrior_bastion, materialized_staples, cheap_curve] | 1●/0✦ | Warrior | C | ▸ Materialized: Dissolve an enemy with spark 2 or less.
+[cost_reduction, big_energy, cheap_curve, finishers] | 1●/1✦ | Child | U | Characters with cost 5● or more cost you 2● less.
+[warrior_pressure, ally_formation, spark_growth] | 2●/1✦ | Warrior | R | ▸ Judgment: Kindle 1. 5●: Each allied character gains +1 spark.
+[spirit_growth, ally_formation, judgment_engines, big_energy] | 2●/1✦ | Spirit Animal | U | ▸ Judgment: Gain 1●. With 4 or more allies, gain 3● instead.
+[warrior_pressure, spark_tall, spark_growth, cheap_curve] | 2●/1✦ | Warrior | U | ▸ Judgment: This character gains +2 spark.
+[spirit_growth, big_energy, spark_tall, finishers] | 6●/*✦ | Spirit Animal | R | This character's spark is equal to your maximum ●.
+[ally_formation, spark_tall, figment_swarm] | 5●/1✦ | Visionary | R | ▸ Judgment: Each ally gains spark equal to this character's spark.
+[survivor_dissolve, figment_swarm, abandon_furnace] | 5●/3✦ | Survivor | U | When a non-Figment ally is dissolved, materialize a Warrior figment.
+[survivor_dissolve, abandon_furnace, figment_swarm] | 10●/8✦ | Ancient | R | ▸ Dissolved: Materialize three Warrior figments.
+[void_recursion, big_energy, finishers] | 4● | Event | C | Gain N maximum ●, where N is the number of characters in your void.
+[abandon_furnace, judgment_engines] | 4● | Event | R | ▸ Judgment: You may abandon a character to materialize a random character from your deck.
+[finishers, big_energy, cost_reduction] | 13●/10✦ | Ancient | L | When you play this character from hand, take an extra turn after this one.
+[big_energy, event_setup, resource_burst] | 1● | Event | C | Gain 1 maximum ●.
+[judgment_bodies, big_energy, resource_burst, midcurve_glue] | 3●/1✦ | Explorer | U | ▸ Judgment: Choose — gain 1● or gain 1 maximum ●.
+[hand_cycling, discard_velocity, card_flow, event_setup] | 3● | Event | R | Each player draws 5 cards, then discards 2 cards.
+[event_chain, character_velocity] | 6●/2✦ | Spirit Animal | C | When you play a card, draw a card.
+[prevent_control, premium_removal, finishers, materialize_value] | 9●/4✦ | Visionary | R | ▸ Materialized: The opponent abandons 3 characters
+[prevent_control, defensive_curve, midcurve_glue] | 3●/2✦ | Survivor | C | The opponent cannot play fast cards on your turn.
+[premium_removal, materialize_value, prevent_control, finishers] | 6● | Event | C | Banish an enemy. Materialize a copy of it.
+[discard_velocity, spark_tall, spirit_growth] | 5●/1✦ | Spirit Animal | C | Discard a card: This character gains +2 spark.
+[reclaim_characters, void_recursion, survivor_dissolve] | 2●/1✦ | Survivor | U | ▸ Judgment: Return a character from your void to your hand.
+[materialize_value, event_chain] | 4●/3✦ | Explorer | R | ▸ Materialized: Play a random event with cost 3● or less from your deck, with targets chosen randomly.
+[character_tutors, materialize_value, topdeck_setup] | 4●/5✦ | Explorer | R | ▸ Materialized: Draw the top character of your deck.
+[cheap_removal, big_energy] | 1● | Event | C | Lose 2 maximum ●: Dissolve an enemy.
+[figment_swarm, void_setup, void_recursion, go_wide_enablers, judgment_engines] | 3●/1✦ | Outsider | R | ▸ Judgment: Materialize a Shadow Figment, then put the top card of your deck into your void.
+[warrior_pressure, cheap_curve, point_pressure, spark_growth] | 1●/1✦ | Warrior | C | 2●: This character gains +1 spark.
+[materialize_tempo, fast_tempo, finishers, card_flow, cheap_removal] | 7●/3✦ | Ancient | R | ↯fast -- ▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less.
+[spirit_growth, big_energy, judgment_engines, materialize_value, finishers] | 8●/3✦ | Spirit Animal | R | ▸ Materialized: Draw a card. ▸ Judgment: Gain 4●.
+[materialize_value, event_chain, character_tutors, finishers] | 7●/4✦ | Synth | R | ▸ Materialized: Draw a character and an event from your deck.
+[judgment_bodies, big_energy, abandon_fodder, leave_play_enablers] | 0●/0✦ | Child | R | ▸ Judgment: Gain 3●. When you materialize another character, abandon this one.
+[judgment_bodies] | 3●/1✦ | Visionary | R | ▸ Judgment: With exactly 5 cards in your hand, draw a card.
+[trigger_reuse, judgment_engines, materialize_value] | 3●/1✦ | Explorer | R | ▸ Materialized: Gain the ▸ Judgment: ability of a chosen ally.
+[event_chain, character_velocity] | 2●/0✦ | Explorer | R | ▸ Materialized: This character gains +2 spark for each card you played this turn.
+[spark_tall, point_pressure, judgment_bodies] | 3●/2✦ | Musician | R | ▸ Judgment: With no allies, gain 1✪ and draw a card.
+[discard_velocity] | 1●/0✦ | Outsider | R | When you discard a card, this character gains +1 spark. With 4 or more spark, the opponent's characters cost 2● more.
+[discover_toolbox, prevent_control, fast_tempo, materialize_tempo] | 3●/1✦ | Detective | R | ↯fast -- ▸ Materialized: Look at the opponent's hand. Gain a copy of a card there.
+[materialize_value, materialize_tempo] | 4●/1✦ | Synth | R | The ▸ Materialized: ability of allies triggers an additional time.
+[trigger_reuse, survivor_dissolve] | 5●/2✦ | Ancient | R | ▸ Materialized: Trigger the ▸ Dissolved: ability of each ally.
+[discard_velocity, character_velocity, materialize_value] | 5●/2✦ | Tinkerer | R | When you discard a character, materialize it.
+[discard_velocity, finishers, prevent_control, materialize_value] | 8●/5✦ | Ancient | R | Costs 1● less for each card you discarded this turn. ▸ Materialized: The opponent discards a card and you draw a card.
+[spark_growth, character_velocity] | 4●/2✦ | Explorer | R | ▸ Materialized: Each character in your hand gains +2 spark.
+[figment_swarm] | 4● | Event | R | For the rest of the game, your Figments have +2 spark.
+[big_energy, resource_burst, finishers] | 5● | Event | R | Choose one: • Gain 3 maximum ●. • Your ● becomes your maximum ●.
+[prevent_control, hand_disruption, point_pressure, judgment_engines] | 4●/2✦ | Outsider | R | ▸ Judgment: The opponent discards a card. If they can't, gain 2✪.
+[discard_velocity] | 3●/0✦ | Explorer | R | While in hand, when you discard another card, this gains +2 spark.
+[materialize_value, topdeck_setup, void_setup] | 5●/2✦ | Explorer | R | ▸ Materialized: Look at the top 3 cards of your deck. You may play one for 0●, then put the rest into your void.
+[event_chain, event_setup, cost_reduction] | 3● | Event | R | Until end of turn, your events cost 1●.
+[prevent_control] | 3●/1✦ | Warrior | R | When you prevent a card, draw a card and gain 2●.
+[materialize_tempo, materialize_value, premium_removal] | 4●/0✦ | Mage | R | ▸ Materialized: This character becomes a copy of an enemy. Disable that enemy's abilities while in play.
+[spark_disruption, sweepers] | 6●/2✦ | Ancient | R | ▸ Materialized: The spark of each enemy becomes 1.
+[spirit_growth] | 7●/3✦ | Spirit Animal | R | ▸ Materialized: Materialize each Spirit Animal in your hand.
+[judgment_engines, topdeck_setup, event_chain] | 5●/2✦ | Warrior | R | ▸ Judgment: Play the top event of your deck for 0●, with targets chosen randomly.
+[event_chain] | 5●/1✦ | Tinkerer | R | When you play an event, draw an event with lower cost.
+[survivor_dissolve, abandon_furnace, spark_tall] | 5●/2✦ | Ancient | R | ▸ Dissolved: Dissolve each enemy with spark less than this character's spark.
+[survivor_dissolve, character_tutors, finishers] | 4●/2✦ | Explorer | R | ▸ Materialized: Draw a character with cost 5● or more. ▸ Dissolved: Materialize it from your hand.
+[void_recursion, void_setup] | 6● | Event | R | Put your deck into your void.
+[copy_effects, fast_setup] | 1● | Fast Event | R | Play a copy of the last event the opponent played.
+[survivor_dissolve, abandon_furnace, spark_tall] | 4●/1✦ | Ancient | R | While in hand, when an ally is dissolved, this character gains +2 spark.
+[warrior_bastion, survivor_dissolve, void_denial] | 4●/2✦ | Warrior | R | When an enemy is dissolved, banish it. ▸ Dissolved: Materialize each enemy banished this way.
+[materialize_value, survivor_dissolve, materialize_tempo] | 4● | Event | R | Dissolve all characters, then materialize them with 1 spark.
+[spark_disruption, materialize_tempo, warrior_pressure] | 6●/1✦ | Warrior | R | ▸ Materialized: Swap this character's spark with an enemy's spark.
+[spark_tall, spirit_growth, survivor_dissolve] | 4●/2✦ | Spirit Animal | R | ▸ Dissolved: The ally with the most spark gains +3 spark and this ability.
+[prevent_control] | 4● | Event | R | For the rest of the game, when you prevent a card, gain 1✪ and draw a card.
+[materialize_value, void_recursion, copy_effects] | 4●/2✦ | Tinkerer | R | ▸ Materialized: Gain the abilities of a chosen character in your void.
+[event_chain] | 3●/1✦ | Tinkerer | R | When you play an event from your void, copy it.
+[judgment_engines, void_recursion] | 3●/1✦ | Survivor | R | ▸ Judgment: Become a copy of a random character in your void.
+[survivor_dissolve, abandon_furnace, trigger_reuse] | 4●/1✦ | Ancient | R | Allied ▸ Dissolved: abilities trigger an additional time.
+[event_chain] | 3●/1✦ | Musician | R | When you play your second event each turn, copy it.
+[judgment_engines, premium_removal, void_denial] | 6●/2✦ | Ancient | R | ▸ Judgment: Banish an enemy until this character leaves play.
+[abandon_furnace, survivor_dissolve, ally_formation] | 4● | Event | R | Each ally gains '▸ Dissolved: Materialize a character with equal cost from your deck.'
+[spirit_growth, big_energy, judgment_engines] | 3●/1✦ | Spirit Animal | R | ▸ Judgment: Gain +1 spark. You may abandon this character to gain maximum ● equal to its spark.
+[materialize_tempo, premium_removal] | 5●/2✦ | Outsider | R | ▸ Materialized: If you drew this character this turn, banish an enemy.
+[prevent_control, hand_disruption] | 3●/2✦ | Outsider | R | ▸ Materialized: The opponent discards a card. They can't play cards with that cost until your next turn.
+[event_chain] | 4●/1✦ | Tinkerer | R | At end of turn, play a random event with cost 2● or less from your void for 0●.
+[prevent_control] | 5●/2✦ | Outsider | R | When you prevent a character, materialize a copy of it.
+[figment_swarm, character_velocity, warrior_pressure] | 3●/1✦ | Warrior | R | When you draw a character, materialize a Warrior figment.
+[warrior_pressure, warrior_bastion, character_velocity] | 5●/2✦ | Warrior | R | When you draw a Warrior, materialize a copy of it with 1 spark.
+[ally_formation, abandon_furnace] | 5●/2✦ | Ancient | R | ▸ Materialized: Abandon an ally. Each other ally gains that ally's spark.
+[warrior_pressure, warrior_bastion, ally_formation] | 4● | Event | R | Materialize a 0 spark copy of each allied Warrior.
+[discard_velocity, character_velocity, spark_tall] | 3●/0✦ | Outsider | R | Discard a character: Play this character for 0● and it gains that character's spark.
+[event_chain, character_velocity, materialize_value] | 5●/2✦ | Warrior | R | When you play an event, materialize a random character with equal cost from your deck.
+[character_velocity, cost_reduction, go_wide_enablers] | 3● | Event | R | Until end of turn, characters in hand cost 1● and have 1 spark.
+[figment_swarm, survivor_dissolve] | 4●/2✦ | Monster | R | ▸ Materialized: Materialize 2 Warrior Figments. Each gains '▸ Dissolved: Dissolve a random enemy.'
+[figment_swarm, warrior_pressure] | 4●/2✦ | Warrior | R | ▸ Materialized: Each enemy gains '▸ Dissolved: The opponent materializes a Warrior figment.'
+[materialize_value, trigger_reuse, materialize_tempo] | 5●/1✦ | Warrior | R | ▸ Materialized: Banish an ally. At end of turn, materialize it and a copy of it.
+[abandon_furnace, spark_tall] | 4●/2✦ | Ancient | R | Abandon an ally: This character gains spark equal to that ally's cost.
+[sweepers, discard_velocity, survivor_dissolve, finishers] | 7●/3✦ | Ancient | R | ▸ Materialized: Dissolve all other characters. Discard a card for each ally dissolved.
+[judgment_engines, void_setup, void_recursion] | 4●/2✦ | Survivor | R | ▸ Judgment: Put the top cards 2 of your deck into your void. Materialize a copy of a random character from among them with 1 spark.
+[void_recursion, character_velocity] | 5●/2✦ | Survivor | R | ▸ Materialized: Put 3 characters from your void into your deck. They cost 0●.
+[warrior_pressure, warrior_bastion, character_velocity] | 3●/2✦ | Warrior | R | ▸ Dissolved: Materialize a Warrior from hand. It gains +3 spark.
+[event_chain, reclaim_events, materialize_value] | 5●/2✦ | Spirit Animal | R | ▸ Materialized: Return each event played last turn from your void to hand.
+[void_recursion, materialize_value, finishers] | 6●/2✦ | Ancient | R | ▸ Materialized: Materialize a random 1-spark, a 2-spark, and a 3-spark character from your void.
+[spirit_growth, defensive_curve, spark_tall] | 3●/0✦ | Spirit Animal | R | When the opponent would dissolve an ally, dissolve this character instead. ▸ Dissolved: Kindle 2.
+[ally_formation, spark_tall] | 4●/2✦ | Explorer | R | ▸ Materialized: Choose an ally. Each other ally's spark becomes equal to that ally's spark.
+[judgment_engines, spark_disruption, warrior_bastion] | 5●/2✦ | Warrior | R | ▸ Judgment: Each enemy loses 1 spark.
+[ally_formation, spark_tall, warrior_pressure] | 4●/2✦ | Warrior | R | When you kindle, each other allied character also gains +1 spark.
+[spark_disruption, spark_tall] | 4●/0✦ | Survivor | R | ▸ Materialized: Choose an enemy. This character gains spark equal to its spark. Its spark becomes 0.
+[spark_tall, character_velocity] | 6●/2✦ | Guide | R | ▸ Materialized: Each character in your deck gains +2 spark.
+[spark_tall, judgment_engines, warrior_pressure] | 4●/1✦ | Warrior | R | ▸ Judgment: Double this character's spark.
+[materialize_value, survivor_dissolve, copy_effects] | 3●/1✦ | Monster | R | ▸ Materialized: Choose an enemy. ▸ Dissolved: Materialize a copy of it.
+[point_pressure, card_flow, midcurve_glue] | 3● | Event | R | Secretly choose 1, 2, or 3. After that many turns, gain that many ✪ and draw that many cards.
+[topdeck_setup, materialize_value, resource_burst] | 3●/0✦ | Explorer | R | ▸ Materialized: Banish the top card of your deck. ▸ Banished: Play the card you banished for 0●.
+[spirit_growth, spark_growth, judgment_engines] | 4●/1✦ | Spirit Animal | R | ▸ Judgment: Each character in your hand gains +1 spark.
+[materialize_value, materialized_staples, materialize_tempo] | 4●/2✦ | Ancient | R | ▸ Materialized: The opponent chooses — you draw 2 cards, or they abandon a character.
+[judgment_engines, sweepers] | 4●/3✦ | Ancient | R | ▸ Judgment: Lose 1 spark. If this has 0 spark, dissolve all enemies.
+[spirit_growth, survivor_dissolve, topdeck_setup] | 2●/2✦ | Spirit Animal | R | ▸ Dissolved: You may put this card on top of your deck with +3 spark.
+[materialize_value, spark_disruption, materialized_staples] | 6●/2✦ | Ancient | R | ▸ Materialized: Each enemy loses 1 spark.
+[defensive_curve] | 5●/0✦ | Outsider | R | This character's spark is equal to the highest enemy's spark.
+[big_energy, spark_tall, resource_burst] | 4●/1✦ | Explorer | R | At the end of your turn, this character gains +1 spark for each unspent ● you have.
+[materialize_tempo, bounce_blink_tools, spirit_growth, spark_growth] | 5●/2✦ | Spirit Animal | R | ▸ Materialized: Return each other ally to hand, they gain +2 spark.
+[abandon_furnace, character_velocity, ally_formation] | 5●/2✦ | Explorer | R | ▸ Materialized: Banish each ally. For each, materialize a character with cost 1● higher from your deck.
+[spirit_growth, topdeck_setup, character_velocity, finishers] | 5●/1✦ | Explorer | R | ▸ Materialized: Reveal the top card of your deck. You may play it. If you do, this character gains +2 spark and you repeat this process.
+[discard_velocity] | 4●/2✦ | Tinkerer | R | When you discard a character, it gains +3 spark and is put into your deck instead.
+[discard_velocity] | 4●/2✦ | Outsider | R | When you discard a card, reveal the top of your deck. If it costs less, play it for 0●.
+[spark_disruption, prevent_control, materialize_value] | 4●/2✦ | Explorer | R | ▸ Materialized: Choose an enemy. It cannot gain spark while this character is in play.
+[judgment_engines, warrior_bastion, spark_disruption, premium_removal] | 3●/2✦ | Warrior | R | ▸ Materialized: Choose an enemy. ▸ Judgment: It loses 2 spark. At 0, dissolve it and draw 2.
+[judgment_engines] | 7●/7✦ | Ancient | L | ▸ Materialized: For the rest of the game, ▸ Judgment: abilities trigger twice.
+[judgment_engines, spark_tall, spark_disruption, finishers] | 7●/3✦ | Ancient | R | ▸ Judgment: Each enemy loses 1 spark. This character gains +1 spark for each.
+[judgment_engines, survivor_dissolve] | 4●/1✦ | Tinkerer | R | ▸ Judgment: Banish the top card of your deck. ▸ Dissolved: Play each card banished this way for 0●.
+[judgment_engines, materialize_value, ally_formation] | 4●/1✦ | Spirit Animal | R | ▸ Materialized: Choose an ally. ▸ Judgment: Materialize a copy of it with 1 spark.
+[void_recursion, judgment_engines, survivor_dissolve] | 5●/2✦ | Ancient | R | ▸ Materialized, Judgment: Each character in your void gains +2 spark.
+[materialize_tempo, spark_disruption, discard_velocity] | 3●/1✦ | Synth | R | ▸ Materialized: An enemy's spark becomes 0 until your next turn. Discard a card.
+[abandon_furnace, judgment_engines, ally_formation, figment_swarm] | 4●/2✦ | Ancient | R | ▸ Judgment: You may abandon an ally to play the top card of the opponent's deck for 0●.
+[spirit_growth, spark_growth, judgment_bodies, ally_formation] | 2●/1✦ | Spirit Animal | R | ▸ Materialized: Choose an ally. ▸ Judgment: That ally and this character each gain +1 spark.
+[abandon_furnace, ally_formation] | 4●/1✦ | Ancient | R | When you abandon an ally, this character becomes a copy of that ally. It keeps this ability.
+[event_chain, copy_effects] | 4●/2✦ | Explorer | R | ▸ Materialized: Choose an event in hand. At the beginning of each turn, play a copy of it for 0●.
+[void_recursion] | 3●/1✦ | Child | R | When a character enters your void from your deck, add it to your hand.
+[character_velocity, cost_reduction, warrior_bastion] | 4●/2✦ | Warrior | R | ▸ Dissolved: For the rest of the game, your first character each turn costs 2● less.
+[abandon_furnace] | 7●/4✦ | Synth | R | ▸ Dissolved: Materialize each character abandoned this turn from your void with +3 spark.
+[warrior_pressure, spark_tall, spark_disruption] | 4●/1✦ | Warrior | R | ▸ Materialized: An enemy loses all spark. This character gains that much spark.
+[void_recursion, judgment_engines, hand_cycling] | 3●/2✦ | Explorer | U | ▸ Judgment: You may swap a card in your hand with a card in your void.
+[figment_swarm] | 5●/1✦ | Synth | R | When you materialize a Figment, this character gains +2 spark.
+[abandon_furnace, premium_removal, warrior_bastion] | 4●/2✦ | Warrior | R | Abandon this character: Dissolve an enemy.
+[event_chain, spark_disruption, prevent_control] | 4●/2✦ | Renegade | R | When you play an event, the enemy with the most spark loses 1 spark.
+[event_chain] | 5●/2✦ | Warrior | R | ▸ Materialized: Dissolve a random enemy for each event you played this turn.
+[event_chain] | 3●/1✦ | Survivor | R | ▸ Materialized: Events cost you 2● less this turn. For the rest of the game after that, events cost you 1● more.
+[warrior_bastion, abandon_furnace] | 4●/2✦ | Warrior | R | When an allied Warrior is dissolved, reclaim it with 1 spark.
+[premium_removal, materialize_value, materialized_staples, discover_toolbox] | 6●/3✦ | Monster | R | ▸ Materialized: Banish an enemy. Add a copy of it to your hand.
+[spirit_growth, spark_tall, ally_formation] | 4●/2✦ | Spirit Animal | R | When another ally gains spark, this character gains +1 spark.
+[topdeck_setup, foresee_selection, spirit_growth] | 3●/2✦ | Visionary | R | ▸ Materialized: Reorder your deck from highest cost to lowest cost.
+[spark_tall, spark_growth, materialize_value] | 5●/2✦ | Tinkerer | R | ▸ Materialized: Double an ally's spark.
+[event_chain, void_recursion] | 4●/2✦ | Synth | R | Events you reclaim cost 0●.
+[foresee_selection, hand_cycling, topdeck_setup, card_flow] | 3● | Event | R | Swap your hand with the top 5 cards of your deck.
+[character_velocity, event_chain] | 4● | Event | R | Banish your hand. For the rest of the game, cards you draw cost 1● less.
+[materialize_tempo, bounce_blink_tools, character_velocity, cost_reduction] | 3● | Event | R | Return each ally to hand. They cost 2● less this turn.
+[materialize_value, materialize_tempo, trigger_reuse] | 3● | Event | R | Banish all characters, then materialize them.
+[spark_tall, ally_formation, abandon_furnace] | 4● | Event | R | An ally gains the total spark of your other allies. Abandon them.
+[reclaim_events, event_chain] | 4● | Event | R | Return each event in your void to your hand. At end of turn, banish them.
+[character_velocity, materialize_value] | 2● | Event | R | Materialize a random character from your deck with cost equal to the number of cards in your hand.
+[discover_toolbox, prevent_control, event_chain] | 4● | Event | R | Look at the top 5 cards of the opponent's deck. Play one for 0●. Put the rest on the bottom.
+[materialize_value, character_velocity] | 5● | Event | R | Until end of turn, when you materialize a character, materialize a copy of it.
+[premium_removal, sweepers, spark_disruption] | 5● | Event | R | Dissolve an enemy. Each other enemy loses spark equal to the dissolved character's cost.
+[cheap_removal, fast_interaction] | 2● | Fast Event | C | Dissolve an enemy with spark 4 or more.
+[reclaim_events, void_setup, event_chain] | 2● | Event | C | Put 5 random events from your deck into your void.
+[abandon_furnace, ally_formation, figment_swarm] | 4● | Event | R | Abandon all allies. Gain 2● and draw a card for each ally dissolved.
+[abandon_furnace, ally_formation, character_velocity] | 5● | Event | R | Abandon any number of allies. Materialize a random character from your deck for each ally abandoned.
+[discard_velocity, character_velocity] | 3● | Event | R | Until end of turn, when you discard a character, materialize it.
+[character_velocity, cost_reduction, resource_burst] | 2● | Event | R | The cost of a random character in your hand becomes 0●.
+[discover_toolbox, prevent_control, hand_disruption] | 4● | Event | R | Look at the opponent's hand. You may play an event from it for 0●.
+[ally_formation, figment_swarm, finishers] | 6● | Event | R | Each ally becomes a copy of the ally with the most spark.
+- | 2●/1✦ | Musician | Starter | Supported allies have +2 spark.
+- | 3●/1✦ | Visionary | Starter | ▸ Materialized: Foresee 1.
+- | 4●/4✦ | Spirit Animal | Starter | 
+- | 5●/3✦ | Warrior | Starter | ▸ Judgment: Gain 1 point.
+- | 3●/2✦ | Visitor | Starter | ▸ Dissolved: Draw a card.
+- | 6●/6✦ | Synth | Starter | This character has +2 spark per supporting ally.
+- | 2● | Event | Starter | Dissolve a character with cost 3● or less.
+- | 1● | Event | Starter | Draw a card. Foresee 1.
+- | 2● | Event | Starter | Discover a character.
+- | 1● | Event | Starter | An ally gains +3 spark.
