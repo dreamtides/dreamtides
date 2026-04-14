@@ -195,6 +195,17 @@ Utility tides:
 - `sweepers`: reset buttons and anti-wide punishment
 - `finishers`: top-end threats and closing tools
 - `void_denial`: banish, void hate, and anti-recursion tools
+- `discover_toolbox`: discover, flexible search, and narrow tutoring that trade
+  raw rate for access to the right card
+- `judgment_bodies`: cheap characters whose main job is to cash in a small
+  `▸ Judgment` trigger for energy, cards, foresee, or kindle
+- `materialized_staples`: generically playable `▸ Materialized` characters that
+  provide one-shot cards, energy, or removal without needing dedicated blink
+  support
+- `tempo_resets`: bounce, top-of-deck resets, and full-hand resets that buy time
+  without permanently answering the card
+- `point_pressure`: small, low-commitment point gain and race tools that help
+  any shell close games without a dedicated board engine
 
 Utility tide target size: 18-32 cards.
 
