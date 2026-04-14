@@ -2,10 +2,9 @@
 
 ## Scope
 
-This spec replaces the old faction-like tide system for quest drafting. In the
-new system, a Dreamcaller points at a curated set of tide mini-decks. The run's
-draft pool is built once, up front, by combining those tides into a multiset of
-about 200 cards.
+This spec defines the tide system for quest drafting. A Dreamcaller points at a
+curated set of tide mini-decks. The run's draft pool is built once, up front,
+by combining those tides into a multiset of about 200 cards.
 
 Runtime data is intentionally minimal:
 
@@ -36,13 +35,12 @@ is also fine. Support tides should usually not contain the core build-arounds
 that pay you for repeatedly doing the package's signature thing. If a card
 mostly reads as "when you do the tide thing, get paid," it probably belongs in
 the structural tide, not the support tide. What is not fine is a shipping tide
-that is so tiny or abstract
-that it does not draft like a useful package. "Discard outlets" by itself is too
-atomized. "Event setup" or "void setup" is acceptable if it gives another deck a
-real play pattern, not just a keyword pile.
+that is so tiny or abstract that it does not draft like a useful package.
+"Discard outlets" by itself is too atomized. "Event setup" or "void setup" is
+acceptable if it gives another deck a real play pattern, not just a keyword
+pile.
 
-This revision expands the library because the current card pool supports more
-meaningful packages than the original 30-tide proposal. The target is:
+The target library is:
 
 - 43 tides total
 - 17 structural tides
@@ -120,12 +118,11 @@ Typical support tide contents:
 - smoothing, rebates, or interaction that reinforce the package's texture
 - generic or low-scaling role-players that are still playable as a splash
 
-Support tides should not be the home for build-around payoffs. In particular,
-do not place these card classes into support tides:
+Support tides should not be the home for build-around payoffs. In particular, do
+not place these card classes into support tides:
 
 - cards whose main value is "when" or "whenever" you discard, abandon, banish,
-  dissolve, reclaim, materialize, flicker, prevent, or play fast cards or
-  events
+  dissolve, reclaim, materialize, flicker, prevent, or play fast cards or events
 - cards that care how many allies, figments, Warriors, Spirit Animals, or other
   character types you have
 - cards that care how many cards or events you played this turn
@@ -147,16 +144,16 @@ Support tides:
   cards
 - `reclaim_events`: event rebuy and replay setup without event-recursion payoff
   cards
-- `spark_growth`: direct spark buffs, kindle tools, and tall-board setup
-  without spark-scaling reward bodies
+- `spark_growth`: direct spark buffs, kindle tools, and tall-board setup without
+  spark-scaling reward bodies
 - `spark_disruption`: shrink, flatten, steal, or otherwise manipulate enemy
   spark totals
 - `go_wide_enablers`: cheap extra bodies, token makers, deployment smoothing,
   and non-scaling board support without ally-count or tribal payoff cards
 - `leave_play_enablers`: sacrifice, bounce, banish, and dissolve bridges that
   let other shells exploit leave-play patterns without leave-play reward cards
-- `bounce_blink_tools`: ally return, temporary banish, replay setup, and
-  cheap blink infrastructure without most materialized payoff cards
+- `bounce_blink_tools`: ally return, temporary banish, replay setup, and cheap
+  blink infrastructure without most materialized payoff cards
 - `void_setup`: self-mill, discard-to-void, threshold setup, and void stocking
   without void-threshold or reclaim payoff concentration
 - `judgment_repeaters`: extra phases, trigger-copying, and generic Judgment
@@ -310,8 +307,8 @@ utility tides.
 3. Cut support slices out of the structural spaces. For each major archetype,
 identify what another deck would want to borrow: setup, early plays, role
 compression, light recursion, safe interaction, smoothing, or cost help. Move
-those cards into support tides without moving most of the parent
-shell's most exclusive win conditions. Build-around rewards, count payoffs, and
+those cards into support tides without moving most of the parent shell's most
+exclusive win conditions. Build-around rewards, count payoffs, and
 repeated-trigger payoffs should stay behind in the structural tide.
 
 4. Anchor every card in one best home. Ask what package most wants this card and
@@ -350,8 +347,8 @@ Global validation:
 - every support tide has a clear job as a splash package, not just a mechanic
   bucket
 - no support tide should be mostly dead without one specific structural tide
-- no support tide should contain cards whose main text is "when you do the
-  tide thing, get paid"
+- no support tide should contain cards whose main text is "when you do the tide
+  thing, get paid"
 - no support tide should contain the shell's ally-count, tribal-count,
   cards-played-this-turn, or second-event style payoff cards
 - no support tide should contain most of one shell's exclusive closers
@@ -383,8 +380,8 @@ Warrior control Dreamcaller:
 
 - mandatory: `warrior_bastion`, `defensive_curve`, `cheap_removal`, `card_flow`
 - optional: `warrior_pressure`, `spark_tall`, `go_wide_enablers`,
-  `figment_swarm`, `prevent_control`, `premium_removal`, `sweepers`, `finishers`,
-  `resource_burst`
+  `figment_swarm`, `prevent_control`, `premium_removal`, `sweepers`,
+  `finishers`, `resource_burst`
 
 Result: some runs stay pure attrition-control, while others branch into wider
 Warrior floods or a taller spark endgame.
@@ -402,8 +399,8 @@ play texture, or board-flood side plans without changing the core identity.
 
 ## Rejected Models
 
-- Do not recreate the old seven-tide color wheel. This system is about curated
-  packages, not faction identity.
+- Do not use a seven-tide color wheel. This system is about curated packages,
+  not faction identity.
 - Do not ban overlap between support and structural tides. That overlap is one
   of the main reasons support tides exist.
 - Do not use ultra-small "mechanic atom" tides as shipping content. Support
@@ -411,5 +408,6 @@ play texture, or board-flood side plans without changing the core identity.
   packages.
 - Do not aim for 10 tides per card. That destroys variance and turns optional
   selection into duplicate inflation.
-- Do not use runtime card weights based on prior picks. The signal source should
-  be the pool that the Dreamcaller built, not a hidden current.
+- Do not use runtime card weights based on earlier picks in the draft. The
+  signal source should be the pool that the Dreamcaller built, not a hidden
+  current.
