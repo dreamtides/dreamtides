@@ -1,0 +1,789 @@
+[[dreamcaller]]
+name = "Orla, Last Hearthkeeper"
+id = "60BD584B-5BC8-4EE7-8A98-CBB304EB71AB"
+awakening = 5
+rendered-text = "With 3 allied Survivors, cards in your void have reclaim equal to their cost."
+mandatory-tides = [
+  "survivor_dissolve",
+  "void_recursion",
+  "reclaim_characters",
+]
+optional-tides = [
+  "void_setup",
+  "cheap_curve",
+  "character_tutors",
+  "fast_interaction",
+  "cheap_removal",
+  "finishers",
+  "leave_play_enablers",
+  "void_denial",
+  "reclaim_events",
+  "judgment_bodies",
+]
+
+[[dreamcaller]]
+name = "Selise, Echo Broker"
+id = "2C53B1B9-9291-4BBA-8D3A-F40B545C8F3C"
+awakening = 4
+rendered-text = "When an ally's ▸ Materialized: ability triggers, gain 1●."
+mandatory-tides = [
+  "materialize_value",
+  "ally_formation",
+  "trigger_reuse",
+]
+optional-tides = [
+  "bounce_blink_tools",
+  "copy_effects",
+  "character_tutors",
+  "event_setup",
+  "fast_setup",
+  "premium_removal",
+  "finishers",
+  "topdeck_setup",
+  "cheap_curve",
+  "foresee_selection",
+]
+
+[[dreamcaller]]
+name = "Talira, Tide Recaller"
+id = "3C4773E4-F8E1-4686-86CB-B407A42489D4"
+awakening = 5
+rendered-text = "0●, once per turn: Return an ally to hand."
+mandatory-tides = [
+  "materialize_tempo",
+  "character_velocity",
+  "bounce_blink_tools",
+  "cheap_curve",
+]
+optional-tides = [
+  "materialize_value",
+  "card_flow",
+  "resource_burst",
+  "fast_setup",
+  "leave_play_enablers",
+  "trigger_reuse",
+  "character_tutors",
+  "finishers",
+  "cheap_removal",
+  "ally_formation",
+]
+
+[[dreamcaller]]
+name = "Nyra, Chain Broker"
+id = "84E7020C-7384-4CC3-A20F-AB05F03CC375"
+awakening = 3
+rendered-text = "When you play your second event each turn, your events cost 1● less this turn."
+mandatory-tides = [
+  "event_chain",
+  "prevent_control",
+  "event_setup",
+  "cost_reduction",
+]
+optional-tides = [
+  "reclaim_events",
+  "copy_effects",
+  "fast_interaction",
+  "resource_burst",
+  "foresee_selection",
+  "fast_setup",
+  "topdeck_setup",
+  "hand_disruption",
+  "void_setup",
+  "fast_tempo",
+]
+
+[[dreamcaller]]
+name = "Veya, Figment Regent"
+id = "9E19B3D1-12F2-43C1-9CB1-08DE7CD32E32"
+awakening = 3
+rendered-text = "Allied figments have +1 spark."
+mandatory-tides = [
+  "figment_swarm",
+  "warrior_pressure",
+  "go_wide_enablers",
+  "cheap_curve",
+]
+optional-tides = [
+  "ally_formation",
+  "fast_setup",
+  "card_flow",
+  "resource_burst",
+  "point_pressure",
+  "spark_tall",
+  "big_energy",
+  "foresee_selection",
+  "cheap_removal",
+  "fast_interaction",
+]
+
+[[dreamcaller]]
+name = "Elara, Echo Conductor"
+id = "5E28154D-770A-4B84-8AAC-9DE44F5D7D02"
+awakening = 6
+rendered-text = "2●, once per turn: Trigger an ally's ▸ Materialized: ability."
+mandatory-tides = [
+  "materialize_tempo",
+  "ally_formation",
+  "trigger_reuse",
+  "materialized_staples",
+]
+optional-tides = [
+  "bounce_blink_tools",
+  "big_energy",
+  "character_tutors",
+  "reclaim_characters",
+  "topdeck_setup",
+  "resource_burst",
+  "cheap_curve",
+  "spirit_growth",
+  "card_flow",
+  "foresee_selection",
+]
+
+[[dreamcaller]]
+name = "Naeva, Solitary Arbiter"
+id = "6029BE40-75B9-4C07-912F-9718B6C5C747"
+awakening = 4
+rendered-text = "▸ Judgment: If you have exactly 1 deployed ally, it gains +2 spark and Unstoppable."
+mandatory-tides = [
+  "judgment_engines",
+  "spark_tall",
+  "spark_growth",
+  "defensive_curve",
+]
+optional-tides = [
+  "bounce_blink_tools",
+  "cheap_curve",
+  "fast_interaction",
+  "premium_removal",
+  "resource_burst",
+  "card_flow",
+  "foresee_selection",
+  "topdeck_setup",
+  "spirit_growth",
+  "judgment_repeaters",
+]
+
+[[dreamcaller]]
+name = "Maelis, Last Muster"
+id = "81954CA0-DA36-49DD-915C-1CCB1B2D7B05"
+awakening = 4
+rendered-text = "Once per turn, when an allied Survivor is dissolved, materialize a random Survivor from your deck."
+mandatory-tides = [
+  "survivor_dissolve",
+  "void_recursion",
+  "defensive_curve",
+  "trigger_reuse",
+]
+optional-tides = [
+  "reclaim_characters",
+  "character_tutors",
+  "void_setup",
+  "premium_removal",
+  "cheap_removal",
+  "fast_interaction",
+  "card_flow",
+  "resource_burst",
+  "judgment_engines",
+  "leave_play_enablers",
+]
+
+[[dreamcaller]]
+name = "Ivera, Debt Arbiter"
+id = "B9BF6D4B-907C-4750-B51C-811AFF29DE59"
+awakening = 5
+rendered-text = "▸ Judgment: You may abandon an ally. If you do, gain ● equal to that ally's cost."
+mandatory-tides = [
+  "abandon_furnace",
+  "ally_formation",
+  "abandon_fodder",
+  "leave_play_enablers",
+]
+optional-tides = [
+  "big_energy",
+  "character_velocity",
+  "figment_swarm",
+  "spark_tall",
+  "topdeck_setup",
+  "character_tutors",
+  "judgment_repeaters",
+  "reclaim_characters",
+  "go_wide_enablers",
+  "resource_burst",
+]
+
+[[dreamcaller]]
+name = "Serin, Banner Marshal"
+id = "BFC40414-5264-41BF-86E1-A0F41EE4F5B5"
+awakening = 2
+rendered-text = "Warriors cost you 1● less."
+mandatory-tides = [
+  "warrior_pressure",
+  "warrior_bastion",
+  "cost_reduction",
+  "cheap_curve",
+]
+optional-tides = [
+  "character_velocity",
+  "spark_tall",
+  "figment_swarm",
+  "character_tutors",
+  "cheap_removal",
+  "premium_removal",
+  "resource_burst",
+  "ally_formation",
+  "card_flow",
+  "point_pressure",
+]
+
+[[dreamcaller]]
+name = "Ivara, Ember Broker"
+id = "9D64A4A2-3DC7-456E-9EB2-5FE3A48883C4"
+awakening = 5
+rendered-text = "Once per turn, abandon an ally: Materialize a random character with cost 1● higher from your deck."
+mandatory-tides = [
+  "abandon_furnace",
+  "character_velocity",
+  "abandon_fodder",
+]
+optional-tides = [
+  "cheap_curve",
+  "ally_formation",
+  "character_tutors",
+  "topdeck_setup",
+  "leave_play_enablers",
+  "resource_burst",
+  "cheap_removal",
+  "finishers",
+  "reclaim_characters",
+  "big_energy",
+]
+
+[[dreamcaller]]
+name = "Selka, Echo Recaller"
+id = "FE2510D9-BFEE-4C35-97F9-30E0CD2E2851"
+awakening = 6
+rendered-text = "2●: Return an ally to hand. It costs 2● less and gains +2 spark."
+mandatory-tides = [
+  "materialize_tempo",
+  "spark_tall",
+  "bounce_blink_tools",
+  "cheap_curve",
+]
+optional-tides = [
+  "cost_reduction",
+  "trigger_reuse",
+  "leave_play_enablers",
+  "topdeck_setup",
+  "event_setup",
+  "discover_toolbox",
+  "premium_removal",
+  "character_tutors",
+  "resource_burst",
+  "foresee_selection",
+]
+
+[[dreamcaller]]
+name = "Marella, Undertow Broker"
+id = "BA973428-6D90-4847-B779-CB7E25A5AC84"
+awakening = 5
+rendered-text = "When you discard a card, return another random card from your void to your hand."
+mandatory-tides = [
+  "discard_velocity",
+  "void_recursion",
+  "hand_cycling",
+]
+optional-tides = [
+  "cheap_removal",
+  "void_setup",
+  "event_setup",
+  "reclaim_events",
+  "reclaim_characters",
+  "card_flow",
+  "fast_interaction",
+  "finishers",
+  "resource_burst",
+  "void_denial",
+]
+
+[[dreamcaller]]
+name = "Veyra, Furnace Shepherd"
+id = "16B579FE-C15B-4DF6-8262-D45CE44732AE"
+awakening = 4
+rendered-text = "When you abandon an ally, the next character you play this turn costs 2● less."
+mandatory-tides = [
+  "abandon_furnace",
+  "character_velocity",
+  "cost_reduction",
+  "go_wide_enablers",
+]
+optional-tides = [
+  "abandon_fodder",
+  "leave_play_enablers",
+  "character_tutors",
+  "cheap_curve",
+  "reclaim_characters",
+  "topdeck_setup",
+  "cheap_removal",
+  "bounce_blink_tools",
+  "midcurve_glue",
+  "ally_formation",
+]
+
+[[dreamcaller]]
+name = "Ilyra, Downstream Savant"
+id = "F6208407-C4E9-42AC-B533-346704F5E39E"
+awakening = 5
+rendered-text = "Once per turn, when you play an event, draw an event with lower cost."
+mandatory-tides = [
+  "event_chain",
+  "prevent_control",
+  "event_setup",
+]
+optional-tides = [
+  "fast_interaction",
+  "reclaim_events",
+  "cost_reduction",
+  "foresee_selection",
+  "discover_toolbox",
+  "hand_disruption",
+  "tempo_resets",
+  "fast_setup",
+  "cheap_curve",
+  "resource_burst",
+]
+
+[[dreamcaller]]
+name = "Aster, Void Broker"
+id = "4D5E3933-7DD6-406B-922D-DD78ACFA044A"
+awakening = 5
+rendered-text = "When you play a card from your void, gain 3●."
+mandatory-tides = [
+  "void_recursion",
+  "discard_velocity",
+  "reclaim_events",
+  "copy_effects",
+]
+optional-tides = [
+  "reclaim_characters",
+  "hand_cycling",
+  "event_setup",
+  "void_setup",
+  "cheap_curve",
+  "cheap_removal",
+  "premium_removal",
+  "fast_interaction",
+  "void_denial",
+  "finishers",
+]
+
+[[dreamcaller]]
+name = "Sareth, Line Captain"
+id = "91D4C3B5-FD63-480B-9ED5-979109A227BB"
+awakening = 4
+rendered-text = "Deployed allies have +1 spark for each other deployed ally."
+mandatory-tides = [
+  "ally_formation",
+  "character_velocity",
+  "cheap_curve",
+  "card_flow",
+]
+optional-tides = [
+  "go_wide_enablers",
+  "resource_burst",
+  "cheap_removal",
+  "premium_removal",
+  "fast_interaction",
+  "materialized_staples",
+  "big_energy",
+  "spark_growth",
+  "warrior_pressure",
+  "spirit_growth",
+]
+
+[[dreamcaller]]
+name = "Kaelis, Ash Broker"
+id = "86026206-1B11-4F38-A24E-FD3C697F5353"
+awakening = 3
+rendered-text = "Discard a card, once per turn: Gain 1●."
+mandatory-tides = [
+  "discard_velocity",
+  "character_velocity",
+  "hand_cycling",
+  "cheap_removal",
+]
+optional-tides = [
+  "card_flow",
+  "event_setup",
+  "reclaim_events",
+  "fast_interaction",
+  "finishers",
+  "resource_burst",
+  "void_denial",
+  "cheap_curve",
+  "premium_removal",
+  "judgment_bodies",
+]
+
+[[dreamcaller]]
+name = "Tamsin, Standard-Bearer"
+id = "3EBABA62-9000-429D-B203-2A5A9724389A"
+awakening = 4
+rendered-text = "2●, once per turn: Each ally gains +1 spark."
+mandatory-tides = [
+  "ally_formation",
+  "character_velocity",
+  "go_wide_enablers",
+  "fast_interaction",
+]
+optional-tides = [
+  "big_energy",
+  "figment_swarm",
+  "materialize_tempo",
+  "card_flow",
+  "finishers",
+  "premium_removal",
+  "cheap_curve",
+  "resource_burst",
+  "fast_setup",
+  "spark_growth",
+]
+
+[[dreamcaller]]
+name = "Corin, Echo Marshal"
+id = "BF72ADFF-7D74-4BE8-9B93-1DB7BA13A1DB"
+awakening = 5
+rendered-text = "Once per turn, when you play a Warrior, materialize a 1-spark copy of it."
+mandatory-tides = [
+  "warrior_pressure",
+  "materialize_tempo",
+  "bounce_blink_tools",
+  "cheap_removal",
+]
+optional-tides = [
+  "warrior_bastion",
+  "figment_swarm",
+  "trigger_reuse",
+  "character_tutors",
+  "copy_effects",
+  "premium_removal",
+  "card_flow",
+  "resource_burst",
+  "spark_tall",
+  "cheap_curve",
+]
+
+[[dreamcaller]]
+name = "Calia, Ashwake Witness"
+id = "6488452D-4E9E-466C-96DF-716D4EC646B1"
+awakening = 5
+rendered-text = "Allied ▸ Dissolved: abilities trigger an additional time."
+mandatory-tides = [
+  "survivor_dissolve",
+  "figment_swarm",
+  "trigger_reuse",
+  "leave_play_enablers",
+]
+optional-tides = [
+  "reclaim_characters",
+  "ally_formation",
+  "abandon_fodder",
+  "character_tutors",
+  "cheap_curve",
+  "premium_removal",
+  "judgment_bodies",
+  "void_setup",
+  "cheap_removal",
+  "materialized_staples",
+]
+
+[[dreamcaller]]
+name = "Riona, Riot Choreographer"
+id = "8A2FCD65-BBA7-459C-A6B0-F0391B9293FD"
+awakening = 4
+rendered-text = "When you discard a card, deployed allies gain +1 spark."
+mandatory-tides = [
+  "discard_velocity",
+  "ally_formation",
+  "character_velocity",
+  "cheap_removal",
+]
+optional-tides = [
+  "hand_cycling",
+  "go_wide_enablers",
+  "cheap_curve",
+  "fast_interaction",
+  "resource_burst",
+  "spark_growth",
+  "finishers",
+  "void_setup",
+  "judgment_repeaters",
+  "premium_removal",
+]
+
+[[dreamcaller]]
+name = "Thessa, Chorus Arbiter"
+id = "1CC5A88A-134F-42F7-A0AE-95ACE44B3745"
+awakening = 5
+rendered-text = "▸ Judgment: Each deployed ally gains +1 spark for each other deployed ally."
+mandatory-tides = [
+  "ally_formation",
+  "judgment_engines",
+  "go_wide_enablers",
+  "cheap_curve",
+]
+optional-tides = [
+  "character_velocity",
+  "materialize_tempo",
+  "card_flow",
+  "resource_burst",
+  "fast_interaction",
+  "cheap_removal",
+  "judgment_repeaters",
+  "finishers",
+  "spark_growth",
+  "foresee_selection",
+]
+
+[[dreamcaller]]
+name = "Mirel, Procession Director"
+id = "C72CFD7B-408B-47F6-ADF1-1E486A7E20D3"
+awakening = 4
+rendered-text = "Once per turn, when you deploy an ally, trigger its ▸ Materialized: ability."
+mandatory-tides = [
+  "materialize_value",
+  "ally_formation",
+  "bounce_blink_tools",
+]
+optional-tides = [
+  "materialized_staples",
+  "trigger_reuse",
+  "character_tutors",
+  "copy_effects",
+  "go_wide_enablers",
+  "spark_growth",
+  "discover_toolbox",
+  "point_pressure",
+  "cost_reduction",
+  "cheap_curve",
+]
+
+[[dreamcaller]]
+name = "Velastra, Dusk Intercessor"
+id = "9E4862FD-E18C-463E-9D5F-E5D73C29A66F"
+awakening = 5
+rendered-text = "During the opponent's turn, cards you play cost 1● less."
+mandatory-tides = [
+  "fast_tempo",
+  "prevent_control",
+  "fast_setup",
+  "fast_interaction",
+]
+optional-tides = [
+  "materialize_tempo",
+  "character_velocity",
+  "card_flow",
+  "resource_burst",
+  "materialized_staples",
+  "bounce_blink_tools",
+  "event_setup",
+  "hand_disruption",
+  "tempo_resets",
+  "premium_removal",
+]
+
+[[dreamcaller]]
+name = "Neris, Wake Broker"
+id = "B8C1B0AB-0FE6-47D6-B576-0C2231AEB81E"
+awakening = 4
+rendered-text = "When you discard a card, it gains reclaim until end of turn."
+mandatory-tides = [
+  "discard_velocity",
+  "void_recursion",
+  "event_setup",
+]
+optional-tides = [
+  "cheap_removal",
+  "hand_cycling",
+  "void_setup",
+  "reclaim_events",
+  "reclaim_characters",
+  "fast_interaction",
+  "finishers",
+  "void_denial",
+  "cheap_curve",
+  "resource_burst",
+]
+
+[[dreamcaller]]
+name = "Oren, Echo Broker"
+id = "F0F5449E-01C2-4635-BCE1-76B179FC2108"
+awakening = 5
+rendered-text = "Once per turn, when you discard a character from your hand, materialize a 1-spark copy of it."
+mandatory-tides = [
+  "discard_velocity",
+  "character_velocity",
+  "hand_cycling",
+]
+optional-tides = [
+  "reclaim_characters",
+  "trigger_reuse",
+  "character_tutors",
+  "void_setup",
+  "cost_reduction",
+  "spark_growth",
+  "cheap_curve",
+  "materialized_staples",
+  "materialize_tempo",
+  "ally_formation",
+]
+
+[[dreamcaller]]
+name = "Cassia, Undertow Treasurer"
+id = "133E22DD-F81B-406D-B4E3-98C346D7FD4E"
+awakening = 5
+rendered-text = "Characters cost you 1● less for each 3 cards in your void."
+mandatory-tides = [
+  "void_recursion",
+  "character_velocity",
+  "cost_reduction",
+]
+optional-tides = [
+  "void_setup",
+  "cheap_curve",
+  "reclaim_characters",
+  "materialized_staples",
+  "hand_cycling",
+  "resource_burst",
+  "cheap_removal",
+  "premium_removal",
+  "character_tutors",
+  "finishers",
+]
+
+[[dreamcaller]]
+name = "Aveline, Wave Standard"
+id = "BDD3A3A7-242C-4D2B-8071-EBE56891A340"
+awakening = 5
+rendered-text = "When 2 or more allies score points, gain 1✪."
+mandatory-tides = [
+  "ally_formation",
+  "figment_swarm",
+  "character_velocity",
+  "cheap_curve",
+]
+optional-tides = [
+  "big_energy",
+  "spark_growth",
+  "go_wide_enablers",
+  "cheap_removal",
+  "premium_removal",
+  "card_flow",
+  "resource_burst",
+  "materialized_staples",
+  "point_pressure",
+  "fast_interaction",
+]
+
+[[dreamcaller]]
+name = "Liora, Procession Guide"
+id = "94E7C651-25E9-4A62-9DE4-EAF5BA20542C"
+awakening = 4
+rendered-text = "When you play a character, if you have played another character this turn, draw a card."
+mandatory-tides = [
+  "character_velocity",
+  "ally_formation",
+  "reclaim_characters",
+  "cheap_curve",
+]
+optional-tides = [
+  "character_tutors",
+  "go_wide_enablers",
+  "spark_growth",
+  "finishers",
+  "premium_removal",
+  "bounce_blink_tools",
+  "cheap_removal",
+  "cost_reduction",
+  "materialized_staples",
+  "resource_burst",
+]
+
+[[dreamcaller]]
+name = "Meris, Resonant Magistrate"
+id = "B99936CA-97F9-4930-AF5A-FA9EF92557EF"
+awakening = 6
+rendered-text = "Allied ▸ Judgment: abilities trigger an additional time."
+mandatory-tides = [
+  "judgment_engines",
+  "ally_formation",
+  "judgment_bodies",
+  "judgment_repeaters",
+]
+optional-tides = [
+  "spirit_growth",
+  "big_energy",
+  "trigger_reuse",
+  "resource_burst",
+  "go_wide_enablers",
+  "card_flow",
+  "cheap_removal",
+  "premium_removal",
+  "spark_growth",
+  "cheap_curve",
+]
+
+[[dreamcaller]]
+name = "Tessara, Verdict Broker"
+id = "2B7E921D-0CD7-4C20-A415-9E7EEDE7B477"
+awakening = 5
+rendered-text = "When you prevent a card, add a copy of it to your hand."
+mandatory-tides = [
+  "prevent_control",
+  "fast_tempo",
+  "materialize_tempo",
+]
+optional-tides = [
+  "fast_interaction",
+  "fast_setup",
+  "hand_disruption",
+  "discover_toolbox",
+  "bounce_blink_tools",
+  "event_setup",
+  "tempo_resets",
+  "cheap_curve",
+  "resource_burst",
+  "premium_removal",
+]
+
+[metadata]
+schema_version = 1
+
+[metadata.rows]
+default_height = 100
+frozen_rows = 1
+
+[[metadata.columns]]
+key = "name"
+width = 220
+bold = true
+
+[[metadata.columns]]
+key = "awakening"
+width = 90
+
+[[metadata.columns]]
+key = "rendered-text"
+width = 360
+
+[[metadata.columns]]
+key = "id"
+width = 140
+
+[[metadata.columns]]
+key = "mandatory-tides"
+width = 240
+
+[[metadata.columns]]
+key = "optional-tides"
+width = 320
