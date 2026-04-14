@@ -5,6 +5,7 @@ import { CardDisplay } from "./CardDisplay";
 const params = new URLSearchParams(window.location.search);
 const FRONT_SLOT_COUNT = params.get("front") ? parseInt(params.get("front")!, 10) : 4;
 const BACK_SLOT_COUNT = params.get("back") ? parseInt(params.get("back")!, 10) : 5;
+const BATTLEFIELD_CARD_HEIGHT = 112;
 
 interface RankZoneProps {
   label: string;
@@ -155,6 +156,7 @@ export function RankZone({
                 disabled={disabled}
                 compact
                 battlefield
+                showCompactRulesText
                 draggable={canDrag}
                 onDragStart={(e) => handleDragStart(e, card)}
                 onDragEnd={handleDragEnd}
@@ -169,7 +171,7 @@ export function RankZone({
               onDragLeave={handleDragLeave}
               style={{
                 width: 90,
-                height: 48,
+                height: BATTLEFIELD_CARD_HEIGHT,
                 border: `1px dashed ${dragOverSlot === i ? "rgb(34, 197, 94)" : "var(--color-border)"}`,
                 borderRadius: 4,
                 transition: "box-shadow 0.15s, border-color 0.15s",

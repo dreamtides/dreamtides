@@ -7,6 +7,7 @@ interface CardDisplayProps {
   disabled?: boolean;
   compact?: boolean;
   battlefield?: boolean;
+  showCompactRulesText?: boolean;
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: (e: React.DragEvent) => void;
@@ -79,12 +80,28 @@ function stripIconChars(text: string): string {
     .trim();
 }
 
+const OVERRIDE_RULES_TEXT_BY_NAME: Record<string, string> = {
+  "Duskborn Sentry": "Supported characters gain +2 spark.",
+  "Duskborne Sentry": "Supported characters gain +2 spark.",
+  "Veilward Knight": "At end of turn, each supporting character gains +1 spark.",
+};
+
+function displayRulesText(name: string, rulesText: string): string {
+  const trimmed = rulesText.trim();
+  return trimmed !== "" ? trimmed : (OVERRIDE_RULES_TEXT_BY_NAME[name] ?? "");
+}
+
+function compactRulesPreview(text: string): string {
+  return stripIconChars(stripAllTags(stripUnityTags(text))).replace(/\s+/g, " ").trim();
+}
+
 export function CardDisplay({
   card,
   onAction,
   disabled,
   compact,
   battlefield,
+  showCompactRulesText,
   draggable,
   onDragStart,
   onDragEnd,
@@ -144,6 +161,21 @@ export function CardDisplay({
   }
 
   const imageUrl = getCardImageUrl(card);
+  const resolvedRulesText = displayRulesText(revealed.name, revealed.rules_text);
+  const compactRulesText = compactRulesPreview(resolvedRulesText);
+  const compactCardHeight = compact ? (showCompactRulesText ? 112 : 48) : 180;
+  const compactImageHeight = compact ? (showCompactRulesText ? 18 : 28) : 80;
+  const compactNameStyle = compact && showCompactRulesText
+    ? {
+        maxWidth: "70%",
+        lineHeight: 1.1,
+        display: "-webkit-box",
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: "vertical" as const,
+        overflow: "hidden",
+        whiteSpace: "normal" as const,
+      }
+    : { maxWidth: "70%" };
 
   return (
     <div
@@ -152,9 +184,10 @@ export function CardDisplay({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       className="rounded overflow-hidden flex flex-col"
+      title={compactRulesText !== "" ? compactRulesText : revealed.name}
       style={{
         width: compact ? 90 : 140,
-        minHeight: compact ? 48 : 180,
+        minHeight: compactCardHeight,
         background: revealed.summoning_sick && battlefield ? "rgba(100, 149, 237, 0.1)" : "var(--color-surface)",
         border: `2px solid ${revealed.summoning_sick && battlefield ? "rgba(100, 149, 237, 0.6)" : outlineColor}`,
         cursor: draggable ? "grab" : isClickable ? "pointer" : "default",
@@ -166,12 +199,12 @@ export function CardDisplay({
           src={imageUrl}
           alt={revealed.name}
           className="w-full object-cover"
-          style={{ height: compact ? 28 : 80 }}
+          style={{ height: compactImageHeight }}
         />
       )}
-      <div className="p-1 flex flex-col gap-0.5" style={{ fontSize: compact ? 9 : 11 }}>
-        <div className="flex justify-between items-center">
-          <span className="font-bold truncate" style={{ maxWidth: "70%" }}>
+      <div className="p-1 flex flex-col gap-0.5" style={{ fontSize: compact ? 9 : 11, flex: 1 }}>
+        <div className="flex justify-between items-start gap-1">
+          <span className={showCompactRulesText && compact ? "font-bold" : "font-bold truncate"} style={compactNameStyle}>
             {revealed.name}
             {revealed.summoning_sick && battlefield && (
               <span style={{ color: "rgba(100, 149, 237, 0.8)", fontSize: compact ? 7 : 9, marginLeft: 2 }} title="Summoning Sick">zzz</span>
@@ -194,7 +227,22 @@ export function CardDisplay({
             &#x21AF; Fast
           </span>
         )}
-        {!compact && revealed.rules_text && (
+        {compact && showCompactRulesText && compactRulesText !== "" && (
+          <div
+            className="mt-0.5 overflow-hidden"
+            style={{
+              fontSize: 7,
+              color: "var(--color-text-dim)",
+              lineHeight: 1.15,
+              display: "-webkit-box",
+              WebkitLineClamp: 4,
+              WebkitBoxOrient: "vertical" as const,
+            }}
+          >
+            {compactRulesText}
+          </div>
+        )}
+        {!compact && resolvedRulesText !== "" && (
           <div
             className="mt-1 overflow-hidden"
             style={{
@@ -203,7 +251,7 @@ export function CardDisplay({
               lineHeight: 1.3,
               maxHeight: 52,
             }}
-            dangerouslySetInnerHTML={{ __html: stripUnityTags(revealed.rules_text) }}
+            dangerouslySetInnerHTML={{ __html: stripUnityTags(resolvedRulesText) }}
           />
         )}
       </div>
@@ -234,6 +282,7 @@ export function CardDisplay({
                 : "pointer",
             borderTop: "1px solid var(--color-border)",
             fontSize: compact ? 8 : 10,
+            marginTop: "auto",
           }}
         >
           {stripIconChars(revealed.actions.button_attachment.label)}
