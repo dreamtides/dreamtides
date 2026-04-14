@@ -1,15 +1,17 @@
+import { cardAccentTide } from "./card-database";
 import type { CardData, Tide } from "../types/cards";
 
 /** Counts tide occurrences in the player's deck. */
 export function countDeckTides(
   deck: ReadonlyArray<{ cardNumber: number }>,
-  cardDatabase: ReadonlyMap<number, { tide: Tide }>,
+  cardDatabase: ReadonlyMap<number, CardData>,
 ): Map<Tide, number> {
   const counts = new Map<Tide, number>();
   for (const entry of deck) {
     const card = cardDatabase.get(entry.cardNumber);
     if (card) {
-      counts.set(card.tide, (counts.get(card.tide) ?? 0) + 1);
+      const accentTide = cardAccentTide(card);
+      counts.set(accentTide, (counts.get(accentTide) ?? 0) + 1);
     }
   }
   return counts;
@@ -78,12 +80,12 @@ export function selectRareRewards(
 ): CardData[] {
   const excludedSet = new Set(excludedTides);
   const rareCards = Array.from(cardDatabase.values()).filter(
-    (c) => c.rarity === "Rare" && !excludedSet.has(c.tide),
+    (card) => card.rarity === "Rare" && !excludedSet.has(cardAccentTide(card)),
   );
 
   if (rareCards.length === 0) return [];
 
   return weightedSample(rareCards, 4, (card) =>
-    tideWeight(card.tide, deckTideCounts),
+    tideWeight(cardAccentTide(card), deckTideCounts),
   );
 }

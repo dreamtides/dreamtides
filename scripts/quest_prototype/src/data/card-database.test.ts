@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
+  cardAccentTide,
   cardImageUrl,
   tideIconUrl,
   loadCardDatabase,
@@ -19,8 +20,7 @@ const SAMPLE_CARD: CardData = {
   energyCost: 3,
   spark: 2,
   isFast: false,
-  tide: "Bloom",
-  tideCost: 1,
+  tides: ["Bloom"],
   renderedText: "Sample text",
   imageNumber: 12345,
   artOwned: true,
@@ -178,7 +178,7 @@ async function readCardDataJson(): Promise<CardData[] | null> {
 /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 
 describe("loadCardDatabase integration (real card-data.json)", () => {
-  it("loads 483 cards and indexes them by cardNumber", async () => {
+  it("loads the generated card set and indexes it by cardNumber", async () => {
     const raw = await readCardDataJson();
     if (raw === null) return;
 
@@ -214,17 +214,6 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
       "Rare",
       "Legendary",
     ]);
-    const validTides = new Set([
-      "Bloom",
-      "Arc",
-      "Ignite",
-      "Pact",
-      "Umbra",
-      "Rime",
-      "Surge",
-      "Neutral",
-    ]);
-
     for (const [cardNumber, card] of db) {
       expect(cardNumber).toBe(card.cardNumber);
       expect(typeof card.name).toBe("string");
@@ -240,8 +229,12 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
         card.spark === null || typeof card.spark === "number",
       ).toBe(true);
       expect(typeof card.isFast).toBe("boolean");
-      expect(validTides.has(card.tide)).toBe(true);
-      expect(typeof card.tideCost).toBe("number");
+      expect(Array.isArray(card.tides)).toBe(true);
+      expect(card.tides.length).toBeGreaterThan(0);
+      for (const packageTideId of card.tides) {
+        expect(typeof packageTideId).toBe("string");
+        expect(packageTideId.length).toBeGreaterThan(0);
+      }
       expect(typeof card.renderedText).toBe("string");
       expect(typeof card.imageNumber).toBe("number");
       expect(typeof card.artOwned).toBe("boolean");
@@ -265,5 +258,6 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
     expect(card).toBeDefined();
     expect(card?.cardNumber).toBe(1);
     expect(card?.name.length).toBeGreaterThan(0);
+    expect(card ? cardAccentTide(card) : null).not.toBeNull();
   });
 });

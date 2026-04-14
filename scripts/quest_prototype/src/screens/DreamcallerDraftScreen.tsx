@@ -1,22 +1,38 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Dreamcaller, SiteState } from "../types/quest";
-import type { Tide } from "../types/cards";
 import { useQuest } from "../state/quest-context";
-import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { dreamcallerAccentTide } from "../data/quest-content";
 import { logEvent } from "../logging";
+import type { DreamcallerContent } from "../types/content";
+import type { Dreamcaller, SiteState } from "../types/quest";
 
-/** Returns all dreamcallers matching the chosen tide or Neutral. */
-function selectOfferedDreamcallers(chosenTide: Tide | null): Dreamcaller[] {
-  if (chosenTide === null) return [...DREAMCALLERS];
-  return DREAMCALLERS.filter(
-    (dc) => dc.tide === chosenTide || dc.tide === "Neutral",
-  );
+/** Returns 3 Dreamcallers in a stable random order for the current site visit. */
+function selectOfferedDreamcallers(
+  dreamcallers: readonly DreamcallerContent[],
+): DreamcallerContent[] {
+  const pool = [...dreamcallers];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, 3);
+}
+
+function toSelectedDreamcaller(dreamcaller: DreamcallerContent): Dreamcaller {
+  const tide = dreamcallerAccentTide(dreamcaller);
+
+  return {
+    name: dreamcaller.name,
+    tide,
+    abilityDescription: dreamcaller.renderedText,
+    essenceBonus: 0,
+    tideCrystalGrant: tide,
+  };
 }
 
 interface DreamcallerCardProps {
-  dreamcaller: Dreamcaller;
+  dreamcaller: DreamcallerContent;
   isSelected: boolean;
   isDismissed: boolean;
   onSelect: () => void;
@@ -29,7 +45,8 @@ function DreamcallerCard({
   isDismissed,
   onSelect,
 }: DreamcallerCardProps) {
-  const tideColor = TIDE_COLORS[dreamcaller.tide];
+  const accentTide = dreamcallerAccentTide(dreamcaller);
+  const tideColor = TIDE_COLORS[accentTide];
 
   return (
     <motion.div
@@ -53,8 +70,8 @@ function DreamcallerCard({
     >
       {/* Tide icon */}
       <img
-        src={tideIconUrl(dreamcaller.tide)}
-        alt={dreamcaller.tide}
+        src={tideIconUrl(accentTide)}
+        alt={accentTide}
         className="mb-3 h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
         style={{ border: `2px solid ${tideColor}` }}
       />
@@ -67,7 +84,7 @@ function DreamcallerCard({
         {dreamcaller.name}
       </h3>
 
-      {/* Tide label */}
+      {/* Awakening label */}
       <span
         className="mb-3 rounded-full px-3 py-0.5 text-xs font-medium"
         style={{
@@ -76,7 +93,7 @@ function DreamcallerCard({
           border: `1px solid ${tideColor}30`,
         }}
       >
-        {dreamcaller.tide} Tide
+        Awakening {String(dreamcaller.awakening)}
       </span>
 
       {/* Ability description */}
@@ -84,29 +101,8 @@ function DreamcallerCard({
         className="mb-4 text-center text-sm leading-relaxed opacity-80"
         style={{ color: "#e2e8f0" }}
       >
-        {dreamcaller.abilityDescription}
+        {dreamcaller.renderedText}
       </p>
-
-      {/* Essence bonus */}
-      <div className="mb-2 flex items-center gap-1.5">
-        <span style={{ color: "#fbbf24" }}>{"\u25C6"}</span>
-        <span className="text-lg font-bold" style={{ color: "#fbbf24" }}>
-          +{String(dreamcaller.essenceBonus)}
-        </span>
-        <span className="text-xs opacity-50">Essence</span>
-      </div>
-
-      {/* Tide crystal grant */}
-      <div className="mb-5 flex items-center gap-1.5">
-        <img
-          src={tideIconUrl(dreamcaller.tideCrystalGrant)}
-          alt={dreamcaller.tideCrystalGrant}
-          className="h-4 w-4 rounded-full object-contain"
-        />
-        <span className="text-sm font-medium" style={{ color: tideColor }}>
-          1 {dreamcaller.tideCrystalGrant} Crystal
-        </span>
-      </div>
 
       {/* Select button */}
       {!isSelected && !isDismissed && (
@@ -146,7 +142,7 @@ function DreamcallerCard({
 
 /** Screen for selecting a dreamcaller from 3 options. */
 export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
-  const { state, mutations } = useQuest();
+  const { mutations, questContent } = useQuest();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -160,9 +156,9 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
   }, []);
 
   // Compute offered dreamcallers once on first render and keep stable.
-  const offeredRef = useRef<Dreamcaller[] | null>(null);
+  const offeredRef = useRef<DreamcallerContent[] | null>(null);
   if (offeredRef.current === null) {
-    offeredRef.current = selectOfferedDreamcallers(state.chosenTide);
+    offeredRef.current = selectOfferedDreamcallers(questContent.dreamcallers);
   }
   const offered = offeredRef.current;
 
@@ -171,19 +167,17 @@ export function DreamcallerDraftScreen({ site }: { site: SiteState }) {
       if (selectedIndex !== null) return;
 
       const dreamcaller = offered[index];
+      const selectedDreamcaller = toSelectedDreamcaller(dreamcaller);
       setSelectedIndex(index);
 
-      // Apply state mutations
-      mutations.setDreamcaller(dreamcaller);
-      mutations.changeEssence(dreamcaller.essenceBonus, "dreamcaller_bonus");
-      mutations.addTideCrystal(dreamcaller.tideCrystalGrant, 1);
+      mutations.setDreamcaller(selectedDreamcaller);
 
       logEvent("site_completed", {
         siteType: "DreamcallerDraft",
         outcome: `Selected ${dreamcaller.name}`,
         dreamcallerName: dreamcaller.name,
-        dreamcallerTide: dreamcaller.tide,
-        essenceBonus: dreamcaller.essenceBonus,
+        dreamcallerAwakening: dreamcaller.awakening,
+        selectedAccentTide: selectedDreamcaller.tide,
       });
 
       // After animation delay, return to dreamscape

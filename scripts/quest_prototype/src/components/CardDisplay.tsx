@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { CardData } from "../types/cards";
 import {
+  cardAccentTide,
   cardImageUrl,
   tideIconUrl,
   TIDE_COLORS,
@@ -69,7 +70,8 @@ export function CardDisplay({
     setImageError(false);
   }, [card.cardNumber]);
 
-  const tideColor = showTideSymbols ? TIDE_COLORS[card.tide] : "#9ca3af";
+  const accentTide = cardAccentTide(card);
+  const tideColor = showTideSymbols ? TIDE_COLORS[accentTide] : "#9ca3af";
 
   const borderStyle = selected
     ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }
@@ -113,23 +115,16 @@ export function CardDisplay({
             {card.energyCost !== null ? String(card.energyCost) : "X"}
           </span>
         </div>
-
-        {/* Tide cost symbols */}
-        {showTideSymbols && card.tideCost > 0 && (
-          <div className="flex flex-col items-center gap-0.5">
-            {Array.from({ length: card.tideCost }, (_, i) => (
-              <img
-                key={i}
-                src={tideIconUrl(card.tide)}
-                alt={card.tide}
-                className={`${large ? "h-10 w-10" : "h-7 w-7"} rounded-full object-contain shadow-md`}
-                style={{
-                  border: `1px solid ${tideColor}`,
-                  background: "rgba(0, 0, 0, 0.5)",
-                }}
-              />
-            ))}
-          </div>
+        {showTideSymbols && (
+          <img
+            src={tideIconUrl(accentTide)}
+            alt={accentTide}
+            className={`${large ? "h-10 w-10" : "h-7 w-7"} rounded-full object-contain shadow-md`}
+            style={{
+              border: `1px solid ${tideColor}`,
+              background: "rgba(0, 0, 0, 0.5)",
+            }}
+          />
         )}
       </div>
 

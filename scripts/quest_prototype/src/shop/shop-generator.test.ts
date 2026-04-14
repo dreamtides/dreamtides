@@ -19,8 +19,7 @@ function makeCard(overrides: Partial<CardData> = {}): CardData {
     energyCost: 2,
     spark: 1,
     isFast: false,
-    tide: "Bloom",
-    tideCost: 1,
+    tides: ["Bloom"],
     renderedText: "Test text",
     imageNumber: 1,
     artOwned: false,
@@ -102,9 +101,9 @@ describe("rerollCost", () => {
 
 describe("generateShopInventory", () => {
   const cards = [
-    makeCard({ cardNumber: 1, rarity: "Common", tide: "Bloom" }),
-    makeCard({ cardNumber: 2, rarity: "Uncommon", tide: "Arc" }),
-    makeCard({ cardNumber: 3, rarity: "Rare", tide: "Ignite" }),
+    makeCard({ cardNumber: 1, rarity: "Common", tides: ["Bloom"] }),
+    makeCard({ cardNumber: 2, rarity: "Uncommon", tides: ["Arc"] }),
+    makeCard({ cardNumber: 3, rarity: "Rare", tides: ["Ignite"] }),
   ];
   const db = makeDatabase(cards);
 
@@ -197,10 +196,10 @@ describe("generateShopInventory with empty database", () => {
 
 describe("generateSpecialtyShopInventory", () => {
   const cards = [
-    makeCard({ cardNumber: 1, rarity: "Common", tide: "Bloom" }),
-    makeCard({ cardNumber: 2, rarity: "Rare", tide: "Arc" }),
-    makeCard({ cardNumber: 3, rarity: "Rare", tide: "Ignite" }),
-    makeCard({ cardNumber: 4, rarity: "Rare", tide: "Rime" }),
+    makeCard({ cardNumber: 1, rarity: "Common", tides: ["Bloom"] }),
+    makeCard({ cardNumber: 2, rarity: "Rare", tides: ["Arc"] }),
+    makeCard({ cardNumber: 3, rarity: "Rare", tides: ["Ignite"] }),
+    makeCard({ cardNumber: 4, rarity: "Rare", tides: ["Rime"] }),
   ];
   const db = makeDatabase(cards);
 
@@ -240,7 +239,7 @@ describe("generateSpecialtyShopInventory", () => {
       const slots = generateSpecialtyShopInventory(db, deckEntries);
       for (const slot of slots) {
         if (slot.card) {
-          tideCounts[slot.card.tide] = (tideCounts[slot.card.tide] ?? 0) + 1;
+          tideCounts[slot.card.tides[0]] = (tideCounts[slot.card.tides[0]] ?? 0) + 1;
         }
       }
     }
@@ -250,7 +249,7 @@ describe("generateSpecialtyShopInventory", () => {
 
   it("returns empty slots when no rare cards exist", () => {
     const noRareDb = makeDatabase([
-      makeCard({ cardNumber: 10, rarity: "Common", tide: "Bloom" }),
+      makeCard({ cardNumber: 10, rarity: "Common", tides: ["Bloom"] }),
     ]);
     const slots = generateSpecialtyShopInventory(noRareDb, []);
     expect(slots).toHaveLength(0);

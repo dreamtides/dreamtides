@@ -1,0 +1,182 @@
+import { describe, expect, it } from "vitest";
+import {
+  countPackageOverlap,
+  isPackageAdjacent,
+  resolveDreamcallerPackage,
+} from "./quest-content";
+import type { DreamcallerContent, DreamsignTemplate } from "../types/content";
+import type { CardData } from "../types/cards";
+
+function makeCard(
+  cardNumber: number,
+  tides: string[],
+): CardData {
+  return {
+    name: `Card ${String(cardNumber)}`,
+    id: `card-${String(cardNumber)}`,
+    cardNumber,
+    cardType: "Character",
+    subtype: "",
+    rarity: "Common",
+    energyCost: 2,
+    spark: 1,
+    isFast: false,
+    tides,
+    renderedText: "",
+    imageNumber: cardNumber,
+    artOwned: true,
+  };
+}
+
+function buildCards(countsByPackageTide: Record<string, number>): CardData[] {
+  const cards: CardData[] = [];
+  let cardNumber = 1;
+
+  for (const [packageTideId, count] of Object.entries(countsByPackageTide)) {
+    for (let index = 0; index < count; index += 1) {
+      cards.push(makeCard(cardNumber, [packageTideId]));
+      cardNumber += 1;
+    }
+  }
+
+  return cards;
+}
+
+function makeDreamcaller(
+  optionalTides: string[],
+): DreamcallerContent {
+  return {
+    id: "dreamcaller-1",
+    name: "Test Dreamcaller",
+    awakening: 4,
+    renderedText: "Test rules text.",
+    mandatoryTides: ["m1", "m2", "m3"],
+    optionalTides,
+  };
+}
+
+const DREAMSIGN_TEMPLATES: DreamsignTemplate[] = [
+  {
+    id: "adjacent-sign",
+    name: "Adjacent Sign",
+    effectDescription: "Adjacent effect.",
+    displayTide: "Bloom",
+    packageTides: ["o4", "support"],
+  },
+  {
+    id: "mandatory-sign",
+    name: "Mandatory Sign",
+    effectDescription: "Mandatory effect.",
+    displayTide: "Arc",
+    packageTides: ["m2"],
+  },
+  {
+    id: "off-package-sign",
+    name: "Off Package Sign",
+    effectDescription: "Off package effect.",
+    displayTide: "Rime",
+    packageTides: ["unused"],
+  },
+];
+
+describe("countPackageOverlap", () => {
+  it("counts shared package tides exactly once per shared entry", () => {
+    expect(
+      countPackageOverlap(["alpha", "beta", "gamma"], ["delta", "beta", "gamma"]),
+    ).toBe(2);
+  });
+
+  it("returns false adjacency when there is no overlap", () => {
+    expect(isPackageAdjacent(["alpha"], ["beta", "gamma"])).toBe(false);
+  });
+});
+
+describe("resolveDreamcallerPackage", () => {
+  it("rejects Dreamcallers with no legal optional subset", () => {
+    const cards = buildCards({
+      m1: 40,
+      m2: 40,
+      m3: 40,
+      o1: 5,
+      o2: 5,
+      o3: 5,
+      o4: 5,
+    });
+
+    expect(() =>
+      resolveDreamcallerPackage(
+        makeDreamcaller(["o1", "o2", "o3", "o4"]),
+        cards,
+        DREAMSIGN_TEMPLATES,
+      ),
+    ).toThrow(/no legal optional subset/);
+  });
+
+  it("selects the highest-size preferred subset and caps overlap copies at 2", () => {
+    const cards = buildCards({
+      m1: 40,
+      m2: 40,
+      m3: 40,
+      o1: 20,
+      o2: 25,
+      o3: 30,
+      o4: 33,
+    });
+    cards.push(makeCard(999, ["m1", "o4", "extra"]));
+
+    const resolved = resolveDreamcallerPackage(
+      makeDreamcaller(["o1", "o2", "o3", "o4"]),
+      cards,
+      DREAMSIGN_TEMPLATES,
+    );
+
+    expect(resolved.mandatoryOnlyPoolSize).toBe(121);
+    expect(resolved.optionalSubset).toEqual(["o2", "o3", "o4"]);
+    expect(resolved.draftPoolSize).toBe(210);
+    expect(resolved.draftPoolCopiesByCard["999"]).toBe(2);
+    expect(resolved.doubledCardCount).toBe(1);
+  });
+
+  it("breaks equal-size preferred ties lexicographically", () => {
+    const cards = buildCards({
+      m1: 40,
+      m2: 40,
+      m3: 40,
+      o1: 25,
+      o2: 25,
+      o3: 25,
+      o4: 25,
+    });
+
+    const resolved = resolveDreamcallerPackage(
+      makeDreamcaller(["o1", "o2", "o3", "o4"]),
+      cards,
+      DREAMSIGN_TEMPLATES,
+    );
+
+    expect(resolved.optionalSubset).toEqual(["o1", "o2", "o3"]);
+  });
+
+  it("surfaces only Dreamsign templates adjacent to the resolved package", () => {
+    const cards = buildCards({
+      m1: 40,
+      m2: 40,
+      m3: 40,
+      o1: 20,
+      o2: 25,
+      o3: 30,
+      o4: 33,
+    });
+
+    const resolved = resolveDreamcallerPackage(
+      makeDreamcaller(["o1", "o2", "o3", "o4"]),
+      cards,
+      DREAMSIGN_TEMPLATES,
+    );
+
+    expect(resolved.dreamsignPoolIds).toEqual([
+      "adjacent-sign",
+      "mandatory-sign",
+    ]);
+  });
+});

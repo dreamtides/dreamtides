@@ -1,6 +1,6 @@
 import type { CardData, Tide } from "../types/cards";
 import type { DraftConfig, DraftState, PackContext } from "../types/draft";
-import { NAMED_TIDES } from "../data/card-database";
+import { cardAccentTide, NAMED_TIDES } from "../data/card-database";
 import { logEvent } from "../logging";
 
 /** Default shared draft configuration. */
@@ -80,8 +80,8 @@ function depletionPack(ctx: PackContext, seenCards: Set<number>): number[] {
 /** Sort an array of cards by tide order without mutating the original. */
 export function sortCardsByTide(cards: CardData[]): CardData[] {
   return [...cards].sort((a, b) => {
-    const orderA = TIDE_ORDER[a.tide] ?? 8;
-    const orderB = TIDE_ORDER[b.tide] ?? 8;
+    const orderA = TIDE_ORDER[cardAccentTide(a)] ?? 8;
+    const orderB = TIDE_ORDER[cardAccentTide(b)] ?? 8;
     return orderA - orderB;
   });
 }
@@ -98,7 +98,8 @@ function countByTide(
   for (const num of cardNumbers) {
     const card = cardDatabase.get(num);
     if (card) {
-      counts[card.tide] = (counts[card.tide] ?? 0) + 1;
+      const accentTide = cardAccentTide(card);
+      counts[accentTide] = (counts[accentTide] ?? 0) + 1;
     }
   }
   return counts;
@@ -111,7 +112,8 @@ export function initializeDraftState(
 ): DraftState {
   const pool = Array.from(cardDatabase.keys()).filter((cardNum) => {
     const card = cardDatabase.get(cardNum);
-    return card !== undefined && (card.tide === chosenTide || card.tide === "Neutral");
+    return card !== undefined &&
+      (cardAccentTide(card) === chosenTide || cardAccentTide(card) === "Neutral");
   });
 
   logEvent("draft_pool_initialized", {
@@ -201,7 +203,7 @@ export function processPlayerPick(
     pickNumber: state.pickNumber,
     cardNumber,
     cardName: card?.name ?? "Unknown",
-    cardTide: card?.tide ?? "Neutral",
+    cardTide: card === undefined ? "Neutral" : cardAccentTide(card),
     packCards: state.currentPack,
     poolRemaining: state.pool.length,
   });

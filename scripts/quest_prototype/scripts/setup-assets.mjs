@@ -13,7 +13,8 @@ const IMAGE_CACHE_DIR = join(homedir(), "Library", "Caches", "io.github.dreamtid
 const PUBLIC_DIR = join(ROOT, "public");
 const CARDS_DIR = join(PUBLIC_DIR, "cards");
 const TIDES_DIR = join(PUBLIC_DIR, "tides");
-const JSON_PATH = join(PUBLIC_DIR, "card-data.json");
+const CARD_JSON_PATH = join(PUBLIC_DIR, "card-data.json");
+const DREAMCALLER_JSON_PATH = join(PUBLIC_DIR, "dreamcaller-data.json");
 
 /**
  * Find the main git worktree root for resolving untracked assets. Falls back
@@ -82,6 +83,17 @@ function transformCard(card) {
 }
 
 /**
+ * Convert a TOML Dreamcaller record to its JSON representation with camelCase keys.
+ */
+function transformDreamcaller(dreamcaller) {
+  const result = {};
+  for (const [key, value] of Object.entries(dreamcaller)) {
+    result[kebabToCamel(key)] = value;
+  }
+  return result;
+}
+
+/**
  * Compute the SHA-256 hash of the Shutterstock URL for a given image number.
  */
 function imageHash(imageNumber) {
@@ -98,13 +110,14 @@ function recreateDir(dir) {
 }
 
 function main() {
-  const tomlPath = resolveAssetPath("client", "Assets", "StreamingAssets", "Tabula", "rendered-cards-mono.toml");
+  const cardTomlPath = resolveAssetPath("client", "Assets", "StreamingAssets", "Tabula", "rendered-cards.toml");
+  const dreamcallerTomlPath = resolveAssetPath("client", "Assets", "StreamingAssets", "Tabula", "dreamcallers.toml");
   const tideIconsDir = resolveAssetPath("client", "Assets", "ThirdParty", "GameAssets", "Tides");
 
   console.log("Parsing rendered-cards.toml...");
-  const tomlContent = readFileSync(tomlPath, "utf8");
-  const parsed = parse(tomlContent);
-  const allCards = parsed.cards;
+  const cardTomlContent = readFileSync(cardTomlPath, "utf8");
+  const parsedCards = parse(cardTomlContent);
+  const allCards = parsedCards.cards;
 
   if (!Array.isArray(allCards)) {
     throw new Error("Expected [[cards]] array in TOML file");
@@ -121,8 +134,26 @@ function main() {
 
   // Write card-data.json
   mkdirSync(PUBLIC_DIR, { recursive: true });
-  writeFileSync(JSON_PATH, JSON.stringify(jsonCards, null, 2) + "\n");
+  writeFileSync(CARD_JSON_PATH, JSON.stringify(jsonCards, null, 2) + "\n");
   console.log(`Wrote ${jsonCards.length} cards to card-data.json`);
+
+  console.log("Parsing dreamcallers.toml...");
+  const dreamcallerTomlContent = readFileSync(dreamcallerTomlPath, "utf8");
+  const parsedDreamcallers = parse(dreamcallerTomlContent);
+  const allDreamcallers = parsedDreamcallers.dreamcaller;
+
+  if (!Array.isArray(allDreamcallers)) {
+    throw new Error("Expected [[dreamcaller]] array in dreamcallers.toml");
+  }
+
+  const jsonDreamcallers = allDreamcallers.map(transformDreamcaller);
+  writeFileSync(
+    DREAMCALLER_JSON_PATH,
+    JSON.stringify(jsonDreamcallers, null, 2) + "\n",
+  );
+  console.log(
+    `Wrote ${jsonDreamcallers.length} dreamcallers to dreamcaller-data.json`,
+  );
 
   // Create card image symlinks
   recreateDir(CARDS_DIR);

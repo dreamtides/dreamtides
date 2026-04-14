@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DREAMCALLERS } from "./dreamcallers";
-import { DREAMSIGNS } from "./dreamsigns";
+import { DREAMSIGN_TEMPLATES } from "./dreamsigns";
 import { DREAM_JOURNEYS } from "./dream-journeys";
 import type { JourneyEffect } from "./dream-journeys";
 import { TEMPTING_OFFERS } from "./tempting-offers";
@@ -18,7 +17,6 @@ const ALL_TIDES: Tide[] = [
   "Surge",
   "Neutral",
 ];
-const NAMED_TIDES: Tide[] = ALL_TIDES.filter((t) => t !== "Neutral");
 const ALL_RARITIES: Rarity[] = ["Common", "Uncommon", "Rare", "Legendary"];
 const tideSet = new Set<string>(ALL_TIDES);
 const raritySet = new Set<string>(ALL_RARITIES);
@@ -69,50 +67,26 @@ function offerEffectRarities(e: OfferEffect): string[] {
   }
 }
 
-describe("dreamcallers", () => {
-  it("has exactly 25 entries", () => {
-    expect(DREAMCALLERS).toHaveLength(25);
-  });
-
-  it("every entry has all required fields", () => {
-    for (const dc of DREAMCALLERS) {
-      expect(dc.name.length).toBeGreaterThan(0);
-      expect(tideSet.has(dc.tide)).toBe(true);
-      expect(dc.abilityDescription.length).toBeGreaterThan(0);
-      expect(dc.essenceBonus).toBeGreaterThanOrEqual(50);
-      expect(dc.essenceBonus).toBeLessThanOrEqual(150);
-      expect(dc.tideCrystalGrant).toBe(dc.tide);
-    }
-  });
-
-  it("covers every named tide at least once", () => {
-    const tides = new Set(DREAMCALLERS.map((dc) => dc.tide));
-    for (const t of NAMED_TIDES) {
-      expect(tides.has(t)).toBe(true);
-    }
-  });
-
-  it("has unique names", () => {
-    const names = DREAMCALLERS.map((dc) => dc.name);
-    expect(new Set(names).size).toBe(names.length);
-  });
-});
-
 describe("dreamsigns", () => {
   it("has exactly 10 entries", () => {
-    expect(DREAMSIGNS).toHaveLength(10);
+    expect(DREAMSIGN_TEMPLATES).toHaveLength(10);
   });
 
-  it("every entry has all required fields with valid tides", () => {
-    for (const ds of DREAMSIGNS) {
+  it("every template has all required fields with valid display tides", () => {
+    for (const ds of DREAMSIGN_TEMPLATES) {
+      expect(ds.id.length).toBeGreaterThan(0);
       expect(ds.name.length).toBeGreaterThan(0);
-      expect(tideSet.has(ds.tide)).toBe(true);
+      expect(tideSet.has(ds.displayTide)).toBe(true);
       expect(ds.effectDescription.length).toBeGreaterThan(0);
+      expect(ds.packageTides.length).toBeGreaterThan(0);
+      for (const packageTideId of ds.packageTides) {
+        expect(packageTideId.length).toBeGreaterThan(0);
+      }
     }
   });
 
   it("has unique names", () => {
-    const names = DREAMSIGNS.map((ds) => ds.name);
+    const names = DREAMSIGN_TEMPLATES.map((ds) => ds.name);
     expect(new Set(names).size).toBe(names.length);
   });
 });

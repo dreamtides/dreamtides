@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { QuestContent } from "../data/quest-content";
 import type { CardData, Tide } from "../types/cards";
 import { NAMED_TIDES } from "../data/card-database";
 import type {
@@ -60,6 +61,7 @@ export interface QuestContextValue {
   state: QuestState;
   mutations: QuestMutations;
   cardDatabase: Map<number, CardData>;
+  questContent: QuestContent;
 }
 
 const QuestContext = createContext<QuestContextValue | null>(null);
@@ -104,9 +106,11 @@ function createDefaultState(): QuestState {
 export function QuestProvider({
   children,
   cardDatabase,
+  questContent,
 }: {
   children: ReactNode;
   cardDatabase: Map<number, CardData>;
+  questContent: QuestContent;
 }) {
   const [state, setState] = useState<QuestState>(createDefaultState);
   const entryIdCounter = useRef(0);
@@ -427,8 +431,8 @@ export function QuestProvider({
   );
 
   const value = useMemo<QuestContextValue>(
-    () => ({ state, mutations, cardDatabase }),
-    [state, mutations, cardDatabase],
+    () => ({ state, mutations, cardDatabase, questContent }),
+    [state, mutations, cardDatabase, questContent],
   );
 
   return (

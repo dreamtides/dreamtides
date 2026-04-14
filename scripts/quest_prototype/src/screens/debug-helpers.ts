@@ -1,6 +1,6 @@
 import type { Tide, CardData } from "../types/cards";
 import type { DraftState, PackStrategy } from "../types/draft";
-import { NAMED_TIDES } from "../data/card-database";
+import { cardAccentTide, NAMED_TIDES } from "../data/card-database";
 
 /** Debug info for the player's draft state. */
 export interface DraftDebugInfo {
@@ -34,7 +34,8 @@ export function extractDraftDebugInfo(
     const card = cardDatabase.get(cardNum);
     if (card) {
       draftedCards.push(card);
-      cardsByTide[card.tide] = (cardsByTide[card.tide] ?? 0) + 1;
+      const accentTide = cardAccentTide(card);
+      cardsByTide[accentTide] = (cardsByTide[accentTide] ?? 0) + 1;
     }
   }
 

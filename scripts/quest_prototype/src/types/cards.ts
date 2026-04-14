@@ -1,3 +1,5 @@
+import type { PackageTideId } from "./content";
+
 /** The 8 tide affinities in Dreamtides. */
 export type Tide =
   | "Bloom"
@@ -26,8 +28,7 @@ export interface CardData {
   energyCost: number | null;
   spark: number | null;
   isFast: boolean;
-  tide: Tide;
-  tideCost: number;
+  tides: PackageTideId[];
   renderedText: string;
   imageNumber: number;
   artOwned: boolean;

@@ -7,6 +7,7 @@ import type {
 import type { CardData, Tide } from "../types/cards";
 import type { Dreamsign } from "../types/quest";
 import { BIOMES, type Biome } from "../data/biomes";
+import { cardAccentTide } from "../data/card-database";
 import { logEvent } from "../logging";
 
 /** Parameters for site generation that require external data. */
@@ -123,7 +124,7 @@ function generateRewardData(
   const { cardDatabase, dreamsignPool, excludedTides } = context;
   const excludedSet = new Set(excludedTides);
   const cards = Array.from(cardDatabase.values()).filter(
-    (c) => !excludedSet.has(c.tide),
+    (card) => !excludedSet.has(cardAccentTide(card)),
   );
 
   // 70% chance card reward, 30% chance dreamsign reward

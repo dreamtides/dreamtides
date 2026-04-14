@@ -1,3 +1,4 @@
+import type { PackageTideId } from "../types/content";
 import type { CardData, Tide, Rarity } from "../types/cards";
 
 /** Gray circle SVG used as fallback icon for the Neutral tide. */
@@ -35,9 +36,39 @@ export const RARITY_COLORS: Readonly<Record<Rarity, string>> = {
   Legendary: "#a855f7",
 };
 
+const PACKAGE_TIDE_ACCENT_PALETTE: readonly Tide[] = NAMED_TIDES;
+
 /** Returns the URL path for a card's image. */
 export function cardImageUrl(cardNumber: number): string {
   return `/cards/${String(cardNumber)}.webp`;
+}
+
+/** Returns a stable accent tide for a hidden package tide id. */
+export function packageTideAccent(packageTideId: PackageTideId): Tide {
+  if (packageTideId in TIDE_COLORS) {
+    return packageTideId as Tide;
+  }
+
+  if (packageTideId.startsWith("accent:")) {
+    const accentTide = packageTideId.slice("accent:".length);
+    if (accentTide in TIDE_COLORS) {
+      return accentTide as Tide;
+    }
+  }
+
+  let hash = 0;
+  for (const char of packageTideId) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }
+  return PACKAGE_TIDE_ACCENT_PALETTE[hash % PACKAGE_TIDE_ACCENT_PALETTE.length];
+}
+
+/** Returns the accent tide used for legacy display surfaces. */
+export function cardAccentTide(card: Pick<CardData, "tides">): Tide {
+  if (card.tides.length === 0) {
+    return "Neutral";
+  }
+  return packageTideAccent(card.tides[0]);
 }
 
 /** Returns the URL path for a tide's icon. Neutral returns an inline SVG fallback. */

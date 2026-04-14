@@ -2,7 +2,12 @@ import { useCallback, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { DraftState } from "../types/draft";
-import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import {
+  cardAccentTide,
+  NAMED_TIDES,
+  TIDE_COLORS,
+  tideIconUrl,
+} from "../data/card-database";
 import { extractDraftDebugInfo } from "./debug-helpers";
 
 /** Props for the DebugScreen component. */
@@ -159,19 +164,22 @@ export function DebugScreen({
                       }}
                     >
                       <div className="flex flex-wrap gap-1">
-                        {debugInfo.draftedCards.map((card, i) => (
-                          <span
-                            key={`${String(card.cardNumber)}-${String(i)}`}
-                            className="rounded-full px-2 py-0.5 text-[10px] font-medium"
-                            style={{
-                              background: `${TIDE_COLORS[card.tide]}15`,
-                              border: `1px solid ${TIDE_COLORS[card.tide]}30`,
-                              color: TIDE_COLORS[card.tide],
-                            }}
-                          >
-                            {card.name}
-                          </span>
-                        ))}
+                        {debugInfo.draftedCards.map((card, i) => {
+                          const accentTide = cardAccentTide(card);
+                          return (
+                            <span
+                              key={`${String(card.cardNumber)}-${String(i)}`}
+                              className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                              style={{
+                                background: `${TIDE_COLORS[accentTide]}15`,
+                                border: `1px solid ${TIDE_COLORS[accentTide]}30`,
+                                color: TIDE_COLORS[accentTide],
+                              }}
+                            >
+                              {card.name}
+                            </span>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>

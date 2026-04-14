@@ -3,56 +3,63 @@ import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
 import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
-import { DREAMCALLERS } from "../data/dreamcallers";
-import { DREAMSIGNS } from "../data/dreamsigns";
+import { dreamcallerAccentTide } from "../data/quest-content";
+import { createDreamsign } from "../data/dreamsigns";
 import { initializeDraftState } from "../draft/draft-engine";
 import { logEvent } from "../logging";
+import type { DreamcallerContent } from "../types/content";
 import type { Dreamcaller } from "../types/quest";
 
-/** Pick 3 dreamcallers with distinct tides. */
-function selectStartingDreamcallers(): Dreamcaller[] {
-  const pool = [...DREAMCALLERS];
-  // Shuffle
+/** Pick 3 random Dreamcallers without replacement. */
+function selectStartingDreamcallers(
+  dreamcallers: readonly DreamcallerContent[],
+): DreamcallerContent[] {
+  const pool = [...dreamcallers];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
-  const result: Dreamcaller[] = [];
-  const usedTides = new Set<string>();
-  for (const dc of pool) {
-    if (dc.tide === "Neutral") continue;
-    if (usedTides.has(dc.tide)) continue;
-    result.push(dc);
-    usedTides.add(dc.tide);
-    if (result.length === 3) break;
-  }
-  return result;
+  return pool.slice(0, 3);
+}
+
+function toSelectedDreamcaller(dreamcaller: DreamcallerContent): Dreamcaller {
+  const tide = dreamcallerAccentTide(dreamcaller);
+
+  return {
+    name: dreamcaller.name,
+    tide,
+    abilityDescription: dreamcaller.renderedText,
+    essenceBonus: 0,
+    tideCrystalGrant: tide,
+  };
 }
 
 /** Intro screen where the player picks a dreamcaller to start the quest. */
 export function QuestStartScreen() {
-  const { state, mutations, cardDatabase } = useQuest();
+  const { state, mutations, cardDatabase, questContent } = useQuest();
 
-  const offeredRef = useRef<Dreamcaller[] | null>(null);
+  const offeredRef = useRef<DreamcallerContent[] | null>(null);
   if (offeredRef.current === null) {
-    offeredRef.current = selectStartingDreamcallers();
+    offeredRef.current = selectStartingDreamcallers(questContent.dreamcallers);
   }
   const offered = offeredRef.current;
 
   const handlePickDreamcaller = useCallback(
-    (dreamcaller: Dreamcaller) => {
-      const tide = dreamcaller.tide;
+    (dreamcaller: DreamcallerContent) => {
+      const selectedDreamcaller = toSelectedDreamcaller(dreamcaller);
+      const tide = selectedDreamcaller.tide;
+      const excludedTides = NAMED_TIDES.filter((namedTide) => namedTide !== tide);
       mutations.setChosenTide(tide);
-      mutations.setDreamcaller(dreamcaller);
-      mutations.changeEssence(dreamcaller.essenceBonus, "dreamcaller_bonus");
+      mutations.setDreamcaller(selectedDreamcaller);
 
-      const excludedTides = NAMED_TIDES.filter((t) => t !== tide);
       const playerHasBanes =
         state.deck.some((e) => e.isBane) ||
         state.dreamsigns.some((d) => d.isBane);
       const atlas = generateInitialAtlas(state.completionLevel, {
         cardDatabase,
-        dreamsignPool: DREAMSIGNS,
+        dreamsignPool: questContent.dreamsignTemplates.map((template) =>
+          createDreamsign(template),
+        ),
         playerHasBanes,
         excludedTides,
       });
@@ -68,8 +75,10 @@ export function QuestStartScreen() {
 
       logEvent("quest_started", {
         initialEssence: state.essence,
-        chosenTide: tide,
         dreamcallerName: dreamcaller.name,
+        dreamcallerAwakening: dreamcaller.awakening,
+        packageTideCount:
+          dreamcaller.mandatoryTides.length + dreamcaller.optionalTides.length,
         dreamscapesGenerated: Object.keys(atlas.nodes).length - 1,
       });
 
@@ -80,7 +89,7 @@ export function QuestStartScreen() {
         mutations.setScreen({ type: "atlas" });
       }
     },
-    [state.completionLevel, state.essence, state.deck, state.dreamsigns, mutations, cardDatabase],
+    [state.completionLevel, state.deck, state.dreamsigns, state.essence, mutations, cardDatabase, questContent.dreamsignTemplates],
   );
 
   return (
@@ -118,7 +127,8 @@ export function QuestStartScreen() {
         transition={{ duration: 0.6, delay: 0.5 }}
       >
         {offered.map((dreamcaller, index) => {
-          const color = TIDE_COLORS[dreamcaller.tide];
+          const accentTide = dreamcallerAccentTide(dreamcaller);
+          const color = TIDE_COLORS[accentTide];
           return (
             <motion.button
               key={dreamcaller.name}
@@ -145,8 +155,8 @@ export function QuestStartScreen() {
               }}
             >
               <img
-                src={tideIconUrl(dreamcaller.tide)}
-                alt={dreamcaller.tide}
+                src={tideIconUrl(accentTide)}
+                alt={accentTide}
                 className="mb-3 h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
                 style={{ border: `2px solid ${color}` }}
               />
@@ -164,21 +174,14 @@ export function QuestStartScreen() {
                   border: `1px solid ${color}30`,
                 }}
               >
-                {dreamcaller.tide} Tide
+                Awakening {String(dreamcaller.awakening)}
               </span>
               <p
                 className="mb-4 text-center text-sm leading-relaxed opacity-80"
                 style={{ color: "#e2e8f0" }}
               >
-                {dreamcaller.abilityDescription}
+                {dreamcaller.renderedText}
               </p>
-              <div className="flex items-center gap-1.5">
-                <span style={{ color: "#fbbf24" }}>{"\u25C6"}</span>
-                <span className="text-lg font-bold" style={{ color: "#fbbf24" }}>
-                  +{String(dreamcaller.essenceBonus)}
-                </span>
-                <span className="text-xs opacity-50">Essence</span>
-              </div>
             </motion.button>
           );
         })}

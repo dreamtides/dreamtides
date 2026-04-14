@@ -1,6 +1,6 @@
 import type { CardData, Tide } from "../types/cards";
+import { cardAccentTide, NAMED_TIDES } from "../data/card-database";
 import type { DeckEntry } from "../types/quest";
-import { NAMED_TIDES } from "../data/card-database";
 
 /** All tides including Neutral, used for distribution computation. */
 const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Neutral"] as const;
@@ -36,7 +36,8 @@ export function computeTideDistribution(
   for (const entry of deck) {
     const card = cardDatabase.get(entry.cardNumber);
     if (card === undefined) continue;
-    counts[card.tide] = (counts[card.tide] ?? 0) + 1;
+    const accentTide = cardAccentTide(card);
+    counts[accentTide] = (counts[accentTide] ?? 0) + 1;
     total += 1;
   }
 

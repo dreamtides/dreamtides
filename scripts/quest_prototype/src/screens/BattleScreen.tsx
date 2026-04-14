@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
-import { DREAMCALLERS } from "../data/dreamcallers";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { dreamcallerAccentTide } from "../data/quest-content";
 import { countDeckTides, selectRareRewards } from "../data/tide-weights";
 import { CardDisplay } from "../components/CardDisplay";
 import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
-import { DREAMSIGNS } from "../data/dreamsigns";
+import { createDreamsign } from "../data/dreamsigns";
+import type { DreamcallerContent } from "../types/content";
 
 type BattlePhase = "preBattle" | "animation" | "victory";
 
@@ -21,8 +22,9 @@ interface EnemyData {
 }
 
 /** Generates synthetic enemy data from the dreamcaller pool. */
-function generateEnemy(): EnemyData {
-  const template = DREAMCALLERS[Math.floor(Math.random() * DREAMCALLERS.length)];
+function generateEnemy(dreamcallers: readonly DreamcallerContent[]): EnemyData {
+  const template =
+    dreamcallers[Math.floor(Math.random() * dreamcallers.length)];
   const prefixes = [
     "Shadow",
     "Nightmare",
@@ -38,9 +40,9 @@ function generateEnemy(): EnemyData {
 
   return {
     name: `${prefix} ${baseName}`,
-    abilityText: template.abilityDescription,
+    abilityText: template.renderedText,
     dreamsignCount: Math.floor(Math.random() * 5) + 1,
-    tide: template.tide,
+    tide: dreamcallerAccentTide(template),
   };
 }
 
@@ -416,7 +418,7 @@ export function BattleScreen({
   site: SiteState;
   cardDatabase: Map<number, CardData>;
 }) {
-  const { state, mutations } = useQuest();
+  const { state, mutations, questContent } = useQuest();
   const { completionLevel, atlas, currentDreamscape, deck } = state;
 
   const [phase, setPhase] = useState<BattlePhase>("preBattle");
@@ -439,7 +441,7 @@ export function BattleScreen({
   // Generate enemy and rare card rewards once on mount and keep stable.
   const enemyRef = useRef<EnemyData | null>(null);
   if (enemyRef.current === null) {
-    enemyRef.current = generateEnemy();
+    enemyRef.current = generateEnemy(questContent.dreamcallers);
   }
   const enemy = enemyRef.current;
 
@@ -528,7 +530,9 @@ export function BattleScreen({
               completionLevel,
               {
                 cardDatabase,
-                dreamsignPool: DREAMSIGNS,
+                dreamsignPool: questContent.dreamsignTemplates.map((template) =>
+                  createDreamsign(template),
+                ),
                 playerHasBanes,
                 excludedTides: state.excludedTides,
               },
@@ -559,6 +563,8 @@ export function BattleScreen({
       state.deck,
       state.dreamsigns,
       cardDatabase,
+      questContent.dreamcallers,
+      questContent.dreamsignTemplates,
     ],
   );
 

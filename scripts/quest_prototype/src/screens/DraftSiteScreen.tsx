@@ -14,7 +14,7 @@ import {
 } from "../draft/draft-engine";
 import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
-import { TIDE_COLORS, cardImageUrl } from "../data/card-database";
+import { cardAccentTide, cardImageUrl, TIDE_COLORS } from "../data/card-database";
 import { logEvent } from "../logging";
 
 
@@ -161,7 +161,7 @@ function DeckSidebar({
         const cost = card.energyCost ?? 0;
         const showDivider = cost !== lastCost;
         lastCost = cost;
-        const tideColor = TIDE_COLORS[card.tide];
+        const tideColor = TIDE_COLORS[cardAccentTide(card)];
 
         return (
           <div key={`deck-${String(card.cardNumber)}-${String(i)}`}>

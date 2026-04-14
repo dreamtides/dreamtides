@@ -1,6 +1,7 @@
 import type { CardData, Tide, Rarity } from "../types/cards";
 import type { DeckEntry, Dreamsign } from "../types/quest";
 
+import { cardAccentTide } from "../data/card-database";
 import { DREAMSIGNS } from "../data/dreamsigns";
 
 /** Prices by rarity for card items. */
@@ -67,7 +68,7 @@ function selectWeightedCard(
 
   const weights = cards.map((card) => {
     if (totalDeckCards === 0) return 1;
-    const tideCount = deckTideCounts[card.tide] ?? 0;
+    const tideCount = deckTideCounts[cardAccentTide(card)] ?? 0;
     return baseline + (tideCount / totalDeckCards) * 10;
   });
 
@@ -100,7 +101,7 @@ function countDeckTides(
   for (const entry of deck) {
     const card = cardDatabase.get(entry.cardNumber);
     if (card) {
-      counts[card.tide] += 1;
+      counts[cardAccentTide(card)] += 1;
     }
   }
   return counts;
@@ -123,7 +124,7 @@ export function generateShopInventory(
 ): ShopSlot[] {
   const excludedSet = new Set(excludedTides);
   const allCards = Array.from(cardDatabase.values()).filter(
-    (c) => !excludedSet.has(c.tide),
+    (card) => !excludedSet.has(cardAccentTide(card)),
   );
   const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
   const slots: ShopSlot[] = [];
@@ -202,7 +203,7 @@ export function generateSpecialtyShopInventory(
 ): ShopSlot[] {
   const excludedSet = new Set(excludedTides);
   const rareCards = Array.from(cardDatabase.values()).filter(
-    (c) => c.rarity === "Rare" && !excludedSet.has(c.tide),
+    (card) => card.rarity === "Rare" && !excludedSet.has(cardAccentTide(card)),
   );
   const deckTideCounts = countDeckTides(playerDeck, cardDatabase);
   const slots: ShopSlot[] = [];

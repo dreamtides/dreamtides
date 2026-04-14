@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { CardData } from "./types/cards";
-import { loadCardDatabase } from "./data/card-database";
+import type { QuestContent } from "./data/quest-content";
+import { loadQuestContent } from "./data/quest-content";
 import { QuestProvider, useQuest } from "./state/quest-context";
 import { ScreenRouter } from "./components/ScreenRouter";
 import { HUD } from "./components/HUD";
@@ -64,28 +65,46 @@ function QuestApp({
 }
 
 export default function App() {
-  const [cardDatabase, setCardDatabase] =
-    useState<Map<number, CardData> | null>(null);
+  const [questContent, setQuestContent] = useState<QuestContent | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadCardDatabase()
-      .then(setCardDatabase)
-      .catch(() => {
-        setCardDatabase(new Map());
+    loadQuestContent()
+      .then((content) => {
+        setQuestContent(content);
+        setLoadError(null);
+      })
+      .catch((error) => {
+        setLoadError(
+          error instanceof Error ? error.message : "Failed to load quest content.",
+        );
       });
   }, []);
 
-  if (cardDatabase === null) {
+  if (loadError !== null) {
     return (
       <div className="flex h-screen items-center justify-center p-8">
-        <p className="text-lg opacity-60">Loading card database...</p>
+        <p className="max-w-2xl text-center text-sm whitespace-pre-wrap opacity-70">
+          {loadError}
+        </p>
+      </div>
+    );
+  }
+
+  if (questContent === null) {
+    return (
+      <div className="flex h-screen items-center justify-center p-8">
+        <p className="text-lg opacity-60">Loading quest content...</p>
       </div>
     );
   }
 
   return (
-    <QuestProvider cardDatabase={cardDatabase}>
-      <QuestApp cardDatabase={cardDatabase} />
+    <QuestProvider
+      cardDatabase={questContent.cardDatabase}
+      questContent={questContent}
+    >
+      <QuestApp cardDatabase={questContent.cardDatabase} />
     </QuestProvider>
   );
 }

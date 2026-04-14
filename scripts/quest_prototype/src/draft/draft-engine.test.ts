@@ -27,8 +27,7 @@ function makeCard(
     energyCost: 3,
     spark: 1,
     isFast: false,
-    tide,
-    tideCost: 1,
+    tides: [tide],
     renderedText: "",
     imageNumber: cardNumber,
     artOwned: false,
@@ -82,7 +81,7 @@ describe("initializeDraftState", () => {
 
     for (const cardNum of state.pool) {
       const card = db.get(cardNum)!;
-      expect(card.tide === "Bloom" || card.tide === "Neutral").toBe(true);
+      expect(card.tides[0] === "Bloom" || card.tides[0] === "Neutral").toBe(true);
     }
   });
 
@@ -205,7 +204,7 @@ describe("sortCardsByTide", () => {
       makeCard(4, "Arc"),
     ];
     const sorted = sortCardsByTide(cards);
-    expect(sorted.map((c) => c.tide)).toEqual([
+    expect(sorted.map((c) => c.tides[0])).toEqual([
       "Bloom", "Arc", "Surge", "Neutral",
     ]);
   });

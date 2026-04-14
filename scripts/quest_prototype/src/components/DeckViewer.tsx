@@ -6,7 +6,12 @@ import type {
   QuestState,
 } from "../types/quest";
 import { useQuest } from "../state/quest-context";
-import { NAMED_TIDES, TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import {
+  cardAccentTide,
+  NAMED_TIDES,
+  TIDE_COLORS,
+  tideIconUrl,
+} from "../data/card-database";
 import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
 import { logEvent } from "../logging";
@@ -153,7 +158,7 @@ export function DeckViewer({
 
   const filteredEntries = useMemo<ResolvedEntry[]>(() => {
     return resolvedEntries.filter((resolved) => {
-      if (!tideFilters[resolved.card.tide]) return false;
+      if (!tideFilters[cardAccentTide(resolved.card)]) return false;
       if (
         cardTypeFilter === "Characters" &&
         resolved.card.cardType !== "Character"
@@ -183,7 +188,9 @@ export function DeckViewer({
           cmp = a.card.name.localeCompare(b.card.name);
           break;
         case "tide":
-          cmp = TIDE_ORDER[a.card.tide] - TIDE_ORDER[b.card.tide];
+          cmp =
+            TIDE_ORDER[cardAccentTide(a.card)] -
+            TIDE_ORDER[cardAccentTide(b.card)];
           break;
         case "cardType":
           cmp = a.card.cardType.localeCompare(b.card.cardType);
