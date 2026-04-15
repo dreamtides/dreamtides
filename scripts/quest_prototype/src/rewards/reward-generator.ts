@@ -1,7 +1,10 @@
 import type { CardData } from "../types/cards";
 import type { DreamsignTemplate, PackageTideId } from "../types/content";
 import { pickPackageAdjacentItem } from "../data/tide-weights";
-import { readDreamsignPool } from "../dreamsign/dreamsign-pool";
+import {
+  readDreamsignPool,
+  resolveDreamsignTemplates,
+} from "../dreamsign/dreamsign-pool";
 
 export type RewardSiteData =
   | {
@@ -45,14 +48,9 @@ export function generateRewardSiteData({
     (candidate) => candidate.tides,
     selectedPackageTides,
   );
-  const availableDreamsignPool = readDreamsignPool(
-    remainingDreamsignPoolIds,
-    dreamsignTemplates,
-  );
+  const availableDreamsignPool = readDreamsignPool(remainingDreamsignPoolIds, dreamsignTemplates);
   const dreamsignTemplate = pickPackageAdjacentItem(
-    availableDreamsignPool.availableIds
-      .map((id) => availableDreamsignPool.templatesById.get(id))
-      .filter((template): template is DreamsignTemplate => template !== undefined),
+    resolveDreamsignTemplates(availableDreamsignPool.availableIds, dreamsignTemplates),
     (candidate) => candidate.packageTides,
     selectedPackageTides,
   );

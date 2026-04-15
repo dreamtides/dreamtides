@@ -239,6 +239,53 @@ describe("RewardSiteScreen", () => {
     });
   });
 
+  it("keeps the revealed reward stable across rerenders after spending the shared Dreamsign pool", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const mutations = makeMutations();
+    const initialState = makeState({
+      remainingDreamsignPool: ["dreamsign-1"],
+    });
+
+    setQuestContext(
+      initialState,
+      mutations,
+      new Map(),
+    );
+
+    const element = (
+      <RewardSiteScreen
+        site={{ id: "site-1", type: "Reward", isEnhanced: false, isVisited: false }}
+      />
+    );
+    const { container, root } = mount(element);
+
+    expect(container.textContent).toContain("Dreamsign One");
+    expect(mutations.setRemainingDreamsignPool).toHaveBeenCalledTimes(1);
+    expect(mutations.setRemainingDreamsignPool).toHaveBeenCalledWith(
+      [],
+      "reward_site_revealed",
+    );
+
+    setQuestContext(
+      makeState({
+        remainingDreamsignPool: [],
+      }),
+      mutations,
+      new Map(),
+    );
+
+    act(() => {
+      root.render(element);
+    });
+
+    expect(container.textContent).toContain("Dreamsign One");
+    expect(mutations.setRemainingDreamsignPool).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
   it("reveals a card reward without mutating the Dreamsign pool", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
     const mutations = makeMutations();

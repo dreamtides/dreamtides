@@ -3,7 +3,10 @@ import type { DreamsignTemplate, PackageTideId } from "../types/content";
 import type { DeckEntry, Dreamsign } from "../types/quest";
 
 import { pickPackageAdjacentItem } from "../data/tide-weights";
-import { readDreamsignPool } from "../dreamsign/dreamsign-pool";
+import {
+  readDreamsignPool,
+  resolveDreamsignTemplates,
+} from "../dreamsign/dreamsign-pool";
 import { createDreamsign } from "../data/dreamsigns";
 
 /** Prices by rarity for card items. */
@@ -119,9 +122,10 @@ export function generateShopInventory(
         options.dreamsignTemplates,
       );
       const template = pickPackageAdjacentItem(
-        dreamsignPoolState.availableIds
-          .map((id) => dreamsignPoolState.templatesById.get(id))
-          .filter((candidate): candidate is DreamsignTemplate => candidate !== undefined),
+        resolveDreamsignTemplates(
+          dreamsignPoolState.availableIds,
+          options.dreamsignTemplates,
+        ),
         (candidate) => candidate.packageTides,
         selectedPackageTides,
       );
