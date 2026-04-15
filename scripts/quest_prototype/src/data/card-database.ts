@@ -1,5 +1,5 @@
 import type { PackageTideId } from "../types/content";
-import type { CardData, Tide, Rarity } from "../types/cards";
+import type { CardData, Tide } from "../types/cards";
 
 /** Gray circle SVG used as fallback icon for the Neutral tide. */
 const NEUTRAL_TIDE_FALLBACK =
@@ -26,15 +26,6 @@ export const TIDE_COLORS: Readonly<Record<Tide, string>> = {
   Rime: "#3b82f6",
   Surge: "#06b6d4",
   Neutral: "#9ca3af",
-};
-
-/** Display color hex value for each rarity. */
-export const RARITY_COLORS: Readonly<Record<Rarity, string>> = {
-  Starter: "#f59e0b",
-  Common: "#ffffff",
-  Uncommon: "#10b981",
-  Rare: "#3b82f6",
-  Legendary: "#a855f7",
 };
 
 const PACKAGE_TIDE_ACCENT_PALETTE: readonly Tide[] = NAMED_TIDES;
@@ -64,8 +55,8 @@ export function packageTideAccent(packageTideId: PackageTideId): Tide {
   return PACKAGE_TIDE_ACCENT_PALETTE[hash % PACKAGE_TIDE_ACCENT_PALETTE.length];
 }
 
-export function isStarterCard(card: Pick<CardData, "rarity">): boolean {
-  return card.rarity === "Starter";
+export function isStarterCard(card: Pick<CardData, "isStarter">): boolean {
+  return card.isStarter;
 }
 
 /** Returns the accent tide used for legacy display surfaces. */

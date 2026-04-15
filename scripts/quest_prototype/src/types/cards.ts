@@ -11,14 +11,6 @@ export type Tide =
   | "Surge"
   | "Neutral";
 
-/** Card rarity levels (Special excluded from the runtime card pool). */
-export type Rarity =
-  | "Starter"
-  | "Common"
-  | "Uncommon"
-  | "Rare"
-  | "Legendary";
-
 /** The two card types in Dreamtides. */
 export type CardType = "Character" | "Event";
 
@@ -29,7 +21,7 @@ export interface CardData {
   cardNumber: number;
   cardType: CardType;
   subtype: string;
-  rarity: Rarity;
+  isStarter: boolean;
   energyCost: number | null;
   spark: number | null;
   isFast: boolean;

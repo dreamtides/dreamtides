@@ -1,4 +1,4 @@
-import type { CardData, Rarity } from "../types/cards";
+import type { CardData } from "../types/cards";
 import type { DreamsignTemplate, PackageTideId } from "../types/content";
 import type { DeckEntry, Dreamsign } from "../types/quest";
 
@@ -11,14 +11,11 @@ import {
 } from "../dreamsign/dreamsign-pool";
 import { createDreamsign } from "../data/dreamsigns";
 
-/** Prices by rarity for card items. */
-const RARITY_PRICES: Readonly<Record<Rarity, number>> = {
-  Starter: 50,
-  Common: 50,
-  Uncommon: 100,
-  Rare: 200,
-  Legendary: 400,
-};
+/** Fixed price for standard card items. */
+const STANDARD_CARD_PRICE = 100;
+
+/** Fixed price for specialty-shop card items. */
+const SPECIALTY_CARD_PRICE = 200;
 
 /** Fixed price for dreamsign items. */
 const DREAMSIGN_PRICE = 150;
@@ -145,8 +142,7 @@ function pickWeightedCard(
       Math.max(
         1,
         candidate.overlapCount * 10 +
-        candidate.deckAffinity * 3 +
-        raritySelectionWeight(candidate.card.rarity),
+        candidate.deckAffinity * 3,
       ),
     0,
   );
@@ -160,8 +156,7 @@ function pickWeightedCard(
     roll -= Math.max(
       1,
       candidate.overlapCount * 10 +
-      candidate.deckAffinity * 3 +
-      raritySelectionWeight(candidate.card.rarity),
+      candidate.deckAffinity * 3,
     );
     if (roll <= 0) {
       return candidate.card;
@@ -170,22 +165,6 @@ function pickWeightedCard(
 
   return candidates[candidates.length - 1]?.card ?? null;
 }
-
-function raritySelectionWeight(rarity: Rarity): number {
-  switch (rarity) {
-    case "Common":
-      return 4;
-    case "Uncommon":
-      return 3;
-    case "Rare":
-      return 2;
-    case "Legendary":
-      return 1;
-    case "Starter":
-      return 0;
-  }
-}
-
 /**
  * Generates shop inventory with 6 slots. Each slot can be a card,
  * dreamsign, or reroll option.
@@ -272,7 +251,7 @@ export function generateShopInventory(
         itemType: "card",
         card,
         dreamsign: null,
-        basePrice: RARITY_PRICES[card.rarity],
+        basePrice: STANDARD_CARD_PRICE,
         discountPercent: 0,
         purchased: false,
       });
@@ -301,7 +280,7 @@ export function generateShopInventory(
 }
 
 /**
- * Generates specialty shop inventory: 4 rare cards weighted
+ * Generates specialty shop inventory: 4 curated cards weighted
  * toward the player's drafted tides.
  */
 export function generateSpecialtyShopInventory(
@@ -309,8 +288,8 @@ export function generateSpecialtyShopInventory(
   playerDeck: DeckEntry[],
   selectedPackageTides: readonly PackageTideId[] = [],
 ): ShopSlot[] {
-  const rareCards = Array.from(cardDatabase.values()).filter(
-    (card) => card.rarity === "Rare",
+  const specialtyCards = Array.from(cardDatabase.values()).filter(
+    (card) => !isStarterCard(card),
   );
   const slots: ShopSlot[] = [];
   const selectedCardNumbers = new Set<number>();
@@ -319,7 +298,7 @@ export function generateSpecialtyShopInventory(
     const card = selectWeightedCard(
       cardDatabase,
       playerDeck,
-      rareCards,
+      specialtyCards,
       selectedPackageTides,
       selectedCardNumbers,
     );
@@ -329,7 +308,7 @@ export function generateSpecialtyShopInventory(
         itemType: "card",
         card,
         dreamsign: null,
-        basePrice: RARITY_PRICES.Rare,
+        basePrice: SPECIALTY_CARD_PRICE,
         discountPercent: 0,
         purchased: false,
       });

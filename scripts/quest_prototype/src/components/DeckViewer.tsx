@@ -1,14 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { CardData, Rarity } from "../types/cards";
+import type { CardData } from "../types/cards";
 import type {
   DeckEntry,
   QuestState,
 } from "../types/quest";
 import { useQuest } from "../state/quest-context";
-import {
-  RARITY_COLORS,
-} from "../data/card-database";
 import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
 import {
@@ -19,11 +16,7 @@ import {
 } from "./card-size";
 import { logEvent } from "../logging";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
-import {
-  ALL_RARITIES,
-  compareRarities,
-  computeDeckSummary,
-} from "./deck-summary";
+import { computeDeckSummary } from "./deck-summary";
 import { DreamcallerPortrait } from "./DreamcallerPortrait";
 
 /** Sort criteria options. */
@@ -31,7 +24,6 @@ type SortCriteria =
   | "acquisitionOrder"
   | "energyCost"
   | "name"
-  | "rarity"
   | "cardType";
 
 /** Labels for sort criteria. */
@@ -39,7 +31,6 @@ const SORT_LABELS: Readonly<Record<SortCriteria, string>> = {
   acquisitionOrder: "Acquisition Order",
   energyCost: "Energy Cost",
   name: "Name",
-  rarity: "Rarity",
   cardType: "Card Type",
 };
 
@@ -77,15 +68,6 @@ export function DeckViewer({
 }: DeckViewerProps) {
   const { state } = useQuest();
 
-  const [rarityFilters, setRarityFilters] = useState<Record<Rarity, boolean>>(
-    () => {
-      const filters: Partial<Record<Rarity, boolean>> = {};
-      for (const rarity of ALL_RARITIES) {
-        filters[rarity] = true;
-      }
-      return filters as Record<Rarity, boolean>;
-    },
-  );
   const [cardTypeFilter, setCardTypeFilter] =
     useState<CardTypeFilter>("All");
   const [sortCriteria, setSortCriteria] =
@@ -104,7 +86,6 @@ export function DeckViewer({
       openTimestampRef.current = Date.now();
       logEvent("deck_viewer_opened", {
         cardCount: state.deck.length,
-        disabledRarities: ALL_RARITIES.filter((rarity) => !rarityFilters[rarity]),
         sortCriteria,
         sortAscending,
         cardTypeFilter,
@@ -115,7 +96,6 @@ export function DeckViewer({
   }, [
     isOpen,
     state.deck.length,
-    rarityFilters,
     sortCriteria,
     sortAscending,
     cardTypeFilter,
@@ -160,15 +140,12 @@ export function DeckViewer({
   );
 
   const hasActiveFilters = useMemo(
-    () =>
-      ALL_RARITIES.some((rarity) => !rarityFilters[rarity])
-      || cardTypeFilter !== "All",
-    [rarityFilters, cardTypeFilter],
+    () => cardTypeFilter !== "All",
+    [cardTypeFilter],
   );
 
   const filteredEntries = useMemo<ResolvedEntry[]>(() => {
     return resolvedEntries.filter((resolved) => {
-      if (!rarityFilters[resolved.card.rarity]) return false;
       if (
         cardTypeFilter === "Characters" &&
         resolved.card.cardType !== "Character"
@@ -181,7 +158,7 @@ export function DeckViewer({
         return false;
       return true;
     });
-  }, [resolvedEntries, rarityFilters, cardTypeFilter]);
+  }, [resolvedEntries, cardTypeFilter]);
 
   const sortedEntries = useMemo<ResolvedEntry[]>(() => {
     const sorted = [...filteredEntries];
@@ -197,9 +174,6 @@ export function DeckViewer({
         case "name":
           cmp = a.card.name.localeCompare(b.card.name);
           break;
-        case "rarity":
-          cmp = compareRarities(a.card.rarity, b.card.rarity);
-          break;
         case "cardType":
           cmp = a.card.cardType.localeCompare(b.card.cardType);
           break;
@@ -208,10 +182,6 @@ export function DeckViewer({
     });
     return sorted;
   }, [filteredEntries, sortCriteria, sortAscending]);
-
-  const toggleRarity = useCallback((rarity: Rarity) => {
-    setRarityFilters((prev) => ({ ...prev, [rarity]: !prev[rarity] }));
-  }, []);
 
   const setCardSize = useCallback((size: CardSizePreset) => {
     setCardSizeState(size);
@@ -355,83 +325,11 @@ export function DeckViewer({
                   }
                 />
               </div>
-
-              <div
-                className="mb-2 flex h-2 overflow-hidden rounded-full"
-                style={{ background: "rgba(255, 255, 255, 0.05)" }}
-              >
-                {deckSummary.rarities
-                  .filter((rarity) => rarity.count > 0)
-                  .map((rarity) => (
-                    <div
-                      key={rarity.rarity}
-                      style={{
-                        width: `${String(rarity.percentage)}%`,
-                        background: RARITY_COLORS[rarity.rarity],
-                        opacity: 0.85,
-                      }}
-                      title={`${rarity.rarity}: ${String(rarity.count)} (${String(rarity.percentage)}%)`}
-                    />
-                  ))}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                {deckSummary.rarities.map((rarity) => (
-                  <div
-                    key={rarity.rarity}
-                    className="flex items-center gap-1"
-                    style={{
-                      opacity: rarity.count > 0 ? 1 : 0.35,
-                    }}
-                  >
-                    <span
-                      className="h-3 w-3 rounded-full"
-                      style={{
-                        background: RARITY_COLORS[rarity.rarity],
-                        boxShadow:
-                          rarity.count > 0
-                            ? `0 0 8px ${RARITY_COLORS[rarity.rarity]}55`
-                            : "none",
-                      }}
-                    />
-                    <span
-                      className="text-[11px] font-medium"
-                      style={{
-                        color:
-                          rarity.count > 0
-                            ? RARITY_COLORS[rarity.rarity]
-                            : "#6b7280",
-                      }}
-                    >
-                      {rarity.rarity}
-                    </span>
-                    <span
-                      className="text-[11px]"
-                      style={{
-                        color: rarity.count > 0 ? "#e2e8f0" : "#4b5563",
-                      }}
-                    >
-                      {String(rarity.count)}
-                    </span>
-                    {rarity.count > 0 && (
-                      <span
-                        className="text-[10px]"
-                        style={{ color: "#9ca3af" }}
-                      >
-                        ({String(rarity.percentage)}%)
-                      </span>
-                    )}
-                  </div>
-                ))}
-                {hasActiveFilters && (
-                  <span
-                    className="ml-auto text-[10px] italic"
-                    style={{ color: "#6b7280" }}
-                  >
-                    (showing full deck)
-                  </span>
-                )}
-              </div>
+              {hasActiveFilters && (
+                <div className="text-[10px] italic" style={{ color: "#6b7280" }}>
+                  Showing the full deck summary while a type filter is active.
+                </div>
+              )}
             </div>
           )}
 
@@ -443,47 +341,6 @@ export function DeckViewer({
               background: "rgba(10, 6, 18, 0.6)",
             }}
           >
-            {/* Rarity filter toggles */}
-            <div className="flex flex-wrap items-center gap-1">
-              <span className="mr-1 text-[10px] uppercase tracking-wider opacity-40">
-                Rarity
-              </span>
-              {ALL_RARITIES.map((rarity) => (
-                <button
-                  key={rarity}
-                  className="flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
-                  style={{
-                    background: rarityFilters[rarity]
-                      ? `${RARITY_COLORS[rarity]}25`
-                      : "rgba(255, 255, 255, 0.03)",
-                    border: `1px solid ${rarityFilters[rarity] ? `${RARITY_COLORS[rarity]}60` : "rgba(255, 255, 255, 0.1)"}`,
-                    color: rarityFilters[rarity]
-                      ? RARITY_COLORS[rarity]
-                      : "#6b7280",
-                    opacity: rarityFilters[rarity] ? 1 : 0.5,
-                  }}
-                  onClick={() => {
-                    toggleRarity(rarity);
-                  }}
-                >
-                  <span
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{
-                      background: RARITY_COLORS[rarity],
-                      opacity: rarityFilters[rarity] ? 1 : 0.4,
-                    }}
-                  />
-                  <span className="hidden sm:inline">{rarity}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Divider */}
-            <div
-              className="mx-1 hidden h-5 md:block"
-              style={{ borderLeft: "1px solid rgba(255, 255, 255, 0.1)" }}
-            />
-
             {/* Card type filter */}
             <div className="flex items-center gap-1">
               <span className="mr-1 text-[10px] uppercase tracking-wider opacity-40">

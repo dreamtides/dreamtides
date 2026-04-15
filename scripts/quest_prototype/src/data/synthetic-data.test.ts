@@ -1,11 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { DREAMSIGN_TEMPLATES } from "./dreamsigns";
 import { DREAM_JOURNEYS } from "./dream-journeys";
-import type { JourneyEffect } from "./dream-journeys";
 import { TEMPTING_OFFERS } from "./tempting-offers";
-import type { OfferEffect } from "./tempting-offers";
 import { BIOMES } from "./biomes";
-import type { Tide, Rarity } from "../types/cards";
+import type { Tide } from "../types/cards";
 
 const ALL_TIDES: Tide[] = [
   "Bloom",
@@ -17,37 +15,7 @@ const ALL_TIDES: Tide[] = [
   "Surge",
   "Neutral",
 ];
-const ALL_RARITIES: Rarity[] = [
-  "Starter",
-  "Common",
-  "Uncommon",
-  "Rare",
-  "Legendary",
-];
 const tideSet = new Set<string>(ALL_TIDES);
-const raritySet = new Set<string>(ALL_RARITIES);
-
-/** Returns the rarity values referenced by a JourneyEffect, if any. */
-function journeyEffectRarities(e: JourneyEffect): string[] {
-  switch (e.type) {
-    case "addRandomCards":
-      return [e.rarity];
-    case "removeCardsAndAddRandomCards":
-      return [e.rarity];
-    default:
-      return [];
-  }
-}
-
-/** Returns the rarity values referenced by an OfferEffect, if any. */
-function offerEffectRarities(e: OfferEffect): string[] {
-  switch (e.type) {
-    case "addRandomCards":
-      return [e.rarity];
-    default:
-      return [];
-  }
-}
 
 describe("dreamsigns", () => {
   it("has exactly 10 entries", () => {
@@ -94,14 +62,6 @@ describe("dream journeys", () => {
     );
 
     expect(tideEffects).toHaveLength(0);
-  });
-
-  it("effect rarities are valid Rarity values", () => {
-    for (const dj of DREAM_JOURNEYS) {
-      for (const r of journeyEffectRarities(dj.effect)) {
-        expect(raritySet.has(r)).toBe(true);
-      }
-    }
   });
 
   it("no addEssence effect has a negative amount", () => {
@@ -156,17 +116,6 @@ describe("tempting offers", () => {
     );
 
     expect(tideEffects).toHaveLength(0);
-  });
-
-  it("effect rarities are valid Rarity values", () => {
-    for (const to of TEMPTING_OFFERS) {
-      for (const r of [
-        ...offerEffectRarities(to.benefit),
-        ...offerEffectRarities(to.cost),
-      ]) {
-        expect(raritySet.has(r)).toBe(true);
-      }
-    }
   });
 
   it("at least 3 costs use addBaneCards", () => {

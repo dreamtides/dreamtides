@@ -10,7 +10,7 @@ function makeCard(overrides: Partial<CardData> = {}): CardData {
     cardNumber: 1,
     cardType: "Character",
     subtype: "",
-    rarity: "Common",
+    isStarter: false,
     energyCost: 2,
     spark: 1,
     isFast: false,
@@ -69,12 +69,12 @@ describe("generateRewardSiteData", () => {
     expect(result.spentDreamsignPoolIds).toEqual([]);
   });
 
-  it("skips starter-rarity cards when picking a card reward", () => {
+  it("skips starter cards when picking a card reward", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
 
     const result = generateRewardSiteData({
       cardDatabase: makeDatabase([
-        makeCard({ cardNumber: 1, rarity: "Starter", tides: ["alpha"] }),
+        makeCard({ cardNumber: 1, isStarter: true, tides: ["alpha"] }),
         makeCard({ cardNumber: 2, name: "Real Reward", tides: ["alpha"] }),
       ]),
       dreamsignTemplates: DREAMSIGN_TEMPLATES,

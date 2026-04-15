@@ -1,11 +1,11 @@
-import type { Tide, Rarity } from "../types/cards";
+import type { Tide } from "../types/cards";
 
 /** A structured effect applied when a dream journey is chosen. */
 export type JourneyEffect =
   | { type: "addEssence"; amount: number }
   | { type: "removeEssence"; amount: number }
   | { type: "removeRandomCards"; count: number }
-  | { type: "addRandomCards"; count: number; rarity: Rarity }
+  | { type: "addRandomCards"; count: number }
   | {
       type: "addEssenceAndRemoveCards";
       essenceAmount: number;
@@ -15,7 +15,6 @@ export type JourneyEffect =
       type: "removeCardsAndAddRandomCards";
       removeCount: number;
       addCount: number;
-      rarity: Rarity;
     }
   | {
       type: "removeCardsAndAddTideCrystal";
@@ -50,8 +49,8 @@ export const DREAM_JOURNEYS: readonly DreamJourney[] = [
   {
     name: "The Ember Lottery",
     description:
-      "A cloaked figure offers you a fistful of smoldering tickets. Two rare cards materialize from the flames.",
-    effect: { type: "addRandomCards", count: 2, rarity: "Rare" },
+      "A cloaked figure offers you a fistful of smoldering tickets. Two cards materialize from the flames.",
+    effect: { type: "addRandomCards", count: 2 },
   },
   {
     name: "Mirror of Unbecoming",
@@ -68,8 +67,8 @@ export const DREAM_JOURNEYS: readonly DreamJourney[] = [
   {
     name: "Garden of Crystallized Thought",
     description:
-      "Frozen ideas bloom like gemstones in an impossible garden. You harvest three uncommon cards from the crystalline branches.",
-    effect: { type: "addRandomCards", count: 3, rarity: "Uncommon" },
+      "Frozen ideas bloom like gemstones in an impossible garden. You harvest three cards from the crystalline branches.",
+    effect: { type: "addRandomCards", count: 3 },
   },
   {
     name: "Descent into the Sable Marrow",
@@ -87,12 +86,12 @@ export const DREAM_JOURNEYS: readonly DreamJourney[] = [
     name: "Pact of the Drowned Stars",
     description:
       "Fallen constellations whisper bargains from beneath black water. You surrender two cards and an unfamiliar champion rises from the drowned sky in return.",
-    effect: { type: "removeCardsAndAddRandomCards", removeCount: 2, addCount: 1, rarity: "Rare" },
+    effect: { type: "removeCardsAndAddRandomCards", removeCount: 2, addCount: 1 },
   },
   {
     name: "The Flensing Wind",
     description:
-      "A howling gale strips away everything inessential. Two cards are torn from your deck, but the wind deposits a single legendary card in their place.",
-    effect: { type: "removeCardsAndAddRandomCards", removeCount: 2, addCount: 1, rarity: "Legendary" },
+      "A howling gale strips away everything inessential. Two cards are torn from your deck, but the wind deposits a single card in their place.",
+    effect: { type: "removeCardsAndAddRandomCards", removeCount: 2, addCount: 1 },
   },
 ] as const;

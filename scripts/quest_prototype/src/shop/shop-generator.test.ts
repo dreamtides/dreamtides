@@ -16,7 +16,7 @@ function makeCard(overrides: Partial<CardData> = {}): CardData {
     cardNumber: 1,
     cardType: "Character",
     subtype: "",
-    rarity: "Common",
+    isStarter: false,
     energyCost: 2,
     spark: 1,
     isFast: false,
@@ -119,9 +119,9 @@ describe("rerollCost", () => {
 
 describe("generateShopInventory", () => {
   const cards = [
-    makeCard({ cardNumber: 1, rarity: "Common", tides: ["Bloom"] }),
-    makeCard({ cardNumber: 2, rarity: "Uncommon", tides: ["Arc"] }),
-    makeCard({ cardNumber: 3, rarity: "Rare", tides: ["Ignite"] }),
+    makeCard({ cardNumber: 1, tides: ["Bloom"] }),
+    makeCard({ cardNumber: 2, tides: ["Arc"] }),
+    makeCard({ cardNumber: 3, tides: ["Ignite"] }),
   ];
   const db = makeDatabase(cards);
 
@@ -160,18 +160,12 @@ describe("generateShopInventory", () => {
     }
   });
 
-  it("card slots have correct rarity-based prices", () => {
+  it("card slots have a fixed base price", () => {
     for (let i = 0; i < 20; i++) {
       const result = generateShopInventory(db, []);
       for (const slot of result.slots) {
         if (slot.itemType === "card" && slot.card) {
-          const expected: Record<string, number> = {
-            Common: 50,
-            Uncommon: 100,
-            Rare: 200,
-            Legendary: 400,
-          };
-          expect(slot.basePrice).toBe(expected[slot.card.rarity]);
+          expect(slot.basePrice).toBe(100);
         }
       }
     }
@@ -270,17 +264,17 @@ describe("generateShopInventory", () => {
     expect(new Set(cardNumbers).size).toBe(cardNumbers.length);
   });
 
-  it("never offers starter-rarity cards in normal shop inventory", () => {
+  it("never offers starter cards in normal shop inventory", () => {
     const starterDb = makeDatabase([
-      makeCard({ cardNumber: 1, rarity: "Starter", tides: ["Bloom"] }),
-      makeCard({ cardNumber: 2, rarity: "Common", tides: ["Arc"] }),
+      makeCard({ cardNumber: 1, isStarter: true, tides: ["Bloom"] }),
+      makeCard({ cardNumber: 2, tides: ["Arc"] }),
     ]);
 
     for (let i = 0; i < 10; i += 1) {
       const result = generateShopInventory(starterDb, []);
       for (const slot of result.slots) {
         if (slot.itemType === "card" && slot.card !== null) {
-          expect(slot.card.rarity).not.toBe("Starter");
+          expect(slot.card.isStarter).toBe(false);
         }
       }
     }
@@ -310,10 +304,10 @@ describe("generateShopInventory with empty database", () => {
 
 describe("generateSpecialtyShopInventory", () => {
   const cards = [
-    makeCard({ cardNumber: 1, rarity: "Common", tides: ["Bloom"] }),
-    makeCard({ cardNumber: 2, rarity: "Rare", tides: ["Arc"] }),
-    makeCard({ cardNumber: 3, rarity: "Rare", tides: ["Ignite"] }),
-    makeCard({ cardNumber: 4, rarity: "Rare", tides: ["Rime"] }),
+    makeCard({ cardNumber: 1, tides: ["Bloom"] }),
+    makeCard({ cardNumber: 2, tides: ["Arc"] }),
+    makeCard({ cardNumber: 3, tides: ["Ignite"] }),
+    makeCard({ cardNumber: 4, tides: ["Rime"] }),
   ];
   const db = makeDatabase(cards);
 
@@ -322,12 +316,12 @@ describe("generateSpecialtyShopInventory", () => {
     expect(slots).toHaveLength(4);
   });
 
-  it("all slots are rare cards", () => {
+  it("all slots are non-starter cards", () => {
     const slots = generateSpecialtyShopInventory(db, []);
     for (const slot of slots) {
       expect(slot.itemType).toBe("card");
       expect(slot.card).not.toBeNull();
-      expect(slot.card!.rarity).toBe("Rare");
+      expect(slot.card!.isStarter).toBe(false);
     }
   });
 
@@ -345,17 +339,17 @@ describe("generateSpecialtyShopInventory", () => {
     }
   });
 
-  it("fills all 4 slots even when the rare pool is smaller than 4", () => {
+  it("fills all 4 slots when 4 eligible cards exist", () => {
     const deckEntries = Array.from({ length: 20 }, () => makeDeckEntry(2));
     const slots = generateSpecialtyShopInventory(db, deckEntries);
     expect(slots).toHaveLength(4);
   });
 
-  it("returns empty slots when no rare cards exist", () => {
-    const noRareDb = makeDatabase([
-      makeCard({ cardNumber: 10, rarity: "Common", tides: ["Bloom"] }),
+  it("returns empty slots when no non-starter cards exist", () => {
+    const noEligibleDb = makeDatabase([
+      makeCard({ cardNumber: 10, isStarter: true, tides: ["Bloom"] }),
     ]);
-    const slots = generateSpecialtyShopInventory(noRareDb, []);
+    const slots = generateSpecialtyShopInventory(noEligibleDb, []);
     expect(slots).toHaveLength(0);
   });
 
@@ -366,22 +360,22 @@ describe("generateSpecialtyShopInventory", () => {
     expect(slots).toHaveLength(0);
   });
 
-  it("uses package-adjacent rare cards when available", () => {
-    const rareAdjacentDb = makeDatabase([
-      makeCard({ cardNumber: 1, rarity: "Rare", tides: ["Arc"] }),
-      makeCard({ cardNumber: 2, rarity: "Rare", tides: ["Arc"] }),
-      makeCard({ cardNumber: 3, rarity: "Rare", tides: ["Arc"] }),
-      makeCard({ cardNumber: 4, rarity: "Rare", tides: ["Arc"] }),
-      makeCard({ cardNumber: 5, rarity: "Rare", tides: ["Rime"] }),
+  it("uses package-adjacent cards when available", () => {
+    const adjacentDb = makeDatabase([
+      makeCard({ cardNumber: 1, tides: ["Arc"] }),
+      makeCard({ cardNumber: 2, tides: ["Arc"] }),
+      makeCard({ cardNumber: 3, tides: ["Arc"] }),
+      makeCard({ cardNumber: 4, tides: ["Arc"] }),
+      makeCard({ cardNumber: 5, tides: ["Rime"] }),
     ]);
-    const slots = generateSpecialtyShopInventory(rareAdjacentDb, [], ["Arc"]);
+    const slots = generateSpecialtyShopInventory(adjacentDb, [], ["Arc"]);
     expect(slots).toHaveLength(4);
     for (const slot of slots) {
       expect(slot.card?.tides).toContain("Arc");
     }
   });
 
-  it("falls back to the broader rare pool when no package-adjacent rares exist", () => {
+  it("falls back to the broader pool when no package-adjacent cards exist", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
     const slots = generateSpecialtyShopInventory(db, [], ["Umbra"]);
     expect(slots).toHaveLength(4);

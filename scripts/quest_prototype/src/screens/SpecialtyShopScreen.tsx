@@ -17,7 +17,7 @@ interface SpecialtyShopScreenProps {
   site: SiteState;
 }
 
-/** Renders the Specialty Shop site screen with 4 rare cards. */
+/** Renders the Specialty Shop site screen with 4 curated cards. */
 export function SpecialtyShopScreen({ site }: SpecialtyShopScreenProps) {
   const { state, mutations, cardDatabase } = useQuest();
   const { essence, deck } = state;
@@ -98,7 +98,7 @@ export function SpecialtyShopScreen({ site }: SpecialtyShopScreenProps) {
           Specialty Shop
         </h2>
         <p className="mt-1 text-sm opacity-50">
-          Rare cards for the discerning collector
+          Curated cards for the discerning collector
         </p>
         {site.isEnhanced && (
           <span

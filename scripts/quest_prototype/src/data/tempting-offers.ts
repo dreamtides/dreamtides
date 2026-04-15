@@ -1,9 +1,9 @@
-import type { Tide, Rarity } from "../types/cards";
+import type { Tide } from "../types/cards";
 
 /** A structured effect for the benefit or cost of a tempting offer. */
 export type OfferEffect =
   | { type: "addEssence"; amount: number }
-  | { type: "addRandomCards"; count: number; rarity: Rarity }
+  | { type: "addRandomCards"; count: number }
   | { type: "addTideCrystal"; tide: Tide; count: number }
   | { type: "addMultipleTideCrystals"; crystals: Array<{ tide: Tide; count: number }> }
   | { type: "addBaneCards"; count: number }
@@ -33,18 +33,18 @@ export const TEMPTING_OFFERS: readonly TemptingOffer[] = [
   },
   {
     benefitDescription:
-      "A spectral merchant offers two rare cards from a locked vault, free of charge.",
+      "A spectral merchant offers two cards from a locked vault, free of charge.",
     costDescription:
       "The vault's guardian marks your soul. Two bane cards join your deck.",
-    benefit: { type: "addRandomCards", count: 2, rarity: "Rare" },
+    benefit: { type: "addRandomCards", count: 2 },
     cost: { type: "addBaneCards", count: 2 },
   },
   {
     benefitDescription:
-      "A hidden reliquary cracks open. Gain 2 uncommon cards.",
+      "A hidden reliquary cracks open. Gain 2 cards.",
     costDescription:
       "The reliquary's backlash destabilizes your essence reserves. Lose 150 essence.",
-    benefit: { type: "addRandomCards", count: 2, rarity: "Uncommon" },
+    benefit: { type: "addRandomCards", count: 2 },
     cost: { type: "removeEssence", amount: 150 },
   },
   {
@@ -65,10 +65,10 @@ export const TEMPTING_OFFERS: readonly TemptingOffer[] = [
   },
   {
     benefitDescription:
-      "A shadowed forge offers to craft a legendary card from raw nightmare.",
+      "A shadowed forge offers to craft a card from raw nightmare.",
     costDescription:
       "The forge demands fuel. Lose 250 essence to feed the flames.",
-    benefit: { type: "addRandomCards", count: 1, rarity: "Legendary" },
+    benefit: { type: "addRandomCards", count: 1 },
     cost: { type: "removeEssence", amount: 250 },
   },
   {
@@ -81,10 +81,10 @@ export const TEMPTING_OFFERS: readonly TemptingOffer[] = [
   },
   {
     benefitDescription:
-      "A phantasmal librarian offers three uncommon cards of surprising synergy.",
+      "A phantasmal librarian offers three cards of surprising synergy.",
     costDescription:
       "The librarian reclaims a toll. Two random cards are stripped from your deck.",
-    benefit: { type: "addRandomCards", count: 3, rarity: "Uncommon" },
+    benefit: { type: "addRandomCards", count: 3 },
     cost: { type: "removeRandomCards", count: 2 },
   },
   {

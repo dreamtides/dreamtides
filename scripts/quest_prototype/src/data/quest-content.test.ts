@@ -20,7 +20,7 @@ function makeCard(
     cardNumber,
     cardType: "Character",
     subtype: "",
-    rarity: "Common",
+    isStarter: false,
     energyCost: 2,
     spark: 1,
     isFast: false,

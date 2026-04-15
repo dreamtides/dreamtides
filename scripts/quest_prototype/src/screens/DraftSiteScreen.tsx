@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
-import { compareRarities } from "../components/deck-summary";
 import {
   countRemainingCards,
   enterDraftSite,
@@ -14,7 +13,7 @@ import {
 } from "../draft/draft-engine";
 import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
-import { cardImageUrl, RARITY_COLORS } from "../data/card-database";
+import { cardAccentTide, cardImageUrl, TIDE_COLORS } from "../data/card-database";
 import { logEvent } from "../logging";
 
 
@@ -29,11 +28,6 @@ function sortCardsForDisplay(cards: CardData[]): CardData[] {
     const energyCostDelta = (a.energyCost ?? 0) - (b.energyCost ?? 0);
     if (energyCostDelta !== 0) {
       return energyCostDelta;
-    }
-
-    const rarityDelta = compareRarities(a.rarity, b.rarity);
-    if (rarityDelta !== 0) {
-      return rarityDelta;
     }
 
     return a.name.localeCompare(b.name);
@@ -177,7 +171,10 @@ function DeckSidebar({
         const cost = card.energyCost ?? 0;
         const showDivider = cost !== lastCost;
         lastCost = cost;
-        const rarityColor = RARITY_COLORS[card.rarity];
+        const accentColor =
+          card.cardType === "Event"
+            ? "#c084fc"
+            : TIDE_COLORS[cardAccentTide(card)];
 
         return (
           <div key={`deck-${String(card.cardNumber)}-${String(i)}`}>
@@ -202,8 +199,8 @@ function DeckSidebar({
             <div
               className="relative flex items-center gap-2 overflow-hidden rounded px-2 py-1"
               style={{
-                background: `linear-gradient(90deg, ${rarityColor}15 0%, rgba(10, 6, 18, 0.7) 70%)`,
-                borderLeft: `2px solid ${rarityColor}60`,
+                background: `linear-gradient(90deg, ${accentColor}15 0%, rgba(10, 6, 18, 0.7) 70%)`,
+                borderLeft: `2px solid ${accentColor}60`,
               }}
             >
               <img

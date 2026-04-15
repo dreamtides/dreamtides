@@ -190,7 +190,7 @@ describe("DeckViewer", () => {
           cardNumber: 1,
           cardType: "Character",
           subtype: "",
-          rarity: "Rare",
+          isStarter: false,
           energyCost: 3,
           spark: 1,
           isFast: false,

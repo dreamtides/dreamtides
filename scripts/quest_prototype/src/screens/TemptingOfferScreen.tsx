@@ -9,6 +9,7 @@ import {
   type TemptingOffer,
 } from "../data/tempting-offers";
 import { DREAMSIGNS } from "../data/dreamsigns";
+import { sampleRewardCards } from "../data/tide-weights";
 
 /** Props for the TemptingOfferScreen component. */
 interface TemptingOfferScreenProps {
@@ -27,7 +28,7 @@ function describeOfferEffect(effect: OfferEffect): string {
     case "addEssence":
       return `+${String(effect.amount)} essence`;
     case "addRandomCards":
-      return `+${String(effect.count)} ${effect.rarity} card${effect.count === 1 ? "" : "s"}`;
+      return `+${String(effect.count)} card${effect.count === 1 ? "" : "s"}`;
     case "addTideCrystal":
       return "bonus removed";
     case "addMultipleTideCrystals":
@@ -51,6 +52,7 @@ function describeOfferEffect(effect: OfferEffect): string {
 export function TemptingOfferScreen({ site }: TemptingOfferScreenProps) {
   const { state, mutations, cardDatabase } = useQuest();
   const { deck, dreamsigns: currentDreamsigns } = state;
+  const selectedPackageTides = state.resolvedPackage?.selectedTides ?? [];
 
   const pairCount = site.isEnhanced ? 3 : 2;
 
@@ -91,32 +93,26 @@ export function TemptingOfferScreen({ site }: TemptingOfferScreenProps) {
     [deck, mutations],
   );
 
-  /** Adds N random cards of a given rarity. */
+  /** Adds N package-adjacent non-starter cards. */
   const addRandomCards = useCallback(
-    (count: number, rarity: string) => {
-      const cardsOfRarity = Array.from(cardDatabase.values()).filter(
-        (c) => c.rarity === rarity,
+    (count: number) => {
+      const cards = sampleRewardCards(
+        cardDatabase,
+        count,
+        selectedPackageTides,
       );
-      if (cardsOfRarity.length === 0) return;
-      for (let i = 0; i < count; i++) {
-        const card =
-          cardsOfRarity[Math.floor(Math.random() * cardsOfRarity.length)];
+      for (const card of cards) {
         mutations.addCard(card.cardNumber, "tempting_offer");
       }
     },
-    [cardDatabase, mutations],
+    [cardDatabase, mutations, selectedPackageTides],
   );
 
-  /** Adds N bane cards (random common cards flagged as bane). */
+  /** Adds N bane cards from the non-starter pool. */
   const addBaneCards = useCallback(
     (count: number) => {
-      const commonCards = Array.from(cardDatabase.values()).filter(
-        (c) => c.rarity === "Common",
-      );
-      if (commonCards.length === 0) return;
-      for (let i = 0; i < count; i++) {
-        const card =
-          commonCards[Math.floor(Math.random() * commonCards.length)];
+      const cards = sampleRewardCards(cardDatabase, count);
+      for (const card of cards) {
         mutations.addBaneCard(card.cardNumber, "tempting_offer");
       }
     },
@@ -130,7 +126,7 @@ export function TemptingOfferScreen({ site }: TemptingOfferScreenProps) {
           mutations.changeEssence(effect.amount, "tempting_offer");
           break;
         case "addRandomCards":
-          addRandomCards(effect.count, effect.rarity);
+          addRandomCards(effect.count);
           break;
         case "addTideCrystal":
           logEvent("legacy_reward_skipped", {

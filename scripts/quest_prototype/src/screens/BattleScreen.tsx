@@ -5,7 +5,7 @@ import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { dreamcallerAccentTide } from "../data/quest-content";
-import { selectRareRewards } from "../data/tide-weights";
+import { selectBattleRewards } from "../data/tide-weights";
 import { CardDisplay } from "../components/CardDisplay";
 import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
@@ -303,15 +303,15 @@ function BattleAnimationPhase() {
 
 interface VictoryPhaseProps {
   essenceReward: number;
-  rareCards: CardData[];
+  rewardCards: CardData[];
   selectedRewardIndex: number | null;
   onSelectReward: (index: number) => void;
 }
 
-/** Victory phase: displays rewards and rare card picks. */
+/** Victory phase: displays rewards and card picks. */
 function VictoryPhase({
   essenceReward,
-  rareCards,
+  rewardCards,
   selectedRewardIndex,
   onSelectReward,
 }: VictoryPhaseProps) {
@@ -368,12 +368,12 @@ function VictoryPhase({
           className="mb-4 text-center text-lg font-bold md:text-xl"
           style={{ color: "#e2e8f0" }}
         >
-          Choose a Rare Card
+          Choose a Card Reward
         </h2>
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
           <AnimatePresence>
-            {rareCards.map((card, index) => {
+            {rewardCards.map((card, index) => {
               const isSelected = selectedRewardIndex === index;
               const isDismissed =
                 selectedRewardIndex !== null && selectedRewardIndex !== index;
@@ -436,21 +436,21 @@ export function BattleScreen({
   const isMiniboss = completionLevel === 3;
   const isFinalBoss = completionLevel === 6;
   const essenceReward = 100 + completionLevel * 50;
-  // Generate enemy and rare card rewards once on mount and keep stable.
+  // Generate enemy and card rewards once on mount and keep stable.
   const enemyRef = useRef<EnemyData | null>(null);
   if (enemyRef.current === null) {
     enemyRef.current = generateEnemy(questContent.dreamcallers);
   }
   const enemy = enemyRef.current;
 
-  const rareCardsRef = useRef<CardData[] | null>(null);
-  if (rareCardsRef.current === null) {
-    rareCardsRef.current = selectRareRewards(
+  const rewardCardsRef = useRef<CardData[] | null>(null);
+  if (rewardCardsRef.current === null) {
+    rewardCardsRef.current = selectBattleRewards(
       cardDatabase,
       resolvedPackage?.selectedTides ?? [],
     );
   }
-  const rareCards = rareCardsRef.current;
+  const rewardCards = rewardCardsRef.current;
 
   const hasCompletedRef = useRef(false);
 
@@ -477,7 +477,7 @@ export function BattleScreen({
       if (selectedRewardIndex !== null || hasCompletedRef.current) return;
       hasCompletedRef.current = true;
 
-      const card = rareCards[index];
+      const card = rewardCards[index];
       setSelectedRewardIndex(index);
 
       // Grant essence reward
@@ -546,7 +546,7 @@ export function BattleScreen({
     },
     [
       selectedRewardIndex,
-      rareCards,
+      rewardCards,
       mutations,
       essenceReward,
       site.id,
@@ -584,7 +584,7 @@ export function BattleScreen({
         <motion.div key="victory">
           <VictoryPhase
             essenceReward={essenceReward}
-            rareCards={rareCards}
+            rewardCards={rewardCards}
             selectedRewardIndex={selectedRewardIndex}
             onSelectReward={handleSelectReward}
           />

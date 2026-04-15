@@ -68,7 +68,7 @@ vi.mock("../data/card-database", () => ({
     Bloom: "#34d399",
     Arc: "#a78bfa",
   },
-  isStarterCard: (card: { rarity: string }) => card.rarity === "Starter",
+  isStarterCard: (card: { isStarter: boolean }) => card.isStarter,
   tideIconUrl: (tide: string) => `/mock/${tide}.png`,
 }));
 
@@ -136,7 +136,7 @@ function makeCardDatabase(): Map<number, CardData> {
         cardNumber: 1,
         cardType: "Character",
         subtype: "",
-        rarity: "Common",
+        isStarter: false,
         energyCost: 1,
         spark: 1,
         isFast: false,

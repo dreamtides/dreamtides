@@ -68,12 +68,16 @@ export function transformCard(card) {
   const result = {};
   for (const [key, value] of Object.entries(card)) {
     const camelKey = kebabToCamel(key);
+    if (camelKey === "rarity") {
+      continue;
+    }
     if (camelKey === "spark" || camelKey === "energyCost") {
       result[camelKey] = value === "" || value === "*" ? null : value;
     } else {
       result[camelKey] = value;
     }
   }
+  result.isStarter = card.rarity === "Starter";
   if (!("spark" in result)) {
     result.spark = null;
   }
@@ -163,7 +167,7 @@ export function setupAssets({
 
   console.log(`Found ${allCards.length} total cards`);
 
-  // Filter out Special-rarity cards
+  // Filter out Special cards from the runtime pool.
   const cards = allCards.filter((c) => c.rarity !== "Special");
   console.log(`Filtered to ${cards.length} runtime cards`);
 

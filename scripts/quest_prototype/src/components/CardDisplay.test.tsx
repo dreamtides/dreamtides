@@ -14,7 +14,7 @@ function makeCard(overrides: Partial<CardData>): CardData {
     cardNumber: 1,
     cardType: "Character",
     subtype: "",
-    rarity: "Common",
+    isStarter: false,
     energyCost: 3,
     spark: 2,
     isFast: false,
@@ -57,7 +57,6 @@ describe("CardDisplay", () => {
       <CardDisplay
         card={makeCard({
           cardType: "Event",
-          rarity: "Common",
           spark: null,
         })}
       />,
@@ -76,9 +75,9 @@ describe("CardDisplay", () => {
     });
   });
 
-  it("keeps Character cards on neutral common chrome", () => {
+  it("keeps neutral cards on subdued chrome", () => {
     const { container, root } = mount(
-      <CardDisplay card={makeCard({ cardType: "Character", rarity: "Common" })} />,
+      <CardDisplay card={makeCard({ cardType: "Character", tides: [] })} />,
     );
 
     const cardRoot = container.firstElementChild as HTMLDivElement | null;

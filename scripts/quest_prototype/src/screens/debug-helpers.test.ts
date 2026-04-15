@@ -17,7 +17,7 @@ function makeCard(num: number, name: string): CardData {
     cardNumber: num,
     cardType: "Character",
     subtype: "",
-    rarity: "Common",
+    isStarter: false,
     energyCost: 1,
     spark: 1,
     isFast: false,

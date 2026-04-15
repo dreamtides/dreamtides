@@ -1,5 +1,6 @@
 import type { CardData } from "../types/cards";
 import type { PackageTideId } from "../types/content";
+import { isStarterCard } from "./card-database";
 import { packageAdjacentCandidatesOrFallback } from "./quest-content";
 
 export function weightedSample<T>(
@@ -68,14 +69,22 @@ export function samplePackageAdjacentItems<T>(
 }
 
 /** Selects rare rewards from the package-adjacent pool without touching the draft multiset. */
-export function selectRareRewards(
+export function sampleRewardCards(
   cardDatabase: ReadonlyMap<number, CardData>,
+  count: number,
   selectedPackageTides: readonly PackageTideId[] = [],
 ): CardData[] {
   return samplePackageAdjacentItems(
-    Array.from(cardDatabase.values()).filter((card) => card.rarity === "Rare"),
-    4,
+    Array.from(cardDatabase.values()).filter((card) => !isStarterCard(card)),
+    count,
     (card) => card.tides,
     selectedPackageTides,
   );
+}
+
+export function selectBattleRewards(
+  cardDatabase: ReadonlyMap<number, CardData>,
+  selectedPackageTides: readonly PackageTideId[] = [],
+): CardData[] {
+  return sampleRewardCards(cardDatabase, 4, selectedPackageTides);
 }

@@ -99,7 +99,7 @@ function makeCard(overrides: Partial<CardData>): CardData {
     cardNumber: 1,
     cardType: "Character",
     subtype: "",
-    rarity: "Common",
+    isStarter: false,
     energyCost: 3,
     spark: 2,
     isFast: false,

@@ -1,6 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { CardData } from "../types/cards";
-import { cardImageUrl, RARITY_COLORS } from "../data/card-database";
+import {
+  cardAccentTide,
+  cardImageUrl,
+  TIDE_COLORS,
+} from "../data/card-database";
 import { tokenizeRulesText, formatTypeLine } from "./card-text";
 
 /** Color used for each symbol type when rendering rules text. */
@@ -45,7 +49,7 @@ function renderRulesText(text: string): ReactNode[] {
 }
 
 /**
- * Renders a Dreamtides card with neutral, rarity-driven chrome.
+ * Renders a Dreamtides card with tide-driven chrome.
  */
 export function CardDisplay({
   card,
@@ -62,17 +66,18 @@ export function CardDisplay({
     setImageError(false);
   }, [card.cardNumber]);
 
-  const rarityColor = RARITY_COLORS[card.rarity];
+  const accentTide = cardAccentTide(card);
+  const accentColor = TIDE_COLORS[accentTide];
   const chromeColor =
-    card.cardType === "Event" ? EVENT_CHROME_COLOR : rarityColor;
+    card.cardType === "Event" ? EVENT_CHROME_COLOR : accentColor;
   const borderColor =
     card.cardType === "Event"
       ? chromeColor
-      : card.rarity === "Common"
+      : accentTide === "Neutral"
       ? "rgba(255, 255, 255, 0.18)"
       : `${chromeColor}55`;
   const nameColor =
-    card.rarity === "Common" ? "#f8fafc" : rarityColor;
+    accentTide === "Neutral" ? "#f8fafc" : accentColor;
 
   const borderStyle = selected
     ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }
@@ -108,7 +113,7 @@ export function CardDisplay({
         className="pointer-events-none absolute inset-x-0 top-0 h-1"
         style={{
           background: `linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, ${chromeColor} 50%, rgba(255, 255, 255, 0.08) 100%)`,
-          opacity: card.cardType === "Event" || card.rarity !== "Common" ? 0.8 : 0.35,
+          opacity: card.cardType === "Event" || accentTide !== "Neutral" ? 0.8 : 0.35,
         }}
       />
 
@@ -158,7 +163,7 @@ export function CardDisplay({
           <div
             className="flex h-full w-full items-center justify-center p-2"
             style={{
-              background: `linear-gradient(135deg, ${rarityColor}24, rgba(255, 255, 255, 0.05))`,
+              background: `linear-gradient(135deg, ${accentColor}24, rgba(255, 255, 255, 0.05))`,
             }}
           >
             <span
@@ -194,16 +199,6 @@ export function CardDisplay({
             style={{ color: "#e2e8f0" }}
           >
             {formatTypeLine(card)}
-          </span>
-          <span
-            className={`shrink-0 rounded-full ${large ? "px-2 py-0.5 text-[10px]" : "px-1.5 py-0.5 text-[9px]"} font-bold uppercase tracking-wide`}
-            style={{
-              background: `${rarityColor}18`,
-              border: `1px solid ${chromeColor}55`,
-              color: nameColor,
-            }}
-          >
-            {card.rarity}
           </span>
         </div>
 

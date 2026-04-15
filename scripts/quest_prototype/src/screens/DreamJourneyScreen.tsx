@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
+import { sampleRewardCards } from "../data/tide-weights";
 import { DREAM_JOURNEYS, type JourneyEffect, type DreamJourney } from "../data/dream-journeys";
 
 /** Props for the DreamJourneyScreen component. */
@@ -26,11 +27,11 @@ function describeEffect(effect: JourneyEffect): string {
     case "removeRandomCards":
       return `Lost ${String(effect.count)} cards`;
     case "addRandomCards":
-      return `Gained ${String(effect.count)} ${effect.rarity} card${effect.count === 1 ? "" : "s"}`;
+      return `Gained ${String(effect.count)} card${effect.count === 1 ? "" : "s"}`;
     case "addEssenceAndRemoveCards":
       return `Gained ${String(effect.essenceAmount)} essence, lost ${String(effect.removeCount)} cards`;
     case "removeCardsAndAddRandomCards":
-      return `Lost ${String(effect.removeCount)} cards, gained ${String(effect.addCount)} ${effect.rarity} card${effect.addCount === 1 ? "" : "s"}`;
+      return `Lost ${String(effect.removeCount)} cards, gained ${String(effect.addCount)} card${effect.addCount === 1 ? "" : "s"}`;
     case "removeCardsAndAddTideCrystal":
       return `Lost ${String(effect.removeCount)} cards`;
     case "upgradeRandomCards":
@@ -44,6 +45,7 @@ function describeEffect(effect: JourneyEffect): string {
 export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
   const { state, mutations, cardDatabase } = useQuest();
   const { deck } = state;
+  const selectedPackageTides = state.resolvedPackage?.selectedTides ?? [];
 
   const optionCount = site.isEnhanced ? 3 : 2;
 
@@ -84,20 +86,19 @@ export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
     [deck, mutations],
   );
 
-  /** Adds N random cards of a given rarity to the deck. */
+  /** Adds N package-adjacent non-starter cards to the deck. */
   const addRandomCards = useCallback(
-    (count: number, rarity: string) => {
-      const cardsOfRarity = Array.from(cardDatabase.values()).filter(
-        (c) => c.rarity === rarity,
+    (count: number) => {
+      const cards = sampleRewardCards(
+        cardDatabase,
+        count,
+        selectedPackageTides,
       );
-      if (cardsOfRarity.length === 0) return;
-      for (let i = 0; i < count; i++) {
-        const card =
-          cardsOfRarity[Math.floor(Math.random() * cardsOfRarity.length)];
+      for (const card of cards) {
         mutations.addCard(card.cardNumber, "dream_journey");
       }
     },
-    [cardDatabase, mutations],
+    [cardDatabase, mutations, selectedPackageTides],
   );
 
   const applyEffect = useCallback(
@@ -113,7 +114,7 @@ export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
           removeRandomCards(effect.count);
           break;
         case "addRandomCards":
-          addRandomCards(effect.count, effect.rarity);
+          addRandomCards(effect.count);
           break;
         case "addEssenceAndRemoveCards":
           mutations.changeEssence(effect.essenceAmount, "dream_journey");
@@ -121,7 +122,7 @@ export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
           break;
         case "removeCardsAndAddRandomCards":
           removeRandomCards(effect.removeCount);
-          addRandomCards(effect.addCount, effect.rarity);
+          addRandomCards(effect.addCount);
           break;
         case "removeCardsAndAddTideCrystal":
           removeRandomCards(effect.removeCount);

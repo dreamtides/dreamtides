@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CardData } from "../types/cards";
-import { selectRareRewards } from "./tide-weights";
+import { selectBattleRewards } from "./tide-weights";
 
 function makeCard(overrides: Partial<CardData> = {}): CardData {
   return {
@@ -9,7 +9,7 @@ function makeCard(overrides: Partial<CardData> = {}): CardData {
     cardNumber: 1,
     cardType: "Character",
     subtype: "",
-    rarity: "Rare",
+    isStarter: false,
     energyCost: 2,
     spark: 1,
     isFast: false,
@@ -29,11 +29,11 @@ beforeEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("selectRareRewards", () => {
-  it("prefers package-adjacent rare rewards", () => {
+describe("selectBattleRewards", () => {
+  it("prefers package-adjacent rewards", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
 
-    const rewards = selectRareRewards(
+    const rewards = selectBattleRewards(
       makeDatabase([
         makeCard({ cardNumber: 1, tides: ["alpha"] }),
         makeCard({ cardNumber: 2, tides: ["alpha", "beta"] }),
@@ -50,10 +50,10 @@ describe("selectRareRewards", () => {
     }
   });
 
-  it("falls back to the broader rare pool when no adjacent rare rewards exist", () => {
+  it("falls back to the broader pool when no adjacent rewards exist", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
 
-    const rewards = selectRareRewards(
+    const rewards = selectBattleRewards(
       makeDatabase([
         makeCard({ cardNumber: 1, tides: ["beta"] }),
         makeCard({ cardNumber: 2, tides: ["gamma"] }),
