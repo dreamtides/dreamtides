@@ -4,7 +4,6 @@ import type { SiteState, Dreamsign } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import { CardDisplay } from "../components/CardDisplay";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import type { Tide } from "../types/cards";
 import {
   generateRewardSiteData,
@@ -204,47 +203,50 @@ function CardRewardDisplay({ cardNumber }: { cardNumber: number }) {
 /** Renders a dreamsign reward with tide icon, name, and effect. */
 function DreamsignRewardDisplay({
   name,
-  tide,
+  tide: _tide,
   effectDescription,
 }: {
   name: string;
   tide: Tide;
   effectDescription: string;
 }) {
-  const tideColor = TIDE_COLORS[tide];
-
   return (
     <div
       className="flex w-64 flex-col items-center gap-3 rounded-xl p-6"
       style={{
         background:
           "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-        border: `1px solid ${tideColor}60`,
-        boxShadow: `0 0 30px ${tideColor}15`,
+        border: "1px solid rgba(168, 85, 247, 0.3)",
+        boxShadow: "0 0 30px rgba(168, 85, 247, 0.12)",
       }}
     >
       <p className="text-xs font-bold uppercase tracking-wider opacity-50">
         Dreamsign Reward
       </p>
-      <img
-        src={tideIconUrl(tide)}
-        alt={tide}
-        className="h-14 w-14 rounded-full object-contain"
-        style={{ border: `2px solid ${tideColor}` }}
-      />
+      <div
+        className="flex h-14 w-14 items-center justify-center rounded-full text-2xl"
+        style={{
+          background: "rgba(255, 255, 255, 0.08)",
+          border: "2px solid rgba(168, 85, 247, 0.35)",
+          color: "#cbd5f5",
+        }}
+        aria-label={`${name} sigil`}
+      >
+        {"\u2726"}
+      </div>
       <span
         className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
         style={{
-          background: `${tideColor}20`,
-          color: tideColor,
-          border: `1px solid ${tideColor}40`,
+          background: "rgba(168, 85, 247, 0.16)",
+          color: "#c4b5fd",
+          border: "1px solid rgba(168, 85, 247, 0.35)",
         }}
       >
-        {tide}
+        Dreamsign
       </span>
       <h3
         className="text-center text-lg font-bold"
-        style={{ color: tideColor }}
+        style={{ color: "#f8fafc" }}
       >
         {name}
       </h3>

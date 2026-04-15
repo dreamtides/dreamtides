@@ -1,11 +1,11 @@
 import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { selectDreamcallerOffer } from "../data/dreamcaller-selection";
-import { dreamcallerAccentTide } from "../data/quest-content";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 import type { DreamcallerContent } from "../types/content";
+
+const DREAMCALLER_ACCENTS = ["#c084fc", "#fbbf24", "#7dd3fc"] as const;
 
 /** Intro screen where the player picks a dreamcaller to start the quest. */
 export function QuestStartScreen() {
@@ -79,16 +79,17 @@ export function QuestStartScreen() {
         transition={{ duration: 0.6, delay: 0.5 }}
       >
         {offered.map((dreamcaller, index) => {
-          const accentTide = dreamcallerAccentTide(dreamcaller);
-          const color = TIDE_COLORS[accentTide];
+          const accentColor = DREAMCALLER_ACCENTS[
+            index % DREAMCALLER_ACCENTS.length
+          ];
           return (
             <motion.button
               key={dreamcaller.name}
               className="flex cursor-pointer flex-col items-center rounded-xl px-5 py-6 md:px-6 md:py-8"
               style={{
                 background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-                border: `2px solid ${color}40`,
-                boxShadow: `0 0 20px ${color}15`,
+                border: `2px solid ${accentColor}40`,
+                boxShadow: `0 0 20px ${accentColor}15`,
                 minWidth: "220px",
                 maxWidth: "320px",
                 flex: "1 1 0",
@@ -97,8 +98,8 @@ export function QuestStartScreen() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
               whileHover={{
-                boxShadow: `0 0 40px ${color}50`,
-                borderColor: `${color}90`,
+                boxShadow: `0 0 40px ${accentColor}50`,
+                borderColor: `${accentColor}90`,
                 scale: 1.05,
               }}
               whileTap={{ scale: 0.97 }}
@@ -106,24 +107,29 @@ export function QuestStartScreen() {
                 handlePickDreamcaller(dreamcaller);
               }}
             >
-              <img
-                src={tideIconUrl(accentTide)}
-                alt={accentTide}
-                className="mb-3 h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
-                style={{ border: `2px solid ${color}` }}
-              />
+              <div
+                className="mb-3 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black md:h-14 md:w-14 md:text-2xl"
+                style={{
+                  border: `2px solid ${accentColor}`,
+                  background: "rgba(255, 255, 255, 0.06)",
+                  color: accentColor,
+                }}
+                aria-label={`${dreamcaller.name} sigil`}
+              >
+                {dreamcaller.name.charAt(0)}
+              </div>
               <h3
                 className="mb-2 text-center text-xl font-bold leading-tight md:text-2xl"
-                style={{ color }}
+                style={{ color: "#f8fafc" }}
               >
                 {dreamcaller.name}
               </h3>
               <span
                 className="mb-3 rounded-full px-3 py-0.5 text-xs font-medium"
                 style={{
-                  background: `${color}20`,
-                  color,
-                  border: `1px solid ${color}30`,
+                  background: `${accentColor}20`,
+                  color: accentColor,
+                  border: `1px solid ${accentColor}30`,
                 }}
               >
                 Awakening {String(dreamcaller.awakening)}

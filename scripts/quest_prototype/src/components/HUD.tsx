@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuest } from "../state/quest-context";
 import { downloadLog } from "../logging";
-import { TIDE_COLORS } from "../data/card-database";
 
 /** Duration in ms for the essence count animation. */
 const ESSENCE_ANIM_DURATION = 500;
@@ -63,9 +62,8 @@ export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudPr
   }
 
   const dreamcallerName = state.dreamcaller?.name ?? null;
-  const dreamcallerTide = state.dreamcaller?.accentTide ?? null;
   const dreamcallerColor =
-    dreamcallerTide !== null ? TIDE_COLORS[dreamcallerTide] : "#6b7280";
+    dreamcallerName !== null ? "#e2e8f0" : "#6b7280";
 
   return (
     <div
@@ -113,7 +111,7 @@ export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudPr
           <div
             className="flex h-6 w-6 items-center justify-center rounded md:h-7 md:w-7"
             style={{
-              border: `2px solid ${dreamcallerColor}`,
+              border: "2px solid rgba(255, 255, 255, 0.2)",
               background: "rgba(0, 0, 0, 0.4)",
             }}
             aria-label="Dreamcaller"

@@ -12,18 +12,6 @@ export const DEFAULT_DRAFT_CONFIG: Readonly<DraftConfig> = {
 /** Number of player picks per draft site visit. */
 export const SITE_PICKS = 5;
 
-/** Tide ordering for display sorting. */
-const TIDE_ORDER: Readonly<Record<string, number>> = {
-  Bloom: 0,
-  Arc: 1,
-  Ignite: 2,
-  Pact: 3,
-  Umbra: 4,
-  Rime: 5,
-  Surge: 6,
-  Neutral: 7,
-};
-
 /**
  * Sample unique card numbers from weighted entries without replacement.
  * Returns the selected card numbers.
@@ -122,15 +110,6 @@ function revealOffer(
     uniqueCardsRemaining: countRemainingUniqueCards(state.remainingCopiesByCard),
   });
   return true;
-}
-
-/** Sort an array of cards by tide order without mutating the original. */
-export function sortCardsByTide(cards: CardData[]): CardData[] {
-  return [...cards].sort((a, b) => {
-    const orderA = TIDE_ORDER[cardAccentTide(a)] ?? 8;
-    const orderB = TIDE_ORDER[cardAccentTide(b)] ?? 8;
-    return orderA - orderB;
-  });
 }
 
 /** Count cards per tide in a collection of card numbers. */

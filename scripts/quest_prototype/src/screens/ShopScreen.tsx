@@ -6,7 +6,6 @@ import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import {
   generateShopInventory,
   effectivePrice,
@@ -313,7 +312,6 @@ function ShopSlotCard({
 
   if (slot.itemType === "dreamsign" && slot.dreamsign) {
     const ds = slot.dreamsign;
-    const tideColor = TIDE_COLORS[ds.tide];
     return (
       <div className="flex flex-col gap-2">
         <div
@@ -322,29 +320,34 @@ function ShopSlotCard({
             aspectRatio: "2 / 3",
             background:
               "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-            border: `1px solid ${tideColor}60`,
-            boxShadow: `0 0 8px ${tideColor}20`,
+            border: "1px solid rgba(168, 85, 247, 0.3)",
+            boxShadow: "0 0 8px rgba(168, 85, 247, 0.12)",
           }}
         >
-          <img
-            src={tideIconUrl(ds.tide)}
-            alt={ds.tide}
-            className="h-10 w-10 rounded-full object-contain"
-            style={{ border: `2px solid ${tideColor}` }}
-          />
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-full text-lg"
+            style={{
+              background: "rgba(255, 255, 255, 0.08)",
+              border: "2px solid rgba(168, 85, 247, 0.35)",
+              color: "#cbd5f5",
+            }}
+            aria-label={`${ds.name} sigil`}
+          >
+            {"\u2726"}
+          </div>
           <span
             className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
             style={{
-              background: `${tideColor}20`,
-              color: tideColor,
-              border: `1px solid ${tideColor}40`,
+              background: "rgba(168, 85, 247, 0.16)",
+              color: "#c4b5fd",
+              border: "1px solid rgba(168, 85, 247, 0.35)",
             }}
           >
             Dreamsign
           </span>
           <h3
             className="text-center text-sm font-bold"
-            style={{ color: tideColor }}
+            style={{ color: "#f8fafc" }}
           >
             {ds.name}
           </h3>

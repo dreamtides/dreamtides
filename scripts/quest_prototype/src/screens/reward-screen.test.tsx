@@ -219,6 +219,8 @@ describe("RewardSiteScreen", () => {
     );
 
     expect(container.textContent).toContain("Dreamsign One");
+    expect(container.textContent).not.toContain("Bloom");
+    expect(container.querySelector('img[alt="Bloom"]')).toBeNull();
     expect(mutations.setRemainingDreamsignPool).toHaveBeenCalledWith(
       [],
       "reward_site_revealed",

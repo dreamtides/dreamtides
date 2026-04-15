@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { logEvent, downloadLog } from "../logging";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { CardDisplay } from "../components/CardDisplay";
 import type { CardData } from "../types/cards";
 
@@ -53,10 +52,9 @@ export function QuestCompleteScreen() {
   ).length;
 
   const dreamcallerName = state.dreamcaller?.name ?? "None";
-  const dreamcallerTide = state.dreamcaller?.accentTide ?? null;
   const dreamcallerAwakening = state.dreamcaller?.awakening ?? null;
   const dreamcallerColor =
-    dreamcallerTide !== null ? TIDE_COLORS[dreamcallerTide] : "#6b7280";
+    state.dreamcaller !== null ? "#f8fafc" : "#6b7280";
 
   const stats = [
     { label: "Battles Won", value: String(state.completionLevel) },
@@ -100,17 +98,18 @@ export function QuestCompleteScreen() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        {dreamcallerTide !== null && (
-          <img
-            src={tideIconUrl(dreamcallerTide)}
-            alt={dreamcallerTide}
-            className="h-10 w-10 rounded-full object-contain md:h-12 md:w-12"
-            style={{
-              border: `2px solid ${dreamcallerColor}`,
-              boxShadow: `0 0 12px ${dreamcallerColor}40`,
-            }}
-          />
-        )}
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-black md:h-12 md:w-12 md:text-xl"
+          style={{
+            border: "2px solid rgba(255, 255, 255, 0.2)",
+            boxShadow: "0 0 12px rgba(255, 255, 255, 0.08)",
+            background: "rgba(255, 255, 255, 0.06)",
+            color: dreamcallerColor,
+          }}
+          aria-label={`${dreamcallerName} sigil`}
+        >
+          {dreamcallerName === "None" ? "--" : dreamcallerName.charAt(0)}
+        </div>
         <div className="flex flex-col">
           <span
             className="text-lg font-bold md:text-xl"

@@ -8,14 +8,16 @@ import type {
 import { useQuest } from "../state/quest-context";
 import {
   RARITY_COLORS,
-  TIDE_COLORS,
-  tideIconUrl,
 } from "../data/card-database";
 import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
 import { logEvent } from "../logging";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
-import { ALL_RARITIES, computeDeckSummary } from "./deck-summary";
+import {
+  ALL_RARITIES,
+  compareRarities,
+  computeDeckSummary,
+} from "./deck-summary";
 
 /** Sort criteria options. */
 type SortCriteria =
@@ -36,14 +38,6 @@ const SORT_LABELS: Readonly<Record<SortCriteria, string>> = {
 
 /** Card type filter options. */
 type CardTypeFilter = "All" | "Characters" | "Events";
-
-/** Rarity ordering for sorting. */
-const RARITY_ORDER: Readonly<Record<Rarity, number>> = {
-  Common: 0,
-  Uncommon: 1,
-  Rare: 2,
-  Legendary: 3,
-};
 
 /** A deck entry paired with its resolved card data. */
 interface ResolvedEntry {
@@ -186,7 +180,7 @@ export function DeckViewer({
           cmp = a.card.name.localeCompare(b.card.name);
           break;
         case "rarity":
-          cmp = RARITY_ORDER[a.card.rarity] - RARITY_ORDER[b.card.rarity];
+          cmp = compareRarities(a.card.rarity, b.card.rarity);
           break;
         case "cardType":
           cmp = a.card.cardType.localeCompare(b.card.cardType);
@@ -638,24 +632,32 @@ export function DeckViewer({
                       border: "1px solid rgba(124, 58, 237, 0.2)",
                     }}
                   >
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={tideIconUrl(state.dreamcaller.accentTide)}
-                        alt={state.dreamcaller.accentTide}
-                        className="h-5 w-5 rounded-full"
+                    <div className="flex items-start gap-2">
+                      <div
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
                         style={{
-                          border: `1px solid ${TIDE_COLORS[state.dreamcaller.accentTide]}`,
+                          background: "rgba(255, 255, 255, 0.08)",
+                          border: "1px solid rgba(255, 255, 255, 0.12)",
+                          color: "#e2e8f0",
                         }}
-                      />
-                      <span
-                        className="text-sm font-bold"
-                        style={{
-                          color:
-                            TIDE_COLORS[state.dreamcaller.accentTide],
-                        }}
+                        aria-label={`${state.dreamcaller.name} sigil`}
                       >
-                        {state.dreamcaller.name}
-                      </span>
+                        {state.dreamcaller.name.charAt(0)}
+                      </div>
+                      <div>
+                        <span
+                          className="text-sm font-bold"
+                          style={{ color: "#f8fafc" }}
+                        >
+                          {state.dreamcaller.name}
+                        </span>
+                        <p
+                          className="mt-0.5 text-[10px] uppercase tracking-wider opacity-45"
+                          style={{ color: "#cbd5f5" }}
+                        >
+                          Awakening {String(state.dreamcaller.awakening)}
+                        </p>
+                      </div>
                     </div>
                     <p
                       className="mt-2 text-[11px] leading-relaxed opacity-70"
@@ -697,19 +699,21 @@ export function DeckViewer({
                         }}
                       >
                         <div className="flex items-center gap-1.5">
-                          <img
-                            src={tideIconUrl(sign.tide)}
-                            alt={sign.tide}
-                            className="h-3.5 w-3.5 rounded-full"
+                          <span
+                            className="flex h-4 w-4 items-center justify-center rounded-full text-[9px]"
                             style={{
-                              border: `1px solid ${TIDE_COLORS[sign.tide]}`,
+                              background: sign.isBane
+                                ? "rgba(239, 68, 68, 0.15)"
+                                : "rgba(255, 255, 255, 0.08)",
+                              color: sign.isBane ? "#fca5a5" : "#cbd5f5",
                             }}
-                          />
+                            aria-hidden="true"
+                          >
+                            {sign.isBane ? "\u2620" : "\u2726"}
+                          </span>
                           <span
                             className="text-[11px] font-bold"
-                            style={{
-                              color: TIDE_COLORS[sign.tide],
-                            }}
+                            style={{ color: "#f8fafc" }}
                           >
                             {sign.name}
                           </span>
@@ -849,23 +853,30 @@ function MobileSidebar({
               <div>
                 {dreamcaller !== null ? (
                   <div className="flex items-start gap-2">
-                    <img
-                      src={tideIconUrl(dreamcaller.accentTide)}
-                      alt={dreamcaller.accentTide}
-                      className="mt-0.5 h-5 w-5 rounded-full"
+                    <div
+                      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
                       style={{
-                        border: `1px solid ${TIDE_COLORS[dreamcaller.accentTide]}`,
+                        background: "rgba(255, 255, 255, 0.08)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        color: "#e2e8f0",
                       }}
-                    />
+                      aria-label={`${dreamcaller.name} sigil`}
+                    >
+                      {dreamcaller.name.charAt(0)}
+                    </div>
                     <div>
                       <span
                         className="text-xs font-bold"
-                        style={{
-                          color: TIDE_COLORS[dreamcaller.accentTide],
-                        }}
+                        style={{ color: "#f8fafc" }}
                       >
                         {dreamcaller.name}
                       </span>
+                      <p
+                        className="mt-0.5 text-[9px] uppercase tracking-wider opacity-45"
+                        style={{ color: "#cbd5f5" }}
+                      >
+                        Awakening {String(dreamcaller.awakening)}
+                      </p>
                       <p className="mt-0.5 text-[10px] opacity-60">
                         {dreamcaller.renderedText}
                       </p>
@@ -897,14 +908,21 @@ function MobileSidebar({
                       }}
                     >
                       <div className="flex items-center gap-1.5">
-                        <img
-                          src={tideIconUrl(sign.tide)}
-                          alt={sign.tide}
-                          className="h-3 w-3 rounded-full"
-                        />
+                        <span
+                          className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px]"
+                          style={{
+                            background: sign.isBane
+                              ? "rgba(239, 68, 68, 0.15)"
+                              : "rgba(255, 255, 255, 0.08)",
+                            color: sign.isBane ? "#fca5a5" : "#cbd5f5",
+                          }}
+                          aria-hidden="true"
+                        >
+                          {sign.isBane ? "\u2620" : "\u2726"}
+                        </span>
                         <span
                           className="text-[10px] font-medium"
-                          style={{ color: TIDE_COLORS[sign.tide] }}
+                          style={{ color: "#f8fafc" }}
                         >
                           {sign.name}
                         </span>

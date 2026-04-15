@@ -10,7 +10,6 @@ import {
   initializeDraftState,
   processPlayerPick,
   SITE_PICKS,
-  sortCardsByTide,
 } from "./draft-engine";
 
 function makeCard(
@@ -384,23 +383,5 @@ describe("completeDraftSite", () => {
     expect(completionEvent?.siteId).toBe("site-a");
     expect(completionEvent?.cardsDrafted).toEqual([4, 7]);
     expect(completionEvent?.picksCompleted).toBe(2);
-  });
-});
-
-describe("sortCardsByTide", () => {
-  it("sorts cards in tide order", () => {
-    const cards = [
-      makeCard(1, "Surge"),
-      makeCard(2, "Bloom"),
-      makeCard(3, "Pact"),
-      makeCard(4, "Arc"),
-    ];
-
-    expect(sortCardsByTide(cards).map((card) => card.cardNumber)).toEqual([
-      2,
-      4,
-      3,
-      1,
-    ]);
   });
 });

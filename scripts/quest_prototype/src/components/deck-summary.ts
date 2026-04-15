@@ -8,6 +8,13 @@ export const ALL_RARITIES: readonly Rarity[] = [
   "Legendary",
 ] as const;
 
+export const RARITY_ORDER: Readonly<Record<Rarity, number>> = {
+  Common: 0,
+  Uncommon: 1,
+  Rare: 2,
+  Legendary: 3,
+};
+
 export interface DeckSummaryEntry {
   rarity: Rarity;
   count: number;
@@ -20,6 +27,11 @@ export interface DeckSummary {
   eventCount: number;
   averageEnergyCost: number | null;
   rarities: DeckSummaryEntry[];
+}
+
+/** Compare two rarities using the canonical deck-display order. */
+export function compareRarities(a: Rarity, b: Rarity): number {
+  return RARITY_ORDER[a] - RARITY_ORDER[b];
 }
 
 /** Computes package-safe summary metrics for a deck. */

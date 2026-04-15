@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
+import { compareRarities } from "../components/deck-summary";
 import {
   countRemainingCards,
   enterDraftSite,
@@ -23,8 +24,6 @@ const NEXT_PACK_DELAY = 500;
 /** Animation phases during a pick. */
 type PickPhase = "idle" | "animating" | "waiting";
 
-const RARITY_ORDER = ["Common", "Uncommon", "Rare", "Legendary"] as const;
-
 function sortCardsForDisplay(cards: CardData[]): CardData[] {
   return [...cards].sort((a, b) => {
     const energyCostDelta = (a.energyCost ?? 0) - (b.energyCost ?? 0);
@@ -32,8 +31,7 @@ function sortCardsForDisplay(cards: CardData[]): CardData[] {
       return energyCostDelta;
     }
 
-    const rarityDelta =
-      RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity);
+    const rarityDelta = compareRarities(a.rarity, b.rarity);
     if (rarityDelta !== 0) {
       return rarityDelta;
     }
