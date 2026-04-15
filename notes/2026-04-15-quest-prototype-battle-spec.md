@@ -11,6 +11,8 @@ energy, Judgment, scoring, victory, defeat, draw, and reward handoff.
 Card text is handled through trusted debug tooling that lets the user edit
 battle state directly. The prototype should automate bookkeeping, not legality.
 It should not try to prevent impossible moves, illegal timing, or zone changes.
+The debug surface is the primary interaction model for playable battle, not a
+hidden fallback for exceptional cases.
 
 The current auto-resolve battle flow must remain available. The playable mode
 must activate only behind a runtime URL flag.
@@ -43,6 +45,7 @@ Phase 1 must include:
 - battle-entry initialization from quest state
 - battle state, turn flow, Judgment, scoring, and result detection
 - playable battle UI with hand, board, status strips, and result surfaces
+- prominent skip-to-victory shortcut that jumps straight to reward selection
 - simple AI that obeys energy costs
 - shared battle-entry and victory-completion seams that preserve current reward
   generation, reward application, and atlas progression behavior
@@ -318,14 +321,23 @@ Keep the main action bar minimal:
 - End Turn
 - Undo
 - Redo
+- Skip To Rewards
 - Toggle Battle Log
 - Toggle Debug Inspector on narrow screens
 
-Most debug actions belong in the inspector or contextual surfaces.
+The battle UI should expose its debug affordances plainly. Inspector actions,
+selection-driven actions, and zone-browser actions are primary controls, not
+hidden developer shortcuts.
+
+`Skip To Rewards` should be visually prominent and available directly on the
+playable battle surface so testers can bypass the live battle loop once battle
+testing is done.
 
 ## Debug UX Strategy
 The debug suite is the core design problem. It must be fast enough to manually
 simulate card text without turning into a giant admin form.
+It is also the primary intended interaction model for this prototype battle
+screen.
 
 Recommended structure:
 - persistent inspector rail on desktop
@@ -342,9 +354,12 @@ Selection model:
 
 Important consequence: operations should usually be enabled by default. Prefer
 "do the move and log it" over "block the move and explain why."
+Do not hide core debug actions behind secret gestures, dev-only hotkeys, or
+deeply nested menus.
 
 ## Interaction Model
 Do not require explicit surface modes such as `Play`, `Move`, or `Debug`.
+The user should remain on one overtly debug-capable surface throughout battle.
 
 Phase 1 required path:
 - single click to select a card, zone, or slot
@@ -452,6 +467,8 @@ Requirements:
 - redo reapplies recorded post-state, not a fresh recalculation
 - automatic turn-start processing, Judgment resolution, AI main phase, and
   result entry each commit as one composite history step
+- `Skip To Rewards` records one composite battle-history step that moves
+  directly into the victory reward surface
 - quest-level reward application after the user selects a reward is outside the
   battle undo domain
 
@@ -629,6 +646,8 @@ remain informational unless the user manually applies their effects.
 Leaving battle:
 - on victory, present the frozen reward options from battle entry and then run
   the shared completion bridge
+- `Skip To Rewards` should use that same frozen reward surface and completion
+  bridge, skipping only the remaining battle simulation
 - on defeat or draw, enter an inspectable result overlay on top of the live
   battle screen
 - defeat and draw remain editable
@@ -690,6 +709,8 @@ Integration tests:
 - playable mode routes to the new surface
 - playable mode freezes reward options for the full session
 - victory updates quest progression identically to auto mode
+- `Skip To Rewards` opens the same reward surface and uses the same completion
+  bridge as normal victory
 - debug-forced victory uses the same completion bridge and reward flow
 - defeat and draw preserve an inspectable result surface before reset
 - defeat and draw reach the game-over flow after explicit confirmation
@@ -729,6 +750,9 @@ Core QA:
 - deck, void, banished, and both hands are browsable
 - top and bottom deck moves work
 - victory reward flow still works
+- `Skip To Rewards` is visible and jumps directly to reward selection
+- reward selection after `Skip To Rewards` grants the same quest rewards and
+  progression as normal victory
 - defeat and draw remain inspectable before reset
 - reset only happens after explicit confirmation
 - desktop and tablet layouts remain usable
@@ -765,6 +789,8 @@ Phase 2 sequence:
 - auto mode remains available without the URL flag
 - reward options are generated once per battle entry and stay stable for that
   session
+- a prominent `Skip To Rewards` button is available in playable mode and uses
+  the normal victory reward flow
 - victory still grants the correct quest rewards and progression
 - defeat and draw are inspectable before reset and have explicit game-over
   handling afterward
