@@ -2,6 +2,7 @@ import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { selectDreamcallerOffer } from "../data/dreamcaller-selection";
+import { structuralTidesForPackageTides } from "../data/structural-tides";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 import type { DreamcallerContent } from "../types/content";
 
@@ -84,6 +85,9 @@ export function QuestStartScreen() {
           const accentColor = DREAMCALLER_ACCENTS[
             index % DREAMCALLER_ACCENTS.length
           ];
+          const structuralTides = structuralTidesForPackageTides(
+            dreamcaller.mandatoryTides,
+          );
           return (
             <motion.div
               key={dreamcaller.name}
@@ -148,6 +152,53 @@ export function QuestStartScreen() {
                 >
                   {dreamcaller.renderedText}
                 </p>
+                {structuralTides.length > 0 && (
+                  <div className="flex w-full flex-col items-center gap-2">
+                    <span
+                      className="text-[10px] font-semibold uppercase tracking-[0.28em]"
+                      style={{ color: "#f8fafc", opacity: 0.6 }}
+                    >
+                      Structural Tides
+                    </span>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {structuralTides.map((tide) => (
+                        <span
+                          key={tide.id}
+                          className="group/structural relative"
+                          data-structural-tide-chip={tide.id}
+                          title={tide.hoverBlurb}
+                        >
+                          <span
+                            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
+                            style={{
+                              background: "#000000",
+                              borderColor: "rgba(255, 255, 255, 0.16)",
+                              color: "#ffffff",
+                            }}
+                          >
+                            <i
+                              aria-hidden="true"
+                              className={`bx ${tide.iconClass} text-sm leading-none`}
+                              data-structural-tide-icon={tide.id}
+                            />
+                            <span>{tide.displayName}</span>
+                          </span>
+                          <span
+                            className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg border px-3 py-2 text-left text-xs leading-relaxed shadow-2xl group-hover/structural:block"
+                            style={{
+                              background: "#000000",
+                              borderColor: "rgba(255, 255, 255, 0.16)",
+                              color: "#ffffff",
+                            }}
+                            data-structural-tide-tooltip={tide.id}
+                          >
+                            {tide.hoverBlurb}
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </motion.button>
             </motion.div>
           );

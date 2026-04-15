@@ -11,6 +11,7 @@ import type { QuestState } from "../types/quest";
 import { QuestStartScreen } from "./QuestStartScreen";
 import { useQuest } from "../state/quest-context";
 import { selectDreamcallerOffer } from "../data/dreamcaller-selection";
+import { structuralTidesForPackageTides } from "../data/structural-tides";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 
 vi.mock("framer-motion", () => ({
@@ -101,7 +102,7 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     name: "Mira of Lanterns",
     awakening: 4,
     renderedText: "First dreamcaller.",
-    mandatoryTides: ["core"],
+    mandatoryTides: ["materialize_value", "ally_formation", "support-a"],
     optionalTides: ["support-a", "support-b", "support-c"],
   },
   {
@@ -109,7 +110,7 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     name: "Vey of Embers",
     awakening: 6,
     renderedText: "Second dreamcaller.",
-    mandatoryTides: ["core"],
+    mandatoryTides: ["warrior_pressure", "ally_wide", "support-d"],
     optionalTides: ["support-d", "support-e", "support-f"],
   },
   {
@@ -117,7 +118,7 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     name: "Noctis of Tides",
     awakening: 5,
     renderedText: "Third dreamcaller.",
-    mandatoryTides: ["core"],
+    mandatoryTides: ["void_recursion", "spark_tall", "support-g"],
     optionalTides: ["support-g", "support-h", "support-i"],
   },
 ] as const;
@@ -211,11 +212,15 @@ afterEach(() => {
 describe("QuestStartScreen", () => {
   it("shows exactly 3 Dreamcaller choices without legacy tide-step UI", () => {
     const { container, root } = mount(<QuestStartScreen />);
+    const displayedStructuralTides = OFFERED_DREAMCALLERS.flatMap((dreamcaller) =>
+      structuralTidesForPackageTides(dreamcaller.mandatoryTides),
+    );
 
     expect(container.textContent).toContain("Mira of Lanterns");
     expect(container.textContent).toContain("Vey of Embers");
     expect(container.textContent).toContain("Noctis of Tides");
     expect(container.textContent).toContain("Choose Your Dreamcaller");
+    expect(container.textContent).toContain("Structural Tides");
     expect(container.textContent).not.toContain("Bloom");
     expect(container.textContent).not.toContain("Ignite");
     expect(container.textContent).not.toContain("DreamcallerDraft");
@@ -223,6 +228,27 @@ describe("QuestStartScreen", () => {
     expect(container.querySelector('img[alt="Bloom"]')).toBeNull();
     expect(container.querySelector('img[alt="Ignite"]')).toBeNull();
     expect(container.querySelectorAll("button")).toHaveLength(3);
+    expect(
+      container.querySelectorAll("[data-structural-tide-chip]"),
+    ).toHaveLength(displayedStructuralTides.length);
+
+    for (const tide of displayedStructuralTides) {
+      expect(container.textContent).toContain(tide.displayName);
+      expect(container.textContent).toContain(tide.hoverBlurb);
+      const chip = container.querySelector(
+        `[data-structural-tide-chip="${tide.id}"]`,
+      );
+      expect(chip?.getAttribute("title")).toBe(tide.hoverBlurb);
+      const icon = container.querySelector(
+        `[data-structural-tide-icon="${tide.id}"]`,
+      );
+      expect(icon?.className).toContain("bx");
+      expect(icon?.className).toContain(tide.iconClass);
+    }
+
+    expect(container.textContent).not.toContain("support-a");
+    expect(container.textContent).not.toContain("support-d");
+    expect(container.textContent).not.toContain("support-g");
 
     const secondDreamcallerButton = Array.from(
       container.querySelectorAll("button"),

@@ -13,6 +13,7 @@
     "setup-assets": "node scripts/setup-assets.mjs"
   },
   "dependencies": {
+    "boxicons": "^2.1.4",
     "framer-motion": "^12.6.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
