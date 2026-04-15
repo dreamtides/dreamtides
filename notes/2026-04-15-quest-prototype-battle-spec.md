@@ -121,11 +121,19 @@ Required victory completion bridge behavior, in order:
 
 The playable battle module must not reimplement this sequence itself.
 
+Quest-level logging ownership:
+- the completion bridge emits the persistent quest-progression events such as
+  `battle_won`, `site_completed`, `dreamscape_completed`, and
+  `screen_transition`
+- the battle module emits only `battle_proto_*` events for session-local
+  actions and state changes
+
 ## Session Stability And Trust Model
-The battle session only needs to be stable after entry, not reproducible across
-separate entries from identical quest state.
+The battle session only needs to be stable after entry, but battle
+initialization should still be deterministic for a given `BattleInit.seed`.
 
 At battle entry, create and freeze a session snapshot:
+- initialization seed
 - enemy descriptor
 - player deck order
 - enemy deck definition and order
@@ -135,6 +143,8 @@ At battle entry, create and freeze a session snapshot:
 Required guarantees:
 - reward options are generated once at battle entry and reused for the full
   battle session
+- the same `BattleInit.seed` produces the same enemy descriptor, player deck
+  order, enemy deck definition, and reward options
 - rerenders, undo/redo, and result overlays must not reroll enemy flavor, deck
   order, or reward options
 - the playable battle inspector is trusted developer tooling, not a safe player
@@ -199,6 +209,19 @@ Explicit simplifications:
 - no automatic triggered abilities
 - no automatic support-based spark calculations
 - no legality enforcement for moves or timing
+
+Canonical phase timeline:
+- `startOfTurn`
+- `judgment`
+- `draw`
+- `main`
+- `endOfTurn`
+
+Turn boundary rules:
+- `Judgment` always resolves during `judgment`
+- the first player's first turn skips `draw` but still passes through the phase
+- normal player interaction happens during `main`
+- `End Turn` is the only standard way to advance from `main` to the next turn
 
 ## Energy Model
 Because Dreamwell is out of scope, use a fixed prototype ramp:
@@ -333,6 +356,14 @@ hidden developer shortcuts.
 playable battle surface so testers can bypass the live battle loop once battle
 testing is done.
 
+Control grouping:
+- `Battle Actions`: play, move, end turn, inspect hidden zones
+- `Debug Actions`: numeric edits, zone overrides, reveal and hide controls,
+  force result, and `Skip To Rewards`
+
+Actions that violate the rules slice must always appear under a visible
+`Debug` label with distinct visual treatment from normal battle actions.
+
 ## Debug UX Strategy
 The debug suite is the core design problem. It must be fast enough to manually
 simulate card text without turning into a giant admin form.
@@ -456,6 +487,14 @@ Examples by category:
   kindle
 - visibility: reveal card, hide card, reveal opponent hand
 
+Recommended command ids:
+- `END_TURN`
+- `PLAY_CARD`
+- `MOVE_CARD`
+- `DEBUG_EDIT`
+- `FORCE_RESULT`
+- `SKIP_TO_REWARDS`
+
 ## Undo Semantics
 Undo must be exact, not simulated. Every operation must record enough state to
 reverse itself without consulting derived game rules.
@@ -471,6 +510,16 @@ Requirements:
   directly into the victory reward surface
 - quest-level reward application after the user selects a reward is outside the
   battle undo domain
+
+Required composite boundary:
+- `END_TURN` is one history step that may include ending the active side's
+  `main` phase, switching active side, incrementing turn count when needed,
+  refreshing energy, resolving `Judgment`, processing draw, and running the AI
+  side until control returns to the player or a result is reached
+
+This boundary is authoritative for implementation and tests. Do not split
+automatic start-of-turn processing or the AI main phase into separately undone
+history entries.
 
 Composite examples:
 - "Play to D2" may spend energy, remove from hand, and place on battlefield
@@ -534,6 +583,11 @@ The goal is predictability, not strength.
 
 ## Logging
 Use the existing `logEvent()` pipeline with a `battle_proto_*` prefix.
+
+Ownership rule:
+- the battle module logs only `battle_proto_*` events
+- the shared completion bridge and quest state mutations continue to emit the
+  existing quest-level events
 
 Recommended common fields:
 - `battleId`
@@ -599,6 +653,8 @@ Each card instance needs a stable battle-instance id so movement, spark edits,
 history, and undo target the correct object.
 
 Recommended initialization contract:
+- `seed`: generated once at battle entry and used for all battle-only
+  randomness
 - `questDeckEntries`: copied from `QuestState.deck`, preserving `entryId`,
   `cardNumber`, `transfiguration`, and `isBane`
 - `startingSide`: always `"player"` for Phase 1
@@ -617,8 +673,9 @@ Recommended Phase 1 enemy deck note:
 - use real quest-prototype cards from `cardDatabase`, not synthetic placeholder
   cards
 - derive one enemy accent tide from the generated enemy flavor
-- build the candidate pool from cards whose tides include that accent tide or
-  `Neutral`
+- prefer cards whose tide presentation matches the enemy accent tide
+- treat `Neutral` as a display accent only, not as an assumed source of real
+  candidate cards
 - exclude cards with `energyCost = null`
 - partition candidates into characters and events, then into simple cost bands
   `0-2`, `3-4`, and `5+`
@@ -626,7 +683,9 @@ Recommended Phase 1 enemy deck note:
   `8` characters and `4` events
   characters target `3` cheap, `3` mid, `2` expensive
   events target `2` cheap-or-mid and `2` remaining best-fit cards
-- when a bucket is short, backfill from the remaining candidate pool
+- when a bucket is short, backfill in this order:
+  matching-accent candidates, any non-starter numeric-cost card, then
+  duplicates of already chosen candidates if still required
 - shuffle final enemy deck order once for the session
 
 Transfigurations and bane flags are visual only in battle mode.
@@ -634,6 +693,7 @@ Transfigurations and bane flags are visual only in battle mode.
 ## Quest Integration
 Entering battle in playable mode:
 - read the player's current quest deck into a `BattleInit` payload
+- generate a battle seed once and include it in `BattleInit`
 - preserve quest deck metadata needed for display and debug
 - build a shuffled player battle deck
 - build an enemy descriptor and enemy deck from real quest-prototype card data
@@ -656,16 +716,19 @@ Leaving battle:
 - if a state-changing edit removes the defeat or draw condition, clear
   `resultState` and return to normal interaction
 - resetting the run must be an explicit user action
-- after confirmation, transition to a dedicated `questFailed` screen or
-  equivalent failure route, then call `resetQuest()`
+- after reset confirmation, compute the failure summary, transition to a
+  dedicated `questFailed` screen, and defer `resetQuest()` until the user
+  starts a new run from that screen
 
 Victory is intentionally not an inspectable post-result surface once the user
 starts reward selection. After reward selection begins, battle undo is over.
 
 Recommended `questFailed` behavior:
 - explicit screen variant in the quest router
-- small summary payload:
-  `result`, `turnNumber`, `playerScore`, `enemyScore`, `reason`
+- screen payload:
+  `result`, `turnNumber`, `playerScore`, `enemyScore`, `reason`, `battleId`
+- the screen renders from its own payload, not from live battle state
+- `resetQuest()` is called only from the `questFailed` primary action
 - one primary action to start a new run
 
 ## File Boundaries
