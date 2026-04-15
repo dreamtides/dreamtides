@@ -247,6 +247,7 @@ describe("QuestStartScreen", () => {
     expect(container.textContent).toContain("Vey of Embers");
     expect(container.textContent).toContain("Noctis of Tides");
     expect(container.textContent).toContain("Choose Your Dreamcaller");
+    expect(container.textContent).toContain("Tides:");
     expect(container.textContent).not.toContain("Structural Tides");
     expect(container.textContent).not.toContain("Bloom");
     expect(container.textContent).not.toContain("Ignite");
@@ -256,6 +257,9 @@ describe("QuestStartScreen", () => {
     expect(container.querySelector('img[alt="Ignite"]')).toBeNull();
     expect(container.querySelectorAll("button")).toHaveLength(3);
     expect(
+      container.querySelectorAll("[data-structural-tides-label]"),
+    ).toHaveLength(3);
+    expect(
       container.querySelectorAll("[data-structural-tide-chip]"),
     ).toHaveLength(displayedStructuralTides.length);
     expect(
@@ -263,6 +267,16 @@ describe("QuestStartScreen", () => {
         (chip) => chip.getAttribute("data-structural-tide-chip"),
       ),
     ).toEqual(displayedStructuralTides.map((tide) => tide.id));
+
+    for (const dreamcaller of OFFERED_DREAMCALLERS) {
+      const label = container.querySelector(
+        `[data-structural-tides-label="${dreamcaller.id}"]`,
+      );
+      expect(label?.textContent).toBe("Tides:");
+      expect((label as HTMLElement | null)?.style.color).toBe(
+        "rgb(148, 163, 184)",
+      );
+    }
 
     for (const tide of displayedStructuralTides) {
       expect(container.textContent).toContain(tide.displayName);

@@ -181,52 +181,61 @@ export function QuestStartScreen() {
                 </p>
               </motion.button>
               {structuralTides.length > 0 && (
-                <div className="flex flex-wrap justify-center gap-2">
-                  {structuralTides.map((tide) => (
-                    <span
-                      key={`${dreamcaller.id}-${tide.id}`}
-                      className="group/structural relative"
-                      data-structural-tide-chip={tide.id}
-                      data-structural-tide-appearance={tide.appearance}
-                      title={tide.hoverBlurb}
-                    >
+                <div className="flex w-full flex-col gap-2 px-1">
+                  <span
+                    className="text-xs font-medium"
+                    data-structural-tides-label={dreamcaller.id}
+                    style={{ color: "#94a3b8" }}
+                  >
+                    Tides:
+                  </span>
+                  <div className="grid w-full grid-cols-2 gap-2">
+                    {structuralTides.map((tide) => (
                       <span
-                        className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
-                        style={{
-                          background: "#000000",
-                          borderColor: "rgba(255, 255, 255, 0.16)",
-                          color:
-                            tide.appearance === "optional"
-                              ? "#94a3b8"
-                              : "#ffffff",
-                        }}
+                        key={`${dreamcaller.id}-${tide.id}`}
+                        className="group/structural relative"
+                        data-structural-tide-chip={tide.id}
+                        data-structural-tide-appearance={tide.appearance}
+                        title={tide.hoverBlurb}
                       >
-                        <i
-                          aria-hidden="true"
-                          className={`bx ${tide.iconClass} text-sm leading-none`}
-                          data-structural-tide-icon={tide.id}
+                        <span
+                          className="inline-flex w-full items-center justify-start gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
                           style={{
+                            background: "#000000",
+                            borderColor: "rgba(255, 255, 255, 0.16)",
                             color:
                               tide.appearance === "optional"
                                 ? "#94a3b8"
                                 : "#ffffff",
                           }}
-                        />
-                        <span>{tide.displayName}</span>
+                        >
+                          <i
+                            aria-hidden="true"
+                            className={`bx ${tide.iconClass} text-sm leading-none`}
+                            data-structural-tide-icon={tide.id}
+                            style={{
+                              color:
+                                tide.appearance === "optional"
+                                  ? "#94a3b8"
+                                  : "#ffffff",
+                            }}
+                          />
+                          <span>{tide.displayName}</span>
+                        </span>
+                        <span
+                          className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg border px-3 py-2 text-left text-xs leading-relaxed shadow-2xl group-hover/structural:block"
+                          style={{
+                            background: "#000000",
+                            borderColor: "rgba(255, 255, 255, 0.16)",
+                            color: "#ffffff",
+                          }}
+                          data-structural-tide-tooltip={tide.id}
+                        >
+                          {tide.hoverBlurb}
+                        </span>
                       </span>
-                      <span
-                        className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg border px-3 py-2 text-left text-xs leading-relaxed shadow-2xl group-hover/structural:block"
-                        style={{
-                          background: "#000000",
-                          borderColor: "rgba(255, 255, 255, 0.16)",
-                          color: "#ffffff",
-                        }}
-                        data-structural-tide-tooltip={tide.id}
-                      >
-                        {tide.hoverBlurb}
-                      </span>
-                    </span>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </motion.div>
