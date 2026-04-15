@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dreamcaller Art Match"
+  short_description: "Pair one portrait to a fitting dreamcaller."
+  default_prompt: "Use $dreamcaller-art-match to analyze one dreamcaller image, choose the best ability from notes/dreamcallers.md, and write a proper-name title with story justification."
