@@ -1,5 +1,9 @@
 import type { CardData } from "../types/cards";
 import type { DraftState } from "../types/draft";
+import {
+  countRemainingCards,
+  countRemainingUniqueCards,
+} from "../draft/draft-engine";
 
 /** Debug info for the player's fixed draft pool state. */
 export interface DraftDebugInfo {
@@ -27,10 +31,7 @@ export function extractDraftDebugInfo(
     currentOfferSize: draftState.currentOffer.length,
     pickNumber: draftState.pickNumber,
     sitePicksCompleted: draftState.sitePicksCompleted,
-    remainingCards: Object.values(draftState.remainingCopiesByCard).reduce(
-      (total, copies) => total + copies,
-      0,
-    ),
-    remainingUniqueCards: Object.keys(draftState.remainingCopiesByCard).length,
+    remainingCards: countRemainingCards(draftState.remainingCopiesByCard),
+    remainingUniqueCards: countRemainingUniqueCards(draftState.remainingCopiesByCard),
   };
 }

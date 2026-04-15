@@ -119,7 +119,7 @@ function revealOffer(
     pickNumber: state.pickNumber,
     offerCards: offer,
     poolRemaining: countRemainingCards(state.remainingCopiesByCard),
-    uniqueCardsRemaining: Object.keys(state.remainingCopiesByCard).length,
+    uniqueCardsRemaining: countRemainingUniqueCards(state.remainingCopiesByCard),
   });
   return true;
 }
@@ -185,11 +185,19 @@ function expandRemainingCopies(remainingCopiesByCard: Record<string, number>): n
   );
 }
 
-function countRemainingCards(remainingCopiesByCard: Record<string, number>): number {
+export function countRemainingCards(
+  remainingCopiesByCard: Record<string, number>,
+): number {
   return Object.values(remainingCopiesByCard).reduce(
     (total, copies) => total + copies,
     0,
   );
+}
+
+export function countRemainingUniqueCards(
+  remainingCopiesByCard: Record<string, number>,
+): number {
+  return Object.keys(remainingCopiesByCard).length;
 }
 
 /** Create initial DraftState from the resolved Dreamcaller package. */
@@ -205,7 +213,7 @@ export function initializeDraftState(
 
   logEvent("draft_pool_initialized", {
     poolSize: countRemainingCards(remainingCopiesByCard),
-    uniqueCardCount: Object.keys(remainingCopiesByCard).length,
+    uniqueCardCount: countRemainingUniqueCards(remainingCopiesByCard),
     dreamcallerId: resolvedPackage.dreamcaller.id,
     selectedPackageTides: resolvedPackage.selectedTides,
     cardCountByTide: countByTide(expandedPool, cardDatabase),
@@ -214,6 +222,7 @@ export function initializeDraftState(
   return {
     remainingCopiesByCard,
     currentOffer: [],
+    activeSiteId: null,
     pickNumber: 1,
     sitePicksCompleted: 0,
   };
@@ -222,17 +231,33 @@ export function initializeDraftState(
 /** Prepare the state for a draft site visit. Draws the first pack. */
 export function enterDraftSite(
   state: DraftState,
+  siteId: string,
   _cardDatabase: Map<number, CardData>,
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
+  if (state.activeSiteId === siteId) {
+    logEvent("draft_site_entered", {
+      siteId,
+      pickNumber: state.pickNumber,
+      poolSize: countRemainingCards(state.remainingCopiesByCard),
+      offerCards: state.currentOffer,
+      offerAvailable: state.currentOffer.length === config.packSize,
+      resumedExistingOffer: state.currentOffer.length > 0,
+    });
+    return;
+  }
+
+  state.activeSiteId = siteId;
   state.sitePicksCompleted = 0;
   const hasOffer = revealOffer(state, config);
 
   logEvent("draft_site_entered", {
+    siteId,
     pickNumber: state.pickNumber,
     poolSize: countRemainingCards(state.remainingCopiesByCard),
     offerCards: state.currentOffer,
     offerAvailable: hasOffer,
+    resumedExistingOffer: false,
   });
 }
 
@@ -261,13 +286,14 @@ export function processPlayerPick(
   const card = cardDatabase.get(cardNumber);
 
   logEvent("draft_pick_player", {
+    siteId: state.activeSiteId,
     pickNumber: state.pickNumber,
     cardNumber,
     cardName: card?.name ?? "Unknown",
     cardTide: card === undefined ? "Neutral" : cardAccentTide(card),
     offerCards: currentOffer,
     poolRemaining: countRemainingCards(state.remainingCopiesByCard),
-    uniqueCardsRemaining: Object.keys(state.remainingCopiesByCard).length,
+    uniqueCardsRemaining: countRemainingUniqueCards(state.remainingCopiesByCard),
   });
 
   state.pickNumber += 1;
@@ -287,9 +313,10 @@ export function completeDraftSite(
   draftedCardNumbers: number[],
 ): void {
   logEvent("draft_site_completed", {
+    siteId: state.activeSiteId,
     cardsDrafted: [...draftedCardNumbers],
     picksCompleted: state.sitePicksCompleted,
     poolRemaining: countRemainingCards(state.remainingCopiesByCard),
-    uniqueCardsRemaining: Object.keys(state.remainingCopiesByCard).length,
+    uniqueCardsRemaining: countRemainingUniqueCards(state.remainingCopiesByCard),
   });
 }

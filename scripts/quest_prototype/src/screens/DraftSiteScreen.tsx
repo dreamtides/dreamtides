@@ -4,6 +4,7 @@ import { useQuest } from "../state/quest-context";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import {
+  countRemainingCards,
   enterDraftSite,
   getCurrentOffer,
   processPlayerPick,
@@ -231,35 +232,56 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   const [pickedCardNumber, setPickedCardNumber] = useState<number | null>(null);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const [currentOfferCards, setCurrentOfferCards] = useState<CardData[]>([]);
-  const [draftedCardNumbers, setDraftedCardNumbers] = useState<number[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [offerKey, setOfferKey] = useState(0);
   const [showDeckSidebar, setShowDeckSidebar] = useState(false);
   const draftStateRef = useRef<DraftState | null>(null);
-  const initializedRef = useRef(false);
 
-  // Initialize draft state on mount
+  const draftedCardNumbers = useMemo(() => {
+    const draftState = state.draftState;
+    if (
+      draftState === null
+      || draftState.activeSiteId !== siteId
+      || draftState.sitePicksCompleted === 0
+    ) {
+      return [];
+    }
+
+    return state.deck
+      .slice(-draftState.sitePicksCompleted)
+      .map((entry) => entry.cardNumber);
+  }, [siteId, state.deck, state.draftState]);
+
+  // Initialize or resume draft state for this site.
   useEffect(() => {
-    if (initializedRef.current) return;
     if (cardDatabase.size === 0) return;
     if (state.draftState === null) return;
-    initializedRef.current = true;
 
-    // Deep clone to avoid mutating React state directly
-    const cloned = JSON.parse(JSON.stringify(state.draftState)) as DraftState;
-    enterDraftSite(cloned, cardDatabase);
-    draftStateRef.current = cloned;
-    mutations.setDraftState(cloned, "draft_site_enter");
+    if (
+      state.draftState.activeSiteId === null
+      || state.draftState.activeSiteId !== siteId
+    ) {
+      const cloned = JSON.parse(JSON.stringify(state.draftState)) as DraftState;
+      enterDraftSite(cloned, siteId, cardDatabase);
+      draftStateRef.current = cloned;
+      mutations.setDraftState(cloned, "draft_site_enter");
+      return;
+    }
 
-    const offerCards = getCurrentOffer(cloned)
+    draftStateRef.current = state.draftState;
+    const offerCards = getCurrentOffer(state.draftState)
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
     setCurrentOfferCards(sortCardsByTide(offerCards));
-    if (cloned.currentOffer.length === 0) {
-      completeDraftSite(cloned, []);
-      setIsComplete(true);
-    }
-  }, [state.draftState, cardDatabase, mutations]);
+    setIsComplete(
+      state.draftState.activeSiteId === siteId
+      && state.draftState.currentOffer.length === 0
+      && (
+        state.draftState.sitePicksCompleted > 0
+        || countRemainingCards(state.draftState.remainingCopiesByCard) < 4
+      ),
+    );
+  }, [siteId, state.draftState, cardDatabase, mutations]);
 
   // Resolve the current offer from draft state, sorted by tide.
   const refreshOffer = useCallback(() => {
@@ -288,7 +310,6 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       setTimeout(() => {
         setPickPhase("waiting");
 
-        // Clone to avoid direct mutation
         const cloned = JSON.parse(JSON.stringify(ds)) as DraftState;
         const nextDraftedCardNumbers = [...draftedCardNumbers, cardNumber];
         const siteComplete = processPlayerPick(
@@ -301,8 +322,6 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
         // Add picked card to deck
         mutations.addCard(cardNumber, "draft_pick");
-
-        setDraftedCardNumbers(nextDraftedCardNumbers);
 
         if (siteComplete) {
           completeDraftSite(cloned, nextDraftedCardNumbers);

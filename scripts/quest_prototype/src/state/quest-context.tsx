@@ -20,6 +20,10 @@ import type {
   TransfigurationType,
 } from "../types/quest";
 import type { DraftState } from "../types/draft";
+import {
+  countRemainingCards,
+  countRemainingUniqueCards,
+} from "../draft/draft-engine";
 import { logEvent, resetLog } from "../logging";
 
 const MAX_DREAMSIGNS = 12;
@@ -69,13 +73,6 @@ const QuestContext = createContext<QuestContextValue | null>(null);
 
 function screenName(screen: Screen): string {
   return screen.type === "site" ? `site:${screen.siteId}` : screen.type;
-}
-
-function countRemainingDraftCards(remainingCopiesByCard: Record<string, number>): number {
-  return Object.values(remainingCopiesByCard).reduce(
-    (total, copies) => total + copies,
-    0,
-  );
 }
 
 export function createDefaultState(): QuestState {
@@ -403,8 +400,8 @@ export function QuestProvider({
       pickNumber: draftState.pickNumber,
       sitePicksCompleted: draftState.sitePicksCompleted,
       currentOfferSize: draftState.currentOffer.length,
-      remainingCards: countRemainingDraftCards(draftState.remainingCopiesByCard),
-      remainingUniqueCards: Object.keys(draftState.remainingCopiesByCard).length,
+      remainingCards: countRemainingCards(draftState.remainingCopiesByCard),
+      remainingUniqueCards: countRemainingUniqueCards(draftState.remainingCopiesByCard),
     });
     setState((prev) => applyDraftState(prev, draftState));
   }, []);

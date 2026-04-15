@@ -27,6 +27,7 @@ function makeDraftState(
   return {
     remainingCopiesByCard: {},
     currentOffer: [],
+    activeSiteId: null,
     pickNumber: 1,
     sitePicksCompleted: 0,
     ...overrides,

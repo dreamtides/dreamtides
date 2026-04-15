@@ -78,6 +78,7 @@ function makeDraftState(
   return {
     remainingCopiesByCard: {},
     currentOffer: [],
+    activeSiteId: null,
     pickNumber: 1,
     sitePicksCompleted: 0,
     ...overrides,
@@ -107,6 +108,7 @@ describe("initializeDraftState", () => {
       "2": 1,
     });
     expect(state.currentOffer).toEqual([]);
+    expect(state.activeSiteId).toBeNull();
     expect(state.pickNumber).toBe(1);
     expect(state.sitePicksCompleted).toBe(0);
   });
@@ -145,10 +147,11 @@ describe("fixed multiset offer generation", () => {
 
     vi.spyOn(Math, "random").mockReturnValue(0);
 
-    enterDraftSite(state, cardDatabase);
+    enterDraftSite(state, "site-a", cardDatabase);
 
     expect(getCurrentOffer(state)).toHaveLength(4);
     expect(new Set(getCurrentOffer(state)).size).toBe(4);
+    expect(state.activeSiteId).toBe("site-a");
     expect(state.remainingCopiesByCard).toEqual({
       "1": 1,
       "5": 1,
@@ -176,7 +179,7 @@ describe("fixed multiset offer generation", () => {
       .mockReturnValueOnce(0)
       .mockReturnValueOnce(0);
 
-    enterDraftSite(state, cardDatabase);
+    enterDraftSite(state, "site-a", cardDatabase);
 
     expect(state.currentOffer[0]).toBe(1);
   });
@@ -198,7 +201,7 @@ describe("fixed multiset offer generation", () => {
 
     vi.spyOn(Math, "random").mockReturnValue(0);
 
-    enterDraftSite(state, cardDatabase);
+    enterDraftSite(state, "site-a", cardDatabase);
     const firstOffer = [...state.currentOffer];
     const isComplete = processPlayerPick(firstOffer[0], state, cardDatabase);
 
@@ -228,7 +231,7 @@ describe("fixed multiset offer generation", () => {
 
     vi.spyOn(Math, "random").mockReturnValue(0);
 
-    enterDraftSite(state, cardDatabase);
+    enterDraftSite(state, "site-a", cardDatabase);
     expect(state.remainingCopiesByCard).toEqual({
       "1": 1,
       "5": 1,
@@ -259,7 +262,7 @@ describe("fixed multiset offer generation", () => {
       },
     });
 
-    enterDraftSite(state, cardDatabase);
+    enterDraftSite(state, "site-a", cardDatabase);
 
     expect(state.currentOffer).toEqual([]);
     expect(state.remainingCopiesByCard).toEqual({
@@ -284,7 +287,7 @@ describe("fixed multiset offer generation", () => {
 
     vi.spyOn(Math, "random").mockReturnValue(0);
 
-    enterDraftSite(state, cardDatabase);
+    enterDraftSite(state, "site-a", cardDatabase);
     for (let pickIndex = 0; pickIndex < SITE_PICKS; pickIndex += 1) {
       const currentOffer = getCurrentOffer(state);
       const isComplete = processPlayerPick(
@@ -295,11 +298,79 @@ describe("fixed multiset offer generation", () => {
       expect(isComplete).toBe(pickIndex === SITE_PICKS - 1);
     }
   });
+
+  it("reuses the persisted offer when the same site remounts", () => {
+    const cardDatabase = buildDB(
+      Array.from({ length: 8 }, (_, index) => makeCard(index + 1)),
+    );
+    const state = makeDraftState({
+      remainingCopiesByCard: {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+      },
+    });
+
+    vi.spyOn(Math, "random").mockReturnValue(0);
+
+    enterDraftSite(state, "site-a", cardDatabase);
+    const firstOffer = [...state.currentOffer];
+    const firstRemainingPool = { ...state.remainingCopiesByCard };
+
+    enterDraftSite(state, "site-a", cardDatabase);
+
+    expect(state.currentOffer).toEqual(firstOffer);
+    expect(state.remainingCopiesByCard).toEqual(firstRemainingPool);
+    expect(
+      getLogEntries().filter((entry) => entry.event === "draft_offer_revealed"),
+    ).toHaveLength(1);
+  });
+
+  it("starts a fresh site visit after a prior site has completed", () => {
+    const cardDatabase = buildDB(
+      Array.from({ length: 8 }, (_, index) => makeCard(index + 1)),
+    );
+    const state = makeDraftState({
+      remainingCopiesByCard: {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+      },
+      activeSiteId: "site-a",
+      currentOffer: [],
+      sitePicksCompleted: 3,
+    });
+
+    vi.spyOn(Math, "random").mockReturnValue(0);
+
+    enterDraftSite(state, "site-b", cardDatabase);
+
+    expect(state.activeSiteId).toBe("site-b");
+    expect(state.sitePicksCompleted).toBe(0);
+    expect(state.currentOffer).toEqual([1, 2, 3, 4]);
+    expect(state.remainingCopiesByCard).toEqual({
+      "5": 1,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+    });
+  });
 });
 
 describe("completeDraftSite", () => {
   it("logs the drafted cards provided by the draft site UI", () => {
     const state = makeDraftState({
+      activeSiteId: "site-a",
       remainingCopiesByCard: { "9": 1, "10": 1 },
       sitePicksCompleted: 2,
     });
@@ -310,6 +381,7 @@ describe("completeDraftSite", () => {
       (entry) => entry.event === "draft_site_completed",
     );
     expect(completionEvent).toBeDefined();
+    expect(completionEvent?.siteId).toBe("site-a");
     expect(completionEvent?.cardsDrafted).toEqual([4, 7]);
     expect(completionEvent?.picksCompleted).toBe(2);
   });
