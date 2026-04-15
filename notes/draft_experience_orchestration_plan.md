@@ -1,387 +1,489 @@
-# Dreamcaller Draft Experience Orchestration Plan
+# Dreamcaller Draft Experience Black-Box Orchestration Plan
 
 ## Goal
 
 Evaluate whether the implemented Dreamcaller draft system is achieving the
-original design target from `notes/tides_v2.md` and `notes/tides_v3.md`:
+intended player experience:
 
-- picks should feel thematically relevant to the chosen Dreamcaller
-- the player should face meaningful choices between competing options
-- repeated runs with the same Dreamcaller should feel cohesive without feeling
-  identical
-- the experience should be fun in practice, not only structurally valid
+- the chosen Dreamcaller should make the draft feel cohesive
+- draft offers should present meaningful choices between competing options
+- repeated runs on the same Dreamcaller should stay recognizable without
+  feeling identical
+- the draft should be fun in practice
 
-This is an evaluation plan, not a redesign plan. The purpose is to generate
-evidence from sample draft traces, then decide whether the current system is
-already hitting the target or where it is failing.
+This plan is intentionally **black-box**.
 
-## Current Implementation Facts That Matter
+- evaluation agents must not read implementation files
+- evaluation agents must not inspect tides, package membership, or debug data
+- evaluation agents must not use the web UI
+- evaluation agents must interact only through a CLI runner that exposes the
+  same information a player would see: Dreamcaller names and text, card names,
+  card text, visible offer contents, picks, and end-of-run summaries
 
-- Dreamcaller package resolution is fixed at quest start in
-  `scripts/quest_prototype/src/data/quest-content.ts`.
-- The optional subset is currently chosen deterministically by
-  `chooseBestCandidate()`. Repeated runs on the same Dreamcaller do **not**
-  vary the resolved package unless the code changes.
-- Draft variance therefore comes from sampling the fixed multiset in
-  `scripts/quest_prototype/src/draft/draft-engine.ts`, not from re-rolling
-  different optional subsets.
-- The prototype already emits usable JSONL trace data through
-  `scripts/quest_prototype/src/logging.ts` and the Vite log sink in
-  `scripts/quest_prototype/vite.config.ts`.
-- There is no standalone draft-simulation CLI today. Browser-driven runs are
-  the supported path. If the orchestrator wants large-volume scripted traces,
-  it should create a temporary throwaway harness under `/tmp`, not add repo
-  code just to support the evaluation.
+## Core Rule
 
-## Evaluation Questions
+Separate the work into two worlds.
 
-Every trace review should answer these four questions:
+### World 1: Infrastructure
 
-1. Are the offers thematically relevant to the selected Dreamcaller?
-2. Do offers regularly contain at least two plausible picks that compete for
-   different reasons?
-3. Across repeated runs on the same Dreamcaller, is there enough variation in
-   the offered cards and resulting deck texture to avoid sameness?
-4. Is the draft experience actually fun, or does it feel scripted, obvious, or
-   generic?
+These agents are allowed to touch code, because they exist only to create the
+black-box surface.
 
-## Evidence Model
+They may:
 
-Use two lanes in parallel.
+- build a temporary CLI harness around the quest prototype
+- generate raw traces
+- store transcripts
 
-### Lane A: Quantitative Trace Analysis
+They may not:
 
-Purpose: measure package relevance, pick tension proxies, and run-to-run
-variance at scale.
+- evaluate whether the draft is good
+- write conclusions about cohesion or fun
 
-Inputs:
+### World 2: Evaluation
 
-- `rules_engine/tabula/rendered-cards.toml`
-- `rules_engine/tabula/dreamcallers.toml`
-- `scripts/quest_prototype/src/data/quest-content.ts`
-- `scripts/quest_prototype/src/draft/draft-engine.ts`
-- JSONL traces from prototype runs
+These agents are not allowed to read implementation files or internal data.
 
-Outputs:
+They may see only:
 
-- cohesion metrics per Dreamcaller
-- variance metrics across repeated runs
-- flagged traces for qualitative review
+- CLI prompt/response transcripts
+- Dreamcaller public text
+- card public text
+- pick sequences
+- final drafted decklists
+- simple run metadata such as pick count and run id
 
-### Lane B: Qualitative Experience Review
+They may not see:
 
-Purpose: answer the subjective questions the logs cannot answer by themselves:
-whether choices feel meaningful and whether the run is fun.
+- tides
+- package composition
+- weighting logic
+- pool construction
+- hidden debug info
+- source code
 
-Inputs:
+## Required First Step
 
-- browser-visible draft offers
-- downloaded or captured JSONL logs
-- the chosen Dreamcaller's tide profile and card/tide mapping
+The current prototype does not expose a player-facing CLI draft runner out of
+the box. The orchestration therefore starts by creating a **temporary runner**
+under `/tmp`, not in the repo.
 
-Outputs:
+The runner should:
 
-- pick-by-pick reviewer notes
-- per-run ratings
-- concrete examples of good and bad offers
+- launch a draft run from the existing quest prototype logic
+- print only player-visible information
+- allow Dreamcaller selection by index
+- print each offer in plain text
+- accept picks by index
+- write a full transcript to disk
+- write a machine-readable JSON trace to disk
+- support seeded runs for repeatability
 
-## Cohort Selection
+The runner must not print or export any hidden implementation metadata.
 
-The first agent should select a **6-Dreamcaller cohort** that spans distinct
-draft identities. Do not just pick six favorites. Cover at least:
+## CLI Runner Contract
 
-- one materialize shell
-- one event/control shell
-- one discard or void shell
-- one warrior or figment pressure shell
-- one abandon shell
-- one judgment or tall-board shell
+Every evaluation agent should interact with a single command with this shape:
 
-Suggested starting pool:
+```bash
+node /tmp/draft-experience-eval/tools/draft_cli.mjs --seed 12345
+```
 
-- `Orla, Last Hearthkeeper`
-- `Selise, Echo Broker`
-- `Nyra, Chain Broker`
-- `Veya, Figment Regent`
-- `Ivera, Debt Arbiter`
-- `Naeva, Solitary Arbiter`
+The CLI should behave like this:
 
-The cohort selector may swap names if another Dreamcaller is a clearer
-representative of the same bucket, but it must preserve the six coverage roles.
+1. Print the offered Dreamcallers:
+   - name
+   - awakening
+   - rendered text
+2. Accept a Dreamcaller choice.
+3. For each draft pick, print:
+   - pick number
+   - current deck summary
+   - four offered cards
+   - for each card: name, cost, type, subtype if any, rarity, fast if visible,
+     spark if visible, and rendered text
+4. Accept a pick choice.
+5. Continue until the configured stopping point.
+6. Print a final deck summary.
+7. Save both:
+   - a human-readable transcript
+   - a JSON trace with only public information
 
-## Sampling Plan
+Recommended stop point:
 
-Run both lanes.
+- first 15 picks, or 3 draft sites, whichever maps more cleanly onto current
+  prototype behavior
 
-### Lane A Sample Size
+## Artifacts
 
-- 6 Dreamcallers
-- 5 traces per Dreamcaller
-- evaluate the first 3 draft sites per trace
-- total: 30 traces, roughly 450 picks if each site completes 5 picks
+All run artifacts should live under:
 
-This is enough to test same-Dreamcaller variance even though package
-resolution is deterministic.
+```text
+/tmp/draft-experience-eval/
+  tools/
+    draft_cli.mjs
+  cohort.md
+  transcripts/
+    <dreamcaller-slug>/
+      run-01.txt
+      run-01.json
+      run-02.txt
+      run-02.json
+  reviews/
+    <dreamcaller-slug>/
+      run-01-review-a.md
+      run-01-review-b.md
+  summaries/
+    cohort_summary.md
+    variance_summary.md
+    final_report.md
+    red_team.md
+```
 
-### Lane B Sample Size
+## Dreamcaller Cohort
 
-- 1 browser-reviewed trace per Dreamcaller in the 6-Dreamcaller cohort
-- plus 1 extra browser-reviewed trace for the 2 Dreamcallers that look most
-  suspicious after Lane A
-- total: 8 qualitative traces
+Use a six-Dreamcaller cohort, but choose it from **public Dreamcaller text
+only**.
 
-This keeps the subjective pass small enough to finish while still revisiting
-the likely failures.
+The selector should read only the CLI-exposed Dreamcaller list and choose six
+that appear to promise clearly different draft experiences.
 
-## Agent Topology
+Selection criteria:
 
-### 1. Cohort Selector
+- avoid six variants of the same apparent strategy
+- prefer Dreamcallers whose text implies distinct incentives
+- include both narrow-looking and broad-looking Dreamcallers
+- include at least two Dreamcallers that seem risky or ambiguous from their text
 
-Responsibilities:
-
-- choose the 6-Dreamcaller cohort
-- write a short rationale for each choice
-- record each Dreamcaller’s mandatory and optional tides
+The selector should not know whether the underlying implementation supports
+those promises well.
 
 Output:
 
 - `/tmp/draft-experience-eval/cohort.md`
 
-### 2. Briefing Agent
+The file should record:
+
+- chosen Dreamcallers
+- one-paragraph rationale for each, written only from public text
+- which Dreamcallers seem most likely to produce cohesive drafts
+- which seem most likely to fail
+
+## Sampling Plan
+
+### Primary Pass
+
+- 6 Dreamcallers
+- 5 runs per Dreamcaller
+- total: 30 black-box runs
+
+### Review Depth
+
+Each run should receive:
+
+- 2 independent transcript reviews
+
+This gives:
+
+- 60 independent reviews
+
+### Suspicion Pass
+
+After the first pass, identify the 2 Dreamcallers with the weakest results and
+run:
+
+- 3 additional runs each
+
+This adds:
+
+- 6 more runs
+- 12 more independent reviews
+
+## Agent Topology
+
+### 1. Harness Builder
+
+Type: infrastructure
 
 Responsibilities:
 
-- build a one-page brief for each selected Dreamcaller
-- summarize what cards should feel “on plan” based on tide overlap
-- note any special risks, such as overly generic support tides
+- create the temporary CLI runner in `/tmp/draft-experience-eval/tools/`
+- ensure it exposes only public information
+- verify it can run seeded drafts and save transcripts
 
 Output:
 
-- `/tmp/draft-experience-eval/briefs/<dreamcaller-id>.md`
+- `draft_cli.mjs`
+- `runner_readme.md`
 
-### 3. Trace Runner Agents
+### 2. Cohort Selector
+
+Type: evaluation
+
+Responsibilities:
+
+- inspect Dreamcaller public text from the CLI
+- choose the six-Dreamcaller cohort
+
+Output:
+
+- `cohort.md`
+
+### 3. Run Producer Agents
+
+Type: infrastructure
 
 Responsibilities:
 
 - own one Dreamcaller each
-- generate the assigned traces
-- save raw logs and a compact manifest per run
+- generate the required seeded runs through the CLI
+- save transcript and JSON output
+- never write evaluative commentary
 
-Preferred run method:
+Output per run:
 
-- use the prototype in browser mode via `agent-browser`
+- `run-XX.txt`
+- `run-XX.json`
 
-Allowed scaling fallback:
+### 4. First-Pass Review Agents
 
-- create a temporary TS harness under `/tmp` that imports the prototype draft
-  modules and writes JSONL-like trace records
-
-Outputs:
-
-- `/tmp/draft-experience-eval/traces/<dreamcaller-id>/run-XX.jsonl`
-- `/tmp/draft-experience-eval/traces/<dreamcaller-id>/run-XX.md`
-
-Each `run-XX.md` must state:
-
-- selected Dreamcaller
-- whether the run was browser-played or harness-generated
-- how many draft sites were completed
-- any blockers or ambiguity
-
-### 4. Metrics Agents
+Type: evaluation
 
 Responsibilities:
 
-- parse raw traces
-- join offered and picked card numbers back to card data and Dreamcaller tides
-- compute cohesion and variance metrics
+- review transcript text only
+- never inspect JSON if it contains anything beyond public information
+- judge the run as though it were a real player session log
 
-Outputs:
+Each run gets two separate reviewers.
 
-- `/tmp/draft-experience-eval/metrics/<dreamcaller-id>.md`
-- `/tmp/draft-experience-eval/metrics/summary.csv`
+Output per review:
 
-### 5. Qualitative Review Agents
+- `run-XX-review-a.md`
+- `run-XX-review-b.md`
+
+### 5. Variance Analyst
+
+Type: evaluation
 
 Responsibilities:
 
-- review the browser traces only
-- score each run against the rubric below
-- cite specific offers and picks, not vague impressions
+- compare only public run artifacts
+- assess whether repeated runs on the same Dreamcaller feel too similar
 
-Outputs:
+Output:
 
-- `/tmp/draft-experience-eval/reviews/<dreamcaller-id>-run-XX.md`
+- `variance_summary.md`
 
 ### 6. Synthesis Agent
 
+Type: evaluation
+
 Responsibilities:
 
-- combine metrics and subjective reviews
-- decide whether the system is meeting the goal
-- identify the most likely causes when it fails
+- combine the paired reviews and variance analysis
+- decide whether each Dreamcaller is working
+- identify recurring failure modes
 
 Output:
 
-- `/tmp/draft-experience-eval/final_report.md`
+- `final_report.md`
 
 ### 7. Red-Team Agent
 
+Type: evaluation
+
 Responsibilities:
 
-- read only the final metrics and flagged traces
-- look for overclaiming, weak evidence, or “technically cohesive but boring”
-  failure modes
+- challenge the synthesis
+- look for false confidence
+- ask whether “cohesive” is being overstated when runs are actually repetitive
+- ask whether “meaningful choices” is being overstated when picks are obvious
 
 Output:
 
-- `/tmp/draft-experience-eval/red_team.md`
+- `red_team.md`
 
-## Trace Generation Procedure
+## Reviewer Rubric
 
-### Prototype Setup
+Each transcript reviewer should answer the same questions on a 1-5 scale.
 
-Run once at the start:
+### 1. Dreamcaller Fit
 
-```bash
-cd /Users/dthurn/dreamtides/scripts/quest_prototype
-npm install
-npm run dev
-```
+Does the draft actually feel like it is supporting the chosen Dreamcaller’s
+promise, based only on what the Dreamcaller text says?
 
-For browser-driven agents:
+### 2. Choice Tension
 
-```bash
-agent-browser open http://localhost:5173
-agent-browser wait --load networkidle
-```
+How often do offers contain at least two cards that look meaningfully
+defensible for different reasons?
 
-Trace sources:
+### 3. Novelty
 
-- `scripts/quest_prototype/logs/quest-log.jsonl`
-- downloaded `quest-log-*.jsonl` files from the prototype HUD
+Compared with other runs for the same Dreamcaller, does this run seem likely to
+develop in a distinct direction?
 
-### Browser Run Rules
+### 4. Fun
 
-- Play until 3 draft sites are completed, unless the run ends or becomes
-  blocked earlier.
-- Use the debug screen when needed to confirm selected tides or pool state, but
-  judge the normal player-facing experience separately.
-- Record why each pick was chosen, especially when two or more options looked
-  viable.
-- If the target Dreamcaller is not immediately available on the selection
-  screen, refresh until it appears. Log refresh count in the run notes.
+Would a player likely enjoy drafting this run?
 
-### Harness Run Rules
+### 5. Trust
 
-- Do not modify the repo to add a new runner.
-- Any helper scripts must live under `/tmp/draft-experience-eval/tools/`.
-- The harness should mirror current runtime behavior, including deterministic
-  package resolution and weighted 4-unique-card offers.
-- The harness does not answer the fun question by itself. It exists only to
-  expand sample size for cohesion and variance metrics.
-
-## Metrics
-
-Each Metrics Agent should compute these metrics per Dreamcaller.
-
-### Relevance
-
-- `offer_package_hit_rate`: percent of offers with at least 2 cards that share
-  any selected package tide
-- `offer_strong_hit_rate`: percent of offers with at least 1 card sharing 2 or
-  more selected package tides
-- `pick_package_hit_rate`: percent of picks that share any selected package tide
-- `pick_strong_hit_rate`: percent of picks that share 2 or more selected tides
-- `generic_filler_rate`: percent of offers dominated by generic utility cards
-  with weak package overlap
-
-### Choice Tension
-
-- `multi_live_pick_rate`: percent of offers with at least 2 plausible on-plan
-  options
-- `forced_pick_rate`: percent of offers where only 1 option looks remotely
-  attractive
-- `role_competition_rate`: percent of offers where the live options pull the
-  drafter in different useful directions rather than duplicating the same role
-
-These are proxies. The qualitative lane decides whether the choices actually
-felt meaningful.
-
-### Variance
-
-- offer overlap across the 5 traces for the same Dreamcaller
-- picked-card overlap across the 5 traces for the same Dreamcaller
-- deck-shape variance by cost curve and card type
-- repeated “same first 8 picks” failures
-
-### Failure Flags
-
-Flag a Dreamcaller if any of these happen repeatedly:
-
-- too many offers with 0 or 1 on-plan cards
-- picks repeatedly collapse into obvious single-choice decisions
-- repeated traces converge on nearly identical early decks
-- the drafter must take off-plan generic filler to stay functional
-
-## Qualitative Review Rubric
-
-Every browser-reviewed run should score these from 1 to 5.
-
-- `dreamcaller_fit`: did the cards shown feel like they belonged to the chosen
-  Dreamcaller?
-- `choice_tension`: were there real tradeoffs between competing options?
-- `novelty`: did the run feel distinct from other runs on the same Dreamcaller?
-- `fun`: was the draft enjoyable, surprising, and worth replaying?
+Does the system seem to understand what kind of deck the player is trying to
+build, or does it feel random/generic?
 
 Each review must also include:
 
 - the best offer in the run
 - the weakest offer in the run
-- one example of a meaningful choice
-- one example of an offer that felt flat, generic, or misleading
+- one pick that felt genuinely hard
+- one pick that felt automatic
+- one sentence describing the apparent deck identity by the end of the run
+
+## What Reviewers Are Allowed To Use
+
+Allowed:
+
+- Dreamcaller text
+- card text
+- card names
+- card costs and visible stats
+- offer order
+- pick history
+- final decklist
+
+Not allowed:
+
+- internal terms from implementation docs
+- hidden tags
+- source code
+- devtools
+- debug screens
+- any “this probably maps to package X” reasoning
+
+If a reviewer starts inferring internals, that review is invalid and should be
+redone.
+
+## Transcript Format Requirements
+
+To make blind review easy, every transcript should have this structure:
+
+```text
+RUN <id>
+SEED <seed>
+DREAMCALLER
+  [1] Name - Awakening N
+  Text...
+
+PICK 1
+CURRENT DECK
+  <empty>
+OFFER
+  [1] Card name | Cost | Type | Rarity
+      Text...
+  [2] ...
+  [3] ...
+  [4] ...
+CHOICE
+  [picked index]
+RATIONALE
+  <optional player rationale if using an active review run>
+```
+
+For bulk runs, the rationale can be omitted at generation time and added by the
+reviewer instead.
+
+## How Picks Should Be Generated
+
+Use two different pick modes.
+
+### Mode A: Naturalist Picks
+
+The runner agent chooses the card that seems best for the apparent deck based
+only on public information.
+
+Purpose:
+
+- simulate a player earnestly trying to build a coherent deck
+
+### Mode B: Counterfactual Notes
+
+For selected runs, the review agent should also note:
+
+- what the second-best pick was
+- why it was tempting
+
+Purpose:
+
+- measure whether the offer contained a real choice rather than one obvious
+  answer
+
+## Evaluation Outputs
+
+### Per-Run Review
+
+Each review file should end with:
+
+- `fit: N/5`
+- `choice_tension: N/5`
+- `novelty: N/5`
+- `fun: N/5`
+- `trust: N/5`
+- `verdict: strong | mixed | weak`
+
+### Per-Dreamcaller Summary
+
+For each Dreamcaller, the synthesis should answer:
+
+- Do runs feel cohesive?
+- Do runs present meaningful choices?
+- Do repeated runs diverge enough?
+- Is the experience fun enough to justify replaying?
+
+### Final Report
+
+The final report should rank failure modes, not just Dreamcallers.
+
+It should explicitly decide whether the biggest problem is:
+
+- weak thematic relevance
+- low choice tension
+- low replay variance
+- low fun despite apparent relevance
 
 ## Orchestrator Sequence
 
-1. Start the dev server and confirm logging is working.
-2. Spawn the Cohort Selector.
-3. Spawn the Briefing Agent after cohort selection finishes.
-4. Spawn 6 Trace Runner Agents in parallel, one per Dreamcaller.
-5. After the first trace batch completes, spawn 6 Metrics Agents in parallel.
-6. Use the first metrics pass to identify the 2 most suspicious Dreamcallers.
-7. Spawn 2 additional browser Trace Runner Agents for those Dreamcallers.
-8. Spawn Qualitative Review Agents for all browser traces.
-9. Spawn the Synthesis Agent.
-10. Spawn the Red-Team Agent.
-11. Merge `final_report.md` and `red_team.md` into the final verdict.
+1. Spawn the Harness Builder.
+2. Verify the runner exposes only public information.
+3. Spawn the Cohort Selector.
+4. Spawn 6 Run Producer Agents in parallel, one per Dreamcaller.
+5. After the first 30 runs are complete, spawn paired First-Pass Review Agents.
+6. Spawn the Variance Analyst.
+7. Identify the 2 weakest Dreamcallers.
+8. Spawn 2 more Run Producer Agents for the suspicion pass.
+9. Spawn paired reviewers for those additional runs.
+10. Spawn the Synthesis Agent.
+11. Spawn the Red-Team Agent.
+12. Merge `final_report.md` and `red_team.md` into the final verdict.
 
-## What Counts As Success
+## Success Criteria
 
-The system is probably meeting the goal if most sampled Dreamcallers show all
-of the following:
+The system is meeting the goal if most reviewed Dreamcallers show all of the
+following:
 
-- most offers contain multiple on-plan cards
-- the drafter regularly chooses between at least two reasonable directions
-- repeated runs on the same Dreamcaller diverge in noticeable ways without
-  losing identity
-- subjective reviewers describe the draft as cohesive and fun more often than
-  not
+- reviewers consistently describe the runs as fitting the Dreamcaller’s public
+  promise
+- offers regularly create real tension between at least two choices
+- repeated runs do not collapse into near-identical drafts
+- fun scores are solid, not merely acceptable
 
-## What Counts As Failure
+## Failure Criteria
 
-The system is not meeting the goal if one or more of these dominate:
+The system is failing the goal if one or more of these dominate:
 
-- cohesion exists only in metadata, not in the cards a reviewer actually sees
-- most offers have an obvious correct pick
-- repeated runs on the same Dreamcaller feel nearly identical
-- the “fun” score is low even when cohesion metrics look acceptable
-
-## Expected Final Deliverable
-
-The final report should not stop at “pass” or “fail.” It should answer:
-
-- which Dreamcallers are working well
-- which Dreamcallers are weak
-- whether the main problem is relevance, choice tension, or variance
-- whether the failure looks data-driven, algorithmic, or purely experiential
-- the top 3 follow-up changes that would most likely improve the system
+- the Dreamcaller promise is clear, but the offers do not support it
+- offers often contain one obvious pick and three irrelevant ones
+- repeated runs for the same Dreamcaller feel too similar
+- reviewers describe the experience as coherent but boring
+- reviewers cannot tell what kind of deck the system is trying to help them
+  draft

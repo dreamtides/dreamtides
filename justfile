@@ -787,11 +787,8 @@ prune-remote-branches:
 quest-dev:
     #!/usr/bin/env bash
     set -euo pipefail
-    if lsof -ti:5173 >/dev/null 2>&1; then
-        echo "Error: port 5173 is already in use. Kill the existing process first:" >&2
-        echo "  lsof -ti:5173 | xargs kill" >&2
-        exit 1
-    fi
+    lsof -ti:5173 | xargs kill 2>/dev/null || true
+    sleep 0.5
     cd scripts/quest_prototype
     npm install
     npm run setup-assets
