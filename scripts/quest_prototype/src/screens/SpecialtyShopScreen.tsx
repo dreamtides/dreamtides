@@ -1,9 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { CardData } from "../types/cards";
 import type { SiteState } from "../types/quest";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
+import { buildCardSourceDebugState } from "../debug/card-source-debug";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import {
@@ -39,6 +40,38 @@ export function SpecialtyShopScreen({ site }: SpecialtyShopScreenProps) {
     return inventory;
   });
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
+  const visibleCardOffers = useMemo(
+    () =>
+      slots
+        .filter((slot) => !slot.purchased && slot.card !== null)
+        .map((slot) => slot.card)
+        .filter((card): card is CardData => card !== null),
+    [slots],
+  );
+  const cardSourceDebugState = useMemo(
+    () =>
+      buildCardSourceDebugState(
+        "Specialty Shop Offers",
+        "SpecialtyShop",
+        visibleCardOffers,
+        state.resolvedPackage,
+      ),
+    [visibleCardOffers, state.resolvedPackage],
+  );
+
+  useEffect(() => {
+    mutations.setCardSourceDebug(
+      cardSourceDebugState,
+      "specialty_shop_cards_shown",
+    );
+  }, [cardSourceDebugState, mutations]);
+
+  useEffect(
+    () => () => {
+      mutations.setCardSourceDebug(null, "specialty_shop_cards_hidden");
+    },
+    [mutations],
+  );
 
   const handleBuy = useCallback(
     (index: number) => {

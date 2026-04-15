@@ -5,8 +5,13 @@ import type { QuestContent } from "../data/quest-content";
 import { toQuestDreamcaller } from "../data/dreamcaller-selection";
 import type { ResolvedDreamcallerPackage } from "../types/content";
 import type { DraftState } from "../types/draft";
-import type { Dreamcaller, QuestState } from "../types/quest";
+import type {
+  CardSourceDebugState,
+  Dreamcaller,
+  QuestState,
+} from "../types/quest";
 import {
+  applyCardSourceDebug,
   QuestProvider,
   applyDraftState,
   applyDreamcallerSelection,
@@ -102,6 +107,23 @@ function makeDraftState(): DraftState {
   };
 }
 
+function makeCardSourceDebugState(): CardSourceDebugState {
+  return {
+    screenLabel: "Draft Picks",
+    surface: "Draft",
+    entries: [
+      {
+        cardNumber: 101,
+        cardName: "Lantern Witness",
+        cardTides: ["core", "support-a"],
+        matchedMandatoryTides: ["core"],
+        matchedOptionalTides: ["support-a"],
+        isFallback: false,
+      },
+    ],
+  };
+}
+
 beforeEach(() => {
   vi.spyOn(console, "log").mockImplementation(() => {});
 });
@@ -111,6 +133,7 @@ describe("QuestProvider default state contract", () => {
     const state = createDefaultState();
 
     expect(state.resolvedPackage).toBeNull();
+    expect(state.cardSourceDebug).toBeNull();
     expect(state.remainingDreamsignPool).toEqual([]);
     expect(state.draftState).toBeNull();
     expect("tideCrystals" in (state as unknown as Record<string, unknown>)).toBe(false);
@@ -122,6 +145,7 @@ describe("QuestProvider default state contract", () => {
     const mutationNames = Object.keys(captureQuestContext().mutations);
 
     expect(mutationNames).toContain("setDreamcallerSelection");
+    expect(mutationNames).toContain("setCardSourceDebug");
     expect(mutationNames).toContain("setRemainingDreamsignPool");
     expect(mutationNames).toContain("setDraftState");
     expect(mutationNames).not.toContain("setDreamcaller");
@@ -186,11 +210,33 @@ describe("Task 02 state transitions", () => {
     expect("seenCards" in (next.draftState as unknown as Record<string, unknown>)).toBe(false);
   });
 
+  it("stores and clears card source debug data without mutating prior state", () => {
+    const initial = createDefaultState();
+    const overlay = makeCardSourceDebugState();
+    const next = applyCardSourceDebug(initial, overlay);
+
+    expect(initial.cardSourceDebug).toBeNull();
+    expect(next.cardSourceDebug).toEqual(overlay);
+
+    overlay.entries.push({
+      cardNumber: 202,
+      cardName: "Late Mutation",
+      cardTides: ["support-b"],
+      matchedMandatoryTides: [],
+      matchedOptionalTides: ["support-b"],
+      isFallback: false,
+    });
+
+    expect(next.cardSourceDebug?.entries).toHaveLength(1);
+    expect(applyCardSourceDebug(next, null).cardSourceDebug).toBeNull();
+  });
+
   it("resets package-driven run state back to an empty quest shell", () => {
     const populated: QuestState = {
       ...createDefaultState(),
       dreamcaller: makeDreamcaller(),
       resolvedPackage: makeResolvedPackage(),
+      cardSourceDebug: makeCardSourceDebugState(),
       remainingDreamsignPool: ["embers-whisper"],
       draftState: makeDraftState(),
       visitedSites: ["site-1"],
@@ -205,6 +251,7 @@ describe("Task 02 state transitions", () => {
       deck: [],
       dreamcaller: null,
       resolvedPackage: null,
+      cardSourceDebug: null,
       remainingDreamsignPool: [],
       dreamsigns: [],
       completionLevel: 0,

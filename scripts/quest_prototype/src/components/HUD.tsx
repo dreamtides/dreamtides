@@ -48,11 +48,21 @@ function useAnimatedNumber(target: number, duration: number): number {
 interface HudProps {
   onOpenDeckViewer: () => void;
   onOpenDebugScreen: () => void;
+  onToggleCardSourceOverlay: () => void;
   hasDraftData: boolean;
+  hasCardSourceDebug: boolean;
+  isCardSourceOverlayOpen: boolean;
 }
 
 /** Persistent HUD bar anchored to the bottom of the viewport. */
-export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudProps) {
+export function HUD({
+  onOpenDeckViewer,
+  onOpenDebugScreen,
+  onToggleCardSourceOverlay,
+  hasDraftData,
+  hasCardSourceDebug,
+  isCardSourceOverlayOpen,
+}: HudProps) {
   const { state } = useQuest();
   const animatedEssence = useAnimatedNumber(
     state.essence,
@@ -199,6 +209,22 @@ export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudPr
           <span className="lg:hidden">{"\uD83C\uDCCF"}</span>
           <span className="hidden lg:inline">View Deck</span>
         </button>
+        {hasCardSourceDebug && (
+          <button
+            className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
+            style={{
+              background: isCardSourceOverlayOpen
+                ? "rgba(96, 165, 250, 0.24)"
+                : "rgba(96, 165, 250, 0.14)",
+              border: `1px solid ${isCardSourceOverlayOpen ? "rgba(96, 165, 250, 0.5)" : "rgba(96, 165, 250, 0.28)"}`,
+              color: isCardSourceOverlayOpen ? "#dbeafe" : "#93c5fd",
+            }}
+            onClick={onToggleCardSourceOverlay}
+          >
+            <span className="lg:hidden">{"?"}</span>
+            <span className="hidden lg:inline">Why Cards</span>
+          </button>
+        )}
         {hasDraftData && (
           <button
             className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"

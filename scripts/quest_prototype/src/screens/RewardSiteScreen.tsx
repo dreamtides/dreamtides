@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import type { SiteState, Dreamsign } from "../types/quest";
+import { buildCardSourceDebugState } from "../debug/card-source-debug";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import { CardDisplay } from "../components/CardDisplay";
-import type { Tide } from "../types/cards";
+import type { CardData, Tide } from "../types/cards";
 import {
   generateRewardSiteData,
   type RewardSiteData,
@@ -34,6 +35,25 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
   }
 
   const rewardData = rewardRef.current.reward;
+  const cardSourceDebugState = useMemo(
+    () =>
+      rewardData.rewardType === "card"
+        ? buildCardSourceDebugState(
+          "Reward Card",
+          "Reward",
+          [cardDatabase.get(rewardData.cardNumber)].filter(
+            (card): card is CardData => card !== undefined,
+          ),
+          state.resolvedPackage,
+        )
+        : null,
+    [
+      cardDatabase,
+      rewardData.rewardType,
+      rewardData.rewardType === "card" ? rewardData.cardNumber : null,
+      state.resolvedPackage,
+    ],
+  );
 
   useEffect(() => {
     if (rewardRef.current === null) {
@@ -57,6 +77,17 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
     rewardData.rewardType,
     site.isEnhanced,
   ]);
+
+  useEffect(() => {
+    mutations.setCardSourceDebug(cardSourceDebugState, "reward_site_cards_shown");
+  }, [cardSourceDebugState, mutations]);
+
+  useEffect(
+    () => () => {
+      mutations.setCardSourceDebug(null, "reward_site_cards_hidden");
+    },
+    [mutations],
+  );
 
   const completeSite = useCallback(() => {
     logEvent("site_completed", {

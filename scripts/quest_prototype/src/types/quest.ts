@@ -1,5 +1,5 @@
 import type { Tide } from "./cards";
-import type { ResolvedDreamcallerPackage } from "./content";
+import type { PackageTideId, ResolvedDreamcallerPackage } from "./content";
 import type { DraftState } from "./draft";
 
 /** Badge applied to a card via a Transfiguration site. */
@@ -54,6 +54,31 @@ export interface Dreamsign {
   isBane: boolean;
 }
 
+/** One card currently being explained by the provenance debug overlay. */
+export interface CardSourceDebugEntry {
+  cardNumber: number;
+  cardName: string;
+  cardTides: PackageTideId[];
+  matchedMandatoryTides: PackageTideId[];
+  matchedOptionalTides: PackageTideId[];
+  isFallback: boolean;
+}
+
+/** Which surface produced the currently explained cards. */
+export type CardSourceDebugSurface =
+  | "Draft"
+  | "Shop"
+  | "SpecialtyShop"
+  | "BattleReward"
+  | "Reward";
+
+/** Global debug data for cards currently revealed on a quest screen. */
+export interface CardSourceDebugState {
+  screenLabel: string;
+  surface: CardSourceDebugSurface;
+  entries: CardSourceDebugEntry[];
+}
+
 /** A site within a dreamscape. */
 export interface SiteState {
   id: string;
@@ -95,6 +120,7 @@ export interface QuestState {
   deck: DeckEntry[];
   dreamcaller: Dreamcaller | null;
   resolvedPackage: ResolvedDreamcallerPackage | null;
+  cardSourceDebug: CardSourceDebugState | null;
   remainingDreamsignPool: string[];
   dreamsigns: Dreamsign[];
   completionLevel: number;

@@ -12,6 +12,7 @@ import { toQuestDreamcaller } from "../data/dreamcaller-selection";
 import type { CardData } from "../types/cards";
 import type { ResolvedDreamcallerPackage } from "../types/content";
 import type {
+  CardSourceDebugState,
   DeckEntry,
   DreamAtlas,
   Dreamsign,
@@ -41,6 +42,10 @@ export interface QuestMutations {
     effectDetails: Record<string, unknown>,
   ) => void;
   setDreamcallerSelection: (resolvedPackage: ResolvedDreamcallerPackage) => void;
+  setCardSourceDebug: (
+    cardSourceDebug: CardSourceDebugState | null,
+    source: string,
+  ) => void;
   addDreamsign: (dreamsign: Dreamsign, sourceSiteType: string) => void;
   removeDreamsign: (index: number, reason: string) => void;
   setRemainingDreamsignPool: (
@@ -81,6 +86,7 @@ export function createDefaultState(): QuestState {
     deck: [],
     dreamcaller: null,
     resolvedPackage: null,
+    cardSourceDebug: null,
     remainingDreamsignPool: [],
     dreamsigns: [],
     completionLevel: 0,
@@ -116,6 +122,27 @@ export function applyRemainingDreamsignPool(
   return {
     ...prev,
     remainingDreamsignPool: [...remainingDreamsignPool],
+  };
+}
+
+export function applyCardSourceDebug(
+  prev: QuestState,
+  cardSourceDebug: CardSourceDebugState | null,
+): QuestState {
+  return {
+    ...prev,
+    cardSourceDebug:
+      cardSourceDebug === null
+        ? null
+        : {
+          ...cardSourceDebug,
+          entries: cardSourceDebug.entries.map((entry) => ({
+            ...entry,
+            cardTides: [...entry.cardTides],
+            matchedMandatoryTides: [...entry.matchedMandatoryTides],
+            matchedOptionalTides: [...entry.matchedOptionalTides],
+          })),
+        },
   };
 }
 
@@ -260,6 +287,20 @@ export function QuestProvider({
   const setDreamcallerSelection = useCallback(
     (resolvedPackage: ResolvedDreamcallerPackage) => {
       setState((prev) => applyDreamcallerSelection(prev, resolvedPackage));
+    },
+    [],
+  );
+
+  const setCardSourceDebug = useCallback(
+    (cardSourceDebug: CardSourceDebugState | null, source: string) => {
+      logEvent("card_source_debug_updated", {
+        source,
+        isVisible: cardSourceDebug !== null,
+        screenLabel: cardSourceDebug?.screenLabel ?? null,
+        surface: cardSourceDebug?.surface ?? null,
+        cardCount: cardSourceDebug?.entries.length ?? 0,
+      });
+      setState((prev) => applyCardSourceDebug(prev, cardSourceDebug));
     },
     [],
   );
@@ -425,6 +466,7 @@ export function QuestProvider({
       removeCard,
       transfigureCard,
       setDreamcallerSelection,
+      setCardSourceDebug,
       addDreamsign,
       removeDreamsign,
       setRemainingDreamsignPool,
@@ -443,6 +485,7 @@ export function QuestProvider({
       removeCard,
       transfigureCard,
       setDreamcallerSelection,
+      setCardSourceDebug,
       addDreamsign,
       removeDreamsign,
       setRemainingDreamsignPool,

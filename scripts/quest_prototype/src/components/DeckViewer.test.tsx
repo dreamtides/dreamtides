@@ -74,6 +74,7 @@ function makeMutations(): QuestMutations {
     removeCard: vi.fn(),
     transfigureCard: vi.fn(),
     setDreamcallerSelection: vi.fn(),
+    setCardSourceDebug: vi.fn(),
     addDreamsign: vi.fn(),
     removeDreamsign: vi.fn(),
     setRemainingDreamsignPool: vi.fn(),
@@ -108,6 +109,7 @@ function makeState(): QuestState {
       accentTide: "Bloom",
     },
     resolvedPackage: null,
+    cardSourceDebug: null,
     remainingDreamsignPool: [],
     dreamsigns: [
       {

@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { CardData, Tide } from "../types/cards";
 import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
+import { buildCardSourceDebugState } from "../debug/card-source-debug";
 import { dreamcallerAccentTide } from "../data/quest-content";
 import { selectBattleRewards } from "../data/tide-weights";
 import { CardDisplay } from "../components/CardDisplay";
@@ -451,8 +452,31 @@ export function BattleScreen({
     );
   }
   const rewardCards = rewardCardsRef.current;
+  const cardSourceDebugState = useMemo(
+    () =>
+      phase === "victory"
+        ? buildCardSourceDebugState(
+          "Battle Rewards",
+          "BattleReward",
+          rewardCards,
+          resolvedPackage,
+        )
+        : null,
+    [phase, resolvedPackage, rewardCards],
+  );
 
   const hasCompletedRef = useRef(false);
+
+  useEffect(() => {
+    mutations.setCardSourceDebug(cardSourceDebugState, "battle_reward_cards_shown");
+  }, [cardSourceDebugState, mutations]);
+
+  useEffect(
+    () => () => {
+      mutations.setCardSourceDebug(null, "battle_reward_cards_hidden");
+    },
+    [mutations],
+  );
 
   const handleStartBattle = useCallback(() => {
     logEvent("battle_started", {

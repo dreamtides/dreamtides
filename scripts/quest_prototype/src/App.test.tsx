@@ -41,6 +41,10 @@ vi.mock("./screens/DebugScreen", () => ({
   DebugScreen: () => <div>Debug Screen</div>,
 }));
 
+vi.mock("./screens/CardSourceOverlay", () => ({
+  CardSourceOverlay: () => <div>Card Source Overlay</div>,
+}));
+
 function makeMutations(): QuestMutations {
   return {
     changeEssence: vi.fn(),
@@ -49,6 +53,7 @@ function makeMutations(): QuestMutations {
     removeCard: vi.fn(),
     transfigureCard: vi.fn(),
     setDreamcallerSelection: vi.fn(),
+    setCardSourceDebug: vi.fn(),
     addDreamsign: vi.fn(),
     removeDreamsign: vi.fn(),
     setRemainingDreamsignPool: vi.fn(),
@@ -68,6 +73,7 @@ function makeState(overrides: Partial<QuestState> = {}): QuestState {
     deck: [],
     dreamcaller: null,
     resolvedPackage: null,
+    cardSourceDebug: null,
     remainingDreamsignPool: [],
     dreamsigns: [],
     completionLevel: 0,

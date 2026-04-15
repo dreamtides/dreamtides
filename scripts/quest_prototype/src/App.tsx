@@ -7,6 +7,7 @@ import { ScreenRouter } from "./components/ScreenRouter";
 import { HUD } from "./components/HUD";
 import { DeckViewer } from "./components/DeckViewer";
 import { DebugScreen } from "./screens/DebugScreen";
+import { CardSourceOverlay } from "./screens/CardSourceOverlay";
 import { STARTER_CARD_NUMBERS } from "./data/starter-cards";
 
 /** Inner component that renders the screen router and HUD. */
@@ -20,9 +21,11 @@ export function QuestApp({
   const [deckViewerOpen, setDeckViewerOpen] = useState(false);
   const [starterDeckIntroOpen, setStarterDeckIntroOpen] = useState(false);
   const [debugScreenOpen, setDebugScreenOpen] = useState(false);
+  const [cardSourceOverlayOpen, setCardSourceOverlayOpen] = useState(false);
   const previousScreenTypeRef = useRef(state.screen.type);
 
   const hasDraftData = state.resolvedPackage !== null;
+  const hasCardSourceDebug = state.cardSourceDebug !== null;
 
   useEffect(() => {
     const leftQuestStart =
@@ -39,6 +42,12 @@ export function QuestApp({
 
     previousScreenTypeRef.current = state.screen.type;
   }, [state.deck, state.dreamcaller, state.screen.type]);
+
+  useEffect(() => {
+    if (!hasCardSourceDebug) {
+      setCardSourceOverlayOpen(false);
+    }
+  }, [hasCardSourceDebug]);
 
   const handleOpenDeckViewer = useCallback(() => {
     setDeckViewerOpen(true);
@@ -63,6 +72,14 @@ export function QuestApp({
     setDebugScreenOpen(false);
   }, []);
 
+  const handleToggleCardSourceOverlay = useCallback(() => {
+    setCardSourceOverlayOpen((prev) => !prev);
+  }, []);
+
+  const handleCloseCardSourceOverlay = useCallback(() => {
+    setCardSourceOverlayOpen(false);
+  }, []);
+
   return (
     <div style={{ paddingBottom: showHud ? "48px" : "0" }}>
       <ScreenRouter />
@@ -70,7 +87,10 @@ export function QuestApp({
         <HUD
           onOpenDeckViewer={handleOpenDeckViewer}
           onOpenDebugScreen={handleOpenDebugScreen}
+          onToggleCardSourceOverlay={handleToggleCardSourceOverlay}
           hasDraftData={hasDraftData}
+          hasCardSourceDebug={hasCardSourceDebug}
+          isCardSourceOverlayOpen={cardSourceOverlayOpen}
         />
       )}
       <DeckViewer
@@ -88,6 +108,11 @@ export function QuestApp({
         resolvedPackage={state.resolvedPackage}
         remainingDreamsignPool={state.remainingDreamsignPool}
         dreamsignTemplates={questContent.dreamsignTemplates}
+      />
+      <CardSourceOverlay
+        cardSourceDebug={state.cardSourceDebug}
+        isOpen={cardSourceOverlayOpen}
+        onClose={handleCloseCardSourceOverlay}
       />
     </div>
   );

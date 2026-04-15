@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
+import { buildCardSourceDebugState } from "../debug/card-source-debug";
 import {
   countRemainingCards,
   enterDraftSite,
@@ -223,6 +224,19 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       .map((entry) => entry.cardNumber);
   }, [siteId, state.deck, state.draftState]);
 
+  const cardSourceDebugState = useMemo(
+    () =>
+      isComplete
+        ? null
+        : buildCardSourceDebugState(
+          "Draft Picks",
+          "Draft",
+          currentOfferCards,
+          state.resolvedPackage,
+        ),
+    [currentOfferCards, isComplete, state.resolvedPackage],
+  );
+
   // Initialize or resume draft state for this site.
   useEffect(() => {
     if (cardDatabase.size === 0) return;
@@ -253,6 +267,17 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       ),
     );
   }, [siteId, state.draftState, cardDatabase, mutations]);
+
+  useEffect(() => {
+    mutations.setCardSourceDebug(cardSourceDebugState, "draft_site_cards_shown");
+  }, [cardSourceDebugState, mutations]);
+
+  useEffect(
+    () => () => {
+      mutations.setCardSourceDebug(null, "draft_site_cards_hidden");
+    },
+    [mutations],
+  );
 
   // Resolve the current offer from draft state using a neutral display order.
   const refreshOffer = useCallback(() => {

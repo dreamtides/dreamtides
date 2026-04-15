@@ -5,6 +5,7 @@ import type { SiteState } from "../types/quest";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import { SIZE_PRESETS } from "../components/card-size";
+import { buildCardSourceDebugState } from "../debug/card-source-debug";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import {
@@ -48,6 +49,24 @@ export function ShopScreen({ site }: ShopScreenProps) {
     () => rerollCost(rerollCount, site.isEnhanced),
     [rerollCount, site.isEnhanced],
   );
+  const visibleCardOffers = useMemo(
+    () =>
+      slots
+        .filter((slot) => !slot.purchased && slot.itemType === "card" && slot.card !== null)
+        .map((slot) => slot.card)
+        .filter((card): card is CardData => card !== null),
+    [slots],
+  );
+  const cardSourceDebugState = useMemo(
+    () =>
+      buildCardSourceDebugState(
+        "Shop Offers",
+        "Shop",
+        visibleCardOffers,
+        state.resolvedPackage,
+      ),
+    [visibleCardOffers, state.resolvedPackage],
+  );
 
   useEffect(() => {
     mutations.setRemainingDreamsignPool(
@@ -55,6 +74,17 @@ export function ShopScreen({ site }: ShopScreenProps) {
       "shop_inventory_revealed",
     );
   }, [mutations, initialInventory.remainingDreamsignPoolIds]);
+
+  useEffect(() => {
+    mutations.setCardSourceDebug(cardSourceDebugState, "shop_cards_shown");
+  }, [cardSourceDebugState, mutations]);
+
+  useEffect(
+    () => () => {
+      mutations.setCardSourceDebug(null, "shop_cards_hidden");
+    },
+    [mutations],
+  );
 
   const handleBuy = useCallback(
     (index: number) => {
