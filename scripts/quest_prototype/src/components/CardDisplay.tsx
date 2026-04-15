@@ -10,6 +10,7 @@ const SYMBOL_COLORS: Readonly<Record<string, string>> = {
   trigger: "#f97316",
   fast: "#facc15",
 };
+const EVENT_CHROME_COLOR = "#c084fc";
 
 /** Props for the CardDisplay component. */
 interface CardDisplayProps {
@@ -62,16 +63,22 @@ export function CardDisplay({
   }, [card.cardNumber]);
 
   const rarityColor = RARITY_COLORS[card.rarity];
+  const chromeColor =
+    card.cardType === "Event" ? EVENT_CHROME_COLOR : rarityColor;
   const borderColor =
-    card.rarity === "Common"
+    card.cardType === "Event"
+      ? chromeColor
+      : card.rarity === "Common"
       ? "rgba(255, 255, 255, 0.18)"
-      : `${rarityColor}55`;
+      : `${chromeColor}55`;
   const nameColor =
     card.rarity === "Common" ? "#f8fafc" : rarityColor;
 
   const borderStyle = selected
     ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }
-    : {};
+    : card.cardType === "Event"
+      ? { boxShadow: `0 0 18px ${EVENT_CHROME_COLOR}26` }
+      : {};
 
   const isInteractive = onClick !== undefined;
 
@@ -100,8 +107,8 @@ export function CardDisplay({
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-1"
         style={{
-          background: `linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, ${rarityColor} 50%, rgba(255, 255, 255, 0.08) 100%)`,
-          opacity: card.rarity === "Common" ? 0.35 : 0.8,
+          background: `linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, ${chromeColor} 50%, rgba(255, 255, 255, 0.08) 100%)`,
+          opacity: card.cardType === "Event" || card.rarity !== "Common" ? 0.8 : 0.35,
         }}
       />
 
@@ -192,7 +199,7 @@ export function CardDisplay({
             className={`shrink-0 rounded-full ${large ? "px-2 py-0.5 text-[10px]" : "px-1.5 py-0.5 text-[9px]"} font-bold uppercase tracking-wide`}
             style={{
               background: `${rarityColor}18`,
-              border: `1px solid ${borderColor}`,
+              border: `1px solid ${chromeColor}55`,
               color: nameColor,
             }}
           >

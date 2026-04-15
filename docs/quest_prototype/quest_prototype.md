@@ -1,11 +1,11 @@
 # Quest Prototype
 
 A standalone web prototype of Dreamtides Quest Mode at
-`scripts/quest_prototype/`. It now reflects the hidden-tides package-based
-quest flow: the player chooses from 3 Dreamcallers, the selected Dreamcaller
-resolves a fixed package once at quest start, and the run proceeds through
-draft sites, Dreamsign surfaces, auto-resolved battles, and atlas progression.
-All state is in memory and resets on page load.
+`scripts/quest_prototype/`. It now reflects the hidden-tides package-based quest
+flow: the player chooses from 3 Dreamcallers, the selected Dreamcaller resolves
+a fixed package once at quest start, and the run proceeds through draft sites,
+Dreamsign surfaces, auto-resolved battles, and atlas progression. All state is
+in memory and resets on page load.
 
 ## Running The Prototype
 
@@ -39,9 +39,9 @@ npm run build        # production build
 ## Tech Stack
 
 React 19, Vite 7, TypeScript 5.8 in strict mode. Tailwind CSS v4 via
-`@tailwindcss/vite` and Framer Motion for animations. The prototype stays
-within `scripts/quest_prototype/` and uses browser-loaded JSON instead of a
-runtime TOML parser.
+`@tailwindcss/vite` and Framer Motion for animations. The prototype stays within
+`scripts/quest_prototype/` and uses browser-loaded JSON instead of a runtime
+TOML parser.
 
 TypeScript is configured for bundler mode (`moduleResolution: "bundler"`), so
 Node built-in modules are not available in type-checked code. Tests that need
@@ -86,14 +86,14 @@ and spent Dreamsign pools.
 
 - Dreamcaller selection is a quest-start choice, not a mid-run site.
 - Card chrome is neutral and rarity-driven instead of tide-driven.
-- Draft sites reveal 4 unique cards when possible and consume the revealed
-  cards from the fixed pool.
+- Draft sites reveal 4 unique cards when possible and consume the revealed cards
+  from the fixed pool.
 - Dreamsign-bearing surfaces spend from a shared pool as soon as a sign is
   shown.
-- Shops, battle rewards, and similar generators prefer package-adjacent
-  content but fall back to the broader pool if nothing overlaps.
-- The live flow no longer uses tide crystals, `chosenTide`, `excludedTides`,
-  or `DreamcallerDraft`.
+- Shops, battle rewards, and similar generators prefer package-adjacent content
+  but fall back to the broader pool if nothing overlaps.
+- The live flow no longer uses tide crystals, `chosenTide`, `excludedTides`, or
+  `DreamcallerDraft`.
 
 ## Card Data Normalization
 

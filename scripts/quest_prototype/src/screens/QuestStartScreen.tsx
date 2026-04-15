@@ -6,6 +6,8 @@ import { bootstrapQuestStart } from "./quest-start-bootstrap";
 import type { DreamcallerContent } from "../types/content";
 
 const DREAMCALLER_ACCENTS = ["#c084fc", "#fbbf24", "#7dd3fc"] as const;
+const DREAMCALLER_HOVER_TRANSITION = { duration: 0.12, delay: 0 } as const;
+const DREAMCALLER_TAP_TRANSITION = { duration: 0.08, delay: 0 } as const;
 
 /** Intro screen where the player picks a dreamcaller to start the quest. */
 export function QuestStartScreen() {
@@ -101,8 +103,12 @@ export function QuestStartScreen() {
                 boxShadow: `0 0 40px ${accentColor}50`,
                 borderColor: `${accentColor}90`,
                 scale: 1.05,
+                transition: DREAMCALLER_HOVER_TRANSITION,
               }}
-              whileTap={{ scale: 0.97 }}
+              whileTap={{
+                scale: 0.97,
+                transition: DREAMCALLER_TAP_TRANSITION,
+              }}
               onClick={() => {
                 handlePickDreamcaller(dreamcaller);
               }}

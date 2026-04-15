@@ -56,8 +56,8 @@ vi.mock("framer-motion", () => ({
       children,
       initial: _initial,
       transition: _transition,
-      whileHover: _whileHover,
-      whileTap: _whileTap,
+      whileHover,
+      whileTap,
       ...props
     }: {
       animate?: unknown;
@@ -67,7 +67,14 @@ vi.mock("framer-motion", () => ({
       whileHover?: unknown;
       whileTap?: unknown;
     } & HTMLAttributes<HTMLButtonElement>) => (
-      <button {...props}>{children}</button>
+      <button
+        data-transition={JSON.stringify(_transition)}
+        data-while-hover={JSON.stringify(whileHover)}
+        data-while-tap={JSON.stringify(whileTap)}
+        {...props}
+      >
+        {children}
+      </button>
     ),
   },
 }));
@@ -231,6 +238,33 @@ describe("QuestStartScreen", () => {
         dreamcaller: OFFERED_DREAMCALLERS[1],
       }),
     );
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  it("applies instant hover and tap transitions even with staggered entrance animation", () => {
+    const { container, root } = mount(<QuestStartScreen />);
+
+    const firstDreamcallerButton = container.querySelector("button");
+    if (!firstDreamcallerButton) {
+      throw new Error("Missing dreamcaller selection button");
+    }
+
+    const transition = JSON.parse(
+      firstDreamcallerButton.getAttribute("data-transition") ?? "null",
+    ) as { delay?: number } | null;
+    const whileHover = JSON.parse(
+      firstDreamcallerButton.getAttribute("data-while-hover") ?? "null",
+    ) as { transition?: { delay?: number; duration?: number } } | null;
+    const whileTap = JSON.parse(
+      firstDreamcallerButton.getAttribute("data-while-tap") ?? "null",
+    ) as { transition?: { delay?: number; duration?: number } } | null;
+
+    expect(transition?.delay).toBeGreaterThan(0);
+    expect(whileHover?.transition).toEqual({ delay: 0, duration: 0.12 });
+    expect(whileTap?.transition).toEqual({ delay: 0, duration: 0.08 });
 
     act(() => {
       root.unmount();
