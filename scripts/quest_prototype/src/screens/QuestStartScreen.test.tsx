@@ -105,7 +105,7 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     renderedText: "First dreamcaller.",
     imageNumber: "0009",
     mandatoryTides: ["materialize_value", "ally_formation", "support-a"],
-    optionalTides: ["support-a", "support-b", "support-c"],
+    optionalTides: ["support-a", "spirit_growth", "support-c"],
   },
   {
     id: "caller-2",
@@ -115,7 +115,7 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     renderedText: "Second dreamcaller.",
     imageNumber: "0010",
     mandatoryTides: ["warrior_pressure", "ally_wide", "support-d"],
-    optionalTides: ["support-d", "support-e", "support-f"],
+    optionalTides: ["support-d", "fast_tempo", "support-f"],
   },
   {
     id: "caller-3",
@@ -125,7 +125,7 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     renderedText: "Third dreamcaller.",
     imageNumber: "0011",
     mandatoryTides: ["void_recursion", "spark_tall", "support-g"],
-    optionalTides: ["support-g", "support-h", "support-i"],
+    optionalTides: ["support-g", "character_chain", "support-i"],
   },
 ] as const;
 
@@ -220,9 +220,28 @@ afterEach(() => {
 describe("QuestStartScreen", () => {
   it("shows exactly 3 Dreamcaller choices without legacy tide-step UI", () => {
     const { container, root } = mount(<QuestStartScreen />);
-    const displayedStructuralTides = OFFERED_DREAMCALLERS.flatMap((dreamcaller) =>
-      structuralTidesForPackageTides(dreamcaller.mandatoryTides),
-    );
+    const displayedStructuralTides = OFFERED_DREAMCALLERS.flatMap((dreamcaller) => {
+      const mandatoryStructuralTides = structuralTidesForPackageTides(
+        dreamcaller.mandatoryTides,
+      );
+      const mandatoryStructuralTideIds = new Set(
+        mandatoryStructuralTides.map((tide) => tide.id),
+      );
+      const optionalStructuralTides = structuralTidesForPackageTides(
+        dreamcaller.optionalTides,
+      ).filter((tide) => !mandatoryStructuralTideIds.has(tide.id));
+
+      return [
+        ...mandatoryStructuralTides.map((tide) => ({
+          ...tide,
+          appearance: "mandatory" as const,
+        })),
+        ...optionalStructuralTides.map((tide) => ({
+          ...tide,
+          appearance: "optional" as const,
+        })),
+      ];
+    });
 
     expect(container.textContent).toContain("Mira of Lanterns");
     expect(container.textContent).toContain("Vey of Embers");
@@ -239,6 +258,11 @@ describe("QuestStartScreen", () => {
     expect(
       container.querySelectorAll("[data-structural-tide-chip]"),
     ).toHaveLength(displayedStructuralTides.length);
+    expect(
+      Array.from(container.querySelectorAll("[data-structural-tide-chip]")).map(
+        (chip) => chip.getAttribute("data-structural-tide-chip"),
+      ),
+    ).toEqual(displayedStructuralTides.map((tide) => tide.id));
 
     for (const tide of displayedStructuralTides) {
       expect(container.textContent).toContain(tide.displayName);
@@ -247,11 +271,26 @@ describe("QuestStartScreen", () => {
         `[data-structural-tide-chip="${tide.id}"]`,
       );
       expect(chip?.getAttribute("title")).toBe(tide.hoverBlurb);
+      expect(chip?.getAttribute("data-structural-tide-appearance")).toBe(
+        tide.appearance,
+      );
+      const visibleChip = chip?.firstElementChild;
+      expect(visibleChip).not.toBeNull();
+      expect((visibleChip as HTMLElement | null)?.style.color).toBe(
+        tide.appearance === "optional"
+          ? "rgb(148, 163, 184)"
+          : "rgb(255, 255, 255)",
+      );
       const icon = container.querySelector(
         `[data-structural-tide-icon="${tide.id}"]`,
       );
       expect(icon?.className).toContain("bx");
       expect(icon?.className).toContain(tide.iconClass);
+      expect((icon as HTMLElement | null)?.style.color).toBe(
+        tide.appearance === "optional"
+          ? "rgb(148, 163, 184)"
+          : "rgb(255, 255, 255)",
+      );
     }
 
     expect(container.textContent).not.toContain("support-a");

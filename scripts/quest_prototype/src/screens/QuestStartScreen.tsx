@@ -86,9 +86,25 @@ export function QuestStartScreen() {
           const accentColor = DREAMCALLER_ACCENTS[
             index % DREAMCALLER_ACCENTS.length
           ];
-          const structuralTides = structuralTidesForPackageTides(
+          const mandatoryStructuralTides = structuralTidesForPackageTides(
             dreamcaller.mandatoryTides,
           );
+          const mandatoryStructuralTideIds = new Set(
+            mandatoryStructuralTides.map((tide) => tide.id),
+          );
+          const optionalStructuralTides = structuralTidesForPackageTides(
+            dreamcaller.optionalTides,
+          ).filter((tide) => !mandatoryStructuralTideIds.has(tide.id));
+          const structuralTides = [
+            ...mandatoryStructuralTides.map((tide) => ({
+              ...tide,
+              appearance: "mandatory" as const,
+            })),
+            ...optionalStructuralTides.map((tide) => ({
+              ...tide,
+              appearance: "optional" as const,
+            })),
+          ];
           return (
             <motion.div
               key={dreamcaller.name}
@@ -168,9 +184,10 @@ export function QuestStartScreen() {
                 <div className="flex flex-wrap justify-center gap-2">
                   {structuralTides.map((tide) => (
                     <span
-                      key={tide.id}
+                      key={`${dreamcaller.id}-${tide.id}`}
                       className="group/structural relative"
                       data-structural-tide-chip={tide.id}
+                      data-structural-tide-appearance={tide.appearance}
                       title={tide.hoverBlurb}
                     >
                       <span
@@ -178,13 +195,22 @@ export function QuestStartScreen() {
                         style={{
                           background: "#000000",
                           borderColor: "rgba(255, 255, 255, 0.16)",
-                          color: "#ffffff",
+                          color:
+                            tide.appearance === "optional"
+                              ? "#94a3b8"
+                              : "#ffffff",
                         }}
                       >
                         <i
                           aria-hidden="true"
                           className={`bx ${tide.iconClass} text-sm leading-none`}
                           data-structural-tide-icon={tide.id}
+                          style={{
+                            color:
+                              tide.appearance === "optional"
+                                ? "#94a3b8"
+                                : "#ffffff",
+                          }}
                         />
                         <span>{tide.displayName}</span>
                       </span>
