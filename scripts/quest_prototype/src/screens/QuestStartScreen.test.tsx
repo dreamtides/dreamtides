@@ -14,7 +14,7 @@ import { selectDreamcallerOffer } from "../data/dreamcaller-selection";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 
 const TIDES_LABEL_HOVER_BLURB =
-  "Each tide adds a themed mini-pool to this Dreamcaller's draft. Those tide pools are shuffled together to build the final draft pool.";
+  "These tidal pools are shuffled together to build the final draft pool.";
 
 vi.mock("framer-motion", () => ({
   motion: {

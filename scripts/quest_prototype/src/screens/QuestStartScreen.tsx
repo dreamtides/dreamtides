@@ -7,7 +7,7 @@ import { DreamcallerPortrait } from "../components/DreamcallerPortrait";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 import type { DreamcallerContent } from "../types/content";
 
-const DREAMCALLER_ACCENTS = ["#c084fc", "#fbbf24", "#7dd3fc"] as const;
+const DREAMCALLER_ACCENT = "#c084fc";
 const DREAMCALLER_HOVER_TRANSITION = { duration: 0.12, delay: 0 } as const;
 const DREAMCALLER_TAP_TRANSITION = { duration: 0.08, delay: 0 } as const;
 const TIDES_LABEL_HOVER_BLURB =
@@ -87,8 +87,7 @@ export function QuestStartScreen() {
         transition={{ duration: 0.6, delay: 0.5 }}
       >
         {offered.map((dreamcaller, index) => {
-          const accentColor =
-            DREAMCALLER_ACCENTS[index % DREAMCALLER_ACCENTS.length];
+          const accentColor = DREAMCALLER_ACCENT;
           const displayedTides = dreamcallerTidesForDisplay(
             dreamcaller.mandatoryTides,
             dreamcaller.optionalTides,
