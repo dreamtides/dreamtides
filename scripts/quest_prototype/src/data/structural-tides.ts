@@ -6,6 +6,22 @@ export interface StructuralTideMeta {
   iconClass: string;
 }
 
+export interface DreamcallerTideDisplay {
+  appearance: "mandatory" | "optional";
+  displayName: string;
+  hoverBlurb: string | null;
+  iconClass: string | null;
+  id: PackageTideId;
+  kind: "structural" | "support";
+}
+
+interface SupportTideMeta {
+  displayName: string;
+  hoverBlurb: string;
+}
+
+const MIN_DREAMCALLER_TIDE_DISPLAY_COUNT = 4;
+
 export const STRUCTURAL_TIDE_META: Readonly<
   Partial<Record<PackageTideId, StructuralTideMeta>>
 > = {
@@ -131,6 +147,243 @@ export const STRUCTURAL_TIDE_META: Readonly<
   },
 } as const;
 
+const SUPPORT_TIDE_META: Readonly<Partial<Record<PackageTideId, SupportTideMeta>>> = {
+  abandon_fodder:
+    {
+      displayName: "Ashen Offerings",
+      hoverBlurb:
+        "Cheap bodies and disposable pieces that make sacrifice effects profitable instead of painful.",
+    },
+  attrition_trade:
+    {
+      displayName: "Grinding Exchange",
+      hoverBlurb:
+        "Cards that turn routine exchanges into small material wins until the other side runs out first.",
+    },
+  big_energy:
+    {
+      displayName: "Stormwell Surge",
+      hoverBlurb:
+        "Heavy energy generation that helps the deck jump straight to expensive, swingy turns.",
+    },
+  bounce_blink_tools:
+    {
+      displayName: "Shimmer Recall",
+      hoverBlurb:
+        "Utility cards that return or reset permanents so arrival triggers and repositioning stay live.",
+    },
+  card_flow:
+    {
+      displayName: "Open Current",
+      hoverBlurb:
+        "Steady draw and filtering that keeps the hand moving and reduces dead turns.",
+    },
+  character_curve:
+    {
+      displayName: "Steady March",
+      hoverBlurb:
+        "Reliable early and mid-cost characters that make the deck's battlefield progression smoother.",
+    },
+  character_tutors:
+    {
+      displayName: "Summoner's Index",
+      hoverBlurb:
+        "Search tools that find the right character for the current board instead of relying on raw draw.",
+    },
+  cheap_curve:
+    {
+      displayName: "First-Light Muster",
+      hoverBlurb:
+        "Low-cost plays that let the deck start affecting the board before slower engines come online.",
+    },
+  cheap_removal:
+    {
+      displayName: "Clean Cut",
+      hoverBlurb:
+        "Efficient answers that clear small threats without forcing the deck to spend an entire turn.",
+    },
+  copy_effects:
+    {
+      displayName: "Echo Script",
+      hoverBlurb:
+        "Effects that duplicate a useful spell, trigger, or permanent to increase the deck's best outputs.",
+    },
+  cost_reduction:
+    {
+      displayName: "Lightened Burden",
+      hoverBlurb:
+        "Discount effects that compress turns and let multiple meaningful plays happen ahead of schedule.",
+    },
+  defensive_curve:
+    {
+      displayName: "Shielded Opening",
+      hoverBlurb:
+        "Early blockers and stabilizers that buy time for slower synergies to take over.",
+    },
+  discard_outlets:
+    {
+      displayName: "Cinder Outlet",
+      hoverBlurb:
+        "Reliable ways to pitch cards so graveyard and discard payoffs can turn on when needed.",
+    },
+  discover_toolbox:
+    {
+      displayName: "Lantern Search",
+      hoverBlurb:
+        "Flexible selection effects that trade raw consistency for access to situational answers.",
+    },
+  event_setup:
+    {
+      displayName: "Ritual Staging",
+      hoverBlurb:
+        "Support cards that make spell-heavy turns easier to assemble and more rewarding to fire off.",
+    },
+  fast_interaction:
+    {
+      displayName: "Snap Reply",
+      hoverBlurb:
+        "Instant-speed answers and tricks that help the deck fight on the opponent's timing.",
+    },
+  fast_setup:
+    {
+      displayName: "Quick Lattice",
+      hoverBlurb:
+        "Quick enablers that establish key synergies early instead of waiting for a slow buildup.",
+    },
+  finishers:
+    {
+      displayName: "Closing Bell",
+      hoverBlurb:
+        "Closing threats that convert an established advantage into an actual end to the game.",
+    },
+  foresee_selection:
+    {
+      displayName: "Veil Sifting",
+      hoverBlurb:
+        "Deck smoothing tools that line up future draws and keep the next few turns clean.",
+    },
+  go_wide_enablers:
+    {
+      displayName: "Crowded Horizon",
+      hoverBlurb:
+        "Cards that help the deck produce or reward a broad battlefield instead of a single focal threat.",
+    },
+  hand_cycling:
+    {
+      displayName: "Turning Palm",
+      hoverBlurb:
+        "Cheap redraw and replacement effects that turn spare cards into a steadier stream of action.",
+    },
+  hand_disruption:
+    {
+      displayName: "Mind Static",
+      hoverBlurb:
+        "Pressure pieces that interfere with the opponent's hand and make planning harder to execute.",
+    },
+  judgment_bodies:
+    {
+      displayName: "Weighted Witnesses",
+      hoverBlurb:
+        "Characters that contribute meaningfully once judgment matters and help carry that phase.",
+    },
+  judgment_repeaters:
+    {
+      displayName: "Second Verdict",
+      hoverBlurb:
+        "Effects that make judgment triggers happen again or hit harder than usual.",
+    },
+  leave_play_enablers:
+    {
+      displayName: "Parting Triggers",
+      hoverBlurb:
+        "Sacrifice, bounce, and death-adjacent tools that make exit triggers easier to exploit.",
+    },
+  materialized_staples:
+    {
+      displayName: "Threshold Arrivals",
+      hoverBlurb:
+        "Reliable materialize payoffs and enablers that keep arrival-based decks consistent.",
+    },
+  point_pressure:
+    {
+      displayName: "Relentless Tally",
+      hoverBlurb:
+        "Steady sources of score or spark pressure that force the opponent to answer quickly.",
+    },
+  premium_removal:
+    {
+      displayName: "Royal Severance",
+      hoverBlurb:
+        "High-quality answers reserved for the threats that ordinary interaction does not cleanly solve.",
+    },
+  reclaim_characters:
+    {
+      displayName: "Soul Recall",
+      hoverBlurb:
+        "Recursion tools focused on bringing creatures back when the board needs to refill.",
+    },
+  reclaim_events:
+    {
+      displayName: "Spell Recall",
+      hoverBlurb:
+        "Spell recursion that lets the deck reuse its strongest events instead of exhausting them once.",
+    },
+  recursion_fuel:
+    {
+      displayName: "Buried Embers",
+      hoverBlurb:
+        "Self-stock and disposable resources that make later recursion cards much more effective.",
+    },
+  resource_burst:
+    {
+      displayName: "Sudden Windfall",
+      hoverBlurb:
+        "Temporary acceleration that creates one oversized turn even if the deck cannot sustain it forever.",
+    },
+  spark_growth:
+    {
+      displayName: "Kindling Spiral",
+      hoverBlurb:
+        "Support pieces that steadily increase spark output or make spark scaling easier to maintain.",
+    },
+  tax_pressure:
+    {
+      displayName: "Levy of Sleep",
+      hoverBlurb:
+        "Cards that make the opponent's plays clunkier, slower, or more expensive over time.",
+    },
+  tempo_resets:
+    {
+      displayName: "Backstep Tide",
+      hoverBlurb:
+        "Bounce and reset effects that erase enemy setup and reopen the race on your terms.",
+    },
+  topdeck_setup:
+    {
+      displayName: "Crown the Draw",
+      hoverBlurb:
+        "Tools that prepare the top of the deck so future draws and reveals land where they should.",
+    },
+  trigger_reuse:
+    {
+      displayName: "Echo Harness",
+      hoverBlurb:
+        "Cards that replay, copy, or refresh important triggers so core synergies keep firing.",
+    },
+  void_denial:
+    {
+      displayName: "Grave Silence",
+      hoverBlurb:
+        "Interaction aimed at shrinking, disrupting, or invalidating graveyard-style plans.",
+    },
+  void_setup:
+    {
+      displayName: "Grave Preparation",
+      hoverBlurb:
+        "Self-mill and discard support that makes void payoffs turn on earlier and more reliably.",
+    },
+} as const;
+
 export function structuralTidesForPackageTides(
   packageTides: readonly PackageTideId[],
 ): Array<StructuralTideMeta & { id: PackageTideId }> {
@@ -139,5 +392,100 @@ export function structuralTidesForPackageTides(
     return structuralTide === undefined
       ? []
       : [{ id: packageTideId, ...structuralTide }];
+  });
+}
+
+export function dreamcallerTidesForDisplay(
+  mandatoryTides: readonly PackageTideId[],
+  optionalTides: readonly PackageTideId[],
+): DreamcallerTideDisplay[] {
+  const mandatoryTideIds = new Set(mandatoryTides);
+  const mandatoryStructuralTides = structuralTidesForPackageTides(
+    mandatoryTides,
+  ).map((tide) => ({
+    ...tide,
+    appearance: "mandatory" as const,
+    kind: "structural" as const,
+  }));
+  const optionalStructuralTides = structuralTidesForPackageTides(optionalTides)
+    .filter((tide) => !mandatoryTideIds.has(tide.id))
+    .map((tide) => ({
+      ...tide,
+      appearance: "optional" as const,
+      kind: "structural" as const,
+    }));
+  const displayedIds = new Set([
+    ...mandatoryStructuralTides.map((tide) => tide.id),
+    ...optionalStructuralTides.map((tide) => tide.id),
+  ]);
+  const supportFillCount = Math.max(
+    0,
+    MIN_DREAMCALLER_TIDE_DISPLAY_COUNT -
+      (mandatoryStructuralTides.length + optionalStructuralTides.length),
+  );
+
+  const mandatorySupportTides = supportTidesForDisplay(
+    mandatoryTides,
+    "mandatory",
+    displayedIds,
+  ).slice(0, supportFillCount);
+  const optionalSupportTides = supportTidesForDisplay(
+    optionalTides,
+    "optional",
+    displayedIds,
+  ).slice(
+    0,
+    Math.max(0, supportFillCount - mandatorySupportTides.length),
+  );
+
+  return [
+    ...mandatoryStructuralTides,
+    ...mandatorySupportTides,
+    ...optionalStructuralTides,
+    ...optionalSupportTides,
+  ];
+}
+
+function packageTideDisplayName(packageTideId: PackageTideId): string {
+  return packageTideId
+    .split(/[_-]+/u)
+    .filter((segment) => segment.length > 0)
+    .map(
+      (segment) =>
+        segment.charAt(0).toUpperCase() + segment.slice(1),
+    )
+    .join(" ");
+}
+
+function supportTidesForDisplay(
+  packageTides: readonly PackageTideId[],
+  appearance: DreamcallerTideDisplay["appearance"],
+  excludedIds: ReadonlySet<PackageTideId>,
+): DreamcallerTideDisplay[] {
+  const displayedIds = new Set(excludedIds);
+
+  return packageTides.flatMap((packageTideId) => {
+    if (
+      displayedIds.has(packageTideId) ||
+      STRUCTURAL_TIDE_META[packageTideId] !== undefined
+    ) {
+      return [];
+    }
+
+    displayedIds.add(packageTideId);
+    return [
+      {
+        appearance,
+        displayName:
+          SUPPORT_TIDE_META[packageTideId]?.displayName ??
+          packageTideDisplayName(packageTideId),
+        hoverBlurb:
+          SUPPORT_TIDE_META[packageTideId]?.hoverBlurb ??
+          `Support cards that reinforce ${packageTideDisplayName(packageTideId).toLowerCase()}.`,
+        iconClass: "bxs-circle",
+        id: packageTideId,
+        kind: "support",
+      },
+    ];
   });
 }

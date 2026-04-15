@@ -2,7 +2,7 @@ import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { selectDreamcallerOffer } from "../data/dreamcaller-selection";
-import { structuralTidesForPackageTides } from "../data/structural-tides";
+import { dreamcallerTidesForDisplay } from "../data/structural-tides";
 import { DreamcallerPortrait } from "../components/DreamcallerPortrait";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 import type { DreamcallerContent } from "../types/content";
@@ -86,25 +86,10 @@ export function QuestStartScreen() {
           const accentColor = DREAMCALLER_ACCENTS[
             index % DREAMCALLER_ACCENTS.length
           ];
-          const mandatoryStructuralTides = structuralTidesForPackageTides(
+          const displayedTides = dreamcallerTidesForDisplay(
             dreamcaller.mandatoryTides,
-          );
-          const mandatoryStructuralTideIds = new Set(
-            mandatoryStructuralTides.map((tide) => tide.id),
-          );
-          const optionalStructuralTides = structuralTidesForPackageTides(
             dreamcaller.optionalTides,
-          ).filter((tide) => !mandatoryStructuralTideIds.has(tide.id));
-          const structuralTides = [
-            ...mandatoryStructuralTides.map((tide) => ({
-              ...tide,
-              appearance: "mandatory" as const,
-            })),
-            ...optionalStructuralTides.map((tide) => ({
-              ...tide,
-              appearance: "optional" as const,
-            })),
-          ];
+          );
           return (
             <motion.div
               key={dreamcaller.name}
@@ -180,7 +165,7 @@ export function QuestStartScreen() {
                   {dreamcaller.renderedText}
                 </p>
               </motion.button>
-              {structuralTides.length > 0 && (
+              {displayedTides.length > 0 && (
                 <div className="flex w-full flex-col gap-2 px-1">
                   <span
                     className="text-xs font-medium"
@@ -190,12 +175,14 @@ export function QuestStartScreen() {
                     Tides:
                   </span>
                   <div className="flex w-full flex-col gap-2">
-                    {structuralTides.map((tide) => (
+                    {displayedTides.map((tide) => (
                       <span
                         key={`${dreamcaller.id}-${tide.id}`}
                         className="group/structural relative"
-                        data-structural-tide-chip={tide.id}
-                        data-structural-tide-appearance={tide.appearance}
+                        data-dreamcaller-tide={`${dreamcaller.id}:${tide.id}`}
+                        data-dreamcaller-tide-appearance={tide.appearance}
+                        data-dreamcaller-tide-id={tide.id}
+                        data-dreamcaller-tide-kind={tide.kind}
                       >
                         <span
                           className="inline-flex min-h-8 w-full items-center justify-start gap-1.5 px-1 py-1 text-xs font-medium"
@@ -206,30 +193,34 @@ export function QuestStartScreen() {
                                 : "#ffffff",
                           }}
                         >
-                          <i
-                            aria-hidden="true"
-                            className={`bx ${tide.iconClass} text-sm leading-none`}
-                            data-structural-tide-icon={tide.id}
-                            style={{
-                              color:
-                                tide.appearance === "optional"
-                                  ? "#94a3b8"
-                                  : "#ffffff",
-                            }}
-                          />
+                          {tide.iconClass !== null && (
+                            <i
+                              aria-hidden="true"
+                              className={`bx ${tide.iconClass} text-sm leading-none`}
+                              data-dreamcaller-tide-icon={`${dreamcaller.id}:${tide.id}`}
+                              style={{
+                                color:
+                                  tide.appearance === "optional"
+                                    ? "#94a3b8"
+                                    : "#ffffff",
+                              }}
+                            />
+                          )}
                           <span>{tide.displayName}</span>
                         </span>
-                        <span
-                          className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg border px-3 py-2 text-left text-xs leading-relaxed shadow-2xl group-hover/structural:block"
-                          style={{
-                            background: "#000000",
-                            borderColor: "rgba(255, 255, 255, 0.16)",
-                            color: "#ffffff",
-                          }}
-                          data-structural-tide-tooltip={tide.id}
-                        >
-                          {tide.hoverBlurb}
-                        </span>
+                        {tide.hoverBlurb !== null && (
+                          <span
+                            className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg border px-3 py-2 text-left text-xs leading-relaxed shadow-2xl group-hover/structural:block"
+                            style={{
+                              background: "#000000",
+                              borderColor: "rgba(255, 255, 255, 0.16)",
+                              color: "#ffffff",
+                            }}
+                            data-dreamcaller-tide-tooltip={`${dreamcaller.id}:${tide.id}`}
+                          >
+                            {tide.hoverBlurb}
+                          </span>
+                        )}
                       </span>
                     ))}
                   </div>

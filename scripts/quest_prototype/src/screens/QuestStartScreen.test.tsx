@@ -11,7 +11,6 @@ import type { QuestState } from "../types/quest";
 import { QuestStartScreen } from "./QuestStartScreen";
 import { useQuest } from "../state/quest-context";
 import { selectDreamcallerOffer } from "../data/dreamcaller-selection";
-import { structuralTidesForPackageTides } from "../data/structural-tides";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 
 vi.mock("framer-motion", () => ({
@@ -104,8 +103,8 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     awakening: 4,
     renderedText: "First dreamcaller.",
     imageNumber: "0009",
-    mandatoryTides: ["materialize_value", "ally_formation", "support-a"],
-    optionalTides: ["support-a", "spirit_growth", "support-c"],
+    mandatoryTides: ["materialize_value", "ally_formation", "cheap_curve"],
+    optionalTides: ["cheap_curve", "spirit_growth", "topdeck_setup"],
   },
   {
     id: "caller-2",
@@ -114,8 +113,8 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     awakening: 6,
     renderedText: "Second dreamcaller.",
     imageNumber: "0010",
-    mandatoryTides: ["warrior_pressure", "ally_wide", "support-d"],
-    optionalTides: ["support-d", "fast_tempo", "support-f"],
+    mandatoryTides: ["warrior_pressure", "ally_wide", "tempo_resets"],
+    optionalTides: ["tempo_resets", "fast_tempo", "resource_burst"],
   },
   {
     id: "caller-3",
@@ -124,8 +123,119 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     awakening: 5,
     renderedText: "Third dreamcaller.",
     imageNumber: "0011",
-    mandatoryTides: ["void_recursion", "spark_tall", "support-g"],
-    optionalTides: ["support-g", "character_chain", "support-i"],
+    mandatoryTides: ["void_recursion", "spark_tall", "trigger_reuse"],
+    optionalTides: ["trigger_reuse", "character_chain", "void_setup"],
+  },
+] as const;
+
+const DISPLAYED_TIDES = [
+  {
+    appearance: "mandatory",
+    displayName: "Echo Arrival",
+    dreamcallerId: "caller-1",
+    hoverBlurb:
+      "Arrival is never just arrival. Every entrance leaves behind an extra page of value, until replay itself feels like drawing breath.",
+    id: "materialize_value",
+    kind: "structural",
+  },
+  {
+    appearance: "mandatory",
+    displayName: "Banner Formation",
+    dreamcallerId: "caller-1",
+    hoverBlurb:
+      "This tide fights like a drilled company. Position matters, timing matters, and a disciplined line turns ordinary allies into a precise machine.",
+    id: "ally_formation",
+    kind: "structural",
+  },
+  {
+    appearance: "mandatory",
+    displayName: "First-Light Muster",
+    dreamcallerId: "caller-1",
+    hoverBlurb:
+      "Low-cost plays that let the deck start affecting the board before slower engines come online.",
+    id: "cheap_curve",
+    kind: "support",
+  },
+  {
+    appearance: "optional",
+    displayName: "Verdant Ascent",
+    dreamcallerId: "caller-1",
+    hoverBlurb:
+      "Life gathers momentum in secret roots. Small turns become rich turns, rich turns become overwhelming ones, and the dream keeps flowering upward.",
+    id: "spirit_growth",
+    kind: "structural",
+  },
+  {
+    appearance: "mandatory",
+    displayName: "Iron Charge",
+    dreamcallerId: "caller-2",
+    hoverBlurb:
+      "A war drum beat made into doctrine. The first bodies hit hard, then every follow-up turns the field into a sprint the enemy cannot survive.",
+    id: "warrior_pressure",
+    kind: "structural",
+  },
+  {
+    appearance: "mandatory",
+    displayName: "Rising Host",
+    dreamcallerId: "caller-2",
+    hoverBlurb:
+      "A single threat can be answered. A battlefield that keeps filling cannot. The host grows until the whole dream is occupied.",
+    id: "ally_wide",
+    kind: "structural",
+  },
+  {
+    appearance: "mandatory",
+    displayName: "Backstep Tide",
+    dreamcallerId: "caller-2",
+    hoverBlurb:
+      "Bounce and reset effects that erase enemy setup and reopen the race on your terms.",
+    id: "tempo_resets",
+    kind: "support",
+  },
+  {
+    appearance: "optional",
+    displayName: "Quickened Edge",
+    dreamcallerId: "caller-2",
+    hoverBlurb:
+      "Victory lives in the half-second before the rival is ready. This tide steals initiative, acts at impossible moments, and never gives it back.",
+    id: "fast_tempo",
+    kind: "structural",
+  },
+  {
+    appearance: "mandatory",
+    displayName: "Haunting Return",
+    dreamcallerId: "caller-3",
+    hoverBlurb:
+      "Nothing properly leaves. The void keeps its own ledger, and what was spent comes stalking back when the moment is right.",
+    id: "void_recursion",
+    kind: "structural",
+  },
+  {
+    appearance: "mandatory",
+    displayName: "Kindled Crown",
+    dreamcallerId: "caller-3",
+    hoverBlurb:
+      "All strength is gathered into a chosen few. One threat grows radiant enough to rule the board while lesser bodies exist only to feed it.",
+    id: "spark_tall",
+    kind: "structural",
+  },
+  {
+    appearance: "mandatory",
+    displayName: "Echo Harness",
+    dreamcallerId: "caller-3",
+    hoverBlurb:
+      "Cards that replay, copy, or refresh important triggers so core synergies keep firing.",
+    id: "trigger_reuse",
+    kind: "support",
+  },
+  {
+    appearance: "optional",
+    displayName: "Living Procession",
+    dreamcallerId: "caller-3",
+    hoverBlurb:
+      "Each body invites the next. The turn becomes a procession of arrivals, rebates, and chained deployments that never quite stop on schedule.",
+    id: "character_chain",
+    kind: "structural",
   },
 ] as const;
 
@@ -220,28 +330,6 @@ afterEach(() => {
 describe("QuestStartScreen", () => {
   it("shows exactly 3 Dreamcaller choices without legacy tide-step UI", () => {
     const { container, root } = mount(<QuestStartScreen />);
-    const displayedStructuralTides = OFFERED_DREAMCALLERS.flatMap((dreamcaller) => {
-      const mandatoryStructuralTides = structuralTidesForPackageTides(
-        dreamcaller.mandatoryTides,
-      );
-      const mandatoryStructuralTideIds = new Set(
-        mandatoryStructuralTides.map((tide) => tide.id),
-      );
-      const optionalStructuralTides = structuralTidesForPackageTides(
-        dreamcaller.optionalTides,
-      ).filter((tide) => !mandatoryStructuralTideIds.has(tide.id));
-
-      return [
-        ...mandatoryStructuralTides.map((tide) => ({
-          ...tide,
-          appearance: "mandatory" as const,
-        })),
-        ...optionalStructuralTides.map((tide) => ({
-          ...tide,
-          appearance: "optional" as const,
-        })),
-      ];
-    });
 
     expect(container.textContent).toContain("Mira of Lanterns");
     expect(container.textContent).toContain("Vey of Embers");
@@ -260,13 +348,17 @@ describe("QuestStartScreen", () => {
       container.querySelectorAll("[data-structural-tides-label]"),
     ).toHaveLength(3);
     expect(
-      container.querySelectorAll("[data-structural-tide-chip]"),
-    ).toHaveLength(displayedStructuralTides.length);
+      container.querySelectorAll("[data-dreamcaller-tide]"),
+    ).toHaveLength(DISPLAYED_TIDES.length);
     expect(
-      Array.from(container.querySelectorAll("[data-structural-tide-chip]")).map(
-        (chip) => chip.getAttribute("data-structural-tide-chip"),
+      Array.from(container.querySelectorAll("[data-dreamcaller-tide]")).map((tide) =>
+        tide.getAttribute("data-dreamcaller-tide"),
       ),
-    ).toEqual(displayedStructuralTides.map((tide) => tide.id));
+    ).toEqual(
+      DISPLAYED_TIDES.map(
+        (tide) => `${tide.dreamcallerId}:${tide.id}`,
+      ),
+    );
 
     for (const dreamcaller of OFFERED_DREAMCALLERS) {
       const label = container.querySelector(
@@ -278,38 +370,56 @@ describe("QuestStartScreen", () => {
       );
     }
 
-    for (const tide of displayedStructuralTides) {
+    for (const tide of DISPLAYED_TIDES) {
       expect(container.textContent).toContain(tide.displayName);
       expect(container.textContent).toContain(tide.hoverBlurb);
-      const chip = container.querySelector(
-        `[data-structural-tide-chip="${tide.id}"]`,
+      const row = container.querySelector(
+        `[data-dreamcaller-tide="${tide.dreamcallerId}:${tide.id}"]`,
       );
-      expect(chip?.getAttribute("title")).toBeNull();
-      expect(chip?.getAttribute("data-structural-tide-appearance")).toBe(
+      expect(row?.getAttribute("data-dreamcaller-tide-appearance")).toBe(
         tide.appearance,
       );
-      const visibleChip = chip?.firstElementChild;
-      expect(visibleChip).not.toBeNull();
-      expect((visibleChip as HTMLElement | null)?.style.color).toBe(
+      expect(row?.getAttribute("data-dreamcaller-tide-kind")).toBe(tide.kind);
+      const visibleRow = row?.firstElementChild;
+      expect(visibleRow).not.toBeNull();
+      expect((visibleRow as HTMLElement | null)?.style.color).toBe(
         tide.appearance === "optional"
           ? "rgb(148, 163, 184)"
           : "rgb(255, 255, 255)",
       );
       const icon = container.querySelector(
-        `[data-structural-tide-icon="${tide.id}"]`,
+        `[data-dreamcaller-tide-icon="${tide.dreamcallerId}:${tide.id}"]`,
       );
       expect(icon?.className).toContain("bx");
-      expect(icon?.className).toContain(tide.iconClass);
+      expect(icon?.className).toContain(
+        tide.kind === "structural" ? "bx" : "bxs-circle",
+      );
       expect((icon as HTMLElement | null)?.style.color).toBe(
         tide.appearance === "optional"
           ? "rgb(148, 163, 184)"
           : "rgb(255, 255, 255)",
       );
+      if (tide.kind === "structural") {
+        expect(
+          container.querySelector(
+            `[data-dreamcaller-tide-tooltip="${tide.dreamcallerId}:${tide.id}"]`,
+          )?.textContent,
+        ).toBe(tide.hoverBlurb);
+      } else {
+        expect(
+          container.querySelector(
+            `[data-dreamcaller-tide-tooltip="${tide.dreamcallerId}:${tide.id}"]`,
+          )?.textContent,
+        ).toBe(tide.hoverBlurb);
+      }
     }
 
-    expect(container.textContent).not.toContain("support-a");
-    expect(container.textContent).not.toContain("support-d");
-    expect(container.textContent).not.toContain("support-g");
+    expect(container.textContent).not.toContain("cheap_curve");
+    expect(container.textContent).not.toContain("topdeck_setup");
+    expect(container.textContent).not.toContain("tempo_resets");
+    expect(container.textContent).not.toContain("resource_burst");
+    expect(container.textContent).not.toContain("trigger_reuse");
+    expect(container.textContent).not.toContain("void_setup");
 
     const secondDreamcallerButton = Array.from(
       container.querySelectorAll("button"),
