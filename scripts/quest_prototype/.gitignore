@@ -3,4 +3,5 @@ dist/
 public/cards/
 public/tides/
 public/card-data.json
+public/dreamcaller-data.json
 logs/
