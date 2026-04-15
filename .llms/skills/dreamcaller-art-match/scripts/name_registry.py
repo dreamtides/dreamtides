@@ -1,0 +1,144 @@
+#!/usr/bin/env python3
+
+import argparse
+import datetime as dt
+import json
+import re
+import sys
+from pathlib import Path
+
+import fcntl
+
+
+REGISTRY_PATH = (
+    Path("/tmp")
+    / "dreamcaller_art_match_registry.json"
+)
+WORD_PATTERN = re.compile(r"[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Track unique dreamcaller names for the dreamcaller-art-match skill."
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    check_parser = subparsers.add_parser("check", help="Check whether a name is unused.")
+    check_parser.add_argument("--name", required=True, help='Candidate like "Proper Name, Title".')
+
+    claim_parser = subparsers.add_parser("claim", help="Reserve a unique dreamcaller name.")
+    claim_parser.add_argument("--name", required=True, help='Final choice like "Proper Name, Title".')
+    claim_parser.add_argument("--image", default="", help="Image path or label for provenance.")
+    claim_parser.add_argument("--ability", default="", help="Short ability excerpt for provenance.")
+
+    status_parser = subparsers.add_parser("status", help="Show registry stats.")
+    status_parser.add_argument(
+        "--limit",
+        type=int,
+        default=10,
+        help="How many recent claimed names to print.",
+    )
+
+    args = parser.parse_args()
+    if args.command == "check":
+        return run_check(args.name)
+    if args.command == "claim":
+        return run_claim(args.name, args.image, args.ability)
+    return run_status(args.limit)
+
+
+def run_check(name: str) -> int:
+    with locked_registry() as registry:
+        return print_check_result(name, registry)
+
+
+def run_claim(name: str, image: str, ability: str) -> int:
+    with locked_registry() as registry:
+        if print_check_result(name, registry) != 0:
+            return 1
+        registry["entries"].append(
+            {
+                "timestamp_utc": dt.datetime.now(dt.UTC).isoformat().replace("+00:00", "Z"),
+                "name": collapse_whitespace(name),
+                "normalized_name": normalize_name(name),
+                "words": extract_words(name),
+                "image": image,
+                "ability": ability,
+            }
+        )
+        print(f'claimed: "{collapse_whitespace(name)}"')
+        return 0
+
+
+def run_status(limit: int) -> int:
+    with locked_registry() as registry:
+        entries = registry["entries"]
+        used_words = sorted({word for entry in entries for word in entry["words"]})
+        print(f"registry: {REGISTRY_PATH}")
+        print(f"claimed names: {len(entries)}")
+        print(f"used words: {len(used_words)}")
+        for entry in entries[-limit:]:
+            print(entry["name"])
+        return 0
+
+
+def print_check_result(name: str, registry: dict) -> int:
+    candidate_words = extract_words(name)
+    if not candidate_words:
+        print("conflict: candidate has no usable words after normalization")
+        return 1
+
+    normalized_name = normalize_name(name)
+    existing_names = {entry["normalized_name"] for entry in registry["entries"]}
+    if normalized_name in existing_names:
+        print(f'conflict: full name already claimed: "{collapse_whitespace(name)}"')
+        return 1
+
+    used_words = {word for entry in registry["entries"] for word in entry["words"]}
+    overlapping_words = sorted(set(candidate_words) & used_words)
+    if overlapping_words:
+        print("conflict: reused words: " + ", ".join(overlapping_words))
+        return 1
+
+    print("ok: name is unique")
+    print("words: " + ", ".join(candidate_words))
+    return 0
+
+
+class locked_registry:
+    def __enter__(self) -> dict:
+        REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
+        self.handle = REGISTRY_PATH.open("a+", encoding="utf-8")
+        fcntl.flock(self.handle.fileno(), fcntl.LOCK_EX)
+        self.handle.seek(0)
+        content = self.handle.read()
+        self.registry = json.loads(content) if content.strip() else {"version": 1, "entries": []}
+        self.registry.setdefault("version", 1)
+        self.registry.setdefault("entries", [])
+        return self.registry
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.handle.seek(0)
+        self.handle.truncate()
+        json.dump(self.registry, self.handle, indent=2, ensure_ascii=True)
+        self.handle.write("\n")
+        self.handle.flush()
+        fcntl.flock(self.handle.fileno(), fcntl.LOCK_UN)
+        self.handle.close()
+
+
+def extract_words(name: str) -> list[str]:
+    sanitized = collapse_whitespace(name).replace("-", " ").lower()
+    return WORD_PATTERN.findall(sanitized)
+
+
+def normalize_name(name: str) -> str:
+    return " ".join(extract_words(name))
+
+
+def collapse_whitespace(value: str) -> str:
+    return " ".join(value.split())
+
+
+if __name__ == "__main__":
+    sys.exit(main())

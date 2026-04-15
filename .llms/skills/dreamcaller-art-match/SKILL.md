@@ -8,6 +8,11 @@ description: Match one dreamcaller art image to the best-fitting Dreamtides drea
 Match a single dreamcaller image to one existing dreamcaller ability and turn that
 match into a convincing character identity.
 
+This skill is optimized for dreamcaller portrait sheets: one humanoid figure in
+a neutral or near-neutral pose, usually with little or no meaningful setting or
+action. Prioritize costume, silhouette, props, bearing, and expression over
+background storytelling.
+
 Run with strong reasoning. `medium` is acceptable for straightforward portraits;
 use `high` when the art is ambiguous or several abilities fit.
 
@@ -37,6 +42,9 @@ from the filename alone.
 Dreamcallers are character identities, so the art should depict a single
 person-like figure with clear individual presence.
 
+A single humanoid portrait in a neutral pose is the normal case for this skill,
+not a weakness in the source art.
+
 Reject the image and stop if the art is primarily:
 
 - a landscape or environment
@@ -55,6 +63,40 @@ Read `notes/dreamcallers.md` every time. That file is the ability pool.
 If a Dreamtides keyword in the chosen ability is unclear, briefly inspect local
 project docs before finalizing the match. Do not guess on core mechanic terms.
 
+Game rules are in `docs/battle_rules/battle_rules.md`.
+
+## Local Name Registry
+
+Every run must produce a totally unique dreamcaller name and title.
+
+Use this local-only registry file:
+
+`/tmp/dreamcaller_art_match_registry.json`
+
+That file lives outside the repo. It is the centralized source of truth for
+previously used dreamcaller naming words.
+
+Before finalizing any candidate, check it with:
+
+`python3 .llms/skills/dreamcaller-art-match/scripts/name_registry.py check --name "Proper Name, Title"`
+
+After choosing the final name, immediately claim it with:
+
+`python3 .llms/skills/dreamcaller-art-match/scripts/name_registry.py claim --name "Proper Name, Title" --image "<image path or label>" --ability "<short ability excerpt>"`
+
+The registry normalizes to lowercase, strips punctuation, and splits hyphenated
+words. Every normalized word counts. If a word has appeared in any earlier
+generated dreamcaller name or title, do not reuse it. This rule is strict: if a
+candidate overlaps on even one word, discard the whole candidate and invent a
+different name and title.
+
+Because the registry is in `/tmp`, uniqueness lasts until that temp file is
+cleared. If `/tmp/dreamcaller_art_match_registry.json` disappears, the naming
+history has been reset and must begin fresh.
+
+If `claim` reports a conflict, assume another run claimed that word first.
+Generate a new name, re-check it, and only then continue.
+
 ## Workflow
 
 ### 1. Ground the image in what is visible
@@ -64,22 +106,27 @@ Describe only what the image actually shows:
 - subject
 - posture and gesture
 - costume, props, symbols, and silhouette
-- setting cues
+- minimal background or setting cues, if any
 - palette and mood
 - anything that implies status, ritual, violence, patience, command, loss, or recurrence
 
 Do not hallucinate lore from ambiguous details. Build from visible facts first.
+For these dreamcaller portrait sheets, most of the usable signal is in wardrobe,
+ornament, stance, and facial or bodily bearing rather than scene context.
 
 ### 2. Extract the dramatic role
 
 Write a short narrative anchor in plain story terms:
 
 - who this person seems to be
-- what kind of moment the image captures
+- what kind of presented identity the image captures
 - what emotional or symbolic role they occupy in the dream
 
 Think in terms like commander, mourner, scavenger, conspirator, herald, judge,
 caretaker, revenant, witness, thief, or martyr.
+
+Do not force an action beat if the art is just a posed figure. In many cases the
+"moment" is simply self-presentation, office, rank, or ritual identity.
 
 ### 3. Search the ability list for resonance
 
@@ -121,7 +168,22 @@ Bad pattern:
 - `The Discard Person`
 - `Event Discount Mage`
 
-### 5. Make the title carry the mechanic
+### 5. Enforce total naming uniqueness
+
+Before outputting any candidate:
+
+- run `python3 .llms/skills/dreamcaller-art-match/scripts/name_registry.py check --name "Proper Name, Title"`
+- reject the candidate if the command reports any reused word
+- keep iterating until the candidate uses only fresh words
+
+After you have the final match:
+
+- run `python3 .llms/skills/dreamcaller-art-match/scripts/name_registry.py claim --name "Proper Name, Title" --image "<image path or label>" --ability "<short ability excerpt>"`
+- if the claim fails, generate a different name and title and try again
+
+Never present an unclaimed name as final output.
+
+### 6. Make the title carry the mechanic
 
 The title must be mechanically linked to the ability, especially the part that
 makes this dreamcaller distinct.
@@ -137,7 +199,7 @@ into a diegetic role:
 
 The title should make a player feel, "Of course this person has that ability."
 
-### 6. Write the narrative justification
+### 7. Write the narrative justification
 
 Explain all of this directly in the output:
 
