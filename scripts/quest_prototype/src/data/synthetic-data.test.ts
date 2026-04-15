@@ -24,10 +24,6 @@ const raritySet = new Set<string>(ALL_RARITIES);
 /** Returns the tide values referenced by a JourneyEffect, if any. */
 function journeyEffectTides(e: JourneyEffect): string[] {
   switch (e.type) {
-    case "addTideCrystal":
-      return [e.tide];
-    case "removeCardsAndAddTideCrystal":
-      return [e.tide];
     default:
       return [];
   }
@@ -48,10 +44,6 @@ function journeyEffectRarities(e: JourneyEffect): string[] {
 /** Returns the tide values referenced by an OfferEffect, if any. */
 function offerEffectTides(e: OfferEffect): string[] {
   switch (e.type) {
-    case "addTideCrystal":
-      return [e.tide];
-    case "addMultipleTideCrystals":
-      return e.crystals.map((c) => c.tide);
     default:
       return [];
   }
@@ -139,10 +131,6 @@ describe("dream journeys", () => {
         expect(e.removeCount).toBeGreaterThan(0);
         expect(e.addCount).toBeGreaterThan(0);
       }
-      if (e.type === "removeCardsAndAddTideCrystal") {
-        expect(e.removeCount).toBeGreaterThan(0);
-        expect(e.crystalCount).toBeGreaterThan(0);
-      }
     }
   });
 
@@ -195,15 +183,17 @@ describe("tempting offers", () => {
     expect(baneCount).toBeGreaterThanOrEqual(3);
   });
 
-  it("addMultipleTideCrystals entries grant crystals matching their description", () => {
+  it("player-facing journey and offer copy avoids legacy tide-crystal language", () => {
+    for (const dj of DREAM_JOURNEYS) {
+      expect(dj.description.toLowerCase()).not.toContain("tide crystal");
+      expect(dj.description.toLowerCase()).not.toContain("tide crystals");
+    }
+
     for (const to of TEMPTING_OFFERS) {
-      if (to.benefit.type === "addMultipleTideCrystals") {
-        expect(to.benefit.crystals.length).toBeGreaterThan(0);
-        for (const c of to.benefit.crystals) {
-          expect(tideSet.has(c.tide)).toBe(true);
-          expect(c.count).toBeGreaterThan(0);
-        }
-      }
+      expect(to.benefitDescription.toLowerCase()).not.toContain("tide crystal");
+      expect(to.benefitDescription.toLowerCase()).not.toContain("tide crystals");
+      expect(to.costDescription.toLowerCase()).not.toContain("tide crystal");
+      expect(to.costDescription.toLowerCase()).not.toContain("tide crystals");
     }
   });
 });

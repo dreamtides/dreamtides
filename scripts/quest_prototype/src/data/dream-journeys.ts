@@ -86,8 +86,8 @@ export const DREAM_JOURNEYS: readonly DreamJourney[] = [
   {
     name: "Pact of the Drowned Stars",
     description:
-      "Fallen constellations whisper bargains from beneath black water. You surrender two cards and receive a tide crystal pulsing with Surge energy.",
-    effect: { type: "removeCardsAndAddTideCrystal", removeCount: 2, tide: "Surge", crystalCount: 1 },
+      "Fallen constellations whisper bargains from beneath black water. You surrender two cards and an unfamiliar champion rises from the drowned sky in return.",
+    effect: { type: "removeCardsAndAddRandomCards", removeCount: 2, addCount: 1, rarity: "Rare" },
   },
   {
     name: "The Flensing Wind",

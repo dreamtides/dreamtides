@@ -41,10 +41,10 @@ export const TEMPTING_OFFERS: readonly TemptingOffer[] = [
   },
   {
     benefitDescription:
-      "A tide crystal hums with concentrated power. Gain 2 Bloom tide crystals.",
+      "A hidden reliquary cracks open. Gain 2 uncommon cards.",
     costDescription:
-      "The crystal's resonance destabilizes your essence reserves. Lose 150 essence.",
-    benefit: { type: "addTideCrystal", tide: "Bloom", count: 2 },
+      "The reliquary's backlash destabilizes your essence reserves. Lose 150 essence.",
+    benefit: { type: "addRandomCards", count: 2, rarity: "Uncommon" },
     cost: { type: "removeEssence", amount: 150 },
   },
   {
@@ -73,10 +73,10 @@ export const TEMPTING_OFFERS: readonly TemptingOffer[] = [
   },
   {
     benefitDescription:
-      "A constellation of tide crystals descends. Gain one crystal each of Arc and Rime.",
+      "A split constellation opens a safer route through the dream. Gain 275 essence.",
     costDescription:
-      "The celestial gift narrows your dreamsign capacity. Max dreamsigns reduced by 2.",
-    benefit: { type: "addMultipleTideCrystals", crystals: [{ tide: "Arc", count: 1 }, { tide: "Rime", count: 1 }] },
+      "The celestial bargain narrows your dreamsign capacity. Max dreamsigns reduced by 2.",
+    benefit: { type: "addEssence", amount: 275 },
     cost: { type: "reduceMaxDreamsigns", amount: 2 },
   },
   {

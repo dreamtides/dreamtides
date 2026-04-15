@@ -1,57 +1,88 @@
 # QA Tooling for the Quest Prototype
 
-Browser testing for the quest prototype requires Python Playwright. WebFetch and
-`mcp__ide__executeCode` both fail on localhost URLs. This document covers the
-correct tools and patterns.
+Browser QA for the quest prototype uses `agent-browser` against the local Vite
+app at `http://localhost:5173`. Do not use WebFetch for localhost, and do not
+substitute Python Playwright when `agent-browser` is available in this
+environment.
 
 ## Browser Automation
 
-**Python Playwright** is the correct tool for all UI interaction and
-screenshots. It is installed system-wide.
+Confirm the tool exists before starting:
 
-```python
-from playwright.sync_api import sync_playwright
-
-with sync_playwright() as p:
-    browser = p.chromium.launch()
-    page = browser.new_page(viewport={"width": 1280, "height": 900})
-    page.goto("http://localhost:5173")
-    page.screenshot(path="/tmp/screenshot.png")
-    browser.close()
+```bash
+which agent-browser
 ```
 
-Confirm availability: `which agent-browser` or
-`/opt/homebrew/bin/playwright --version`.
+Start the prototype, then open it in `agent-browser`:
 
-**WebFetch does not work on localhost.** Every attempt to
-`WebFetch http://localhost:5173` returns `ERROR: Invalid URL`. Do not try it. Do
-not search for `mcp__ide__executeCode` — it is not available in this pipeline
-context.
-
-## Screenshot Limitations
-
-Screenshots saved to `/tmp/` cannot be viewed inline by agents — the Read tool
-returns `(no result)` for PNG files in subagent contexts. Screenshots are
-evidence for human review only.
-
-Use DOM inspection as the primary verification method:
-
-```python
-# Extract computed CSS values
-color = page.evaluate(
-    "getComputedStyle(document.querySelector('.hud')).backgroundColor"
-)
-
-# Read element text
-text = page.locator(".essence-counter").inner_text()
-
-# Check element dimensions
-box = page.locator(".card-grid").bounding_box()
+```bash
+cd /Users/dthurn/dreamtides/scripts/quest_prototype
+npm install
+npm run dev
 ```
 
-Combine `page.evaluate()`, `page.locator().inner_text()`, and
-`page.locator().bounding_box()` to assert layout, content, and color without
-relying on screenshot viewing.
+In a second shell:
+
+```bash
+agent-browser open http://localhost:5173
+agent-browser wait --load networkidle
+```
+
+Use the accessibility snapshot to inspect the current screen and find clickable
+element refs:
+
+```bash
+agent-browser snapshot -i
+agent-browser click @e3
+agent-browser wait 500
+```
+
+## Hidden Tides Smoke Path
+
+The hidden-tides migration smoke path is:
+
+1. Open `http://localhost:5173` and confirm the app starts on the Dreamcaller
+   selection screen.
+2. Verify the quest start shows exactly 3 Dreamcaller choices.
+3. Pick one Dreamcaller and confirm the run enters quest play immediately with
+   no tide-pick step, no tide crystals, and no `DreamcallerDraft` screen.
+4. Reach a draft site and confirm the offer shows 4 unique card names.
+5. Continue far enough to see another draft offer and confirm duplicates can
+   recur across the run but never inside the same offer.
+6. Reach a Dreamsign surface and confirm shown Dreamsigns are spent immediately,
+   including skipped ones.
+7. Reach a later Dreamsign surface in the same run and confirm no previously
+   shown Dreamsign repeats.
+8. Open the debug surface, if present, and confirm package summary details are
+   visible there without exposing package internals in the normal player flow.
+
+## Screenshots And Inspection
+
+Take screenshots for each major state change:
+
+```bash
+agent-browser screenshot /tmp/quest-start.png
+agent-browser screenshot --annotate /tmp/quest-atlas.png
+agent-browser screenshot --full /tmp/quest-draft.png
+```
+
+Useful inspection commands:
+
+```bash
+agent-browser snapshot -i
+agent-browser eval "JSON.stringify(window.__questLog || [])"
+agent-browser eval "JSON.stringify(window.__errors || [])"
+```
+
+Use these checks during QA:
+
+- The heading contains `Dreamtides`.
+- Normal player-facing screens do not expose `mandatoryTides`, `optionalTides`,
+  card `tides`, tide crystals, or `DreamcallerDraft`.
+- Draft offers remain 4-unique until fewer than 4 unique names remain in the
+  pool.
+- Dreamsigns do not repeat within one run.
+- `window.__errors` stays empty.
 
 ## TypeScript Module Testing
 
@@ -98,14 +129,5 @@ typed `readonly` arrays. Verify readonly enforcement only through
 
 ## Dev Server Setup
 
-Start the dev server before any browser QA:
-
-```bash
-cd scripts/quest_prototype
-npm install   # if node_modules is missing
-npm run dev   # runs setup-assets.mjs then starts Vite at localhost:5173
-```
-
-The dev server output confirms the port. If assets are missing (card images,
-tide PNGs), the setup script logs warnings but continues — the prototype runs
-with placeholder images.
+The dev server output confirms the port. If assets are missing, the setup script
+logs warnings but continues and the prototype uses placeholders.

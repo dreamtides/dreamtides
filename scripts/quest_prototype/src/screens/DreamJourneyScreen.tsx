@@ -32,11 +32,11 @@ function describeEffect(effect: JourneyEffect): string {
     case "removeCardsAndAddRandomCards":
       return `Lost ${String(effect.removeCount)} cards, gained ${String(effect.addCount)} ${effect.rarity} card${effect.addCount === 1 ? "" : "s"}`;
     case "removeCardsAndAddTideCrystal":
-      return `Lost ${String(effect.removeCount)} cards, crystal reward removed`;
+      return `Lost ${String(effect.removeCount)} cards`;
     case "upgradeRandomCards":
       return `Upgraded ${String(effect.count)} cards`;
     case "addTideCrystal":
-      return "Crystal reward removed";
+      return "No additional reward";
   }
 }
 
@@ -125,8 +125,9 @@ export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
           break;
         case "removeCardsAndAddTideCrystal":
           removeRandomCards(effect.removeCount);
-          logEvent("legacy_crystal_reward_skipped", {
+          logEvent("legacy_reward_skipped", {
             sourceSiteType: "DreamJourney",
+            legacyType: "tide_crystal",
             tide: effect.tide,
             count: effect.crystalCount,
           });
@@ -152,8 +153,9 @@ export function DreamJourneyScreen({ site }: DreamJourneyScreenProps) {
           }
           break;
         case "addTideCrystal":
-          logEvent("legacy_crystal_reward_skipped", {
+          logEvent("legacy_reward_skipped", {
             sourceSiteType: "DreamJourney",
+            legacyType: "tide_crystal",
             tide: effect.tide,
             count: effect.count,
           });

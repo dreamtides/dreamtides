@@ -263,4 +263,48 @@ describe("loadQuestContent", () => {
         draftPoolSize: 208,
       });
   });
+
+  it("fails loudly with aggregated Dreamcaller package validation errors", async () => {
+    const cards = buildCards({
+      m1: 40,
+      m2: 40,
+      m3: 40,
+      o1: 5,
+      o2: 5,
+      o3: 5,
+      o4: 5,
+      x1: 5,
+      x2: 5,
+      x3: 5,
+      x4: 5,
+    });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: string | URL) => {
+        const path = String(input);
+        if (path === "/card-data.json") {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(cards),
+          });
+        }
+        if (path === "/dreamcaller-data.json") {
+          return Promise.resolve({
+            ok: true,
+            json: () =>
+              Promise.resolve([
+                { ...makeDreamcaller(["o1", "o2", "o3", "o4"]), id: "bad-1", name: "Bad One" },
+                { ...makeDreamcaller(["x1", "x2", "x3", "x4"]), id: "bad-2", name: "Bad Two" },
+              ]),
+          });
+        }
+        return Promise.reject(new Error(`Unexpected fetch path: ${path}`));
+      }),
+    );
+
+    await expect(loadQuestContent()).rejects.toThrow(
+      /Dreamcaller package validation failed:\nBad One: .*no legal optional subset.*\nBad Two: .*no legal optional subset/s,
+    );
+  });
 });

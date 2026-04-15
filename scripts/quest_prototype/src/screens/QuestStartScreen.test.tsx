@@ -101,6 +101,14 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     mandatoryTides: ["core"],
     optionalTides: ["support-d", "support-e", "support-f"],
   },
+  {
+    id: "caller-3",
+    name: "Noctis of Tides",
+    awakening: 5,
+    renderedText: "Third dreamcaller.",
+    mandatoryTides: ["core"],
+    optionalTides: ["support-g", "support-h", "support-i"],
+  },
 ] as const;
 
 function makeMutations(): QuestMutations {
@@ -190,15 +198,20 @@ afterEach(() => {
 });
 
 describe("QuestStartScreen", () => {
-  it("keeps dreamcaller selection cards free of tide labels and icons", () => {
+  it("shows exactly 3 Dreamcaller choices without legacy tide-step UI", () => {
     const { container, root } = mount(<QuestStartScreen />);
 
     expect(container.textContent).toContain("Mira of Lanterns");
     expect(container.textContent).toContain("Vey of Embers");
+    expect(container.textContent).toContain("Noctis of Tides");
+    expect(container.textContent).toContain("Choose Your Dreamcaller");
     expect(container.textContent).not.toContain("Bloom");
     expect(container.textContent).not.toContain("Ignite");
+    expect(container.textContent).not.toContain("DreamcallerDraft");
+    expect(container.textContent).not.toContain("Choose Your Tide");
     expect(container.querySelector('img[alt="Bloom"]')).toBeNull();
     expect(container.querySelector('img[alt="Ignite"]')).toBeNull();
+    expect(container.querySelectorAll("button")).toHaveLength(3);
 
     const secondDreamcallerButton = Array.from(
       container.querySelectorAll("button"),

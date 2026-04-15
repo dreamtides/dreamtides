@@ -220,8 +220,8 @@ describe("generateShopInventory with empty database", () => {
   it("does not crash on an empty card database", () => {
     const emptyDb = new Map<number, CardData>();
     const result = generateShopInventory(emptyDb, []);
-    // Should still produce some slots (dreamsigns, tide crystals, or rerolls)
-    // but no card slots since the database is empty.
+    // Should still produce valid non-card slots without falling over on an
+    // empty pool.
     for (const slot of result.slots) {
       if (slot.itemType === "card") {
         expect(slot.card).not.toBeNull();
