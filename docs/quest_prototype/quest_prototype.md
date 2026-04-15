@@ -1,137 +1,103 @@
 # Quest Prototype
 
 A standalone web prototype of Dreamtides Quest Mode at
-`scripts/quest_prototype/`. Implements the full roguelike loop: cube draft,
-Dream Atlas navigation, 15 site types, auto-resolved battles, and essence
-economy across 7 battles. State is in-memory (resets on page load). No backend,
-no persistence.
+`scripts/quest_prototype/`. It now reflects the hidden-tides package-based
+quest flow: the player chooses from 3 Dreamcallers, the selected Dreamcaller
+resolves a fixed package once at quest start, and the run proceeds through
+draft sites, Dreamsign surfaces, auto-resolved battles, and atlas progression.
+All state is in memory and resets on page load.
 
-## Running the Prototype
+## Running The Prototype
 
-```
+```bash
 cd scripts/quest_prototype
-npm install          # required — node_modules is not committed
-npm run dev          # runs setup-assets.mjs then starts Vite dev server
+npm install          # required; node_modules is not committed
+npm run dev          # runs setup-assets.mjs then starts Vite
 ```
 
 `npm run dev` invokes `scripts/setup-assets.mjs` automatically before starting
 Vite. The setup script is idempotent and:
 
-1. Parses `rendered-cards.toml` to write `public/card-data.json` (483 cards,
-   Special-rarity excluded).
-2. Symlinks `public/cards/{cardNumber}.webp` into the local image cache at
-   `~/Library/Caches/io.github.dreamtides.tv/image_cache/`. Missing images are
-   skipped with a warning.
-3. Copies the 7 tide PNGs into `public/tides/`.
+1. Parses `rendered-cards.toml` into `public/card-data.json`.
+2. Parses `dreamcallers.toml` into `public/dreamcaller-data.json`.
+3. Symlinks `public/cards/{cardNumber}.webp` into the local image cache at
+   `~/Library/Caches/io.github.dreamtides.tv/image_cache/`.
+4. Copies the tide PNGs into `public/tides/`.
 
-The `public/cards/`, `public/tides/`, and `public/card-data.json` paths are
-gitignored.
+The generated `public/cards/`, `public/tides/`, `public/card-data.json`, and
+`public/dreamcaller-data.json` paths are gitignored.
 
 Other commands:
 
-```
+```bash
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint src/
 npm test             # vitest run
 npm run build        # production build
 ```
 
-**Worktrees:** Each git worktree starts without `node_modules`. Run
-`npm install` before any typecheck, lint, or test commands.
-
 ## Tech Stack
 
-React 19, Vite 7, TypeScript 5.8 (strict mode). Tailwind CSS v4 via
-`@tailwindcss/vite` plugin — no `tailwind.config.js` needed; import via
-`@import "tailwindcss"` in `src/index.css`. Framer Motion for animations.
-`smol-toml` for the asset setup script.
+React 19, Vite 7, TypeScript 5.8 in strict mode. Tailwind CSS v4 via
+`@tailwindcss/vite` and Framer Motion for animations. The prototype stays
+within `scripts/quest_prototype/` and uses browser-loaded JSON instead of a
+runtime TOML parser.
 
-TypeScript is configured for bundler mode (`moduleResolution: "bundler"`, no
-`@types/node`). Node built-in modules (`node:fs`, etc.) are not available in
-type-checked code. Tests that need file I/O should mock `fetch` or use Vitest's
-`node` environment, not `import("node:fs")`.
-
-ESLint uses `typescript-eslint` `recommendedTypeChecked` with `no-unsafe-*`
-rules at error level. The `eslint-plugin-react-hooks` plugin is **not**
-configured — `react-hooks/exhaustive-deps` is not enforced.
+TypeScript is configured for bundler mode (`moduleResolution: "bundler"`), so
+Node built-in modules are not available in type-checked code. Tests that need
+file I/O should mock `fetch` or use Vitest's `node` environment.
 
 ## Architecture
 
-All state lives in a single `QuestState` object provided by `QuestProvider` in
-`src/state/quest-context.tsx`. Components read state and call mutations through
-`useQuestContext()`. The current screen is stored in `state.currentScreen` and
-drives `ScreenRouter.tsx`.
+All game state lives in one `QuestState` object provided by
+`src/state/quest-context.tsx`. The current screen is stored in `state.screen`
+and drives the router. The important runtime pieces are:
 
-```
+```text
 src/
-  main.tsx            — entry point, mounts App
-  App.tsx             — QuestProvider wrapper
-  index.css           — Tailwind import
-  types/
-    cards.ts          — CardData type, Tide union
-    quest.ts          — QuestState, Screen, site types
-    draft.ts          — DraftState, BotState
-  state/
-    quest-context.tsx — QuestProvider, QuestMutations, useQuestContext
-  logging.ts          — centralized JSONL event logger
-  components/
-    ScreenRouter.tsx  — screen dispatch by state.currentScreen
-    CardDisplay.tsx   — full card rendering with art, stats, rules text
-    CardOverlay.tsx   — enlarged card overlay (hover/click)
-    DeckViewer.tsx    — deck browser panel
-    HUD.tsx           — persistent bottom bar
-    card-text.ts      — rules text symbol substitution
-    AtlasNode.tsx     — atlas graph node component
-    SiteCard.tsx      — site icon card component
-  screens/            — one file per screen (QuestStart, Atlas,
-  |                     Dreamscape, site types, QuestComplete)
-  atlas/
-    atlas-generator.ts  — dream atlas + dreamscape generation
-  draft/
-    draft-engine.ts     — 10-seat cube draft (pick, rotate, bots)
-    |                     Packs always pass left (seat N → seat N+1).
-    |                     Seat 0 is the human player; seats 1-9 are AI bots.
-  data/               — synthetic data (dreamcallers, dreamsigns,
-  |                     journeys, offers, biomes)
-  shop/               — shop item generation helpers
-  transfiguration/    — transfiguration type logic
+  data/            normalized quest content and synthetic data
+  draft/           fixed-multiset draft engine
+  screens/         one file per screen
+  state/           quest context and mutations
+  types/           quest, content, and draft types
 ```
 
-## Registering a New Site Type
+Current quest state includes:
 
-Adding a site type requires changes in two places:
+- `essence`
+- `deck`
+- `dreamcaller`
+- `resolvedPackage`
+- `remainingDreamsignPool`
+- `dreamsigns`
+- `completionLevel`
+- `atlas`
+- `currentDreamscape`
+- `visitedSites`
+- `draftState`
+- `screen`
+- `activeSiteId`
 
-1. **Screen component** — create `src/screens/MySiteScreen.tsx` and add a case
-   to `ScreenRouter.tsx`.
-2. **Atlas pool** — add the site type with a weight to `buildAdditionalSitePool`
-   in `src/atlas/atlas-generator.ts`. Without this step the site type is
-   unreachable during gameplay.
+The hidden package stays out of normal player UI. Debug surfaces can show the
+resolved package, selected optional subset, draft pool size, and the remaining
+and spent Dreamsign pools.
 
-## Extending QuestState
+## Hidden-Tides Behavior
 
-`QuestContextValue`, `QuestMutations`, and `QuestState` are defined in
-`src/state/quest-context.tsx` and `src/types/quest.ts`. When multiple parallel
-tasks need to add fields to these interfaces, they will conflict at merge time.
-Prefer adding interface extensions in a preparatory commit on the task branch
-before writing the screen that uses them.
-
-## JSONL Event Logging
-
-Every game event is logged via `logEvent(eventName, fields)` in
-`src/logging.ts`. The logger appends to an in-memory array and writes to
-`console.log` as single-line JSON. A "Download Log" button in the HUD exports
-the full `.jsonl` file.
-
-Reserved fields (`timestamp`, `event`, `seq`) are assigned by the logger and
-cannot be overridden by caller-supplied `fields`. The spread order is
-`{ timestamp, event, seq, ...fields }`.
-
-Every mutation that changes game state must call `logEvent` before or after the
-mutation. Missing log calls are a conformance blocker.
+- Dreamcaller selection is a quest-start choice, not a mid-run site.
+- Card chrome is neutral and rarity-driven instead of tide-driven.
+- Draft sites reveal 4 unique cards when possible and consume the revealed
+  cards from the fixed pool.
+- Dreamsign-bearing surfaces spend from a shared pool as soon as a sign is
+  shown.
+- Shops, battle rewards, and similar generators prefer package-adjacent
+  content but fall back to the broader pool if nothing overlaps.
+- The live flow no longer uses tide crystals, `chosenTide`, `excludedTides`,
+  or `DreamcallerDraft`.
 
 ## Card Data Normalization
 
-The TOML source has several field variants that `setup-assets.mjs` normalizes to
+The TOML source has a few field variants that `setup-assets.mjs` normalizes to
 JSON:
 
 | Field         | TOML source values           | JSON output    |

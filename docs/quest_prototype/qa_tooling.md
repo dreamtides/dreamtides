@@ -45,7 +45,8 @@ The hidden-tides migration smoke path is:
    selection screen.
 2. Verify the quest start shows exactly 3 Dreamcaller choices.
 3. Pick one Dreamcaller and confirm the run enters quest play immediately with
-   no tide-pick step, no tide crystals, and no `DreamcallerDraft` screen.
+   no tide-pick step, no legacy tide-crystal UI, and no `DreamcallerDraft`
+   screen.
 4. Reach a draft site and confirm the offer shows 4 unique card names.
 5. Continue far enough to see another draft offer and confirm duplicates can
    recur across the run but never inside the same offer.
@@ -78,7 +79,7 @@ Use these checks during QA:
 
 - The heading contains `Dreamtides`.
 - Normal player-facing screens do not expose `mandatoryTides`, `optionalTides`,
-  card `tides`, tide crystals, or `DreamcallerDraft`.
+  card `tides`, the legacy tide-crystal UI, or `DreamcallerDraft`.
 - Draft offers remain 4-unique until fewer than 4 unique names remain in the
   pool.
 - Dreamsigns do not repeat within one run.
