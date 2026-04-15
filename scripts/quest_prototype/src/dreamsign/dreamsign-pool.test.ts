@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { DreamsignTemplate } from "../types/content";
 import {
+  consumeDreamsignPoolIds,
   drawDreamsignOptions,
+  readDreamsignPool,
   resolveDreamsignTemplates,
 } from "./dreamsign-pool";
 
@@ -29,6 +31,42 @@ const DREAMSIGN_TEMPLATES: DreamsignTemplate[] = [
   },
 ];
 
+describe("readDreamsignPool", () => {
+  it("treats the pool as a unique set of stable template ids", () => {
+    const pool = readDreamsignPool(
+      [
+        "glacial-insight",
+        "missing-id",
+        "glacial-insight",
+        "embers-whisper",
+      ],
+      DREAMSIGN_TEMPLATES,
+    );
+
+    expect(pool.availableIds).toEqual([
+      "glacial-insight",
+      "embers-whisper",
+    ]);
+  });
+});
+
+describe("consumeDreamsignPoolIds", () => {
+  it("drops spent, duplicate, and stale ids from the remaining pool", () => {
+    expect(
+      consumeDreamsignPoolIds(
+        [
+          "missing-id",
+          "embers-whisper",
+          "glacial-insight",
+          "embers-whisper",
+        ],
+        DREAMSIGN_TEMPLATES,
+        ["embers-whisper"],
+      ),
+    ).toEqual(["glacial-insight"]);
+  });
+});
+
 describe("drawDreamsignOptions", () => {
   it("spends shown ids immediately from the shared pool", () => {
     const draw = drawDreamsignOptions(
@@ -42,7 +80,27 @@ describe("drawDreamsignOptions", () => {
     expect(draw.offeredIds.every((id) => !draw.remainingDreamsignPool.includes(id))).toBe(true);
   });
 
-  it("ignores stale ids that do not map to a template", () => {
+  it("consumes the shared pool across sequential reveals without repeats", () => {
+    const first = drawDreamsignOptions(
+      ["embers-whisper", "glacial-insight", "verdant-accord"],
+      DREAMSIGN_TEMPLATES,
+      2,
+    );
+    const second = drawDreamsignOptions(
+      first.remainingDreamsignPool,
+      DREAMSIGN_TEMPLATES,
+      2,
+    );
+
+    expect([...first.offeredIds, ...second.offeredIds].sort()).toEqual([
+      "embers-whisper",
+      "glacial-insight",
+      "verdant-accord",
+    ]);
+    expect(second.remainingDreamsignPool).toEqual([]);
+  });
+
+  it("cleans up stale ids instead of preserving a fake non-empty pool", () => {
     const draw = drawDreamsignOptions(
       ["missing-id", "glacial-insight"],
       DREAMSIGN_TEMPLATES,
@@ -50,15 +108,30 @@ describe("drawDreamsignOptions", () => {
     );
 
     expect(draw.offeredIds).toEqual(["glacial-insight"]);
-    expect(draw.remainingDreamsignPool).toEqual(["missing-id"]);
+    expect(draw.remainingDreamsignPool).toEqual([]);
+  });
+
+  it("degrades to a clean no-offer path when the pool is exhausted", () => {
+    expect(
+      drawDreamsignOptions(["missing-id"], DREAMSIGN_TEMPLATES, 3),
+    ).toEqual({
+      offeredIds: [],
+      offeredDreamsigns: [],
+      remainingDreamsignPool: [],
+    });
   });
 });
 
 describe("resolveDreamsignTemplates", () => {
-  it("returns templates in pool order and skips missing ids", () => {
+  it("returns templates in canonical pool order without duplicates", () => {
     expect(
       resolveDreamsignTemplates(
-        ["glacial-insight", "missing-id", "embers-whisper"],
+        [
+          "glacial-insight",
+          "missing-id",
+          "embers-whisper",
+          "glacial-insight",
+        ],
         DREAMSIGN_TEMPLATES,
       ).map((template) => template.id),
     ).toEqual(["glacial-insight", "embers-whisper"]);
