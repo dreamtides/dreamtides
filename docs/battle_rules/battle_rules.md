@@ -298,6 +298,9 @@ then choose one to add to your hand.
 **Copy** — Create a duplicate of a card or effect. Variants include copying a
 character on the battlefield or copying the next card played.
 
+**Echo** — Copy an effect so it happens an additional time. If an effect says to
+echo something, that effect is copied and resolves again.
+
 **Gain Control** — Take control of an opponent's character, moving it to your
 side of the battlefield.
 
