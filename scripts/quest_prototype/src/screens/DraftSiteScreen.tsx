@@ -20,9 +20,34 @@ import { logEvent } from "../logging";
 
 /** Delay in ms before showing the next pack after a pick. */
 const NEXT_PACK_DELAY = 500;
+const DECK_FLY_DURATION = 0.45;
+const DECK_HIGHLIGHT_DURATION = 900;
 
 /** Animation phases during a pick. */
 type PickPhase = "idle" | "animating" | "waiting";
+
+interface RectSnapshot {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+interface FlyingCardAnimation {
+  key: string;
+  card: CardData;
+  sourceRect: RectSnapshot;
+  targetRect: RectSnapshot;
+}
+
+function snapshotRect(rect: DOMRect): RectSnapshot {
+  return {
+    left: rect.left,
+    top: rect.top,
+    width: rect.width,
+    height: rect.height,
+  };
+}
 
 function sortCardsForDisplay(cards: CardData[]): CardData[] {
   return [...cards].sort((a, b) => {
@@ -99,18 +124,29 @@ function DraftSummary({
 /** Compact deck sidebar showing all drafted cards sorted by energy cost. */
 function DeckSidebar({
   cardDatabase,
+  highlightedEntryId,
 }: {
   cardDatabase: Map<number, CardData>;
+  highlightedEntryId: string | null;
 }) {
   const { state } = useQuest();
 
   const deckCards = useMemo(() => {
-    const cards: CardData[] = [];
+    const cards: Array<{ entryId: string; card: CardData }> = [];
     for (const entry of state.deck) {
       const card = cardDatabase.get(entry.cardNumber);
-      if (card) cards.push(card);
+      if (card) {
+        cards.push({ entryId: entry.entryId, card });
+      }
     }
-    return cards.sort((a, b) => (a.energyCost ?? 0) - (b.energyCost ?? 0));
+    return cards.sort((left, right) => {
+      const energyCostDelta = (left.card.energyCost ?? 0) - (right.card.energyCost ?? 0);
+      if (energyCostDelta !== 0) {
+        return energyCostDelta;
+      }
+
+      return left.card.name.localeCompare(right.card.name);
+    });
   }, [state.deck, cardDatabase]);
 
   if (deckCards.length === 0) {
@@ -126,7 +162,7 @@ function DeckSidebar({
 
   return (
     <div className="flex flex-col gap-0.5 overflow-y-auto p-2">
-      {deckCards.map((card, i) => {
+      {deckCards.map(({ entryId, card }) => {
         const cost = card.energyCost ?? 0;
         const showDivider = cost !== lastCost;
         lastCost = cost;
@@ -134,9 +170,29 @@ function DeckSidebar({
           card.cardType === "Event"
             ? "#c084fc"
             : TIDE_COLORS[cardAccentTide(card)];
+        const isHighlighted = highlightedEntryId === entryId;
 
         return (
-          <div key={`deck-${String(card.cardNumber)}-${String(i)}`}>
+          <motion.div
+            key={entryId}
+            layout
+            animate={
+              isHighlighted
+                ? {
+                    scale: [1, 1.04, 1],
+                    boxShadow: [
+                      "0 0 0 rgba(249, 115, 22, 0)",
+                      "0 0 18px rgba(249, 115, 22, 0.35)",
+                      "0 0 0 rgba(249, 115, 22, 0)",
+                    ],
+                  }
+                : {
+                    scale: 1,
+                    boxShadow: "0 0 0 rgba(249, 115, 22, 0)",
+                  }
+            }
+            transition={{ duration: 0.35 }}
+          >
             {showDivider && (
               <div className="flex items-center gap-1.5 px-1 pt-1.5 pb-0.5">
                 <span
@@ -158,10 +214,25 @@ function DeckSidebar({
             <div
               className="relative flex items-center gap-2 overflow-hidden rounded px-2 py-1"
               style={{
-                background: `linear-gradient(90deg, ${accentColor}15 0%, rgba(10, 6, 18, 0.7) 70%)`,
+                background: isHighlighted
+                  ? `linear-gradient(90deg, ${accentColor}28 0%, rgba(249, 115, 22, 0.16) 38%, rgba(10, 6, 18, 0.72) 78%)`
+                  : `linear-gradient(90deg, ${accentColor}15 0%, rgba(10, 6, 18, 0.7) 70%)`,
                 borderLeft: `2px solid ${accentColor}60`,
               }}
             >
+              <div
+                className="relative z-10 h-10 w-[1.75rem] shrink-0 overflow-hidden rounded-sm border"
+                style={{
+                  borderColor: `${accentColor}66`,
+                  background: `linear-gradient(180deg, ${accentColor}30 0%, rgba(9, 6, 16, 0.9) 100%)`,
+                }}
+              >
+                <img
+                  src={cardImageUrl(card.cardNumber)}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              </div>
               <img
                 src={cardImageUrl(card.cardNumber)}
                 alt=""
@@ -190,7 +261,7 @@ function DeckSidebar({
                 {String(cost)}
               </span>
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>
@@ -206,8 +277,14 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   const [currentOfferCards, setCurrentOfferCards] = useState<CardData[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [offerKey, setOfferKey] = useState(0);
-  const [showDeckSidebar, setShowDeckSidebar] = useState(false);
+  const [showDeckSidebar, setShowDeckSidebar] = useState(true);
+  const [highlightedDeckEntryId, setHighlightedDeckEntryId] = useState<string | null>(null);
+  const [flyingCard, setFlyingCard] = useState<FlyingCardAnimation | null>(null);
   const draftStateRef = useRef<DraftState | null>(null);
+  const pendingPickedCardNumberRef = useRef<number | null>(null);
+  const offerCardRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const deckFlightTargetRef = useRef<HTMLDivElement | null>(null);
+  const previousDeckEntryIdsRef = useRef(state.deck.map((entry) => entry.entryId));
 
   const draftedCardNumbers = useMemo(() => {
     const draftState = state.draftState;
@@ -279,6 +356,68 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     [mutations],
   );
 
+  useEffect(() => {
+    if (flyingCard === null) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setFlyingCard((current) =>
+        current?.key === flyingCard.key ? null : current,
+      );
+    }, Math.round(DECK_FLY_DURATION * 1000));
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [flyingCard]);
+
+  useEffect(() => {
+    if (highlightedDeckEntryId === null) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setHighlightedDeckEntryId((current) =>
+        current === highlightedDeckEntryId ? null : current,
+      );
+    }, DECK_HIGHLIGHT_DURATION);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [highlightedDeckEntryId]);
+
+  useEffect(() => {
+    const previousDeckEntryIds = previousDeckEntryIdsRef.current;
+    const addedEntry = state.deck.find(
+      (entry) => !previousDeckEntryIds.includes(entry.entryId),
+    );
+    previousDeckEntryIdsRef.current = state.deck.map((entry) => entry.entryId);
+
+    const pendingPickedCardNumber = pendingPickedCardNumberRef.current;
+    if (
+      pendingPickedCardNumber !== null
+      && addedEntry !== undefined
+      && !showDeckSidebar
+    ) {
+      pendingPickedCardNumberRef.current = null;
+      return;
+    }
+
+    if (
+      pendingPickedCardNumber === null
+      || addedEntry === undefined
+      || addedEntry.cardNumber !== pendingPickedCardNumber
+      || !showDeckSidebar
+    ) {
+      return;
+    }
+
+    setHighlightedDeckEntryId(addedEntry.entryId);
+    pendingPickedCardNumberRef.current = null;
+  }, [showDeckSidebar, state.deck]);
+
   // Resolve the current offer from draft state using a neutral display order.
   const refreshOffer = useCallback(() => {
     const ds = draftStateRef.current;
@@ -295,9 +434,33 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       if (pickPhase !== "idle") return;
       const ds = draftStateRef.current;
       if (!ds) return;
+      const sourceElement = offerCardRefs.current[cardNumber];
+      const targetElement = deckFlightTargetRef.current;
+      const sourceRect =
+        sourceElement === undefined || sourceElement === null
+          ? null
+          : snapshotRect(sourceElement.getBoundingClientRect());
+      const targetRect =
+        targetElement === null
+          ? null
+          : snapshotRect(targetElement.getBoundingClientRect());
+      const pickedCard = cardDatabase.get(cardNumber);
 
       setPickedCardNumber(cardNumber);
       setPickPhase("animating");
+      pendingPickedCardNumberRef.current = cardNumber;
+      if (
+        pickedCard !== undefined
+        && sourceRect !== null
+        && targetRect !== null
+      ) {
+        setFlyingCard({
+          key: `${String(cardNumber)}-${String(Date.now())}`,
+          card: pickedCard,
+          sourceRect,
+          targetRect,
+        });
+      }
 
       // Close overlay if open
       setOverlayCard(null);
@@ -509,6 +672,9 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
                   transition={{ duration: 0.3 }}
                 >
                   <div
+                    ref={(element) => {
+                      offerCardRefs.current[card.cardNumber] = element;
+                    }}
                     className="relative rounded-lg transition-shadow duration-200"
                     style={{
                       height: "calc((100vh - 48px - 80px) / 2)",
@@ -552,6 +718,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       {/* Deck sidebar */}
       {showDeckSidebar && (
         <div
+          data-testid="draft-deck-sidebar"
           className="w-56 shrink-0 overflow-hidden border-l lg:w-64"
           style={{
             borderColor: "rgba(124, 58, 237, 0.2)",
@@ -559,15 +726,58 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
           }}
         >
           <div
-            className="px-3 py-2"
+            className="flex items-center justify-between gap-3 px-3 py-2"
             style={{ borderBottom: "1px solid rgba(124, 58, 237, 0.15)" }}
           >
             <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "#a855f7" }}>
               Deck ({String(state.deck.length)})
             </span>
+            <div
+              ref={deckFlightTargetRef}
+              data-testid="draft-deck-flight-target"
+              className="h-8 w-[1.4rem] shrink-0 overflow-hidden rounded-sm border"
+              style={{
+                borderColor: "rgba(249, 115, 22, 0.45)",
+                background: "linear-gradient(180deg, rgba(249, 115, 22, 0.26) 0%, rgba(15, 10, 24, 0.92) 100%)",
+                boxShadow: "0 0 10px rgba(249, 115, 22, 0.12)",
+              }}
+            />
           </div>
-          <DeckSidebar cardDatabase={cardDatabase} />
+          <DeckSidebar
+            cardDatabase={cardDatabase}
+            highlightedEntryId={highlightedDeckEntryId}
+          />
         </div>
+      )}
+
+      {flyingCard !== null && (
+        <motion.div
+          data-testid="draft-flying-card"
+          className="pointer-events-none fixed z-50"
+          initial={{
+            left: flyingCard.sourceRect.left,
+            top: flyingCard.sourceRect.top,
+            width: flyingCard.sourceRect.width,
+            height: flyingCard.sourceRect.height,
+            opacity: 0.92,
+          }}
+          animate={{
+            left: flyingCard.targetRect.left,
+            top: flyingCard.targetRect.top,
+            width: flyingCard.targetRect.width,
+            height: flyingCard.targetRect.height,
+            opacity: 0.2,
+          }}
+          transition={{ duration: DECK_FLY_DURATION, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            left: flyingCard.sourceRect.left,
+            top: flyingCard.sourceRect.top,
+            width: flyingCard.sourceRect.width,
+            height: flyingCard.sourceRect.height,
+          }}
+        >
+          <CardDisplay card={flyingCard.card} className="h-full w-full" />
+        </motion.div>
       )}
 
       {/* Card overlay */}
