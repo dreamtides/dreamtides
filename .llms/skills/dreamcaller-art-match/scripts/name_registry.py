@@ -17,6 +17,15 @@ REGISTRY_PATH = (
 WORD_PATTERN = re.compile(r"[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?")
 DEFAULT_SOFT_CAP = 3
 DEFAULT_HARD_CAP = 5
+STOP_WORDS = {
+    "a",
+    "an",
+    "and",
+    "for",
+    "of",
+    "the",
+    "to",
+}
 
 
 def main() -> int:
@@ -114,7 +123,7 @@ def run_claim(name: str, image: str, ability: str) -> int:
 def run_status(limit: int, ability_limit: int) -> int:
     with locked_registry() as registry:
         entries = registry["entries"]
-        used_words = sorted({word for entry in entries for word in entry["words"]})
+        used_words = sorted({word for entry in entries for word in entry_words(entry)})
         print(f"registry: {REGISTRY_PATH}")
         print(f"claimed names: {len(entries)}")
         print(f"used words: {len(used_words)}")
@@ -134,12 +143,12 @@ def print_check_result(name: str, registry: dict) -> int:
         return 1
 
     normalized_name = normalize_name(name)
-    existing_names = {entry["normalized_name"] for entry in registry["entries"]}
+    existing_names = {entry_normalized_name(entry) for entry in registry["entries"]}
     if normalized_name in existing_names:
         print(f'conflict: full name already claimed: "{collapse_whitespace(name)}"')
         return 1
 
-    used_words = {word for entry in registry["entries"] for word in entry["words"]}
+    used_words = {word for entry in registry["entries"] for word in entry_words(entry)}
     overlapping_words = sorted(set(candidate_words) & used_words)
     if overlapping_words:
         print("conflict: reused words: " + ", ".join(overlapping_words))
@@ -202,7 +211,7 @@ class locked_registry:
 
 def extract_words(name: str) -> list[str]:
     sanitized = collapse_whitespace(name).replace("-", " ").lower()
-    return WORD_PATTERN.findall(sanitized)
+    return [word for word in WORD_PATTERN.findall(sanitized) if word not in STOP_WORDS]
 
 
 def extract_ability_words(ability: str) -> list[str]:
@@ -211,6 +220,14 @@ def extract_ability_words(ability: str) -> list[str]:
 
 def normalize_name(name: str) -> str:
     return " ".join(extract_words(name))
+
+
+def entry_words(entry: dict) -> list[str]:
+    return extract_words(entry.get("name", ""))
+
+
+def entry_normalized_name(entry: dict) -> str:
+    return normalize_name(entry.get("name", ""))
 
 
 def normalize_ability(ability: str) -> str:

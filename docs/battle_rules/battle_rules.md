@@ -344,7 +344,10 @@ event occurs. Three keyword triggers can appear on characters: **Materialized**
 (fires when the character enters the battlefield), **Judgment** (fires during
 the Judgment phase at the start of each turn), and **Dissolved** (fires when the
 character is destroyed). Triggered abilities can also use descriptive conditions
-like "When you play a card" or "At end of turn." Characters can have combined
+like "When you play a card" or "At end of turn." A character played from hand
+can satisfy both "when you play" and "Materialized" triggers, but a character
+put directly onto the battlefield without being played satisfies only
+"Materialized." Characters can have combined
 triggers such as "Materialized, Judgment" (fires both on entry and each Judgment
 phase).
 

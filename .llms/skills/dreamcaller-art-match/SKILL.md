@@ -90,10 +90,11 @@ After choosing the final name, immediately claim it with:
 `python3 .llms/skills/dreamcaller-art-match/scripts/name_registry.py claim --name "Proper Name, Title" --image "<image path or label>" --ability "<short ability excerpt>"`
 
 The registry normalizes to lowercase, strips punctuation, and splits hyphenated
-words. Every normalized word counts. If a word has appeared in any earlier
-generated dreamcaller name or title, do not reuse it. This rule is strict: if a
-candidate overlaps on even one word, discard the whole candidate and invent a
-different name and title.
+words. Common function words such as `of`, `the`, `and`, `for`, `to`, `a`, and
+`an` are ignored. Every other normalized word counts. If a substantive word has
+appeared in any earlier generated dreamcaller name or title, do not reuse it.
+This rule is strict: if a candidate overlaps on even one substantive word,
+discard the whole candidate and invent a different name and title.
 
 Because the registry is in `/tmp`, uniqueness lasts until that temp file is
 cleared. If `/tmp/dreamcaller_art_match_registry.json` disappears, the naming
@@ -140,6 +141,35 @@ Do not flatten specific visual identity into generic fantasy language when the
 signal is strong. Prefer `samurai-coded armored retainer` over `formal warrior`
 if the art clearly supports it.
 
+### 1.5. Classify the visual register and domain
+
+State the image's visual register in 3-8 words.
+
+Common source domains include:
+
+- sci-fi
+- fantasy
+- modern
+- post-apocalyptic
+- ancient Egypt
+- ancient Rome
+
+This register is binding for the rest of the task.
+
+- The chosen ability must feel native to that register or have a very clear bridge to it.
+- The name and title must also feel native to that register.
+- If the art, ability, and final identity pull from mismatched genres, reject the match and try again.
+
+Treat in-game card domains as part of this check. Some Dreamtides signals come
+with strong default world logic:
+
+- Survivors usually imply post-apocalyptic, ruin-travel, salvage, and hard endurance.
+- Warriors usually imply fantasy or mythic martial identity.
+- Spirit-animal style presences usually imply mythical or forest-bound dream logic.
+
+These are strong priors, not absolute bans. If the chosen ability carries one
+of these signals, make sure the art can actually support it.
+
 ### 2. Extract the dramatic role
 
 Write a short narrative anchor in plain story terms:
@@ -148,29 +178,27 @@ Write a short narrative anchor in plain story terms:
 - what kind of presented identity the image captures
 - what emotional or symbolic role they occupy in the dream
 
-Think in terms like commander, mourner, scavenger, conspirator, herald, judge,
-caretaker, revenant, witness, thief, or martyr.
-
 Do not force an action beat if the art is just a posed figure. In many cases the
 "moment" is simply self-presentation, office, rank, or ritual identity.
+Do not force the role to be a job title if the art does not support that. The
+role can be an office, epithet, vow, burden, lineage, ceremonial station, or
+another identity that feels native to the pictured figure.
 
 ### 3. Search the ability list for resonance
 
 Read all abilities in `notes/dreamcallers.md` and identify the strongest thematic
-fits. Compare the art against the mechanic's implied fantasy:
+fits.
 
-- discard / void / reclaim: loss, memory, scavenging, return, salvage, grief
-- materialize / deploy / repeated arrivals: summoning, leadership, coordination, procession
-- spark buffs / wide boards: banners, inspiration, collective fervor, command
-- event chaining / event discounts: scheming, ritual fluency, improvisation, momentum
-- Survivor hooks: wasteland endurance, ruin-born pragmatism, salvage identity
-- Warrior hooks: martial posture, dueling presence, command through force
-- Judgment hooks: verdict, destiny, ceremony, final reckoning
-- prevent / copy / reactiveness: foresight, interdiction, countermagic, trap-setting
+Internally shortlist several candidates, then compare each serious finalist on:
 
-Internally shortlist several candidates, then choose the single strongest final
-match. Do not pick by mechanic alone; pick by combined visual, emotional, and
-story fit.
+- visible fit
+- dramatic-role fit
+- register and genre fit
+- mechanic fantasy fit
+- usage freshness
+
+Do not pick by mechanic alone. A mechanically plausible ability is still a bad
+match if it drags the character into the wrong genre or card domain.
 
 After building the shortlist, run `check-ability` on each serious finalist using
 the exact ability text from `notes/dreamcallers.md`.
@@ -180,9 +208,9 @@ the exact ability text from `notes/dreamcallers.md`.
 - If multiple candidates fit similarly well, break the tie in favor of the less-used ability.
 - If an ability has hit the hard cap, remove it from consideration entirely.
 
-Do not let one visually broad ability become the default answer for every armored
-warrior, judge, or lone champion portrait just because it is an easy thematic
-fit. Repetition pressure is part of the selection problem.
+Reject finalists with weak register fit even if they are otherwise tempting. If
+none of the abilities can support the image's domain cleanly, say so plainly
+instead of forcing a weak match.
 
 ### 4. Invent the dreamcaller identity
 
@@ -194,23 +222,12 @@ The name is always a proper name plus a title separated by a comma. It is not
 literally always four words, but it must read like a specific person, not a
 card label.
 
-Good pattern:
-
-- `Ilya, Keeper of the Last Choir`
-- `Seren Vale, Twice-Bound Herald`
-- `Morrow, Judge of Empty Thrones`
-- `Kazue Tsuki, Champion of the Solitary Vow`
-
-Bad pattern:
-
-- `Void Reclaimer`
-- `The Discard Person`
-- `Event Discount Mage`
-
 Before finalizing, ask whether the title sounds like an earned office, epithet,
-vow, sobriquet, or ceremonial role that a person in the world could actually
-bear. If it reads like a deck label, a custom keyword, or a compressed mechanic
-summary, discard it and try again.
+vow, sobriquet, ceremonial role, lineage-mark, or other diegetic designation
+that a person in the world could actually bear. It does not have to be a job
+title, but it does have to sound like something a person could be known as in
+that world. If it reads like a deck label, a custom keyword, or a compressed
+mechanic summary, discard it and try again.
 
 ### 5. Enforce total naming uniqueness
 
@@ -228,44 +245,18 @@ After you have the final match:
 
 Never present an unclaimed name as final output.
 
-**Examples in this skill are illustrative, not a vocabulary to draw from.**
-Every word like `ragpicker`, `ferryman`, `mourner`, `herald`, `keeper`,
-`magistrate`, `standard-bearer`, `choir-leader`, `arbiter`, `witness`,
-`midwife`, `oath-bearer`, etc. that appears anywhere in this SKILL.md is shown
-to demonstrate the *shape* of a good title — a diegetic role that implies a
-mechanic without paraphrasing it. Do not lift those words into your final
-answer. If you find yourself reaching for a word because you just read it in
-the skill text, reject that word and invent a different role-noun grounded in
-the specific art and ability in front of you. Treat the example list as a
-worked exercise you have already seen the answers to, not as a menu.
-
 ### 6. Make the title carry the mechanic
 
 The title must be mechanically linked to the ability, especially the part that
 makes this dreamcaller distinct.
 
-Do not paraphrase the rules text in ugly game language. Translate the mechanic
-into a diegetic role:
+Do not paraphrase the rules text in ugly game language. The title must evoke the
+story logic behind the mechanic, not encode its condition literally. Do not
+build titles out of disguised rules text, exact counts, target restrictions, or
+deployment conditions.
 
-- repeated `▸ Materialized:` triggers might suggest a caller, midwife, herald, or stage-director of arrivals
-- discard causing return might suggest a ragpicker, mourner, archivist, or ferryman of the lost
-- group spark scaling might suggest a standard-bearer, choir-leader, field marshal, or saint of the host
-- prevent copying a card might suggest an interceptor, mirror-magistrate, oath-thief, or counterseer
-- Judgment Echo might suggest a judge, oracle, final witness, or keeper of verdicts
-
-The title must evoke the fantasy of the mechanic, not encode its condition
-literally. Do not build titles out of disguised rules text, exact counts,
-target restrictions, or deployment conditions.
-
-Bad title habits:
-
-- invented compounds whose only job is to smuggle mechanics into the title, such as `Singlegate`
-- titles that secretly mean `cares about exactly one ally`, `discounts events`, or `copies prevented cards`
-- phrases that only make sense if the reader already knows the exact ability text
-
-Prefer titles that imply the story logic behind the mechanic: champion,
-arbiter, witness, mourner, herald, keeper, magistrate, ferryman, executioner,
-oath-bearer, or standard-bearer. A good title should make the ability feel
+The title can draw on office, epithet, rank, vow, omen, lineage, ritual
+station, or another diegetic designation. It should make the ability feel
 inevitable without sounding like paraphrased rules text.
 
 If the art strongly suggests a specific cultural register, let that shape the
@@ -310,6 +301,7 @@ user explicitly asks for alternates.
 The final pairing should satisfy all of these:
 
 - the ability feels plausible for the pictured figure
+- the ability belongs to the same genre and card domain as the art
 - the title points at the mechanic without sounding like rules text
 - the character feels like a person with a role in the dream, not a trope stub
 - the story justification explains why this exact ability belongs to them
@@ -317,6 +309,7 @@ The final pairing should satisfy all of these:
 
 Failure modes to avoid:
 
+- genre drift between the art, the chosen ability, and the final identity
 - flattening strong cultural visual cues into generic fantasy description
 - inventing clever-looking title words that are not plausible human titles
 - hiding rules conditions inside pseudo-poetic compounds or abstract jargon
