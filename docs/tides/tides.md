@@ -1,508 +1,627 @@
 # Dreamtides Tides
 
-## Introduction
+## Core Idea
 
-Tides are the philosophical and mechanical backbone of Dreamtides card design.
-Each tide represents a worldview — a way of approaching the struggle for victory
-points and understanding how the dream should be shaped. Tides are primarily
-cosmetic: they do not restrict which cards can be played together. However, the
-natural pressures of drafting and deckbuilding tend to push players toward cards
-that share a tide, since those cards are designed to mechanically reinforce each
-other.
+A tide is a named gameplay package. It describes a real battle pattern: the kind
+of board a deck wants, the resources it converts, the timing it rewards, and the
+way it closes games.
 
-There are seven core tides plus a special neutral tide called Neutral. Each core
-tide has a primary deck archetype and a distinct way of using the battlefield.
-In the modern game, tides are shaped not only by resources, but by how they use
-the staggered grid: how they build reserves, pressure deployed lanes, exploit
-support relationships, and turn Judgment into advantage.
+Tides are not factions, flavor-only labels, or tiny mechanic tags. A tide exists
+when it changes how cards play together on the battlefield. The question is
+always what a card is doing in game terms: what board state it creates, what
+resource loop it feeds, what timing window it exploits, and what payoff it is
+helping a deck reach.
 
-Reserve, Materialize, Dissolve, Banish, Support, Fast, Discover, and Copy are
-available to every tide. The clearest tide-linked battlefield keywords are Veil
-in Umbra, Unbound in Ignite, Test and Preeminence in Rime, and Unstoppable most
-often on Bloom and Umbra finishers.
+Every tide should have both:
 
-The tide circle, in order, is: Bloom — Arc — Ignite — Pact — Umbra — Rime —
-Surge, which loops back to Bloom. Each tide is most naturally allied with its
-two neighbors on this circle, and Neutral sits at the center, compatible with
-all.
+- a narrative identity: what the deck feels like it is trying to do
+- a mechanical identity: the concrete game actions and payoffs that define it
 
-______________________________________________________________________
+## Tide Layers
 
-# Neutral
+Dreamtides uses three tide layers.
 
-## Philosophy
+- Structural tides are full shells. They own the main payoff cards, the central
+  engines, and the finishers that define a deck's primary plan.
+- Support tides are splashable technique packages. They own setup, smoothing,
+  bridges, low-commitment role players, and enablers that reinforce a shell
+  without being that shell's main payoff.
+- Utility tides are broad role packages. They own generally useful curve,
+  interaction, selection, refuel, and closing tools that do one clean job
+  without asking for a dedicated density or threshold.
 
-Neutral is the tide of the untamed and the uncategorized. It believes that the
-dream is too vast, too strange, and too fundamentally unknowable to be captured
-by any single philosophy. Where other tides commit to a worldview and draw
-strength from that commitment, Neutral draws strength from refusing to commit at
-all. It is the trickster, the shapeshifter, the force of raw possibility that
-exists before the dreamer chooses what to dream.
+In practice:
 
-Neutral does not reject the other tides — it sees truth in all of them. It
-simply refuses to be bound by any one truth. To Neutral, flexibility is the
-highest form of power. The dreamer who can adapt to anything will outlast the
-dreamer who has mastered only one thing. Neutral is drawn to the legendary, the
-singular, the mythic — the kind of power that transcends category and defies
-classification.
+- Structural tides own "do the thing, get paid" cards.
+- Support tides own "help the deck do the thing more often" cards.
+- Utility tides own "this is broadly good regardless of shell" cards.
 
-## Mechanical Identity
+## Applying Tides To Cards
 
-Neutral is the neutral tide. Its cards are designed to be effective across three
-or more strategies, serving as glue that holds hybrid decks together and as
-standalone power that any drafter can use.
+Apply tides by battlefield function, not by surface wording.
 
-**Primary tools:**
+- A card belongs to a structural tide when it is a real payoff, engine, or
+  closer for that plan.
+- A card belongs to a support tide when it is setup, smoothing, or a bridge that
+  another shell can use without needing the full payoff package.
+- A card belongs to a utility tide when its job is broadly useful and remains
+  clear outside any dedicated shell.
+- Mentioning a mechanic is not enough. A card should only carry a tide if it
+  actively advances that tide's actual game plan.
 
-- **Generic removal** — Dissolve, banish, and targeted spark reduction that do
-  not ask for tide-specific setup.
-- **Discover cards** — Neutral is the primary home of Discover, helping any deck
-  find what it needs.
-- **Sweepers** — Board resets that punish overcommitment and rescue stalled
-  drafts.
-- **Legendary powers** — Neutral is the exclusive home of the most mythic,
-  format-warping effects: extra turns, massive card draw (draw 3), free energy
-  generation (gain 3 energy for 0 cost), and permanent energy acceleration (gain
-  2 extra energy per turn). These effects are rare, expensive, and
-  game-defining.
+Several boundaries matter because they separate similar-looking cards into
+different play patterns:
 
-**Strategy:** Neutral does not have a dedicated archetype. It appears in every
-deck as utility, removal, and raw power, and it can rescue a weak draft by
-supporting a generic "good stuff" plan.
+- `materialize_value` owns repeatable ETB and materialized value.
+  `materialize_tempo` owns return, temporary banish, replay timing, and pressure
+  sequencing.
+- `ally_formation` owns true multi-ally scaling and pair-based battlefield
+  formation. `ally_wide` owns generic flood plans and non-scaling wide-board
+  pressure.
+- `character_chain` owns explicit second-character and deploy-chain reward
+  cards. `character_curve` owns cheap character density and quantity without
+  chain triggers.
+- `void_recursion` owns reclaim, replay, and recursive threats. `void_threshold`
+  owns count-the-void scaling and threshold finishers.
+- `abandon_value` owns abandon as resource conversion and loop fuel.
+  `abandon_ladder` owns abandon into upgrade, deck-cheat, and escalation chains.
+- `prevent_control` owns reactive denial and payoff for stopping cards.
+  `tax_pressure` and `hand_disruption` own proactive taxes and hand attack.
 
-## Relationships
+## Structural Tides
 
-Neutral is allied with every tide and enemy of none — its generic removal, card
-selection, and legendary powers slot into any strategy as utility.
+Structural tides are the dream's main doctrines. Each one supplies a complete
+way to win games.
 
-______________________________________________________________________
+### `warrior_pressure`
 
-# Bloom
+Narrative identity: Relentless martial momentum.
 
-## Philosophy
+Mechanical identity: Low-curve Warriors, direct spark buffs, point racing, and
+aggressive battlefield snowball.
 
-Bloom believes that the world is a garden waiting to flourish. It values
-patience, cultivation, and deep living energy, but not passivity. Bloom's ideal
-state is abundance: roots spreading below the surface, reserves filling, and
-then a sudden season of explosive growth.
+Apply to cards that build early Warrior boards, push damage immediately, or turn
+Warrior density into pressure.
 
-The spirit animals of Bloom are honored partners, not tools. Their power awakens
-when a dreamer builds a thriving ecosystem rather than a single monument. Bloom
-is optimistic and expansive. It wants the battlefield crowded with life, every
-new arrival making the next one easier.
+### `warrior_bastion`
 
-## Mechanical Identity
+Narrative identity: Disciplined defense and superior trading.
 
-Bloom is the ramp tide. It uses that ramp to build character density, fill
-reserves, and create Judgment engines that let one character play snowball into
-another.
+Mechanical identity: Sticky Warriors, favorable trades, attrition tools, and
+defensive board control.
 
-**Primary strategy — Character Storm / Ramp / Spirit Animal Tribal:**
+Apply to cards that make Warrior boards hard to clear, reward holding ground, or
+grind through combat.
 
-- Spirit Animals are the main home of Bloom's recurring Judgment energy engine
-- Cost reduction, on-play draw, and top-of-deck play that chain real characters
-- Payoffs for a crowded battlefield, especially 4+ allies and full support webs
-- Expensive Spirit Animals that reward an established herd rather than replacing
-  it
+### `spirit_growth`
 
-**Supplemental strategies:**
+Narrative identity: Living abundance that compounds over time.
 
-- **Judgment engine** — Bloom is the main home of "Judgment: gain energy" and
-  allied Judgment retriggers, turning board presence into more mana and more
-  characters.
-- **Wide pressure** — Bloom wins by sustained board growth, ally-count scaling,
-  and a few herd-wide finishers, not by generic overrun effects.
-- **Big growth** — Bloom ramps into notable top-end, and its finishers are
-  strongest when they amplify an existing board. Unstoppable belongs here more
-  naturally than pure spark-doubling.
+Mechanical identity: Spirit Animals, ramp, top-of-deck play, board snowball, and
+Judgment energy and spark chaining.
 
-**Weakness:** Bloom is slower than the dedicated aggressive tides. Its
-characters usually enter reserved, so it can fall behind on immediate tempo, and
-board clears punish Bloom more than spot removal does.
+Apply to cards that ramp into larger Spirit turns, reward Spirit density, or
+convert Judgment into more board.
 
-## Relationships
+### `materialize_value`
 
-Bloom's neighbors are Arc, which multiplies its materialize and Judgment
-engines, and Surge, which turns Bloom's energy surplus into larger sequencing
+Narrative identity: Repeated arrival as a source of advantage.
+
+Mechanical identity: ETB value, materialized triggers, copy effects tied to
+entry, and steady resource gain.
+
+Apply to cards that are premium materialize targets or directly reward repeated
+entries.
+
+### `materialize_tempo`
+
+Narrative identity: Reality in motion, never letting the board settle.
+
+Mechanical identity: Bounce, temporary banish, replay timing, fast pressure, and
+tempo swings.
+
+Apply to cards that remove blockers for a turn, reset allies for timing value,
+or use replay to create pressure windows.
+
+### `ally_formation`
+
+Narrative identity: Coordinated companies moving in deliberate formation.
+
+Mechanical identity: Multi-ally payoffs, pair scoring, formation spark scaling,
+and disciplined board geometry.
+
+Apply to cards that reward exact ally counts, adjacent support patterns, or
+pair-based scaling.
+
+### `ally_wide`
+
+Narrative identity: Overwhelming presence through sheer board spread.
+
+Mechanical identity: Generic go-wide battlefield shells, token-flood finishes,
+and non-scaling wide pressure.
+
+Apply to cards that flood the board with bodies and turn width itself into the
+win condition.
+
+### `fast_tempo`
+
+Narrative identity: Winning through timing and initiative.
+
+Mechanical identity: Dense fast cards, hand-fast enablers, opponent-turn plays,
+and explicit fast-payoff bodies.
+
+Apply to cards that care that a card was played fast or create reactive pressure
+without giving up tempo.
+
+### `event_chain`
+
+Narrative identity: Spell turns that build into a decisive burst.
+
+Mechanical identity: Event density, cost reduction, copies, burst sequencing,
+and cards-played-this-turn finishers.
+
+Apply to cards that reward long event turns, sequencing density, or storm-style
+chaining.
+
+### `prevent_control`
+
+Narrative identity: Command of the game through refusal and interruption.
+
+Mechanical identity: Hard prevents, counterspell pressure, reactive events, and
+denial-as-engine value.
+
+Apply to cards that stop opposing plays on the stack or convert prevented cards
+into advantage.
+
+### `discard_velocity`
+
+Narrative identity: Burning through the hand to gain speed.
+
+Mechanical identity: Self-discard, hand churn, burst draw, and discard-fueled
+tempo.
+
+Apply to cards that want cards discarded as cost or payoff and turn churn into
+speed.
+
+### `void_recursion`
+
+Narrative identity: The void as a second hand and a place of return.
+
+Mechanical identity: Reclaim, replay from void, recursive threats, and
+void-as-hand patterns.
+
+Apply to cards that come back from the void, cast from it, or reward repeated
+rebuy loops.
+
+### `void_threshold`
+
+Narrative identity: Power that grows as the void deepens.
+
+Mechanical identity: Void count scaling, threshold bodies, and count-based
+finishers.
+
+Apply to cards that care how many cards are in the void and become threatening
+at specific void sizes.
+
+### `abandon_value`
+
+Narrative identity: Sacrifice as fuel for resource conversion.
+
+Mechanical identity: Abandon for energy, cards, attrition value, and sacrifice
+loops.
+
+Apply to cards that turn leaving play into cards, energy, or repeatable
+conversion.
+
+### `abandon_ladder`
+
+Narrative identity: Feeding lesser pieces upward into greater ones.
+
+Mechanical identity: Abandon to upgrade, abandon into deck cheat,
+materialize-bigger chains, and deck-as-resource finishing.
+
+Apply to cards that cash in expendable bodies to pull larger cards or step up a
+board state.
+
+### `figment_swarm`
+
+Narrative identity: A dream made real through multiplying fragments.
+
+Mechanical identity: Figment generation, figment multiplication, figment-tribal
+payoffs, and token-board finishes.
+
+Apply to cards that create figments, reward figment count, or turn token mass
+into lethal pressure.
+
+### `survivor_dissolve`
+
+Narrative identity: Endurance through death, recovery, and attrition.
+
+Mechanical identity: Survivors, Dissolved triggers, death loops, void rebuys,
+and sticky attrition.
+
+Apply to cards that reward allied cards dissolving or repeatedly recycle
+dissolved pieces.
+
+### `judgment_engines`
+
+Narrative identity: Winning by bending the scoring phase itself.
+
+Mechanical identity: Extra Judgment phases, repeated Judgment triggers,
+phase-scaling bodies, and Judgment payoff turns.
+
+Apply to cards that care specifically about Judgment happening, happening again,
+or happening bigger.
+
+### `character_chain`
+
+Narrative identity: Momentum built from body after body entering play.
+
+Mechanical identity: Second-character payoffs, deploy rebates, replay-on-deploy
+chains, and character-play cost reduction.
+
+Apply to cards that pay off multiple character plays in a turn or convert
+character sequencing into tempo.
+
+### `spark_tall`
+
+Narrative identity: Concentrating power into a single dominant threat.
+
+Mechanical identity: Kindle, focused spark growth, board compression, and
+one-threat or two-threat pressure.
+
+Apply to cards that stack spark on a small number of bodies and make that
+concentration the plan.
+
+## Support Tides
+
+Support tides are techniques, bridges, and setup packages. They skew how a
+structural shell plays without replacing that shell's main payoff cards.
+
+### `big_energy`
+
+Narrative identity: Power spikes and overcharged turns.
+
+Mechanical identity: Temporary and permanent energy bursts plus flexible sinks.
+
+Apply to cards that produce surplus energy or give decks a place to spend it.
+
+### `fast_setup`
+
+Narrative identity: Reactive posture without needing dedicated fast payoffs.
+
+Mechanical identity: Cheap fast cards, timing tools, and opponent-turn texture.
+
+Apply to cards that make fast play easier or more frequent without being a fast
+reward card.
+
+### `hand_cycling`
+
+Narrative identity: Constant hand sculpting and motion.
+
+Mechanical identity: Looting, rummaging, hand filtering, and redraw.
+
+Apply to cards that turn weak cards into better ones and smooth sequencing.
+
+### `reclaim_characters`
+
+Narrative identity: Recovering bodies for another deployment.
+
+Mechanical identity: Character rebuy and replay setup.
+
+Apply to cards that return characters from the void or hand them back for reuse.
+
+### `reclaim_events`
+
+Narrative identity: Recasting key spells.
+
+Mechanical identity: Event rebuy and replay setup.
+
+Apply to cards that let a deck get more uses out of events without being an
+event-count payoff.
+
+### `spark_growth`
+
+Narrative identity: Quiet preparation for a tall payoff.
+
+Mechanical identity: Direct spark buffs, kindle tools, and tall-board setup.
+
+Apply to cards that add spark efficiently without being the main tall reward.
+
+### `go_wide_enablers`
+
+Narrative identity: Building width before rewards arrive.
+
+Mechanical identity: Cheap extra bodies, token makers, deployment smoothing, and
+board support.
+
+Apply to cards that create wide boards without being an ally-count or tribal
+payoff.
+
+### `leave_play_enablers`
+
+Narrative identity: Making departure matter.
+
+Mechanical identity: Sacrifice, bounce, banish, and dissolve bridges.
+
+Apply to cards that cause allied cards to leave play in ways other shells can
+exploit.
+
+### `bounce_blink_tools`
+
+Narrative identity: Reusing entries through movement.
+
+Mechanical identity: Ally return, temporary banish, replay setup, and blink
+infrastructure.
+
+Apply to cards that reset allies or create low-commitment replay patterns.
+
+### `topdeck_setup`
+
+Narrative identity: Preparing the next draw before it matters.
+
+Mechanical identity: Top-of-deck access, deck smoothing, deck stocking, and
+light deck-cheat setup.
+
+Apply to cards that arrange, reveal, or preload the top of the deck for later
 turns.
 
-______________________________________________________________________
-
-# Arc
-
-## Philosophy
-
-Arc believes that nothing is fixed. Reality is fluid, mutable, endlessly
-recombinable. Where Bloom grows through abundance and Ignite commits to force,
-Arc sees a prism — turn it slightly and everything changes. The same card,
-materialized twice, returned to hand and replayed, or seen from a different
-angle reveals a different truth.
-
-Arc's philosophy is one of motion and perspective. It values cleverness,
-adaptability, and the ability to see opportunities that others miss. It does not
-overpower its opponents — it outmaneuvers them. Arc believes that the dreamer
-who moves fastest and thinks furthest ahead will always prevail, not because
-speed is strength, but because speed creates options, and options are the truest
-form of freedom.
-
-Arc is fascinated by thresholds and transitions — the moment a character
-materializes, the instant between existing and not existing. It exploits these
-liminal moments, stretching them, repeating them, extracting value from the act
-of change itself. To Arc, the journey between states is more valuable than
-either state on its own.
-
-## Mechanical Identity
-
-Arc is the blink and bounce tide. Its primary strategy revolves around
-materializing characters, returning them to hand, banishing them, and replaying
-them to re-trigger their abilities for compounding value.
-
-**Primary strategy — Blink / Bounce / Materialize triggers:**
-
-- Effects that banish a character and immediately materialize it again,
-  re-triggering "Materialized" abilities
-- Effects that return allies to hand so they can be replayed for value or tempo
-- Characters with powerful materialized effects designed to be blinked or
-  replayed repeatedly
-- Temporary banish effects that remove enemy characters for a turn, creating
-  windows of tempo advantage
-- Value engines built on repeating enter-the-battlefield triggers and
-  hand-to-battlefield loops
-
-**Supplemental strategies:**
-
-- **Flash/Fast matters** — Arc has the highest density of fast-speed cards and
-  characters. It rewards playing at fast speed with bonus effects — draw a card
-  when you play a fast card, kindle when a character materializes at fast speed,
-  reduce costs of fast plays. This creates a reactive, instant-speed playstyle.
-- **Tempo** — Arc wins by manipulating state changes, support geometry, and
-  timing windows rather than by raw size.
-- **Protect the Queen** — Arc often commits to a single efficient, evasive
-  threat and then protects it with blink effects (dodging removal by blinking in
-  response) and fast-speed interaction. This "Delver-style" plan deploys a cheap
-  threat early and rides it to victory while keeping the opponent off balance.
-
-**Weakness:** Arc's blink engine requires specific pieces — characters worth
-blinking and effects to blink them. When the engine doesn't come together, Arc's
-individual cards are underpowered compared to more straightforward tides. Arc
-also struggles against strategies that don't care about the board, since its
-tempo advantages are meaningless if the opponent is winning through void
-recursion or event chains.
-
-## Relationships
-
-Arc's neighbors are Bloom, whose Spirit Animals reward repeated materialization,
-and Ignite, whose token-makers turn blink into sudden board floods.
-
-______________________________________________________________________
-
-# Ignite
-
-## Philosophy
-
-Ignite believes in the power of the collective — that a single spark means
-nothing, but a thousand sparks together become an inferno. Where Bloom grows a
-living ecosystem and Arc outmaneuvers with cleverness, Ignite overwhelms through
-sheer presence, passion, and numbers. It is the tide of inspiration,
-camaraderie, and the unstoppable momentum of a shared cause.
-
-Ignite's worldview is built on the conviction that greatness is not found in
-isolated genius but in the bonds between individuals. A warrior alone is just a
-warrior. A warrior standing shoulder to shoulder with a hundred others is an
-army. Ignite does not care about individual power — it cares about what a group
-can accomplish when every member pushes in the same direction.
-
-Ignite is also the tide of raw emotion and immediacy. It does not plan for the
-long term because it believes the present moment is where battles are won.
-Hesitation is defeat. Analysis is paralysis. When Ignite sees an opening, it
-charges through it, trusting that commitment and momentum will carry the day.
-This makes Ignite the most aggressive tide — and the most vulnerable when its
-charge is blunted.
-
-## Mechanical Identity
-
-Ignite is the Warrior and Figment go-wide tide. It pushes bodies into deployed
-lanes, rewards coordinated battalions, and turns front-line pressure into lethal
-Judgment phases.
-
-**Primary strategy — Warrior Tribal / Figment Assault:**
-
-- Warrior characters that reward other Warriors and care about battalion size
-- Figment generation and troop-multiplication that quickly fill open space
-- Unbound and similar immediate-pressure tools that bypass reserve tempo
-- Lords, combat pumps, and Dread-style pressure that make a crowded front line
-  lethal
+### `void_setup`
 
-**Supplemental strategies:**
+Narrative identity: Stocking the void for future use.
 
-- **Aggro** — Ignite's curve is low and fast. It aims to have more total spark
-  than the opponent by turn 3-4 and start scoring points immediately. Every card
-  in an Ignite deck should contribute to the board, and every turn should
-  increase the pressure.
-- **Recruitment** — Ignite is excellent at finding Warriors, turning one troop
-  into several, and rebuilding a board through tribe-specific engines.
-- **Reinforcements** — Death and attrition often become more bodies. Ignite is
-  comfortable trading if those trades produce more Warriors or Figments.
+Mechanical identity: Self-mill, discard-to-void, threshold setup, and void
+loading.
 
-**Weakness:** Ignite runs out of gas. Its cards are cheap but individually weak,
-and once the initial wave is answered — especially by a Neutral sweeper — Ignite
-has less generic staying power than Bloom. It also struggles when it does not
-draw enough tribal payoffs to make its battalion matter.
+Apply to cards that place cards into the void efficiently without being the main
+void payoff.
 
-## Relationships
+### `judgment_repeaters`
 
-Ignite's neighbors are Arc, which multiplies its entry triggers, and Pact, which
-turns expendable Warriors and Figments into fuel.
+Narrative identity: Extending the scoring rhythm.
 
-______________________________________________________________________
+Mechanical identity: Extra phases, trigger copying, and generic Judgment setup.
 
-# Pact
+Apply to cards that cause Judgment abilities to happen again without being the
+payoff for it.
 
-## Philosophy
-
-Pact understands a truth that other tides find uncomfortable: everything has a
-price, and the dreamer willing to pay the highest price wins. Where Bloom
-nurtures and Ignite inspires, Pact bargains. It sees the dream as a marketplace
-of power — not a gentle one with haggling and handshakes, but a ruthless one
-where the currency is whatever you hold most dear.
+### `event_setup`
 
-Pact does not flinch at sacrifice. It abandons its own characters without
-sentiment, pays victory points to gain advantage, burns its maximum energy to
-fuel devastating effects. Other tides see these costs as unthinkable; Pact sees
-them as investments. Every sacrifice is a transaction, and Pact always ensures
-it comes out ahead.
+Narrative identity: Frictionless spell sequencing.
 
-This philosophy extends to Pact's relationship with death itself. Where other
-tides see the void as a place of loss, Pact sees it as a vault — a store of
-power waiting to be withdrawn. The characters that fall serve again, brought
-back stronger or replaced by something greater. Pact does not mourn its dead. It
-leverages them.
+Mechanical identity: Cheap events, cantrips, cost smoothing, and sequencing
+tools.
 
-Pact is the tide of ambition without limits. It asks: how much are you willing
-to give up to get what you want? And its answer is always: everything.
+Apply to cards that make event-heavy turns more reliable without being the event
+finisher.
 
-## Mechanical Identity
+### `copy_effects`
 
-Pact is the sacrifice tide. Its primary strategy revolves around abandoning its
-own characters for powerful effects, then cheating expensive threats into play
-to replace what was lost.
+Narrative identity: Borrowing the same action twice.
 
-**Primary strategy — Sacrifice / Reanimator:**
+Mechanical identity: Event copies, trigger copies, and one-shot duplication
+tools.
 
-- Abandon-as-cost abilities that sacrifice your own characters to generate
-  powerful effects (draw cards, dissolve enemy characters, gain energy)
-- Reanimator effects that materialize characters directly from the void,
-  bypassing their energy cost
-- "Cheat into play" effects that put expensive characters onto the battlefield
-  through alternate means (from hand, from deck, or from void at reduced cost)
-- Characters with powerful dissolved triggers that reward being sacrificed
+Apply to cards that duplicate effects in a generally splashable way.
 
-**Supplemental strategies:**
+### `abandon_fodder`
 
-- **Power at any cost** — Pact has unique access to effects that pay in
-  unconventional currencies. Lose 2 victory points to gain a massive board
-  advantage. Permanently reduce your maximum energy to play a threat for free.
-  These high-risk, high-reward cards are Pact's signature.
-- **Aristocrats** — Characters that generate value whenever any character is
-  abandoned or dissolved. These "death trigger" engines turn every sacrifice
-  into card draw, spark boosts, or direct points.
-- **Big threats** — Pact's reanimation targets are the largest, most impactful
-  characters in the game. Characters with 8+ spark and devastating abilities
-  that would normally cost 7+ energy — Pact puts them into play on turn 4.
+Narrative identity: Supplying expendable material.
 
-**Weakness:** Pact's sacrifice engine requires both things to sacrifice and
-things to reanimate. Without fodder, its abandon effects are painful rather than
-profitable. Without reanimation targets, it's just a deck that destroys itself.
-Pact is also vulnerable to void hate — effects that banish cards from the void
-cut off its reanimation plan entirely.
+Mechanical identity: Cheap bodies and generic abandon outlets.
 
-## Relationships
+Apply to cards that give sacrifice decks things they are happy to cash in.
 
-Pact's neighbors are Ignite, which supplies expendable bodies, and Umbra, which
-shares its taste for recursion and attrition.
+### `cost_reduction`
 
-______________________________________________________________________
+Narrative identity: Making turns larger than the resource system expects.
 
-# Umbra
-
-## Philosophy
+Mechanical identity: Generic rebates, one-off discounts, and flexible cost
+smoothing.
 
-Umbra believes that what is hidden holds more power than what is seen. Umbra is
-the tide of shadow, obscurity, and inevitability: veiled threats, returning
-nightmares, stolen strength, and victories that feel decided before the final
-blow lands.
-
-Umbra is patient and unsettling. It commits narrowly, protects selectively, and
-makes removal fail to solve the real problem. It wins by concealment,
-recurrence, and the gradual collapse of the opponent's ability to answer what
-matters.
+Apply to cards that reduce costs broadly without tying that reduction to one
+shell's payoff.
 
-## Mechanical Identity
+### `trigger_reuse`
 
-Umbra is the veil and recursion tide. Its primary strategy is protecting key
-threats, reusing the void, and turning attrition into inevitability.
+Narrative identity: Squeezing extra value from text already on board.
 
-**Primary strategy — Veil / Recursion / Self-Mill:**
+Mechanical identity: Tools that re-fire Materialized, Dissolved, or Judgment
+abilities.
 
-- Veil and reactive shielding that make key Umbra threats hard to answer
-- Self-mill and reclaim engines that stock the void and turn it into a second
-  hand
-- Survivor cards and other recursive threats that keep returning after removal
-- Tall payoffs built through recursion, drain, copying, or shadow inheritance
-  rather than Bloom-style nurturing
+Apply to cards that explicitly make another card's triggered text happen again.
 
-**Supplemental strategies:**
+### `character_tutors`
 
-- **Shadow control** — Umbra tears down the opponent's board with denial,
-  sacrifice pressure, spark theft, and selective recursion.
-- **Recursive inevitability** — Umbra is the best tide at making one threat stay
-  relevant through removal, whether by reclaiming it, returning it, or replacing
-  it with something worse.
-- **Protected finishers** — Umbra is a natural secondary home for Unstoppable on
-  veiled or recursive threats that are meant to end the game through resistance.
-
-**Weakness:** Umbra is slow and setup-dependent. Void hate hurts badly, and
-Umbra can lose to fast starts before its shielded threats or recursion loops
-matter.
-
-## Relationships
+Narrative identity: Finding the right body at the right time.
 
-Umbra's neighbors are Pact, which shares its attrition and recursion instincts,
-and Rime, whose exacting combat and denial feed Umbra's inevitability.
+Mechanical identity: Search, reveal, and deck-to-hand fetch for characters.
 
-______________________________________________________________________
+Apply to cards that directly locate characters from the deck.
 
-# Rime
+### `character_curve`
 
-## Philosophy
+Narrative identity: Reliable pressure through body count alone.
 
-Rime believes that strength is found through reduction — that by stripping away
-the unnecessary, you reveal what is essential and unbreakable. Where Bloom adds
-and grows, Rime subtracts and hardens. It sees the dream as a place of harsh
-beauty, where only the most resilient ideas and the most efficient strategies
-survive.
+Mechanical identity: Low-curve character density and cheap quantity.
 
-Rime's worldview is austere and disciplined. It does not believe in waste,
-excess, or sentiment. Every card in a Rime player's hand exists for a purpose;
-if it doesn't serve that purpose, it is discarded without hesitation — and that
-discard itself becomes fuel. Rime transforms the act of giving things up from a
-cost into a resource, finding value in the discipline of letting go.
-
-This philosophy extends to how Rime treats the opponent. Rime is the tide of
-denial and taxation — not the explosive denial of a counterspell, but the
-grinding, persistent denial of making everything the opponent does slightly
-worse, slightly more expensive, slightly less effective. Rime does not need to
-stop the opponent's plan. It just needs to make that plan not good enough.
-
-Rime is the tide of the pragmatist, the realist, the survivor who endures not
-through power or cleverness but through sheer, unbreakable efficiency.
-
-## Mechanical Identity
-
-Rime is the self-discard tide. Its primary strategy is discarding its own cards
-for value — fueling powerful effects with cards from hand while deploying
-efficient, resilient threats.
-
-**Primary strategy — Self-Discard / Midrange:**
-
-- Discard-as-cost effects that turn excess cards into energy, card advantage, or
-  removal
-- "Discard matters" triggers on characters that reward you for discarding cards
-- Efficiently-costed characters with above-average spark for their energy cost
-- Efficient combat tools such as Test and Preeminence that let Rime win precise
-  Judgments
-
-**Supplemental strategies:**
-
-- **Disruption** — Rime has access to targeted hand disruption (look at the
-  opponent's hand, force them to discard a card) and permanent-based taxation
-  effects. These tools strip the opponent of key cards and make their remaining
-  cards less effective.
-- **Tap-out Control** — A control variant that plays threats on its own turn and
-  disruption effects proactively, rather than holding up energy for reactive
-  play. Rime's removal is efficient and sorcery-speed, designed to be cast
-  before deploying a threat.
-- **Death and Taxes** — Efficient, disruptive characters paired with taxation
-  effects make Rime the tide most concerned with winning Judgment cleanly.
-
-**Weakness:** Rime's discard-for-value plan requires cards in hand to fuel it.
-If Rime runs out of cards, its engine stalls. Rime also lacks explosive
-finishers — it wins by inches, not miles, which means it can struggle to close
-out games against opponents who stabilize. Its individual card quality is high
-but its ceiling is low.
-
-## Relationships
-
-Rime's neighbors are Umbra, which turns attrition into inevitability, and Surge,
-which adds stack interaction to Rime's battlefield denial.
-
-______________________________________________________________________
-
-# Surge
-
-## Philosophy
-
-Surge believes that knowledge is the ultimate weapon — that understanding the
-currents of the dream deeply enough lets you reshape them entirely. Where other
-tides interact with the physical battlefield, Surge operates on a higher plane,
-manipulating the flow of events, the chain of cause and effect, the very rules
-that govern how the dream unfolds.
-
-Surge's worldview is intellectual and ambitious. It sees every event as a link
-in a chain, every spell as a ripple that creates more ripples. The skilled
-dreamer doesn't just play cards — they orchestrate cascades, setting up
-sequences where each event fuels the next until the accumulated momentum becomes
-unstoppable. Surge believes that a single perfect turn, prepared with patience
-and executed with precision, is worth more than a hundred competent ones.
-
-Surge is also the tide of denial — but where Rime denies through taxation and
-grinding, Surge denies through outright negation. It is the home of the
-counterspell, the tide that says "no." This is not cruelty; to Surge, it is
-simply the most efficient form of interaction. Why fight the opponent's threats
-on the battlefield when you can prevent them from existing at all?
-
-Surge is the most cerebral tide, rewarding deep knowledge of game mechanics and
-perfect sequencing. Its ceiling is the highest of any tide — but so is its
-floor.
-
-## Mechanical Identity
-
-Surge is the storm tide. Its primary strategy is chaining events together in a
-single explosive turn, generating value with each successive event until the
-accumulated effects produce a win.
-
-**Primary strategy — Storm / Events Matter:**
-
-- "Events matter" payoffs — characters and effects that trigger whenever you
-  play an event (draw a card, kindle 1, gain 1 energy, deal 1 point)
-- Cheap, efficient events designed to chain together on a single turn
-- Event-copying effects that double or triple the impact of key spells
-- Direct victory point generation outside the Judgment phase — Surge is the tide
-  most capable of "burning" the opponent out with point-generating events
-
-**Supplemental strategies:**
-
-- **Prevent / Counterspells** — Surge is the primary home of the Prevent
-  mechanic, countering opponent cards on the stack. This gives Surge the most
-  powerful reactive interaction in the game, able to stop any single threat
-  before it resolves.
-- **Draw-Go Control** — A pure control variant that passes the turn with energy
-  held up, threatening counterspells and fast-speed events. Draw-go Surge plays
-  almost entirely at fast speed, acting only during the opponent's turn or the
-  ending phase, maintaining constant pressure through the threat of negation.
-- **Spellslinger** — Characters that grow stronger with each event played,
-  accumulating spark over the course of multiple turns. These "spell count"
-  threats combine with Surge's event chains to create characters that become
-  enormous through sheer volume of events.
-
-**Weakness:** Surge's combo plan requires extensive setup — the right payoff
-characters, enough cheap events, and sufficient energy to chain them. A Surge
-deck that doesn't find its pieces plays awkward, underpowered events that
-accomplish nothing individually. Surge is also vulnerable to hand disruption
-(Rime) and aggressive pressure (Ignite), which can dismantle the combo before it
-comes together.
-
-## Relationships
-
-Surge's neighbors are Rime, which constrains the opponent before Surge answers
-them, and Bloom, which supplies mana and breathing room for larger event turns.
+Apply to cards that are just strong cheap characters for character-heavy decks
+without chain text.
+
+### `discard_outlets`
+
+Narrative identity: Turning cards in hand into movement and setup.
+
+Mechanical identity: Cheap self-discard tools, discard-as-cost activations, and
+hand-to-void bridges.
+
+Apply to cards that ask the player to discard and give useful compensation for
+doing so.
+
+### `recursion_fuel`
+
+Narrative identity: Feeding graveyard-style engines.
+
+Mechanical identity: Deep self-mill and void stocking without threshold or
+reclaim payoffs.
+
+Apply to cards that fill the void aggressively for decks that later exploit it.
+
+### `attrition_trade`
+
+Narrative identity: Trading resources cleanly and often.
+
+Mechanical identity: Efficient one-for-one trades and small attrition payoffs.
+
+Apply to cards that generate modest advantage from repeated exchanges and
+removal.
+
+### `tax_pressure`
+
+Narrative identity: Winning by making every opposing action awkward.
+
+Mechanical identity: Proactive taxes and cost-increase pressure.
+
+Apply to cards that make the opponent pay more or sequence less efficiently.
+
+## Utility Tides
+
+Utility tides are common tools. They stay broadly playable and do one clear job.
+
+### `cheap_curve`
+
+Narrative identity: Reliable early footing.
+
+Mechanical identity: Generically good 0-2 cost starters.
+
+Apply to cards that are strong opening plays without synergy gating.
+
+### `defensive_curve`
+
+Narrative identity: Surviving the early game cleanly.
+
+Mechanical identity: Blockers, reserve-friendly bodies, and stabilizers.
+
+Apply to cards that buy time, absorb pressure, or make early races harder.
+
+### `card_flow`
+
+Narrative identity: Keeping resources moving.
+
+Mechanical identity: Generic draw and hand refuel.
+
+Apply to cards that provide cards without requiring a dedicated shell.
+
+### `foresee_selection`
+
+Narrative identity: Seeing the next turns before they happen.
+
+Mechanical identity: Smoothing, selection, and setup.
+
+Apply to cards that improve draw quality through foresee or adjacent selection
+tools.
+
+### `resource_burst`
+
+Narrative identity: Short-term acceleration available to anyone.
+
+Mechanical identity: Broad energy gain, rebates, and flexible sinks.
+
+Apply to cards that give generic energy tempo without tying it to a
+shell-specific engine.
+
+### `cheap_removal`
+
+Narrative identity: Efficient answers with conditions attached.
+
+Mechanical identity: Fast or inexpensive but conditional removal.
+
+Apply to cards that answer threats cheaply when some board or rules condition is
+met.
+
+### `premium_removal`
+
+Narrative identity: Clean answers that trade rate for certainty.
+
+Mechanical identity: Slower or unconditional removal.
+
+Apply to cards that remove nearly anything without needing synergy support.
+
+### `fast_interaction`
+
+Narrative identity: Flexible disruption at the moment it matters.
+
+Mechanical identity: Prevents, bounce, and combat-speed disruption.
+
+Apply to cards that interrupt combat or stack play at fast speed in a generally
+useful way.
+
+### `hand_disruption`
+
+Narrative identity: Attacking plans before they hit the board.
+
+Mechanical identity: Discard, hand attack, and denial pressure.
+
+Apply to cards that strip options from hand rather than countering them on the
+stack.
+
+### `finishers`
+
+Narrative identity: Ending games once the setup is done.
+
+Mechanical identity: Top-end threats, extra turns, and closing tools.
+
+Apply to cards that are broadly playable closers instead of shell-specific
+payoffs.
+
+### `void_denial`
+
+Narrative identity: Refusing the opponent a second life from the void.
+
+Mechanical identity: Banish, void hate, and anti-recursion tools.
+
+Apply to cards that shut off reclaim loops or punish void-centric decks.
+
+### `discover_toolbox`
+
+Narrative identity: Access over raw efficiency.
+
+Mechanical identity: Discover, flexible search, narrow tutoring, and access
+tools.
+
+Apply to cards that trade rate for finding the right answer or role player.
+
+### `judgment_bodies`
+
+Narrative identity: Low-cost bodies that cash in on scoring.
+
+Mechanical identity: Cheap characters with small Judgment triggers.
+
+Apply to cards that mainly exist to provide a modest Judgment payoff on a
+playable body.
+
+### `materialized_staples`
+
+Narrative identity: Good entry effects that need no shell.
+
+Mechanical identity: Generically playable Materialized characters with one-shot
+value.
+
+Apply to cards that have respectable materialized text even when never blinked.
+
+### `tempo_resets`
+
+Narrative identity: Buying time by undoing the opponent's turn.
+
+Mechanical identity: Bounce, top-of-deck resets, and full-hand resets.
+
+Apply to cards that reset opposing development without permanently answering it.
+
+### `point_pressure`
+
+Narrative identity: Quietly forcing races to end sooner.
+
+Mechanical identity: Small, low-commitment point gain and race tools.
+
+Apply to cards that help almost any deck close games or convert a lead into
+points.
