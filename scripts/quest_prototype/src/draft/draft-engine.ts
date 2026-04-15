@@ -80,6 +80,50 @@ function buildOffer(ctx: PackContext): number[] {
   return weightedSample(entries, ctx.packSize);
 }
 
+function spendShownOffer(
+  remainingCopiesByCard: Record<string, number>,
+  offer: number[],
+): void {
+  for (const cardNumber of offer) {
+    const key = String(cardNumber);
+    const remainingCopies = remainingCopiesByCard[key];
+    if (remainingCopies === undefined) {
+      continue;
+    }
+
+    if (remainingCopies <= 1) {
+      delete remainingCopiesByCard[key];
+    } else {
+      remainingCopiesByCard[key] = remainingCopies - 1;
+    }
+  }
+}
+
+function revealOffer(
+  state: DraftState,
+  config: DraftConfig,
+): boolean {
+  const offer = buildOffer({
+    remainingCopiesByCard: state.remainingCopiesByCard,
+    pickNumber: state.pickNumber,
+    packSize: config.packSize,
+  });
+
+  state.currentOffer = offer;
+  if (offer.length < config.packSize) {
+    return false;
+  }
+
+  spendShownOffer(state.remainingCopiesByCard, offer);
+  logEvent("draft_offer_revealed", {
+    pickNumber: state.pickNumber,
+    offerCards: offer,
+    poolRemaining: countRemainingCards(state.remainingCopiesByCard),
+    uniqueCardsRemaining: Object.keys(state.remainingCopiesByCard).length,
+  });
+  return true;
+}
+
 /** Sort an array of cards by tide order without mutating the original. */
 export function sortCardsByTide(cards: CardData[]): CardData[] {
   return [...cards].sort((a, b) => {
@@ -170,7 +214,6 @@ export function initializeDraftState(
   return {
     remainingCopiesByCard,
     currentOffer: [],
-    draftedCardNumbers: [],
     pickNumber: 1,
     sitePicksCompleted: 0,
   };
@@ -183,22 +226,18 @@ export function enterDraftSite(
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): void {
   state.sitePicksCompleted = 0;
-  state.draftedCardNumbers = [];
-  state.currentOffer = buildOffer({
-    remainingCopiesByCard: state.remainingCopiesByCard,
-    pickNumber: state.pickNumber,
-    packSize: config.packSize,
-  });
+  const hasOffer = revealOffer(state, config);
 
   logEvent("draft_site_entered", {
     pickNumber: state.pickNumber,
     poolSize: countRemainingCards(state.remainingCopiesByCard),
     offerCards: state.currentOffer,
+    offerAvailable: hasOffer,
   });
 }
 
-/** Return the current pack for display. */
-export function getPlayerPack(state: DraftState): number[] {
+/** Return the current offer for display. */
+export function getCurrentOffer(state: DraftState): number[] {
   return state.currentOffer;
 }
 
@@ -212,8 +251,8 @@ export function processPlayerPick(
   cardDatabase: Map<number, CardData>,
   config: DraftConfig = DEFAULT_DRAFT_CONFIG,
 ): boolean {
-  const offerIndex = state.currentOffer.indexOf(cardNumber);
-  if (offerIndex === -1) {
+  const currentOffer = [...state.currentOffer];
+  if (!currentOffer.includes(cardNumber)) {
     throw new Error(
       `Card ${String(cardNumber)} is not in the current offer`,
     );
@@ -221,54 +260,34 @@ export function processPlayerPick(
 
   const card = cardDatabase.get(cardNumber);
 
-  for (const offeredCardNumber of state.currentOffer) {
-    const key = String(offeredCardNumber);
-    const remainingCopies = state.remainingCopiesByCard[key];
-    if (remainingCopies === undefined) {
-      continue;
-    }
-
-    if (remainingCopies <= 1) {
-      delete state.remainingCopiesByCard[key];
-    } else {
-      state.remainingCopiesByCard[key] = remainingCopies - 1;
-    }
-  }
-
   logEvent("draft_pick_player", {
     pickNumber: state.pickNumber,
     cardNumber,
     cardName: card?.name ?? "Unknown",
     cardTide: card === undefined ? "Neutral" : cardAccentTide(card),
-    offerCards: state.currentOffer,
+    offerCards: currentOffer,
     poolRemaining: countRemainingCards(state.remainingCopiesByCard),
     uniqueCardsRemaining: Object.keys(state.remainingCopiesByCard).length,
   });
 
   state.pickNumber += 1;
   state.sitePicksCompleted += 1;
-  state.draftedCardNumbers.push(cardNumber);
 
   if (state.sitePicksCompleted >= SITE_PICKS) {
     state.currentOffer = [];
     return true;
   }
 
-  state.currentOffer = buildOffer({
-    remainingCopiesByCard: state.remainingCopiesByCard,
-    pickNumber: state.pickNumber,
-    packSize: config.packSize,
-  });
-
-  return state.currentOffer.length < config.packSize;
+  return !revealOffer(state, config);
 }
 
 /** Finalize a draft site visit. Log the cards drafted during this visit. */
 export function completeDraftSite(
   state: DraftState,
+  draftedCardNumbers: number[],
 ): void {
   logEvent("draft_site_completed", {
-    cardsDrafted: [...state.draftedCardNumbers],
+    cardsDrafted: [...draftedCardNumbers],
     picksCompleted: state.sitePicksCompleted,
     poolRemaining: countRemainingCards(state.remainingCopiesByCard),
     uniqueCardsRemaining: Object.keys(state.remainingCopiesByCard).length,

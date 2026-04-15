@@ -402,7 +402,6 @@ export function QuestProvider({
       source,
       pickNumber: draftState.pickNumber,
       sitePicksCompleted: draftState.sitePicksCompleted,
-      draftedCardCount: draftState.draftedCardNumbers.length,
       currentOfferSize: draftState.currentOffer.length,
       remainingCards: countRemainingDraftCards(draftState.remainingCopiesByCard),
       remainingUniqueCards: Object.keys(draftState.remainingCopiesByCard).length,

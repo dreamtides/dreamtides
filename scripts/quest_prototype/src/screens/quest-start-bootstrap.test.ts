@@ -150,7 +150,6 @@ describe("bootstrapQuestStart", () => {
       {
         remainingCopiesByCard: { "101": 2, "202": 1 },
         currentOffer: [],
-        draftedCardNumbers: [],
         pickNumber: 1,
         sitePicksCompleted: 0,
       },

@@ -5,8 +5,7 @@ import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
 import {
   enterDraftSite,
-  getPlayerPack,
-  initializeDraftState,
+  getCurrentOffer,
   processPlayerPick,
   completeDraftSite,
   sortCardsByTide,
@@ -231,10 +230,10 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   const [pickPhase, setPickPhase] = useState<PickPhase>("idle");
   const [pickedCardNumber, setPickedCardNumber] = useState<number | null>(null);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
-  const [currentPackCards, setCurrentPackCards] = useState<CardData[]>([]);
+  const [currentOfferCards, setCurrentOfferCards] = useState<CardData[]>([]);
   const [draftedCardNumbers, setDraftedCardNumbers] = useState<number[]>([]);
   const [isComplete, setIsComplete] = useState(false);
-  const [packKey, setPackKey] = useState(0);
+  const [offerKey, setOfferKey] = useState(0);
   const [showDeckSidebar, setShowDeckSidebar] = useState(false);
   const draftStateRef = useRef<DraftState | null>(null);
   const initializedRef = useRef(false);
@@ -243,41 +242,34 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   useEffect(() => {
     if (initializedRef.current) return;
     if (cardDatabase.size === 0) return;
+    if (state.draftState === null) return;
     initializedRef.current = true;
 
-    let ds = state.draftState;
-    if (ds === null) {
-      if (state.resolvedPackage === null) {
-        return;
-      }
-      ds = initializeDraftState(cardDatabase, state.resolvedPackage);
-    }
-
     // Deep clone to avoid mutating React state directly
-    const cloned = JSON.parse(JSON.stringify(ds)) as DraftState;
+    const cloned = JSON.parse(JSON.stringify(state.draftState)) as DraftState;
     enterDraftSite(cloned, cardDatabase);
     draftStateRef.current = cloned;
     mutations.setDraftState(cloned, "draft_site_enter");
 
-    // Load initial pack, sorted by tide
-    const packNums = getPlayerPack(cloned);
-    const cards = packNums
+    const offerCards = getCurrentOffer(cloned)
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
-    setCurrentPackCards(sortCardsByTide(cards));
-    setDraftedCardNumbers([...cloned.draftedCardNumbers]);
-  }, [state.draftState, state.resolvedPackage, cardDatabase, mutations]);
+    setCurrentOfferCards(sortCardsByTide(offerCards));
+    if (cloned.currentOffer.length === 0) {
+      completeDraftSite(cloned, []);
+      setIsComplete(true);
+    }
+  }, [state.draftState, cardDatabase, mutations]);
 
-  // Resolve the current pack from draft state, sorted by tide
-  const refreshPack = useCallback(() => {
+  // Resolve the current offer from draft state, sorted by tide.
+  const refreshOffer = useCallback(() => {
     const ds = draftStateRef.current;
     if (!ds) return;
-    const packNums = getPlayerPack(ds);
-    const cards = packNums
+    const cards = getCurrentOffer(ds)
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
-    setCurrentPackCards(sortCardsByTide(cards));
-    setPackKey((prev) => prev + 1);
+    setCurrentOfferCards(sortCardsByTide(cards));
+    setOfferKey((prev) => prev + 1);
   }, [cardDatabase]);
 
   const handleCardPick = useCallback(
@@ -298,6 +290,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
         // Clone to avoid direct mutation
         const cloned = JSON.parse(JSON.stringify(ds)) as DraftState;
+        const nextDraftedCardNumbers = [...draftedCardNumbers, cardNumber];
         const siteComplete = processPlayerPick(
           cardNumber,
           cloned,
@@ -309,26 +302,26 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
         // Add picked card to deck
         mutations.addCard(cardNumber, "draft_pick");
 
-        setDraftedCardNumbers([...cloned.draftedCardNumbers]);
+        setDraftedCardNumbers(nextDraftedCardNumbers);
 
         if (siteComplete) {
-          completeDraftSite(cloned);
+          completeDraftSite(cloned, nextDraftedCardNumbers);
           setTimeout(() => {
             setIsComplete(true);
             setPickPhase("idle");
             setPickedCardNumber(null);
           }, NEXT_PACK_DELAY);
         } else {
-          // Show next pack after a brief pause
+          // Show the next offer after a brief pause.
           setTimeout(() => {
-            refreshPack();
+            refreshOffer();
             setPickPhase("idle");
             setPickedCardNumber(null);
           }, NEXT_PACK_DELAY);
         }
       }, 300);
     },
-    [pickPhase, cardDatabase, mutations, refreshPack],
+    [pickPhase, draftedCardNumbers, cardDatabase, mutations, refreshOffer],
   );
 
   const handleCardInspect = useCallback(
@@ -345,7 +338,6 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   }, []);
 
   const handleContinue = useCallback(() => {
-    // Log completion
     logEvent("draft_site_completed_ui", {
       siteId,
       cardsDrafted: draftedCardNumbers,
@@ -355,13 +347,35 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     mutations.setScreen({ type: "dreamscape" });
   }, [siteId, draftedCardNumbers, mutations]);
 
-  const pickNumber = draftedCardNumbers.length + 1;
+  const pickNumber = (draftStateRef.current?.sitePicksCompleted ?? 0) + 1;
 
   if (cardDatabase.size === 0) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
         <p className="text-lg opacity-60">
           Card database unavailable. Cannot start draft.
+        </p>
+        <button
+          className="rounded-lg px-6 py-3 font-bold text-white transition-colors"
+          style={{
+            background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+            border: "1px solid rgba(168, 85, 247, 0.5)",
+          }}
+          onClick={() => {
+            mutations.setScreen({ type: "dreamscape" });
+          }}
+        >
+          Return to Dreamscape
+        </button>
+      </div>
+    );
+  }
+
+  if (state.draftState === null && draftStateRef.current === null) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
+        <p className="text-lg opacity-60">
+          Draft pool unavailable. Cannot start draft.
         </p>
         <button
           className="rounded-lg px-6 py-3 font-bold text-white transition-colors"
@@ -451,7 +465,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
         {/* 2x2 card grid, centered */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={`pack-${String(packKey)}`}
+            key={`offer-${String(offerKey)}`}
             className="grid gap-3 md:gap-4"
             style={{
               gridTemplateColumns: "repeat(2, auto)",
@@ -462,7 +476,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            {currentPackCards.map((card) => {
+            {currentOfferCards.map((card) => {
               const isPicked = pickedCardNumber === card.cardNumber;
               const isOther = pickedCardNumber !== null && !isPicked;
 

@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { resetLog, getLogEntries } from "../logging";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getLogEntries, resetLog } from "../logging";
 import type { CardData, Tide } from "../types/cards";
 import type { DraftState } from "../types/draft";
 import type { ResolvedDreamcallerPackage } from "../types/content";
 import {
   completeDraftSite,
   enterDraftSite,
-  getPlayerPack,
+  getCurrentOffer,
   initializeDraftState,
   processPlayerPick,
   SITE_PICKS,
@@ -78,7 +78,6 @@ function makeDraftState(
   return {
     remainingCopiesByCard: {},
     currentOffer: [],
-    draftedCardNumbers: [],
     pickNumber: 1,
     sitePicksCompleted: 0,
     ...overrides,
@@ -87,6 +86,7 @@ function makeDraftState(
 
 beforeEach(() => {
   resetLog();
+  vi.restoreAllMocks();
 });
 
 describe("initializeDraftState", () => {
@@ -107,7 +107,6 @@ describe("initializeDraftState", () => {
       "2": 1,
     });
     expect(state.currentOffer).toEqual([]);
-    expect(state.draftedCardNumbers).toEqual([]);
     expect(state.pickNumber).toBe(1);
     expect(state.sitePicksCompleted).toBe(0);
   });
@@ -134,24 +133,83 @@ describe("initializeDraftState", () => {
   });
 });
 
-describe("enterDraftSite and processPlayerPick", () => {
-  it("draws a 4-unique-card offer on entering a draft site", () => {
+describe("fixed multiset offer generation", () => {
+  it("reveals 4 unique cards and spends one copy of each shown card immediately", () => {
     const cardDatabase = buildDB(
       Array.from({ length: 6 }, (_, index) => makeCard(index + 1)),
     );
     const state = initializeDraftState(
       cardDatabase,
-      buildResolvedPackage({ 1: 1, 2: 2, 3: 1, 4: 1, 5: 1, 6: 1 }),
+      buildResolvedPackage({ 1: 2, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }),
     );
+
+    vi.spyOn(Math, "random").mockReturnValue(0);
 
     enterDraftSite(state, cardDatabase);
 
-    expect(state.currentOffer).toHaveLength(4);
-    expect(new Set(state.currentOffer).size).toBe(4);
-    expect(getPlayerPack(state)).toEqual(state.currentOffer);
+    expect(getCurrentOffer(state)).toHaveLength(4);
+    expect(new Set(getCurrentOffer(state)).size).toBe(4);
+    expect(state.remainingCopiesByCard).toEqual({
+      "1": 1,
+      "5": 1,
+      "6": 1,
+    });
   });
 
-  it("spends shown cards from the remaining copy pool", () => {
+  it("samples names proportionally to remaining copies", () => {
+    const cardDatabase = buildDB(
+      Array.from({ length: 5 }, (_, index) => makeCard(index + 1)),
+    );
+    const state = makeDraftState({
+      remainingCopiesByCard: {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+      },
+    });
+
+    vi.spyOn(Math, "random")
+      .mockReturnValueOnce(0.32)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0);
+
+    enterDraftSite(state, cardDatabase);
+
+    expect(state.currentOffer[0]).toBe(1);
+  });
+
+  it("allows duplicate names to recur across the run while keeping each offer unique", () => {
+    const cardDatabase = buildDB(
+      Array.from({ length: 6 }, (_, index) => makeCard(index + 1)),
+    );
+    const state = makeDraftState({
+      remainingCopiesByCard: {
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+      },
+    });
+
+    vi.spyOn(Math, "random").mockReturnValue(0);
+
+    enterDraftSite(state, cardDatabase);
+    const firstOffer = [...state.currentOffer];
+    const isComplete = processPlayerPick(firstOffer[0], state, cardDatabase);
+
+    expect(isComplete).toBe(false);
+    expect(new Set(firstOffer).size).toBe(4);
+    expect(new Set(state.currentOffer).size).toBe(4);
+    expect(firstOffer).toContain(1);
+    expect(state.currentOffer).toContain(1);
+  });
+
+  it("does not spend the shown offer a second time when the player picks", () => {
     const cardDatabase = buildDB(
       Array.from({ length: 8 }, (_, index) => makeCard(index + 1)),
     );
@@ -166,15 +224,11 @@ describe("enterDraftSite and processPlayerPick", () => {
         "7": 1,
         "8": 1,
       },
-      currentOffer: [1, 2, 3, 4],
     });
 
-    const isComplete = processPlayerPick(1, state, cardDatabase);
+    vi.spyOn(Math, "random").mockReturnValue(0);
 
-    expect(isComplete).toBe(false);
-    expect(state.pickNumber).toBe(2);
-    expect(state.sitePicksCompleted).toBe(1);
-    expect(state.draftedCardNumbers).toEqual([1]);
+    enterDraftSite(state, cardDatabase);
     expect(state.remainingCopiesByCard).toEqual({
       "1": 1,
       "5": 1,
@@ -182,10 +236,18 @@ describe("enterDraftSite and processPlayerPick", () => {
       "7": 1,
       "8": 1,
     });
-    expect(new Set(state.currentOffer).size).toBe(state.currentOffer.length);
+
+    const isComplete = processPlayerPick(1, state, cardDatabase);
+
+    expect(isComplete).toBe(false);
+    expect(state.pickNumber).toBe(2);
+    expect(state.sitePicksCompleted).toBe(1);
+    expect(state.remainingCopiesByCard).toEqual({
+      "8": 1,
+    });
   });
 
-  it("ends the site cleanly when fewer than 4 unique cards remain", () => {
+  it("ends the site cleanly when fewer than 4 unique names remain", () => {
     const cardDatabase = buildDB(
       Array.from({ length: 7 }, (_, index) => makeCard(index + 1)),
     );
@@ -194,18 +256,17 @@ describe("enterDraftSite and processPlayerPick", () => {
         "1": 1,
         "2": 1,
         "3": 1,
-        "4": 1,
-        "5": 1,
-        "6": 1,
-        "7": 1,
       },
-      currentOffer: [1, 2, 3, 4],
     });
 
-    const isComplete = processPlayerPick(1, state, cardDatabase);
+    enterDraftSite(state, cardDatabase);
 
-    expect(isComplete).toBe(true);
     expect(state.currentOffer).toEqual([]);
+    expect(state.remainingCopiesByCard).toEqual({
+      "1": 1,
+      "2": 1,
+      "3": 1,
+    });
   });
 
   it("still completes after SITE_PICKS picks when offers remain", () => {
@@ -221,9 +282,11 @@ describe("enterDraftSite and processPlayerPick", () => {
       ),
     );
 
+    vi.spyOn(Math, "random").mockReturnValue(0);
+
     enterDraftSite(state, cardDatabase);
     for (let pickIndex = 0; pickIndex < SITE_PICKS; pickIndex += 1) {
-      const currentOffer = getPlayerPack(state);
+      const currentOffer = getCurrentOffer(state);
       const isComplete = processPlayerPick(
         currentOffer[0],
         state,
@@ -235,14 +298,13 @@ describe("enterDraftSite and processPlayerPick", () => {
 });
 
 describe("completeDraftSite", () => {
-  it("logs the drafted cards stored in draft state", () => {
+  it("logs the drafted cards provided by the draft site UI", () => {
     const state = makeDraftState({
       remainingCopiesByCard: { "9": 1, "10": 1 },
-      draftedCardNumbers: [4, 7],
       sitePicksCompleted: 2,
     });
 
-    completeDraftSite(state);
+    completeDraftSite(state, [4, 7]);
 
     const completionEvent = getLogEntries().find(
       (entry) => entry.event === "draft_site_completed",
@@ -258,15 +320,15 @@ describe("sortCardsByTide", () => {
     const cards = [
       makeCard(1, "Surge"),
       makeCard(2, "Bloom"),
-      makeCard(3, "Neutral"),
+      makeCard(3, "Pact"),
       makeCard(4, "Arc"),
     ];
 
-    expect(sortCardsByTide(cards).map((card) => card.tides[0])).toEqual([
-      "Bloom",
-      "Arc",
-      "Surge",
-      "Neutral",
+    expect(sortCardsByTide(cards).map((card) => card.cardNumber)).toEqual([
+      2,
+      4,
+      3,
+      1,
     ]);
   });
 });

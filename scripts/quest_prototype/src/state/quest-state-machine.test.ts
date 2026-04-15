@@ -92,7 +92,6 @@ function makeDraftState(): DraftState {
       "202": 2,
     },
     currentOffer: [101, 202, 303, 404],
-    draftedCardNumbers: [101, 202],
     pickNumber: 3,
     sitePicksCompleted: 2,
   };
@@ -175,7 +174,6 @@ describe("Task 02 state transitions", () => {
         "202": 2,
       },
       currentOffer: [101, 202, 303, 404],
-      draftedCardNumbers: [101, 202],
       pickNumber: 3,
       sitePicksCompleted: 2,
     });
