@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { selectDreamcallerOffer } from "../data/dreamcaller-selection";
 import { structuralTidesForPackageTides } from "../data/structural-tides";
+import { DreamcallerPortrait } from "../components/DreamcallerPortrait";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 import type { DreamcallerContent } from "../types/content";
 
@@ -101,8 +102,8 @@ export function QuestStartScreen() {
                   background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
                   border: `2px solid ${accentColor}40`,
                   boxShadow: `0 0 20px ${accentColor}15`,
-                  minWidth: "220px",
-                  maxWidth: "320px",
+                  minWidth: "260px",
+                  maxWidth: "360px",
                   flex: "1 1 0",
                 }}
                 whileHover={{
@@ -119,23 +120,27 @@ export function QuestStartScreen() {
                   handlePickDreamcaller(dreamcaller);
                 }}
               >
-                <div
-                  className="mb-3 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black md:h-14 md:w-14 md:text-2xl"
+                <DreamcallerPortrait
+                  dreamcaller={dreamcaller}
+                  variant="hero"
                   style={{
-                    border: `2px solid ${accentColor}`,
-                    background: "rgba(255, 255, 255, 0.06)",
-                    color: accentColor,
+                    width: "100%",
+                    marginBottom: 16,
+                    boxShadow: `0 14px 28px ${accentColor}20`,
                   }}
-                  aria-label={`${dreamcaller.name} sigil`}
-                >
-                  {dreamcaller.name.charAt(0)}
-                </div>
+                />
                 <h3
-                  className="mb-2 text-center text-xl font-bold leading-tight md:text-2xl"
+                  className="text-center text-xl font-bold leading-tight md:text-2xl"
                   style={{ color: "#f8fafc" }}
                 >
                   {dreamcaller.name}
                 </h3>
+                <p
+                  className="mb-3 text-center text-sm italic opacity-80 md:text-base"
+                  style={{ color: "#cbd5f5" }}
+                >
+                  {dreamcaller.title}
+                </p>
                 <span
                   className="mb-3 rounded-full px-3 py-0.5 text-xs font-medium"
                   style={{

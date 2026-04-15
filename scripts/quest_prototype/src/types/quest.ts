@@ -39,8 +39,10 @@ export interface DeckEntry {
 export interface Dreamcaller {
   id: string;
   name: string;
+  title: string;
   awakening: number;
   renderedText: string;
+  imageNumber: string;
   accentTide: Tide;
 }
 

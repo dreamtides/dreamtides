@@ -101,8 +101,10 @@ function makeState(): QuestState {
     dreamcaller: {
       id: "caller-1",
       name: "Mira of Lanterns",
+      title: "Keeper of Lantern Glass",
       awakening: 5,
       renderedText: "Dreamcaller rules.",
+      imageNumber: "0005",
       accentTide: "Bloom",
     },
     resolvedPackage: null,
@@ -209,6 +211,7 @@ describe("DeckViewer", () => {
     );
 
     expect(container.textContent).toContain("Mira of Lanterns");
+    expect(container.textContent).toContain("Keeper of Lantern Glass");
     expect(container.textContent).toContain("Awakening 5");
     expect(container.textContent).toContain("Night's Mark");
     expect(container.textContent).toContain("Ashen Debt");

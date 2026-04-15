@@ -5,8 +5,10 @@ export type PackageTideId = string;
 export interface DreamcallerContent {
   id: string;
   name: string;
+  title: string;
   awakening: number;
   renderedText: string;
+  imageNumber: string;
   mandatoryTides: PackageTideId[];
   optionalTides: PackageTideId[];
 }

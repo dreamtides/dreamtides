@@ -24,6 +24,7 @@ import {
   compareRarities,
   computeDeckSummary,
 } from "./deck-summary";
+import { DreamcallerPortrait } from "./DreamcallerPortrait";
 
 /** Sort criteria options. */
 type SortCriteria =
@@ -731,18 +732,12 @@ export function DeckViewer({
                       border: "1px solid rgba(124, 58, 237, 0.2)",
                     }}
                   >
-                    <div className="flex items-start gap-2">
-                      <div
-                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-                        style={{
-                          background: "rgba(255, 255, 255, 0.08)",
-                          border: "1px solid rgba(255, 255, 255, 0.12)",
-                          color: "#e2e8f0",
-                        }}
-                        aria-label={`${state.dreamcaller.name} sigil`}
-                      >
-                        {state.dreamcaller.name.charAt(0)}
-                      </div>
+                    <div className="flex items-start gap-3">
+                      <DreamcallerPortrait
+                        dreamcaller={state.dreamcaller}
+                        variant="panel"
+                        style={{ width: 68, flexShrink: 0 }}
+                      />
                       <div>
                         <span
                           className="text-sm font-bold"
@@ -750,6 +745,12 @@ export function DeckViewer({
                         >
                           {state.dreamcaller.name}
                         </span>
+                        <p
+                          className="mt-0.5 text-[11px] italic opacity-80"
+                          style={{ color: "#cbd5f5" }}
+                        >
+                          {state.dreamcaller.title}
+                        </p>
                         <p
                           className="mt-0.5 text-[10px] uppercase tracking-wider opacity-45"
                           style={{ color: "#cbd5f5" }}
@@ -952,17 +953,11 @@ function MobileSidebar({
               <div>
                 {dreamcaller !== null ? (
                   <div className="flex items-start gap-2">
-                    <div
-                      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
-                      style={{
-                        background: "rgba(255, 255, 255, 0.08)",
-                        border: "1px solid rgba(255, 255, 255, 0.12)",
-                        color: "#e2e8f0",
-                      }}
-                      aria-label={`${dreamcaller.name} sigil`}
-                    >
-                      {dreamcaller.name.charAt(0)}
-                    </div>
+                    <DreamcallerPortrait
+                      dreamcaller={dreamcaller}
+                      variant="thumb"
+                      style={{ width: 42, flexShrink: 0 }}
+                    />
                     <div>
                       <span
                         className="text-xs font-bold"
@@ -970,6 +965,12 @@ function MobileSidebar({
                       >
                         {dreamcaller.name}
                       </span>
+                      <p
+                        className="mt-0.5 text-[10px] italic opacity-80"
+                        style={{ color: "#cbd5f5" }}
+                      >
+                        {dreamcaller.title}
+                      </p>
                       <p
                         className="mt-0.5 text-[9px] uppercase tracking-wider opacity-45"
                         style={{ color: "#cbd5f5" }}

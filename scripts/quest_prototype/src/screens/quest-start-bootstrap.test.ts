@@ -16,8 +16,10 @@ function makeDreamcaller(): DreamcallerContent {
   return {
     id: "dreamcaller-1",
     name: "Test Dreamcaller",
+    title: "Caller of Beginnings",
     awakening: 4,
     renderedText: "Test ability.",
+    imageNumber: "0002",
     mandatoryTides: ["Bloom"],
     optionalTides: ["Arc", "Ignite", "Pact", "Rime"],
   };

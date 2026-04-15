@@ -30,8 +30,10 @@ export function toQuestDreamcaller(
   return {
     id: dreamcaller.id,
     name: dreamcaller.name,
+    title: dreamcaller.title,
     awakening: dreamcaller.awakening,
     renderedText: dreamcaller.renderedText,
+    imageNumber: dreamcaller.imageNumber,
     accentTide: dreamcallerAccentTide(dreamcaller),
   };
 }

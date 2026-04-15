@@ -10,6 +10,10 @@ import { parse } from "smol-toml";
 const ROOT = resolve(import.meta.dirname, "..");
 const PROJECT_ROOT = resolve(ROOT, "..", "..");
 const IMAGE_CACHE_DIR = join(homedir(), "Library", "Caches", "io.github.dreamtides.tv", "image_cache");
+const DREAMCALLER_ART_DIR_CANDIDATES = [
+  join(homedir(), "Documents", "synty", "dreamcallers"),
+  join(homedir(), "Documents", "sytny", "dreamcallers"),
+];
 
 const PUBLIC_DIR = join(ROOT, "public");
 
@@ -106,6 +110,16 @@ function recreateDir(dir) {
   mkdirSync(dir, { recursive: true });
 }
 
+function defaultDreamcallerArtDir() {
+  for (const candidate of DREAMCALLER_ART_DIR_CANDIDATES) {
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  return DREAMCALLER_ART_DIR_CANDIDATES[0];
+}
+
 export function setupAssets({
   cardTomlPath = resolveAssetPath(
     "client",
@@ -130,8 +144,10 @@ export function setupAssets({
   ),
   publicDir = PUBLIC_DIR,
   imageCacheDir = IMAGE_CACHE_DIR,
+  dreamcallerArtDir = defaultDreamcallerArtDir(),
 } = {}) {
   const cardsDir = join(publicDir, "cards");
+  const dreamcallersDir = join(publicDir, "dreamcallers");
   const tidesDir = join(publicDir, "tides");
   const cardJsonPath = join(publicDir, "card-data.json");
   const dreamcallerJsonPath = join(publicDir, "dreamcaller-data.json");
@@ -197,6 +213,30 @@ export function setupAssets({
   }
 
   console.log(`Linked ${linked} of ${jsonCards.length} card images (${missing} missing)`);
+
+  recreateDir(dreamcallersDir);
+  let linkedDreamcallerArt = 0;
+  let missingDreamcallerArt = 0;
+
+  for (const dreamcaller of jsonDreamcallers) {
+    const filename = `${dreamcaller.imageNumber}.png`;
+    const sourcePath = join(dreamcallerArtDir, filename);
+    const symlinkPath = join(dreamcallersDir, filename);
+
+    if (existsSync(sourcePath)) {
+      symlinkSync(sourcePath, symlinkPath);
+      linkedDreamcallerArt++;
+    } else {
+      console.warn(
+        `  Warning: missing dreamcaller art for ${dreamcaller.name} (${dreamcaller.imageNumber})`,
+      );
+      missingDreamcallerArt++;
+    }
+  }
+
+  console.log(
+    `Linked ${linkedDreamcallerArt} of ${jsonDreamcallers.length} dreamcaller portraits (${missingDreamcallerArt} missing)`,
+  );
 
   // Copy tide icon PNGs
   recreateDir(tidesDir);

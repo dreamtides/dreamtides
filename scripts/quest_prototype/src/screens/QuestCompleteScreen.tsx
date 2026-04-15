@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { logEvent, downloadLog } from "../logging";
 import { CardDisplay } from "../components/CardDisplay";
+import { DreamcallerPortrait } from "../components/DreamcallerPortrait";
 import type { CardData } from "../types/cards";
 
 /** Final summary screen shown after winning 7 battles. */
@@ -52,6 +53,7 @@ export function QuestCompleteScreen() {
   ).length;
 
   const dreamcallerName = state.dreamcaller?.name ?? "None";
+  const dreamcallerTitle = state.dreamcaller?.title ?? "Unbound";
   const dreamcallerAwakening = state.dreamcaller?.awakening ?? null;
   const dreamcallerColor =
     state.dreamcaller !== null ? "#f8fafc" : "#6b7280";
@@ -98,24 +100,36 @@ export function QuestCompleteScreen() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div
-          className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-black md:h-12 md:w-12 md:text-xl"
-          style={{
-            border: "2px solid rgba(255, 255, 255, 0.2)",
-            boxShadow: "0 0 12px rgba(255, 255, 255, 0.08)",
-            background: "rgba(255, 255, 255, 0.06)",
-            color: dreamcallerColor,
-          }}
-          aria-label={`${dreamcallerName} sigil`}
-        >
-          {dreamcallerName === "None" ? "--" : dreamcallerName.charAt(0)}
-        </div>
+        {state.dreamcaller !== null ? (
+          <DreamcallerPortrait
+            dreamcaller={state.dreamcaller}
+            variant="panel"
+            style={{ width: 56, flexShrink: 0 }}
+          />
+        ) : (
+          <div
+            className="flex h-14 w-14 items-center justify-center rounded-[14px] text-lg font-black"
+            style={{
+              border: "1px solid rgba(255, 255, 255, 0.14)",
+              background: "rgba(255, 255, 255, 0.06)",
+              color: dreamcallerColor,
+            }}
+          >
+            {"--"}
+          </div>
+        )}
         <div className="flex flex-col">
           <span
             className="text-lg font-bold md:text-xl"
             style={{ color: dreamcallerColor }}
           >
             {dreamcallerName}
+          </span>
+          <span
+            className="text-sm italic opacity-80"
+            style={{ color: "#cbd5f5" }}
+          >
+            {dreamcallerTitle}
           </span>
           {dreamcallerAwakening !== null && (
             <span className="text-xs opacity-50">

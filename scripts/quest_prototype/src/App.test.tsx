@@ -147,8 +147,10 @@ describe("QuestApp", () => {
         dreamcaller: {
           id: "caller-1",
           name: "Starter Caller",
+          title: "Of the First Hand",
           awakening: 4,
           renderedText: "Pick your path.",
+          imageNumber: "0004",
           accentTide: "Bloom",
         },
         screen: { type: "dreamscape" },

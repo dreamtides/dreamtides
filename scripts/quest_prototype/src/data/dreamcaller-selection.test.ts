@@ -9,8 +9,10 @@ function makeDreamcaller(id: string): DreamcallerContent {
   return {
     id,
     name: `Dreamcaller ${id}`,
+    title: `Title ${id}`,
     awakening: 3,
     renderedText: `Rules text for ${id}.`,
+    imageNumber: `00${id}`,
     mandatoryTides: ["Bloom"],
     optionalTides: ["support-a", "support-b", "support-c", "support-d"],
   };
@@ -55,8 +57,10 @@ describe("toQuestDreamcaller", () => {
     expect(toQuestDreamcaller(makeDreamcaller("a"))).toEqual({
       id: "a",
       name: "Dreamcaller a",
+      title: "Title a",
       awakening: 3,
       renderedText: "Rules text for a.",
+      imageNumber: "00a",
       accentTide: "Bloom",
     });
   });

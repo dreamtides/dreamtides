@@ -1,6 +1,7 @@
 import type { ResolvedDreamcallerPackage } from "../types/content";
 import type { Dreamcaller } from "../types/quest";
 import { TIDE_COLORS } from "../data/card-database";
+import { DreamcallerPortrait } from "./DreamcallerPortrait";
 
 interface DreamcallerPopoverProps {
   dreamcaller: Dreamcaller;
@@ -50,6 +51,12 @@ export function DreamcallerPopover({
             >
               {dreamcaller.name}
             </h3>
+            <p
+              className="mt-1 text-sm italic leading-tight"
+              style={{ color: "#cbd5f5" }}
+            >
+              {dreamcaller.title}
+            </p>
           </div>
           <span
             className="shrink-0 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wide"
@@ -64,26 +71,16 @@ export function DreamcallerPopover({
         </div>
 
         <div className="relative mt-4">
-          <div
-            className="mx-auto flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl"
+          <DreamcallerPortrait
+            dreamcaller={dreamcaller}
+            variant="panel"
             style={{
+              width: "100%",
               background:
                 "linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 45%, rgba(0, 0, 0, 0.18) 100%)",
               border: "1px solid rgba(255, 255, 255, 0.16)",
             }}
-          >
-            <div
-              className="flex h-24 w-24 items-center justify-center rounded-full text-5xl font-black"
-              style={{
-                background: "rgba(5, 2, 10, 0.48)",
-                border: `2px solid ${accentColor}88`,
-                color: "#f8fafc",
-                boxShadow: `0 0 28px ${accentColor}30`,
-              }}
-            >
-              {dreamcaller.name.charAt(0)}
-            </div>
-          </div>
+          />
         </div>
       </div>
 

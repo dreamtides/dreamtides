@@ -51,8 +51,10 @@ function makeDreamcaller(
   return {
     id: "dreamcaller-1",
     name: "Test Dreamcaller",
+    title: "Speaker of Tests",
     awakening: 4,
     renderedText: "Test rules text.",
+    imageNumber: "0001",
     mandatoryTides: ["m1", "m2", "m3"],
     optionalTides,
   };
