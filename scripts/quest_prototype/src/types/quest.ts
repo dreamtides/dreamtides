@@ -14,7 +14,6 @@ export type TransfigurationType =
 export type SiteType =
   | "Battle"
   | "Draft"
-  | "DreamcallerDraft"
   | "Shop"
   | "SpecialtyShop"
   | "DreamsignOffering"
@@ -36,13 +35,13 @@ export interface DeckEntry {
   isBane: boolean;
 }
 
-/** A selected character that grants bonuses. */
+/** The selected Dreamcaller package shown in player-facing UI. */
 export interface Dreamcaller {
+  id: string;
   name: string;
-  tide: Tide;
-  abilityDescription: string;
-  essenceBonus: number;
-  tideCrystalGrant: Tide;
+  awakening: number;
+  renderedText: string;
+  accentTide: Tide;
 }
 
 /** A passive effect collected during the quest. */

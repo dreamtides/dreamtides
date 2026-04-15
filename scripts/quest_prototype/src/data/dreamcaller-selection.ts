@@ -7,6 +7,12 @@ export function selectDreamcallerOffer(
   dreamcallers: readonly DreamcallerContent[],
   offerSize = 3,
 ): DreamcallerContent[] {
+  if (dreamcallers.length < offerSize) {
+    throw new Error(
+      `Expected at least ${String(offerSize)} Dreamcallers, received ${String(dreamcallers.length)}`,
+    );
+  }
+
   const pool = [...dreamcallers];
 
   for (let index = pool.length - 1; index > 0; index -= 1) {
@@ -17,17 +23,15 @@ export function selectDreamcallerOffer(
   return pool.slice(0, offerSize);
 }
 
-/** Convert normalized Dreamcaller content into the legacy quest-state shape. */
-export function toSelectedDreamcaller(
+/** Convert normalized Dreamcaller content into quest-state display data. */
+export function toQuestDreamcaller(
   dreamcaller: DreamcallerContent,
 ): Dreamcaller {
-  const tide = dreamcallerAccentTide(dreamcaller);
-
   return {
+    id: dreamcaller.id,
     name: dreamcaller.name,
-    tide,
-    abilityDescription: dreamcaller.renderedText,
-    essenceBonus: 0,
-    tideCrystalGrant: tide,
+    awakening: dreamcaller.awakening,
+    renderedText: dreamcaller.renderedText,
+    accentTide: dreamcallerAccentTide(dreamcaller),
   };
 }

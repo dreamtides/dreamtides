@@ -1,0 +1,63 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  selectDreamcallerOffer,
+  toQuestDreamcaller,
+} from "./dreamcaller-selection";
+import type { DreamcallerContent } from "../types/content";
+
+function makeDreamcaller(id: string): DreamcallerContent {
+  return {
+    id,
+    name: `Dreamcaller ${id}`,
+    awakening: 3,
+    renderedText: `Rules text for ${id}.`,
+    mandatoryTides: ["Bloom"],
+    optionalTides: ["support-a", "support-b", "support-c", "support-d"],
+  };
+}
+
+beforeEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe("selectDreamcallerOffer", () => {
+  it("returns exactly 3 distinct Dreamcallers", () => {
+    vi.spyOn(Math, "random")
+      .mockReturnValueOnce(0.9)
+      .mockReturnValueOnce(0.7)
+      .mockReturnValueOnce(0.4)
+      .mockReturnValueOnce(0.1);
+
+    const offer = selectDreamcallerOffer([
+      makeDreamcaller("a"),
+      makeDreamcaller("b"),
+      makeDreamcaller("c"),
+      makeDreamcaller("d"),
+      makeDreamcaller("e"),
+    ]);
+
+    expect(offer).toHaveLength(3);
+    expect(new Set(offer.map((dreamcaller) => dreamcaller.id)).size).toBe(3);
+  });
+
+  it("fails loudly when the validated Dreamcaller list is too small", () => {
+    expect(() =>
+      selectDreamcallerOffer([
+        makeDreamcaller("a"),
+        makeDreamcaller("b"),
+      ]),
+    ).toThrow("Expected at least 3 Dreamcallers");
+  });
+});
+
+describe("toQuestDreamcaller", () => {
+  it("keeps package choice display data without legacy tide-crystal fields", () => {
+    expect(toQuestDreamcaller(makeDreamcaller("a"))).toEqual({
+      id: "a",
+      name: "Dreamcaller a",
+      awakening: 3,
+      renderedText: "Rules text for a.",
+      accentTide: "Bloom",
+    });
+  });
+});

@@ -435,7 +435,6 @@ export function generateNewNodes(
 const SITE_TYPE_META: Record<SiteType, { icon: string; name: string }> = {
   Battle: { icon: "\u2694\uFE0F", name: "Battle" },
   Draft: { icon: "\uD83C\uDCCF", name: "Draft" },
-  DreamcallerDraft: { icon: "\uD83D\uDC51", name: "Dreamcaller Draft" },
   Shop: { icon: "\uD83C\uDFEA", name: "Shop" },
   SpecialtyShop: { icon: "\u2B50", name: "Specialty Shop" },
   DreamsignOffering: { icon: "\u2728", name: "Dreamsign Offering" },

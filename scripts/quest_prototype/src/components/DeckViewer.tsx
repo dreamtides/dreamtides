@@ -69,7 +69,7 @@ interface DeckViewerProps {
 
 /**
  * Full-screen overlay showing the player's complete deck, with filtering,
- * sorting, and a sidebar for dreamcaller, dreamsigns, and tide crystals.
+ * sorting, and a sidebar for dreamcaller and dreamsign data.
  */
 export function DeckViewer({
   isOpen,
@@ -621,18 +621,18 @@ export function DeckViewer({
                   >
                     <div className="flex items-center gap-2">
                       <img
-                        src={tideIconUrl(state.dreamcaller.tide)}
-                        alt={state.dreamcaller.tide}
+                        src={tideIconUrl(state.dreamcaller.accentTide)}
+                        alt={state.dreamcaller.accentTide}
                         className="h-5 w-5 rounded-full"
                         style={{
-                          border: `1px solid ${TIDE_COLORS[state.dreamcaller.tide]}`,
+                          border: `1px solid ${TIDE_COLORS[state.dreamcaller.accentTide]}`,
                         }}
                       />
                       <span
                         className="text-sm font-bold"
                         style={{
                           color:
-                            TIDE_COLORS[state.dreamcaller.tide],
+                            TIDE_COLORS[state.dreamcaller.accentTide],
                         }}
                       >
                         {state.dreamcaller.name}
@@ -642,7 +642,7 @@ export function DeckViewer({
                       className="mt-2 text-[11px] leading-relaxed opacity-70"
                       style={{ color: "#e2e8f0" }}
                     >
-                      {state.dreamcaller.abilityDescription}
+                      {state.dreamcaller.renderedText}
                     </p>
                   </div>
                 ) : (
@@ -812,24 +812,24 @@ function MobileSidebar({
                 {dreamcaller !== null ? (
                   <div className="flex items-start gap-2">
                     <img
-                      src={tideIconUrl(dreamcaller.tide)}
-                      alt={dreamcaller.tide}
+                      src={tideIconUrl(dreamcaller.accentTide)}
+                      alt={dreamcaller.accentTide}
                       className="mt-0.5 h-5 w-5 rounded-full"
                       style={{
-                        border: `1px solid ${TIDE_COLORS[dreamcaller.tide]}`,
+                        border: `1px solid ${TIDE_COLORS[dreamcaller.accentTide]}`,
                       }}
                     />
                     <div>
                       <span
                         className="text-xs font-bold"
                         style={{
-                          color: TIDE_COLORS[dreamcaller.tide],
+                          color: TIDE_COLORS[dreamcaller.accentTide],
                         }}
                       >
                         {dreamcaller.name}
                       </span>
                       <p className="mt-0.5 text-[10px] opacity-60">
-                        {dreamcaller.abilityDescription}
+                        {dreamcaller.renderedText}
                       </p>
                     </div>
                   </div>

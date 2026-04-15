@@ -5,7 +5,7 @@ import { generateInitialAtlas } from "../atlas/atlas-generator";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import {
   selectDreamcallerOffer,
-  toSelectedDreamcaller,
+  toQuestDreamcaller,
 } from "../data/dreamcaller-selection";
 import { dreamcallerAccentTide } from "../data/quest-content";
 import { createDreamsign } from "../data/dreamsigns";
@@ -26,7 +26,7 @@ export function QuestStartScreen() {
 
   const handlePickDreamcaller = useCallback(
     (dreamcaller: DreamcallerContent) => {
-      const selectedDreamcaller = toSelectedDreamcaller(dreamcaller);
+      const selectedDreamcaller = toQuestDreamcaller(dreamcaller);
       const resolvedPackage = questContent.resolvedPackagesByDreamcallerId.get(
         dreamcaller.id,
       );
@@ -61,12 +61,17 @@ export function QuestStartScreen() {
 
       logEvent("quest_started", {
         initialEssence: state.essence,
+        dreamcallerId: dreamcaller.id,
         dreamcallerName: dreamcaller.name,
         dreamcallerAwakening: dreamcaller.awakening,
-        packageTideCount:
-          dreamcaller.mandatoryTides.length + dreamcaller.optionalTides.length,
+        packageSummary: {
+          mandatoryTides: resolvedPackage.mandatoryTides,
+          optionalSubset: resolvedPackage.optionalSubset,
+          selectedTides: resolvedPackage.selectedTides,
+        },
         selectedPackageTides: resolvedPackage.selectedTides,
         draftPoolSize: resolvedPackage.draftPoolSize,
+        dreamsignPoolSize: resolvedPackage.dreamsignPoolIds.length,
         dreamscapesGenerated: Object.keys(atlas.nodes).length - 1,
       });
 

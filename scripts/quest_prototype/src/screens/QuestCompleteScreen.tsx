@@ -53,7 +53,8 @@ export function QuestCompleteScreen() {
   ).length;
 
   const dreamcallerName = state.dreamcaller?.name ?? "None";
-  const dreamcallerTide = state.dreamcaller?.tide ?? null;
+  const dreamcallerTide = state.dreamcaller?.accentTide ?? null;
+  const dreamcallerAwakening = state.dreamcaller?.awakening ?? null;
   const dreamcallerColor =
     dreamcallerTide !== null ? TIDE_COLORS[dreamcallerTide] : "#6b7280";
 
@@ -117,9 +118,9 @@ export function QuestCompleteScreen() {
           >
             {dreamcallerName}
           </span>
-          {dreamcallerTide !== null && (
+          {dreamcallerAwakening !== null && (
             <span className="text-xs opacity-50">
-              {dreamcallerTide} Tide Dreamcaller
+              Awakening {String(dreamcallerAwakening)}
             </span>
           )}
         </div>

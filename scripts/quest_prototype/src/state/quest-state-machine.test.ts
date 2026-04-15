@@ -50,11 +50,11 @@ function captureQuestContext(): QuestContextValue {
 
 function makeDreamcaller(): Dreamcaller {
   return {
+    id: "dreamcaller-1",
     name: "Test Dreamcaller",
-    tide: "Bloom",
-    abilityDescription: "Test ability.",
-    essenceBonus: 50,
-    tideCrystalGrant: "Bloom",
+    awakening: 4,
+    renderedText: "Test ability.",
+    accentTide: "Bloom",
   };
 }
 
@@ -119,6 +119,7 @@ describe("QuestProvider default state contract", () => {
     expect(mutationNames).toContain("setDreamcallerSelection");
     expect(mutationNames).toContain("setRemainingDreamsignPool");
     expect(mutationNames).toContain("setDraftState");
+    expect(mutationNames).not.toContain("setDreamcaller");
     expect(mutationNames).not.toContain("addTideCrystal");
     expect(mutationNames).not.toContain("setChosenTide");
     expect(mutationNames).not.toContain("setExcludedTides");

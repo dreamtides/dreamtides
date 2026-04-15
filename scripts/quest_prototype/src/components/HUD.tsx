@@ -63,7 +63,7 @@ export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudPr
   }
 
   const dreamcallerName = state.dreamcaller?.name ?? null;
-  const dreamcallerTide = state.dreamcaller?.tide ?? null;
+  const dreamcallerTide = state.dreamcaller?.accentTide ?? null;
   const dreamcallerColor =
     dreamcallerTide !== null ? TIDE_COLORS[dreamcallerTide] : "#6b7280";
 

@@ -36,7 +36,6 @@ export interface QuestMutations {
     effectDescription: string,
     effectDetails: Record<string, unknown>,
   ) => void;
-  setDreamcaller: (dreamcaller: Dreamcaller) => void;
   setDreamcallerSelection: (
     dreamcaller: Dreamcaller,
     resolvedPackage: ResolvedDreamcallerPackage,
@@ -265,25 +264,18 @@ export function QuestProvider({
     [cardDatabase],
   );
 
-  const setDreamcaller = useCallback((dreamcaller: Dreamcaller) => {
-    logEvent("dreamcaller_selected", {
-      name: dreamcaller.name,
-      tide: dreamcaller.tide,
-      essenceBonus: dreamcaller.essenceBonus,
-    });
-    setState((prev) => ({ ...prev, dreamcaller }));
-  }, []);
-
   const setDreamcallerSelection = useCallback(
     (
       dreamcaller: Dreamcaller,
       resolvedPackage: ResolvedDreamcallerPackage,
     ) => {
       logEvent("dreamcaller_selected", {
+        id: dreamcaller.id,
         name: dreamcaller.name,
-        tide: dreamcaller.tide,
-        essenceBonus: dreamcaller.essenceBonus,
+        awakening: dreamcaller.awakening,
+        accentTide: dreamcaller.accentTide,
         dreamcallerId: resolvedPackage.dreamcaller.id,
+        optionalSubset: resolvedPackage.optionalSubset,
         selectedPackageTides: resolvedPackage.selectedTides,
         draftPoolSize: resolvedPackage.draftPoolSize,
         dreamsignPoolSize: resolvedPackage.dreamsignPoolIds.length,
@@ -456,7 +448,6 @@ export function QuestProvider({
       addBaneCard,
       removeCard,
       transfigureCard,
-      setDreamcaller,
       setDreamcallerSelection,
       addDreamsign,
       removeDreamsign,
@@ -475,7 +466,6 @@ export function QuestProvider({
       addBaneCard,
       removeCard,
       transfigureCard,
-      setDreamcaller,
       setDreamcallerSelection,
       addDreamsign,
       removeDreamsign,
