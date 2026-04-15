@@ -75,6 +75,8 @@ way to win games.
 
 ### `warrior_pressure`
 
+Display name: Iron Charge.
+
 Narrative identity: Relentless martial momentum.
 
 Boxicon: `bullseye`.
@@ -86,6 +88,8 @@ Apply to cards that build early Warrior boards, push damage immediately, or turn
 Warrior density into pressure.
 
 ### `warrior_bastion`
+
+Display name: Stone Rampart.
 
 Narrative identity: Disciplined defense and superior trading.
 
@@ -99,6 +103,8 @@ grind through combat.
 
 ### `spirit_growth`
 
+Display name: Verdant Ascent.
+
 Narrative identity: Living abundance that compounds over time.
 
 Boxicon: `tree-alt`.
@@ -110,6 +116,8 @@ Apply to cards that ramp into larger Spirit turns, reward Spirit density, or
 convert Judgment into more board.
 
 ### `materialize_value`
+
+Display name: Echo Arrival.
 
 Narrative identity: Repeated arrival as a source of advantage.
 
@@ -123,6 +131,8 @@ entries.
 
 ### `materialize_tempo`
 
+Display name: Flicker Rush.
+
 Narrative identity: Reality in motion, never letting the board settle.
 
 Boxicon: `show`.
@@ -134,6 +144,8 @@ Apply to cards that remove blockers for a turn, reset allies for timing value,
 or use replay to create pressure windows.
 
 ### `ally_formation`
+
+Display name: Banner Formation.
 
 Narrative identity: Coordinated companies moving in deliberate formation.
 
@@ -147,6 +159,8 @@ pair-based scaling.
 
 ### `ally_wide`
 
+Display name: Rising Host.
+
 Narrative identity: Overwhelming presence through sheer board spread.
 
 Boxicon: `sun`.
@@ -158,6 +172,8 @@ Apply to cards that flood the board with bodies and turn width itself into the
 win condition.
 
 ### `fast_tempo`
+
+Display name: Quickened Edge.
 
 Narrative identity: Winning through timing and initiative.
 
@@ -171,6 +187,8 @@ without giving up tempo.
 
 ### `event_chain`
 
+Display name: Arc Cascade.
+
 Narrative identity: Spell turns that build into a decisive burst.
 
 Boxicon: `meteor`.
@@ -182,6 +200,8 @@ Apply to cards that reward long event turns, sequencing density, or storm-style
 chaining.
 
 ### `prevent_control`
+
+Display name: Sealed Verdict.
 
 Narrative identity: Command of the game through refusal and interruption.
 
@@ -195,6 +215,8 @@ into advantage.
 
 ### `discard_velocity`
 
+Display name: Cinder Sprint.
+
 Narrative identity: Burning through the hand to gain speed.
 
 Boxicon: `flame`.
@@ -206,6 +228,8 @@ Apply to cards that want cards discarded as cost or payoff and turn churn into
 speed.
 
 ### `void_recursion`
+
+Display name: Haunting Return.
 
 Narrative identity: The void as a second hand and a place of return.
 
@@ -219,6 +243,8 @@ rebuy loops.
 
 ### `void_threshold`
 
+Display name: Moonlit Threshold.
+
 Narrative identity: Power that grows as the void deepens.
 
 Boxicon: `moon`.
@@ -230,6 +256,8 @@ Apply to cards that care how many cards are in the void and become threatening
 at specific void sizes.
 
 ### `abandon_value`
+
+Display name: Grave Bargain.
 
 Narrative identity: Sacrifice as fuel for resource conversion.
 
@@ -243,6 +271,8 @@ conversion.
 
 ### `abandon_ladder`
 
+Display name: Funeral Ladder.
+
 Narrative identity: Feeding lesser pieces upward into greater ones.
 
 Boxicon: `pyramid`.
@@ -254,6 +284,8 @@ Apply to cards that cash in expendable bodies to pull larger cards or step up a
 board state.
 
 ### `figment_swarm`
+
+Display name: Dream Shards.
 
 Narrative identity: A dream made real through multiplying fragments.
 
@@ -267,6 +299,8 @@ into lethal pressure.
 
 ### `survivor_dissolve`
 
+Display name: Enduring Wake.
+
 Narrative identity: Endurance through death, recovery, and attrition.
 
 Boxicon: `yin-yang`.
@@ -278,6 +312,8 @@ Apply to cards that reward allied cards dissolving or repeatedly recycle
 dissolved pieces.
 
 ### `judgment_engines`
+
+Display name: Turning Hourglass.
 
 Narrative identity: Winning by bending the scoring phase itself.
 
@@ -291,6 +327,8 @@ or happening bigger.
 
 ### `character_chain`
 
+Display name: Living Procession.
+
 Narrative identity: Momentum built from body after body entering play.
 
 Boxicon: `cloud-lightning`.
@@ -302,6 +340,8 @@ Apply to cards that pay off multiple character plays in a turn or convert
 character sequencing into tempo.
 
 ### `spark_tall`
+
+Display name: Kindled Crown.
 
 Narrative identity: Concentrating power into a single dominant threat.
 
