@@ -43,6 +43,13 @@ export function tokenizeRulesText(text: string): TextSegment[] {
 
 /** Format the card type and subtype line. */
 export function formatTypeLine(card: CardData): string {
+  if (card.cardType === "Character") {
+    if (card.subtype && card.subtype !== "" && card.subtype !== "*") {
+      return card.subtype;
+    }
+    return "";
+  }
+
   if (card.subtype && card.subtype !== "" && card.subtype !== "*") {
     return `${card.cardType} \u2014 ${card.subtype}`;
   }

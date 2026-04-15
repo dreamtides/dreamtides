@@ -78,6 +78,7 @@ export function CardDisplay({
       : `${chromeColor}55`;
   const nameColor =
     accentTide === "Neutral" ? "#f8fafc" : accentColor;
+  const typeLine = formatTypeLine(card);
 
   const borderStyle = selected
     ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }
@@ -193,14 +194,16 @@ export function CardDisplay({
           {card.name}
         </h3>
 
-        <div className="mt-0.5 flex items-center gap-1.5">
-          <span
-            className={`truncate ${large ? "text-sm" : "text-[10px]"} opacity-50`}
-            style={{ color: "#e2e8f0" }}
-          >
-            {formatTypeLine(card)}
-          </span>
-        </div>
+        {typeLine !== "" && (
+          <div className="mt-0.5 flex items-center gap-1.5">
+            <span
+              className={`truncate ${large ? "text-sm" : "text-[10px]"} opacity-50`}
+              style={{ color: "#e2e8f0" }}
+            >
+              {typeLine}
+            </span>
+          </div>
+        )}
 
         {/* Rules text */}
         <div

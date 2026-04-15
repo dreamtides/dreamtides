@@ -322,52 +322,49 @@ function ShopSlotCard({
     const ds = slot.dreamsign;
     return (
       <div className="flex flex-col gap-2">
-        <div className="relative">
-          {hasDiscount && <ShopSaleBadge discountPercent={slot.discountPercent} />}
+        <div
+          className="flex flex-col items-center justify-center gap-2 rounded-lg p-3"
+          style={{
+            aspectRatio: "2 / 3",
+            background:
+              "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
+            border: "1px solid rgba(168, 85, 247, 0.3)",
+            boxShadow: "0 0 8px rgba(168, 85, 247, 0.12)",
+          }}
+        >
           <div
-            className="flex flex-col items-center justify-center gap-2 rounded-lg p-3"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-lg"
             style={{
-              aspectRatio: "2 / 3",
-              background:
-                "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-              border: "1px solid rgba(168, 85, 247, 0.3)",
-              boxShadow: "0 0 8px rgba(168, 85, 247, 0.12)",
+              background: "rgba(255, 255, 255, 0.08)",
+              border: "2px solid rgba(168, 85, 247, 0.35)",
+              color: "#cbd5f5",
+            }}
+            aria-label={`${ds.name} sigil`}
+          >
+            {"\u2726"}
+          </div>
+          <span
+            className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+            style={{
+              background: "rgba(168, 85, 247, 0.16)",
+              color: "#c4b5fd",
+              border: "1px solid rgba(168, 85, 247, 0.35)",
             }}
           >
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-full text-lg"
-              style={{
-                background: "rgba(255, 255, 255, 0.08)",
-                border: "2px solid rgba(168, 85, 247, 0.35)",
-                color: "#cbd5f5",
-              }}
-              aria-label={`${ds.name} sigil`}
-            >
-              {"\u2726"}
-            </div>
-            <span
-              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-              style={{
-                background: "rgba(168, 85, 247, 0.16)",
-                color: "#c4b5fd",
-                border: "1px solid rgba(168, 85, 247, 0.35)",
-              }}
-            >
-              Dreamsign
-            </span>
-            <h3
-              className="text-center text-sm font-bold"
-              style={{ color: "#f8fafc" }}
-            >
-              {ds.name}
-            </h3>
-            <p
-              className="text-center text-[10px] leading-tight opacity-70"
-              style={{ color: "#e2e8f0" }}
-            >
-              {ds.effectDescription}
-            </p>
-          </div>
+            Dreamsign
+          </span>
+          <h3
+            className="text-center text-sm font-bold"
+            style={{ color: "#f8fafc" }}
+          >
+            {ds.name}
+          </h3>
+          <p
+            className="text-center text-[10px] leading-tight opacity-70"
+            style={{ color: "#e2e8f0" }}
+          >
+            {ds.effectDescription}
+          </p>
         </div>
         <PriceButton
           basePrice={slot.basePrice}
@@ -376,6 +373,7 @@ function ShopSlotCard({
           canAfford={canAfford}
           onClick={() => onBuy(index)}
         />
+        {hasDiscount && <ShopSaleText discountPercent={slot.discountPercent} />}
       </div>
     );
   }
@@ -384,13 +382,10 @@ function ShopSlotCard({
   if (slot.card) {
     return (
       <div className="flex flex-col gap-2">
-        <div className="relative">
-          {hasDiscount && <ShopSaleBadge discountPercent={slot.discountPercent} />}
-          <CardDisplay
-            card={slot.card}
-            onClick={() => onCardClick(slot.card!)}
-          />
-        </div>
+        <CardDisplay
+          card={slot.card}
+          onClick={() => onCardClick(slot.card!)}
+        />
         <PriceButton
           basePrice={slot.basePrice}
           price={price}
@@ -398,6 +393,7 @@ function ShopSlotCard({
           canAfford={canAfford}
           onClick={() => onBuy(index)}
         />
+        {hasDiscount && <ShopSaleText discountPercent={slot.discountPercent} />}
       </div>
     );
   }
@@ -446,18 +442,13 @@ function PriceButton({
   );
 }
 
-function ShopSaleBadge({ discountPercent }: { discountPercent: number }) {
+function ShopSaleText({ discountPercent }: { discountPercent: number }) {
   return (
-    <div
-      className="pointer-events-none absolute top-2 left-2 z-10 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em]"
-      style={{
-        background: "rgba(239, 68, 68, 0.92)",
-        border: "1px solid rgba(254, 202, 202, 0.65)",
-        boxShadow: "0 0 18px rgba(239, 68, 68, 0.24)",
-        color: "#ffffff",
-      }}
+    <p
+      className="text-center text-[10px] font-black uppercase tracking-[0.18em]"
+      style={{ color: "#fca5a5" }}
     >
       Sale {String(discountPercent)}% Off
-    </div>
+    </p>
   );
 }

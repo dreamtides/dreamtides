@@ -34,48 +34,6 @@ function sortCardsForDisplay(cards: CardData[]): CardData[] {
   });
 }
 
-/** Shows the drafted cards as a row of mini-cards at the bottom. */
-function DraftedCardsRow({ cardNumbers, cardDatabase }: {
-  cardNumbers: number[];
-  cardDatabase: Map<number, CardData>;
-}) {
-  if (cardNumbers.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="flex flex-col items-center gap-1.5 pt-2">
-      <span className="text-xs font-medium opacity-50">Drafted</span>
-      <div className="flex gap-2">
-        {cardNumbers.map((num, i) => {
-          const card = cardDatabase.get(num);
-          if (!card) return null;
-          return (
-            <motion.div
-              key={`drafted-${String(i)}-${String(num)}`}
-              initial={{ opacity: 0, scale: 0.5, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              className="rounded px-2 py-1 text-[10px] font-medium"
-              style={{
-                background: "rgba(26, 16, 37, 0.8)",
-                border: "1px solid rgba(124, 58, 237, 0.3)",
-                color: "#c084fc",
-                maxWidth: "100px",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {card.name}
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 /** Summary screen shown after all 5 picks are complete. */
 function DraftSummary({
   draftedCardNumbers,
@@ -564,12 +522,6 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
             })}
           </motion.div>
         </AnimatePresence>
-
-        {/* Drafted cards row */}
-        <DraftedCardsRow
-          cardNumbers={draftedCardNumbers}
-          cardDatabase={cardDatabase}
-        />
       </div>
 
       {/* Deck sidebar */}

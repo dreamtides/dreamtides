@@ -119,12 +119,12 @@ describe("formatTypeLine", () => {
 
   it("shows card type alone when subtype is *", () => {
     const card = makeCard({ cardType: "Character", subtype: "*" });
-    expect(formatTypeLine(card)).toBe("Character");
+    expect(formatTypeLine(card)).toBe("");
   });
 
-  it("shows type and subtype separated by an em dash", () => {
+  it("shows subtype alone for Character cards", () => {
     const card = makeCard({ cardType: "Character", subtype: "Ancient" });
-    expect(formatTypeLine(card)).toBe("Character \u2014 Ancient");
+    expect(formatTypeLine(card)).toBe("Ancient");
   });
 
   it("handles Event type with subtype", () => {
