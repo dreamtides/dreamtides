@@ -12,6 +12,47 @@ function matchedTides(entry: CardSourceDebugEntry): string[] {
   return [...entry.matchedMandatoryTides, ...entry.matchedOptionalTides];
 }
 
+function qualificationLabel(entry: CardSourceDebugEntry): {
+  label: string;
+  variant: "required" | "optional" | "neutral";
+} {
+  if (entry.isFallback) {
+    return { label: "fallback", variant: "neutral" };
+  }
+
+  if (
+    entry.matchedMandatoryTides.length > 0
+    && entry.matchedOptionalTides.length > 0
+  ) {
+    return { label: "required + optional", variant: "required" };
+  }
+
+  if (entry.matchedMandatoryTides.length > 0) {
+    return { label: "required tide", variant: "required" };
+  }
+
+  return { label: "optional tide", variant: "optional" };
+}
+
+function qualificationCopy(entry: CardSourceDebugEntry): string {
+  if (entry.isFallback) {
+    return "No required or optional tide overlap. This card is showing up as a broader-pool fallback.";
+  }
+
+  if (
+    entry.matchedMandatoryTides.length > 0
+    && entry.matchedOptionalTides.length > 0
+  ) {
+    return "This card qualifies from both a required tide and an optional tide in your package.";
+  }
+
+  if (entry.matchedMandatoryTides.length > 0) {
+    return "This card qualifies because it matches one of your required tides.";
+  }
+
+  return "This card qualifies because it matches one of your optional tides.";
+}
+
 function surfaceCopy(surface: CardSourceDebugState["surface"]): string {
   switch (surface) {
     case "Draft":
@@ -63,6 +104,7 @@ function TideChip({
 
 function CardExplanation({ entry }: { entry: CardSourceDebugEntry }) {
   const selectedTides = matchedTides(entry);
+  const qualification = qualificationLabel(entry);
 
   return (
     <div
@@ -79,32 +121,41 @@ function CardExplanation({ entry }: { entry: CardSourceDebugEntry }) {
           </p>
           <p className="text-[11px] opacity-50">#{String(entry.cardNumber)}</p>
         </div>
-        {entry.isFallback ? (
-          <TideChip label="fallback" variant="neutral" />
-        ) : (
-          <TideChip label="selected" variant="required" />
-        )}
+        <TideChip label={qualification.label} variant={qualification.variant} />
       </div>
 
-      {selectedTides.length > 0 ? (
+      <p className="mt-3 text-xs leading-relaxed opacity-75">
+        {qualificationCopy(entry)}
+      </p>
+
+      {selectedTides.length > 0 && (
         <>
-          <p className="mt-3 text-[11px] font-medium uppercase tracking-wide opacity-60">
-            Matching selected tides
-          </p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {entry.matchedMandatoryTides.map((tide) => (
-              <TideChip key={`required-${tide}`} label={tide} variant="required" />
-            ))}
-            {entry.matchedOptionalTides.map((tide) => (
-              <TideChip key={`optional-${tide}`} label={tide} variant="optional" />
-            ))}
-          </div>
+          {entry.matchedMandatoryTides.length > 0 && (
+            <>
+              <p className="mt-3 text-[11px] font-medium uppercase tracking-wide opacity-60">
+                Required tide matches
+              </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {entry.matchedMandatoryTides.map((tide) => (
+                  <TideChip key={`required-${tide}`} label={tide} variant="required" />
+                ))}
+              </div>
+            </>
+          )}
+
+          {entry.matchedOptionalTides.length > 0 && (
+            <>
+              <p className="mt-3 text-[11px] font-medium uppercase tracking-wide opacity-60">
+                Optional tide matches
+              </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {entry.matchedOptionalTides.map((tide) => (
+                  <TideChip key={`optional-${tide}`} label={tide} variant="optional" />
+                ))}
+              </div>
+            </>
+          )}
         </>
-      ) : (
-        <p className="mt-3 text-xs opacity-70">
-          No selected tide overlap. This card is being shown as a broader-pool
-          fallback.
-        </p>
       )}
 
       <p className="mt-3 text-[11px] font-medium uppercase tracking-wide opacity-60">
@@ -176,6 +227,10 @@ export function CardSourceOverlay({
               </h2>
               <p className="mt-1 text-xs opacity-70">
                 {surfaceCopy(cardSourceDebug.surface)}
+              </p>
+              <p className="mt-2 text-[11px] leading-relaxed opacity-60">
+                Gold chips mark required tide matches. Blue chips mark optional
+                tide matches. Cards with neither are fallbacks.
               </p>
             </div>
             <button

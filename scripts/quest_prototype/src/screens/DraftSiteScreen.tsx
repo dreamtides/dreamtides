@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
 import { CardDisplay } from "../components/CardDisplay";
@@ -14,7 +14,7 @@ import {
 } from "../draft/draft-engine";
 import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
-import { cardAccentTide, cardImageUrl, TIDE_COLORS } from "../data/card-database";
+import { cardImageUrl } from "../data/card-database";
 import { logEvent } from "../logging";
 
 
@@ -22,6 +22,7 @@ import { logEvent } from "../logging";
 const NEXT_PACK_DELAY = 500;
 const DECK_FLY_DURATION = 0.45;
 const DECK_HIGHLIGHT_DURATION = 900;
+const HOVER_PREVIEW_WIDTH = 224;
 
 /** Animation phases during a pick. */
 type PickPhase = "idle" | "animating" | "waiting";
@@ -125,9 +126,15 @@ function DraftSummary({
 function DeckSidebar({
   cardDatabase,
   highlightedEntryId,
+  onPreviewCard,
+  onClearPreview,
+  scrollContainerRef,
 }: {
   cardDatabase: Map<number, CardData>;
   highlightedEntryId: string | null;
+  onPreviewCard: (card: CardData, top: number) => void;
+  onClearPreview: () => void;
+  scrollContainerRef: RefObject<HTMLDivElement | null>;
 }) {
   const { state } = useQuest();
 
@@ -161,15 +168,16 @@ function DeckSidebar({
   let lastCost = -1;
 
   return (
-    <div className="flex flex-col gap-0.5 overflow-y-auto p-2">
+    <div
+      ref={scrollContainerRef}
+      className="flex flex-col gap-0.5 overflow-y-auto p-2"
+    >
       {deckCards.map(({ entryId, card }) => {
         const cost = card.energyCost ?? 0;
         const showDivider = cost !== lastCost;
         lastCost = cost;
         const accentColor =
-          card.cardType === "Event"
-            ? "#c084fc"
-            : TIDE_COLORS[cardAccentTide(card)];
+          card.cardType === "Event" ? "#c084fc" : "#60a5fa";
         const isHighlighted = highlightedEntryId === entryId;
 
         return (
@@ -212,6 +220,7 @@ function DeckSidebar({
               </div>
             )}
             <div
+              data-testid={`draft-deck-row-${entryId}`}
               className="relative flex items-center gap-2 overflow-hidden rounded px-2 py-1"
               style={{
                 background: isHighlighted
@@ -219,6 +228,10 @@ function DeckSidebar({
                   : `linear-gradient(90deg, ${accentColor}15 0%, rgba(10, 6, 18, 0.7) 70%)`,
                 borderLeft: `2px solid ${accentColor}60`,
               }}
+              onMouseEnter={(event) => {
+                onPreviewCard(card, event.currentTarget.getBoundingClientRect().top);
+              }}
+              onMouseLeave={onClearPreview}
             >
               <div
                 className="relative z-10 h-10 w-[1.75rem] shrink-0 overflow-hidden rounded-sm border"
@@ -274,6 +287,10 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   const [pickPhase, setPickPhase] = useState<PickPhase>("idle");
   const [pickedCardNumber, setPickedCardNumber] = useState<number | null>(null);
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
+  const [hoverPreview, setHoverPreview] = useState<{
+    card: CardData;
+    top: number;
+  } | null>(null);
   const [currentOfferCards, setCurrentOfferCards] = useState<CardData[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [offerKey, setOfferKey] = useState(0);
@@ -283,6 +300,8 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
   const draftStateRef = useRef<DraftState | null>(null);
   const pendingPickedCardNumberRef = useRef<number | null>(null);
   const offerCardRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const deckSidebarRef = useRef<HTMLDivElement | null>(null);
+  const deckSidebarScrollRef = useRef<HTMLDivElement | null>(null);
   const deckFlightTargetRef = useRef<HTMLDivElement | null>(null);
   const previousDeckEntryIdsRef = useRef(state.deck.map((entry) => entry.entryId));
 
@@ -387,6 +406,28 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       window.clearTimeout(timeoutId);
     };
   }, [highlightedDeckEntryId]);
+
+  useEffect(() => {
+    if (!showDeckSidebar) {
+      setHoverPreview(null);
+    }
+  }, [showDeckSidebar]);
+
+  useEffect(() => {
+    const scrollElement = deckSidebarScrollRef.current;
+    if (scrollElement === null) {
+      return undefined;
+    }
+
+    function handleScroll() {
+      setHoverPreview(null);
+    }
+
+    scrollElement.addEventListener("scroll", handleScroll);
+    return () => {
+      scrollElement.removeEventListener("scroll", handleScroll);
+    };
+  }, [showDeckSidebar, state.deck.length]);
 
   useEffect(() => {
     const previousDeckEntryIds = previousDeckEntryIdsRef.current;
@@ -513,6 +554,14 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
 
   const handleOverlayClose = useCallback(() => {
     setOverlayCard(null);
+  }, []);
+
+  const handlePreviewCard = useCallback((card: CardData, top: number) => {
+    setHoverPreview({ card, top });
+  }, []);
+
+  const handleClearPreview = useCallback(() => {
+    setHoverPreview(null);
   }, []);
 
   const handleContinue = useCallback(() => {
@@ -718,6 +767,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
       {/* Deck sidebar */}
       {showDeckSidebar && (
         <div
+          ref={deckSidebarRef}
           data-testid="draft-deck-sidebar"
           className="w-56 shrink-0 overflow-hidden border-l lg:w-64"
           style={{
@@ -746,7 +796,34 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
           <DeckSidebar
             cardDatabase={cardDatabase}
             highlightedEntryId={highlightedDeckEntryId}
+            onPreviewCard={handlePreviewCard}
+            onClearPreview={handleClearPreview}
+            scrollContainerRef={deckSidebarScrollRef}
           />
+        </div>
+      )}
+
+      {showDeckSidebar && hoverPreview !== null && deckSidebarRef.current !== null && (
+        <div
+          data-testid="draft-hover-preview"
+          className="pointer-events-none fixed z-40"
+          style={{
+            width: `${String(HOVER_PREVIEW_WIDTH)}px`,
+            left: `${String(
+              Math.max(
+                16,
+                deckSidebarRef.current.getBoundingClientRect().left - HOVER_PREVIEW_WIDTH - 16,
+              ),
+            )}px`,
+            top: `${String(
+              Math.max(
+                16,
+                Math.min(hoverPreview.top - 80, window.innerHeight - 352),
+              ),
+            )}px`,
+          }}
+        >
+          <CardDisplay card={hoverPreview.card} />
         </div>
       )}
 

@@ -90,11 +90,21 @@ describe("CardSourceOverlay", () => {
 
     expect(container.textContent).toContain("Why am I seeing these cards?");
     expect(container.textContent).toContain("Shop Offers");
+    expect(container.textContent).toContain(
+      "Gold chips mark required tide matches. Blue chips mark optional tide matches.",
+    );
     expect(container.textContent).toContain("Lantern Broker");
+    expect(container.textContent).toContain(
+      "This card qualifies from both a required tide and an optional tide in your package.",
+    );
+    expect(container.textContent).toContain("Required tide matches");
+    expect(container.textContent).toContain("Optional tide matches");
     expect(container.textContent).toContain("core");
     expect(container.textContent).toContain("support-a");
     expect(container.textContent).toContain("Driftbound Relic");
-    expect(container.textContent).toContain("broader-pool fallback");
+    expect(container.textContent).toContain(
+      "No required or optional tide overlap. This card is showing up as a broader-pool fallback.",
+    );
 
     act(() => {
       root.unmount();

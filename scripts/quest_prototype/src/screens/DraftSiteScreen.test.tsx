@@ -450,6 +450,40 @@ describe("DraftSiteScreen", () => {
     });
   });
 
+  it("shows a full-card hover preview for deck sidebar rows", () => {
+    const mutations = makeMutations();
+    const cardDatabase = makeCardDatabase();
+    setQuestContext(makeState(), mutations, cardDatabase);
+
+    const { container, root } = mount(<DraftSiteScreen siteId="site-1" />);
+    const deckRow = container.querySelector('[data-testid="draft-deck-row-entry-1"]');
+    if (!(deckRow instanceof HTMLDivElement)) {
+      throw new Error("Missing draft deck row");
+    }
+
+    act(() => {
+      deckRow.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+    });
+
+    const hoverPreview = container.querySelector(
+      '[data-testid="draft-hover-preview"]',
+    );
+    expect(hoverPreview).not.toBeNull();
+    expect(hoverPreview?.textContent).toContain("Starter Lantern");
+
+    act(() => {
+      deckRow.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
+    });
+
+    expect(
+      container.querySelector('[data-testid="draft-hover-preview"]'),
+    ).toBeNull();
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
   it("renders a fly-to-deck animation after a draft pick updates the deck", () => {
     const mutations = makeMutations();
     const cardDatabase = makeCardDatabase();

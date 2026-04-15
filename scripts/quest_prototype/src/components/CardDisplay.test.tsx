@@ -52,6 +52,29 @@ afterEach(() => {
 });
 
 describe("CardDisplay", () => {
+  it("renders Character cards with consistent blue chrome and white names", () => {
+    const { container, root } = mount(
+      <CardDisplay card={makeCard({ tides: [] })} />,
+    );
+
+    const cardRoot = container.firstElementChild;
+    const cardName = container.querySelector("h3");
+    if (
+      !(cardRoot instanceof HTMLDivElement)
+      || !(cardName instanceof HTMLHeadingElement)
+    ) {
+      throw new Error("Missing card content");
+    }
+
+    expect(cardRoot.style.border).toContain("rgba(96, 165, 250, 0.5)");
+    expect(cardRoot.style.boxShadow).toContain("#60a5fa");
+    expect(cardName.style.color).toBe("rgb(248, 250, 252)");
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
   it("renders Event cards with distinctive purple border chrome", () => {
     const { container, root } = mount(
       <CardDisplay
@@ -62,31 +85,18 @@ describe("CardDisplay", () => {
       />,
     );
 
-    const cardRoot = container.firstElementChild as HTMLDivElement | null;
-    if (!cardRoot) {
-      throw new Error("Missing card root");
+    const cardRoot = container.firstElementChild;
+    const cardName = container.querySelector("h3");
+    if (
+      !(cardRoot instanceof HTMLDivElement)
+      || !(cardName instanceof HTMLHeadingElement)
+    ) {
+      throw new Error("Missing card content");
     }
 
-    expect(cardRoot.style.border).toContain("rgb(192, 132, 252)");
+    expect(cardRoot.style.border).toContain("rgba(192, 132, 252, 0.5)");
     expect(cardRoot.style.boxShadow).toContain("#c084fc");
-
-    act(() => {
-      root.unmount();
-    });
-  });
-
-  it("keeps neutral cards on subdued chrome", () => {
-    const { container, root } = mount(
-      <CardDisplay card={makeCard({ cardType: "Character", tides: [] })} />,
-    );
-
-    const cardRoot = container.firstElementChild as HTMLDivElement | null;
-    if (!cardRoot) {
-      throw new Error("Missing card root");
-    }
-
-    expect(cardRoot.style.border).toContain("rgba(255, 255, 255, 0.18)");
-    expect(cardRoot.style.boxShadow).toBe("");
+    expect(cardName.style.color).toBe("rgb(248, 250, 252)");
 
     act(() => {
       root.unmount();
