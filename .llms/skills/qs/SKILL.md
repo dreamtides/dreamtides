@@ -5,199 +5,195 @@ description: Use when working with the quest prototype, adding quest features, f
 
 # Quest Prototype (QS)
 
-Read the documentation before making changes:
+Read these first:
 
-- **Full documentation**: [docs/quest_prototype/quest_prototype.md](../../../docs/quest_prototype/quest_prototype.md) — architecture, module layout, site registration, state extension, JSONL logging, and card data normalization.
+- **Architecture + current flow**: [docs/quest_prototype/quest_prototype.md](../../../docs/quest_prototype/quest_prototype.md)
+- **Browser QA + tooling notes**: [docs/quest_prototype/qa_tooling.md](../../../docs/quest_prototype/qa_tooling.md)
+
+## Current Runtime Model
+
+- The prototype lives in `scripts/quest_prototype/`.
+- Quest start is now a **Dreamcaller selection** screen, not a `"Begin Quest"`
+  landing page. The player chooses 1 of 3 Dreamcallers, then
+  `src/screens/quest-start-bootstrap.ts` resolves a fixed package, initializes
+  the starter deck, draft state, and atlas, and enters the first dreamscape
+  directly.
+- The live flow does **not** use the legacy tide-pick step or a
+  `DreamcallerDraft` surface.
+- Top-level state is `QuestState` in `src/types/quest.ts`. Routing is driven by
+  `state.screen`, not `currentScreen`.
+- Use `useQuest()` from `src/state/quest-context.tsx`, not
+  `useQuestContext()`.
+- Logging goes through `logEvent()` in `src/logging.ts`. In dev it:
+  1. writes one JSON line to `console.log`
+  2. stores entries in-memory for tests via `getLogEntries()`
+  3. POSTs to `/api/log`
+  4. gets appended by Vite to `scripts/quest_prototype/logs/quest-log.jsonl`
 
 ## Running
 
 ```bash
 cd scripts/quest_prototype
-npm install          # required — node_modules is not committed
-npm run setup-assets # generates card-data.json, symlinks card images, copies tide PNGs
-npm run dev          # starts Vite dev server (runs setup-assets first)
+npm install
+npm run dev
 ```
 
-## Commands
+`npm run dev` runs `scripts/setup-assets.mjs` automatically first. That setup
+script is idempotent and refreshes:
 
-- `npm run typecheck` — tsc --noEmit
-- `npm run lint` — eslint src/
-- `npm test` — vitest run
-- `npm run build` — production build
+- `public/card-data.json`
+- `public/dreamcaller-data.json`
+- `public/cards/` symlinks into the local image cache
+- `public/tides/` copied tide icons
 
-**Worktrees:** Each git worktree starts without `node_modules`. Run `npm install` before any typecheck, lint, or test commands.
+Useful one-offs:
+
+```bash
+npm run setup-assets
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+**Worktrees:** `node_modules` is not committed. Run `npm install` before
+typecheck, lint, tests, or browser QA in a fresh worktree.
 
 ## Key Files
 
 | File | Role |
 |------|------|
-| `src/state/quest-context.tsx` | QuestProvider, mutations, useQuestContext |
-| `src/types/quest.ts` | QuestState, Screen, SiteType |
-| `src/types/draft.ts` | DraftState, BotState |
-| `src/components/ScreenRouter.tsx` | Screen dispatch by currentScreen |
-| `src/atlas/atlas-generator.ts` | Dream Atlas + dreamscape generation |
-| `src/draft/draft-engine.ts` | 10-seat cube draft engine |
-| `src/logging.ts` | JSONL event logger |
-| `src/data/` | Synthetic data (dreamcallers, dreamsigns, journeys, offers, biomes) |
-| `src/shop/shop-generator.ts` | Shop item generation |
-| `src/transfiguration/transfiguration-logic.ts` | Transfiguration type logic |
+| `src/App.tsx` | App shell, `QuestProvider`, HUD, deck viewer intro, debug overlay |
+| `src/state/quest-context.tsx` | `QuestState` mutations, `useQuest()`, reset/default-state logic |
+| `src/types/quest.ts` | `QuestState`, `Screen`, `SiteType`, atlas/site types |
+| `src/components/ScreenRouter.tsx` | Dispatches `state.screen` and site screens |
+| `src/screens/QuestStartScreen.tsx` | Dreamcaller offer UI |
+| `src/screens/quest-start-bootstrap.ts` | Resolves package and enters the first dreamscape |
+| `src/data/quest-content.ts` | Loads normalized quest content and validates Dreamcaller packages |
+| `src/atlas/atlas-generator.ts` | Atlas generation, site pools, site metadata, dreamscape creation |
+| `src/draft/draft-engine.ts` | Fixed-pool draft logic with 4-card offers and persisted draft state |
+| `src/logging.ts` | JSONL event logging, in-memory log access, download helper |
+| `src/components/HUD.tsx` | Essence/deck/dreamcaller HUD, debug button, log download |
+| `src/screens/DebugScreen.tsx` | Package and draft-pool debug overlay |
 
 ## Adding a New Site Type
 
-Two changes required:
+At minimum, update the places that define type, routing, and reachability:
 
-1. **Screen component** — create `src/screens/MySiteScreen.tsx` and add a case to `ScreenRouter.tsx`.
-2. **Atlas pool** — add the site type with a weight to `buildAdditionalSitePool` in `src/atlas/atlas-generator.ts`. Without this the site is unreachable during gameplay.
+1. Add the new variant to `SiteType` in `src/types/quest.ts`.
+2. Implement the site UI in `src/screens/`.
+3. Route it from `SiteScreen` in `src/components/ScreenRouter.tsx`.
+4. Add display metadata to `SITE_TYPE_META` in `src/atlas/atlas-generator.ts`.
+5. If the site should spawn normally, add it to `buildAdditionalSitePool()`.
+6. If a biome can enhance it, add or update entries in `src/data/biomes.ts`.
+7. Add or update tests for atlas generation and the new screen behavior.
 
-## Extending QuestState
+Without the atlas pool change, the site is unreachable in normal gameplay.
 
-`QuestContextValue`, `QuestMutations`, and `QuestState` are in `src/state/quest-context.tsx` and `src/types/quest.ts`. Every mutation that changes game state must call `logEvent` — missing log calls are a conformance blocker.
+## Extending Quest State
+
+- Update `QuestState` in `src/types/quest.ts`.
+- Thread the new data through `QuestContextValue`, `QuestMutations`, and
+  `createDefaultState()` in `src/state/quest-context.tsx`.
+- Update any bootstrap/reset helpers that need to preserve or clear the field.
+- Every mutation or state transition that changes quest state should emit a
+  `logEvent()` entry. Missing quest logs are a conformance problem.
+
+For tests, prefer the public surface and assert log behavior through
+`getLogEntries()` rather than adding test-only hooks.
 
 ## Acceptance Criteria
 
-- Run `npm run typecheck`, `npm run lint`, and `npm test` after all changes.
-- Run `just fmt` then `just review` for the overall repo gate.
-- **Browser QA with agent-browser is MANDATORY for every change.** Do not skip
-  this step. Do not substitute code review for browser testing. Changes are not
-  complete until agent-browser QA passes.
+- Run `npm run typecheck`, `npm run lint`, and `npm test` after changes.
+- Run browser QA with `agent-browser`. This is mandatory for quest prototype
+  work.
+- Run `just fmt` and then `just review` at the repo root before finishing.
 
-## Browser QA with agent-browser
+## Browser QA With agent-browser
 
-Every change must be verified in a real browser using `agent-browser`. This is
-not optional. The tool is at `/Users/dthurn/Library/pnpm/agent-browser`.
-
-### Setup
-
-Start the dev server in the background, then open it:
+Confirm the tool exists:
 
 ```bash
-cd scripts/quest_prototype && npm run dev &
-sleep 2
+which agent-browser
+```
+
+Start the dev server in one shell:
+
+```bash
+cd /Users/dthurn/dreamtides/scripts/quest_prototype
+npm install
+npm run dev
+```
+
+Open the app in another:
+
+```bash
 agent-browser open http://localhost:5173
 agent-browser wait --load networkidle
-```
-
-### Navigation Flow
-
-The quest prototype is a single-page app. Navigate by clicking UI elements.
-Use `snapshot` to see interactive elements and their `@ref` IDs:
-
-```bash
-# See what's on screen (interactive elements only)
 agent-browser snapshot -i
-
-# Click "Begin Quest" button (use @ref from snapshot)
-agent-browser click @e3
-
-# Wait for screen transition to complete
-agent-browser wait 500
 ```
 
-Typical quest flow: Begin Quest → Atlas (click dreamscape node) → Dreamscape
-(click sites one by one) → Battle → Victory → back to Atlas → repeat.
+### Current Smoke Path
 
-### Taking and Analyzing Screenshots
+Use this flow unless the change targets something narrower:
 
-Take screenshots at every significant UI state. Use `--annotate` for labeled
-screenshots that are easier to analyze:
+1. Confirm the app starts on the **Dreamcaller selection** screen with exactly
+   3 choices.
+2. Pick a Dreamcaller.
+3. Confirm the starter-deck overlay opens, then click **Begin Quest**.
+4. Confirm the run is already in quest play with no legacy tide-pick step and
+   no `DreamcallerDraft` surface.
+5. Enter a dreamscape site. Battle should stay locked until the non-battle
+   sites are visited.
+6. Reach a draft site and confirm the offer shows 4 unique cards when enough
+   unique cards remain.
+7. Reach a Dreamsign surface when relevant and confirm shown Dreamsigns are
+   spent from the shared pool for the run.
+8. Complete a battle and confirm atlas progression afterward.
+9. Open the HUD debug overlay when relevant and verify package/draft summary
+   details appear there, not in normal player-facing UI.
+
+### Screenshots
+
+Take screenshots at each meaningful state transition:
 
 ```bash
-# Regular screenshot
-agent-browser screenshot /tmp/qs-quest-start.png
-
-# Annotated screenshot (adds element labels — better for analysis)
-agent-browser screenshot --annotate /tmp/qs-atlas-annotated.png
-
-# Full-page screenshot (captures below the fold)
-agent-browser screenshot --full /tmp/qs-dreamscape-full.png
+agent-browser screenshot /tmp/qs-start.png
+agent-browser screenshot --annotate /tmp/qs-dreamcaller.png
+agent-browser screenshot --annotate /tmp/qs-dreamscape.png
+agent-browser screenshot --full /tmp/qs-site.png
 ```
 
-After taking a screenshot, **read it with the Read tool** to visually inspect:
+Inspect screenshots visually after capture. Verify:
 
-```
-Read /tmp/qs-quest-start.png
-```
+- card art and Dreamcaller portraits load
+- layout spacing is stable
+- battle/site buttons are not clipped or overlapped
+- HUD values make sense for the current state
+- normal screens do not expose package internals or legacy tide-crystal UI
 
-When analyzing screenshots, verify:
-- Dark fantasy theme (deep purple-black background #0a0612)
-- Correct text colors (off-white #e2e8f0, gold #fbbf24 for essence)
-- Card art loads (not broken image placeholders)
-- Layout is correct (no overlapping elements, proper spacing)
-- Animations completed (no half-rendered states)
-- HUD shows correct values (essence, deck size, battle counter)
+### Logs And Errors
 
-### Checking Console Output
+Do **not** rely on `window.__questLog` or `window.__errors`; the current app
+does not publish those globals.
 
-Use `eval` to read browser console logs for JSONL events:
+Use the current logging surfaces instead:
 
 ```bash
-# Get all JSONL log entries
-agent-browser eval "JSON.stringify(window.__questLog || [])"
-
-# Check for JavaScript errors
-agent-browser eval "JSON.stringify(window.__errors || [])"
+tail -n 40 /Users/dthurn/dreamtides/scripts/quest_prototype/logs/quest-log.jsonl
 ```
 
-Or check the accessibility snapshot for HUD values:
+Also watch the dev-server terminal for JavaScript or asset-load errors. If you
+need a saved copy from the UI, use the HUD `Download Log` button.
+
+### Responsive Checks
+
+If the change affects layout, test both desktop and tablet widths:
 
 ```bash
-agent-browser snapshot -i | grep -i "essence\|cards\|battle"
-```
-
-### Responsive Testing
-
-Test at both desktop (1280px) and tablet (768px) widths:
-
-```bash
-# Desktop
 agent-browser eval "window.resizeTo(1280, 800)"
 agent-browser screenshot /tmp/qs-desktop.png
 
-# Tablet
 agent-browser eval "window.resizeTo(768, 1024)"
 agent-browser screenshot /tmp/qs-tablet.png
-```
-
-### Minimum QA Checklist
-
-For every change, at minimum:
-
-1. Start dev server and open in agent-browser
-2. Click "Begin Quest"
-3. Navigate to a dreamscape and visit at least 2 sites
-4. Screenshot each site screen you visit — read and verify visually
-5. Complete a battle and verify victory screen
-6. Check that HUD values update correctly
-7. If your change affects a specific site type, visit that site type and
-   screenshot before/after states
-8. Verify zero JS errors via `eval`
-9. Test at 768px width if your change affects layout
-
-### Common Patterns
-
-```bash
-# Full QA session example
-agent-browser open http://localhost:5173
-agent-browser wait --load networkidle
-agent-browser screenshot /tmp/qs-start.png
-
-# Begin quest
-agent-browser snapshot -i
-agent-browser click "Begin Quest"
-agent-browser wait 1000
-agent-browser screenshot /tmp/qs-atlas.png
-
-# Enter first dreamscape
-agent-browser snapshot -i
-# (find the dreamscape node ref from snapshot)
-agent-browser click @e5
-agent-browser wait 500
-agent-browser screenshot /tmp/qs-dreamscape.png
-
-# Visit a site
-agent-browser snapshot -i
-# (find the site button ref from snapshot)
-agent-browser click @e8
-agent-browser wait 500
-agent-browser screenshot /tmp/qs-site.png
 ```
