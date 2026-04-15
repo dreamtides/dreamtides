@@ -85,17 +85,46 @@ export default function App() {
   if (loadError !== null) {
     return (
       <div className="flex h-screen items-center justify-center p-8">
-        <p className="max-w-2xl text-center text-sm whitespace-pre-wrap opacity-70">
-          {loadError}
-        </p>
+        <div
+          role="alert"
+          className="max-w-3xl w-full rounded-lg border border-red-500/60 bg-red-950/40 p-6 shadow-lg"
+        >
+          <h1 className="mb-3 text-xl font-semibold text-red-200">
+            Quest content failed to load
+          </h1>
+          <pre className="max-h-[60vh] overflow-auto whitespace-pre-wrap rounded bg-black/40 p-4 font-mono text-xs text-red-100">
+            {loadError}
+          </pre>
+          <div className="mt-4 flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                window.location.reload();
+              }}
+              className="rounded bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-400"
+            >
+              Retry
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard?.writeText(loadError);
+              }}
+              className="rounded border border-red-400/50 px-4 py-2 text-sm font-medium text-red-100 hover:bg-red-500/20"
+            >
+              Copy details
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (questContent === null) {
     return (
-      <div className="flex h-screen items-center justify-center p-8">
-        <p className="text-lg opacity-60">Loading quest content...</p>
+      <div className="flex h-screen flex-col items-center justify-center gap-3 p-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-500 border-t-transparent" />
+        <p className="text-lg opacity-80">Loading quest content...</p>
       </div>
     );
   }

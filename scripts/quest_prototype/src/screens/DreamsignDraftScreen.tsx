@@ -230,17 +230,18 @@ export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
         </div>
       )}
 
-      {/* Skip */}
+      {/* Skip — both offered Dreamsigns leave the run pool */}
       <button
         className="mt-8 rounded-lg px-6 py-2.5 text-base font-medium transition-colors"
         style={{
-          background: "rgba(107, 114, 128, 0.2)",
-          border: "1px solid rgba(107, 114, 128, 0.4)",
-          color: "#9ca3af",
+          background: "rgba(148, 163, 184, 0.18)",
+          border: "1px solid rgba(203, 213, 225, 0.55)",
+          color: "#e2e8f0",
         }}
         onClick={handleSkip}
+        title="Skips this offering. Both shown Dreamsigns are removed from this run's pool."
       >
-        Skip
+        Skip (discards both Dreamsigns)
       </button>
     </motion.div>
   );

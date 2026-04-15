@@ -285,7 +285,7 @@ describe("DreamsignDraftScreen", () => {
       "dreamsign_draft_revealed",
     );
 
-    clickButton(container, "Skip");
+    clickButton(container, "Skip (discards both Dreamsigns)");
 
     expect(mutations.addDreamsign).not.toHaveBeenCalled();
     expect(mutations.markSiteVisited).toHaveBeenCalledWith("site-1");
@@ -319,7 +319,7 @@ describe("DreamsignDraftScreen", () => {
       "dreamsign_draft_revealed",
     );
 
-    clickButton(container, "Skip");
+    clickButton(container, "Skip (discards both Dreamsigns)");
 
     expect(mutations.addDreamsign).not.toHaveBeenCalled();
     expect(mutations.markSiteVisited).toHaveBeenCalledWith("site-1");

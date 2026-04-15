@@ -1829,7 +1829,7 @@ subtype = ""
 spark = ""
 
 [[cards]]
-name = "A New Advenure"
+name = "A New Adventure"
 id = "7d1b1516-f89a-4a27-b9b6-54afaa85c217"
 energy-cost = 3
 rules-text = """

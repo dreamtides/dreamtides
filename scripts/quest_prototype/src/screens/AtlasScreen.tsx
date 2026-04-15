@@ -136,17 +136,11 @@ export function AtlasScreen() {
           viewBox={`0 0 ${String(svgWidth)} ${String(svgHeight)}`}
           preserveAspectRatio="xMidYMid meet"
         >
-          <defs>
-            <style>
-              {`
-                @keyframes dashFlow {
-                  to { stroke-dashoffset: -20; }
-                }
-                .atlas-edge {
-                  stroke-dasharray: 6 4;
-                  animation: dashFlow 1.5s linear infinite;
-                }
-              `}
+          <defs aria-hidden="true">
+            <style aria-hidden="true">
+              {
+                "@keyframes dashFlow{to{stroke-dashoffset:-20}}.atlas-edge{stroke-dasharray:6 4;animation:dashFlow 1.5s linear infinite}"
+              }
             </style>
           </defs>
 

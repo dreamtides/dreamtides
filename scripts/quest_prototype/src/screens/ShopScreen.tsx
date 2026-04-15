@@ -304,7 +304,7 @@ function ShopSlotCard({
           disabled={!canAffordReroll}
           onClick={() => onReroll(index)}
         >
-          {displayCost === 0 ? "Reroll (FREE)" : `Reroll -- ${String(displayCost)} Essence`}
+          {displayCost === 0 ? "Reroll (FREE)" : `Reroll · ${String(displayCost)} Essence`}
         </button>
       </div>
     );

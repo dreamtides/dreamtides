@@ -30,7 +30,6 @@ export function EssenceSiteScreen({ site }: EssenceSiteScreenProps) {
   const [phase, setPhase] = useState<"counting" | "done">("counting");
 
   const handleComplete = useCallback(() => {
-    mutations.changeEssence(essenceAmount, "essence_site");
     logEvent("site_completed", {
       siteType: "Essence",
       outcome: `Granted ${String(essenceAmount)} essence`,
@@ -39,6 +38,12 @@ export function EssenceSiteScreen({ site }: EssenceSiteScreenProps) {
     mutations.markSiteVisited(site.id);
     mutations.setScreen({ type: "dreamscape" });
   }, [essenceAmount, site, mutations]);
+
+  // Award essence at the start of the count-up so the HUD counter tweens
+  // alongside the on-screen +N rather than jumping after the transition.
+  useEffect(() => {
+    mutations.changeEssence(essenceAmount, "essence_site");
+  }, [essenceAmount, mutations]);
 
   // Count-up animation
   useEffect(() => {

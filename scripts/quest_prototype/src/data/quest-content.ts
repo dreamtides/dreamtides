@@ -1,5 +1,6 @@
 import { loadCardDatabase, packageTideAccent } from "./card-database";
 import { DREAMSIGN_TEMPLATES } from "./dreamsigns";
+import { logEvent } from "../logging";
 import type {
   DreamcallerContent,
   DreamsignTemplate,
@@ -153,7 +154,8 @@ export async function loadQuestContent(): Promise<QuestContent> {
     string,
     ResolvedDreamcallerPackage
   >();
-  const errors: string[] = [];
+  const skipped: { name: string; id: string; reason: string }[] = [];
+  const validDreamcallers: DreamcallerContent[] = [];
 
   for (const dreamcaller of dreamcallers) {
     try {
@@ -165,22 +167,30 @@ export async function loadQuestContent(): Promise<QuestContent> {
           DREAMSIGN_TEMPLATES,
         ),
       );
+      validDreamcallers.push(dreamcaller);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      errors.push(`${dreamcaller.name}: ${message}`);
+      skipped.push({ name: dreamcaller.name, id: dreamcaller.id, reason: message });
+      logEvent("dreamcaller_package_skipped", {
+        dreamcallerId: dreamcaller.id,
+        dreamcallerName: dreamcaller.name,
+        reason: message,
+      });
     }
   }
 
-  if (errors.length > 0) {
-    throw new Error(
-      `Dreamcaller package validation failed:\n${errors.join("\n")}`,
-    );
+  if (skipped.length > 0) {
+    logEvent("dreamcaller_package_validation_summary", {
+      validCount: validDreamcallers.length,
+      skippedCount: skipped.length,
+      skipped,
+    });
   }
 
   return {
     cardDatabase,
     cardsByPackageTide,
-    dreamcallers,
+    dreamcallers: validDreamcallers,
     dreamsignTemplates: DREAMSIGN_TEMPLATES,
     resolvedPackagesByDreamcallerId,
   };

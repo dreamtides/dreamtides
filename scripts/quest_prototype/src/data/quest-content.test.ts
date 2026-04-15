@@ -264,7 +264,7 @@ describe("loadQuestContent", () => {
       });
   });
 
-  it("fails loudly with aggregated Dreamcaller package validation errors", async () => {
+  it("skips invalid Dreamcaller packages with a warning instead of failing the load", async () => {
     const cards = buildCards({
       m1: 40,
       m2: 40,
@@ -303,8 +303,23 @@ describe("loadQuestContent", () => {
       }),
     );
 
-    await expect(loadQuestContent()).rejects.toThrow(
-      /Dreamcaller package validation failed:\nBad One: .*no legal optional subset.*\nBad Two: .*no legal optional subset/s,
+    const { resetLog, getLogEntries } = await import("../logging");
+    resetLog();
+
+    const content = await loadQuestContent();
+
+    expect(content.dreamcallers).toHaveLength(0);
+    expect(content.resolvedPackagesByDreamcallerId.size).toBe(0);
+
+    const skippedEvents = getLogEntries().filter(
+      (entry) => entry.event === "dreamcaller_package_skipped",
     );
+    expect(skippedEvents.map((entry) => entry.dreamcallerId).sort()).toEqual([
+      "bad-1",
+      "bad-2",
+    ]);
+    for (const event of skippedEvents) {
+      expect(String(event.reason)).toMatch(/no legal optional subset/);
+    }
   });
 });

@@ -1669,7 +1669,7 @@ art-owned = false
 card-number = 106
 
 [[cards]]
-name = "A New Advenure"
+name = "A New Adventure"
 id = "7d1b1516-f89a-4a27-b9b6-54afaa85c217"
 tides = ["hand_cycling", "discard_velocity", "card_flow", "resource_burst"]
 rendered-text = """

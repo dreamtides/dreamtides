@@ -175,9 +175,10 @@ export function generateSiteComposition(
   return sites;
 }
 
-/** Randomly assigns a biome from the 9 biomes. */
-export function assignBiome(): Biome {
-  return pickRandom(BIOMES);
+/** Randomly assigns a biome, preferring those whose names are not already in use. */
+export function assignBiome(usedBiomeNames: ReadonlySet<string> = new Set()): Biome {
+  const available = BIOMES.filter((biome) => !usedBiomeNames.has(biome.name));
+  return pickRandom(available.length > 0 ? available : BIOMES);
 }
 
 /**
@@ -205,9 +206,10 @@ function createNode(
   isFirstDreamscape: boolean,
   connections: string[],
   context: SiteGenerationContext,
+  usedBiomeNames: ReadonlySet<string>,
 ): DreamscapeNode {
   const id = nextNodeId();
-  const biome = assignBiome();
+  const biome = assignBiome(usedBiomeNames);
   const sites = generateSiteComposition(completionLevel, isFirstDreamscape, context);
   const enhancedSiteType = applyBiomeEnhancement(sites, biome);
 
@@ -261,6 +263,7 @@ export function generateInitialAtlas(
   const nodeCount = randomInt(2, 3);
   const baseAngle = randomFloat(0, Math.PI * 2);
 
+  const usedBiomeNames = new Set<string>();
   for (let i = 0; i < nodeCount; i++) {
     const angle =
       baseAngle +
@@ -275,7 +278,9 @@ export function generateInitialAtlas(
       true,
       [nexusId],
       context,
+      usedBiomeNames,
     );
+    usedBiomeNames.add(node.biomeName);
     nodes[node.id] = node;
     edges.push([nexusId, node.id]);
   }
@@ -323,6 +328,11 @@ export function generateNewNodes(
 
   const newNodeCount = randomInt(2, 4);
   const spread = Math.PI / 3; // 60-degree spread for children
+  const usedBiomeNames = new Set<string>(
+    Object.values(updatedNodes)
+      .filter((node) => node.id !== atlas.nexusId && node.status !== "completed")
+      .map((node) => node.biomeName),
+  );
 
   for (let i = 0; i < newNodeCount; i++) {
     const angleOffset =
@@ -350,7 +360,9 @@ export function generateNewNodes(
       false,
       connections,
       context,
+      usedBiomeNames,
     );
+    usedBiomeNames.add(node.biomeName);
     updatedNodes[node.id] = node;
 
     for (const connId of connections) {
