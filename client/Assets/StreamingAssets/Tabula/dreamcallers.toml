@@ -2,7 +2,7 @@
 name = "Orla, Last Hearthkeeper"
 id = "60BD584B-5BC8-4EE7-8A98-CBB304EB71AB"
 awakening = 5
-rendered-text = "With 3 allied Survivors, cards in your void have reclaim equal to their cost."
+rendered-text = "When you play a card from your void, cards in your void gain reclaim this turn."
 mandatory-tides = [
   "survivor_dissolve",
   "void_recursion",
@@ -25,7 +25,7 @@ optional-tides = [
 name = "Selise, Echo Broker"
 id = "2C53B1B9-9291-4BBA-8D3A-F40B545C8F3C"
 awakening = 4
-rendered-text = "When an ally's ▸ Materialized: ability triggers, gain 1●."
+rendered-text = "When you trigger a \"▸ Materialized\" ability for the second time in a turn, gain 3●."
 mandatory-tides = [
   "materialize_value",
   "ally_formation",
@@ -49,7 +49,7 @@ optional-tides = [
 name = "Talira, Tide Recaller"
 id = "3C4773E4-F8E1-4686-86CB-B407A42489D4"
 awakening = 5
-rendered-text = "0●, once per turn: Return an ally to hand."
+rendered-text = "▸Judgment: Banish an ally, then materialize it."
 mandatory-tides = [
   "materialize_tempo",
   "character_chain",
@@ -73,7 +73,7 @@ optional-tides = [
 name = "Nyra, Chain Broker"
 id = "84E7020C-7384-4CC3-A20F-AB05F03CC375"
 awakening = 3
-rendered-text = "When you play your second event each turn, your events cost 1● less this turn."
+rendered-text = "When you play your second event in a turn, your events cost 1● less this turn."
 mandatory-tides = [
   "event_chain",
   "prevent_control",
@@ -122,7 +122,7 @@ optional-tides = [
 name = "Elara, Echo Conductor"
 id = "5E28154D-770A-4B84-8AAC-9DE44F5D7D02"
 awakening = 6
-rendered-text = "2●, once per turn: Trigger an ally's ▸ Materialized: ability."
+rendered-text = "2●, once per turn: Trigger the ▸ Materialized: ability of an ally."
 mandatory-tides = [
   "materialize_tempo",
   "ally_formation",
@@ -171,7 +171,7 @@ optional-tides = [
 name = "Maelis, Last Muster"
 id = "81954CA0-DA36-49DD-915C-1CCB1B2D7B05"
 awakening = 4
-rendered-text = "Once per turn, when an allied Survivor is dissolved, materialize a random Survivor from your deck."
+rendered-text = "When an allied Survivor is dissolved, materialize a random Survivor from your deck."
 mandatory-tides = [
   "survivor_dissolve",
   "void_recursion",
@@ -193,7 +193,7 @@ optional-tides = [
 name = "Ivera, Debt Arbiter"
 id = "B9BF6D4B-907C-4750-B51C-811AFF29DE59"
 awakening = 5
-rendered-text = "▸ Judgment: You may abandon an ally. If you do, gain ● equal to that ally's cost."
+rendered-text = "▸Judgment: You may abandon an ally to gain ● equal to that ally's cost."
 mandatory-tides = [
   "abandon_value",
   "ally_formation",
@@ -242,7 +242,7 @@ optional-tides = [
 name = "Ivara, Ember Broker"
 id = "9D64A4A2-3DC7-456E-9EB2-5FE3A48883C4"
 awakening = 5
-rendered-text = "Once per turn, abandon an ally: Materialize a random character with cost 1● higher from your deck."
+rendered-text = "Abandon an ally, once per turn: Materialize a random character with cost 1● higher from your deck."
 mandatory-tides = [
   "abandon_ladder",
   "abandon_fodder",
@@ -266,7 +266,7 @@ optional-tides = [
 name = "Selka, Echo Recaller"
 id = "FE2510D9-BFEE-4C35-97F9-30E0CD2E2851"
 awakening = 6
-rendered-text = "2●: Return an ally to hand. It costs 2● less and gains +2 spark."
+rendered-text = "2●: Return an ally to hand. Its cost is reduced by 2● and it gains +2 spark."
 mandatory-tides = [
   "materialize_tempo",
   "spark_tall",
@@ -290,7 +290,7 @@ optional-tides = [
 name = "Marella, Undertow Broker"
 id = "BA973428-6D90-4847-B779-CB7E25A5AC84"
 awakening = 5
-rendered-text = "When you discard a card, return another random card from your void to your hand."
+rendered-text = "When you discard a card, return another random card from your void to hand."
 mandatory-tides = [
   "discard_velocity",
   "void_recursion",
@@ -360,7 +360,7 @@ optional-tides = [
 name = "Aster, Void Broker"
 id = "4D5E3933-7DD6-406B-922D-DD78ACFA044A"
 awakening = 5
-rendered-text = "When you play a card from your void, gain 3●."
+rendered-text = "When you reclaim a card, draw a card."
 mandatory-tides = [
   "void_recursion",
   "discard_velocity",
@@ -409,7 +409,7 @@ optional-tides = [
 name = "Kaelis, Ash Broker"
 id = "86026206-1B11-4F38-A24E-FD3C697F5353"
 awakening = 3
-rendered-text = "Discard a card, once per turn: Gain 1●."
+rendered-text = "Once per turn, when you discard a card, draw a card."
 mandatory-tides = [
   "discard_velocity",
   "character_chain",
@@ -457,7 +457,7 @@ optional-tides = [
 name = "Corin, Echo Marshal"
 id = "BF72ADFF-7D74-4BE8-9B93-1DB7BA13A1DB"
 awakening = 5
-rendered-text = "Once per turn, when you play a Warrior, materialize a 1-spark copy of it."
+rendered-text = "Once per turn, when you play a Warrior, materialize a copy of it with 1 spark."
 mandatory-tides = [
   "warrior_pressure",
   "materialize_tempo",
@@ -481,7 +481,7 @@ optional-tides = [
 name = "Calia, Ashwake Witness"
 id = "6488452D-4E9E-466C-96DF-716D4EC646B1"
 awakening = 5
-rendered-text = "Allied ▸ Dissolved: abilities trigger an additional time."
+rendered-text = "Allied characters' \"▸ Dissolved\": abilities gain Echo."
 mandatory-tides = [
   "survivor_dissolve",
   "figment_swarm",
@@ -529,7 +529,7 @@ optional-tides = [
 name = "Thessa, Chorus Arbiter"
 id = "1CC5A88A-134F-42F7-A0AE-95ACE44B3745"
 awakening = 5
-rendered-text = "▸ Judgment: Each deployed ally gains +1 spark for each other deployed ally."
+rendered-text = "▸ Judgment: Each deployed ally gains +1 spark"
 mandatory-tides = [
   "ally_formation",
   "judgment_engines",
@@ -553,7 +553,7 @@ optional-tides = [
 name = "Mirel, Procession Director"
 id = "C72CFD7B-408B-47F6-ADF1-1E486A7E20D3"
 awakening = 4
-rendered-text = "Once per turn, when you deploy an ally, trigger its ▸ Materialized: ability."
+rendered-text = "Once per turn, when you deploy an ally, trigger its \"▸ Materialized:\" ability."
 mandatory-tides = [
   "materialize_value",
   "ally_formation",
@@ -575,7 +575,7 @@ optional-tides = [
 name = "Velastra, Dusk Intercessor"
 id = "9E4862FD-E18C-463E-9D5F-E5D73C29A66F"
 awakening = 5
-rendered-text = "During the opponent's turn, cards you play cost 1● less."
+rendered-text = "Cards you play during the opponent's turn cost 1● less."
 mandatory-tides = [
   "fast_tempo",
   "prevent_control",
@@ -623,7 +623,7 @@ optional-tides = [
 name = "Oren, Echo Broker"
 id = "F0F5449E-01C2-4635-BCE1-76B179FC2108"
 awakening = 5
-rendered-text = "Once per turn, when you discard a character from your hand, materialize a 1-spark copy of it."
+rendered-text = "Once per turn, when you discard a character, materialize a copy of it with 1 spark."
 mandatory-tides = [
   "discard_velocity",
   "character_chain",
@@ -718,7 +718,7 @@ optional-tides = [
 name = "Meris, Resonant Magistrate"
 id = "B99936CA-97F9-4930-AF5A-FA9EF92557EF"
 awakening = 6
-rendered-text = "Allied ▸ Judgment: abilities trigger an additional time."
+rendered-text = "2●, once per turn: An allied character's \"▸ Judgment:\" ability gains Echo."
 mandatory-tides = [
   "judgment_engines",
   "ally_formation",
@@ -742,7 +742,7 @@ optional-tides = [
 name = "Tessara, Verdict Broker"
 id = "2B7E921D-0CD7-4C20-A415-9E7EEDE7B477"
 awakening = 5
-rendered-text = "When you prevent a card, add a copy of it to your hand."
+rendered-text = "When you prevent a card, add a copy of that card to your hand."
 mandatory-tides = [
   "prevent_control",
   "fast_tempo",
