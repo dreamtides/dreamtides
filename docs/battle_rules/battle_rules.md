@@ -350,9 +350,8 @@ character is destroyed). Triggered abilities can also use descriptive conditions
 like "When you play a card" or "At end of turn." A character played from hand
 can satisfy both "when you play" and "Materialized" triggers, but a character
 put directly onto the battlefield without being played satisfies only
-"Materialized." Characters can have combined
-triggers such as "Materialized, Judgment" (fires both on entry and each Judgment
-phase).
+"Materialized." Characters can have combined triggers such as "Materialized,
+Judgment" (fires both on entry and each Judgment phase).
 
 **Activated abilities** — Abilities with a cost that a player chooses to use,
 written as "Cost: Effect" (e.g., "2 energy: Draw a card"). Can be once per turn

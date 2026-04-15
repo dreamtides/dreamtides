@@ -1,7 +1,9 @@
 [[dreamcaller]]
-name = "Orla, Last Hearthkeeper"
+name = "Vaela"
+title = "Ember Among Remnants"
 id = "60BD584B-5BC8-4EE7-8A98-CBB304EB71AB"
 awakening = 5
+image-number = "0028"
 rendered-text = "When you play a card from your void, cards in your void gain reclaim this turn."
 mandatory-tides = [
   "survivor_dissolve",
@@ -22,9 +24,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Selise, Echo Broker"
+name = "Demetrios"
+title = "Strategos of the Phalanx"
 id = "2C53B1B9-9291-4BBA-8D3A-F40B545C8F3C"
 awakening = 4
+image-number = "0100"
 rendered-text = "When you trigger a \"▸ Materialized\" ability for the second time in a turn, gain 3●."
 mandatory-tides = [
   "materialize_value",
@@ -46,9 +50,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Talira, Tide Recaller"
+name = "Kaleth"
+title = "The Dreaming"
 id = "3C4773E4-F8E1-4686-86CB-B407A42489D4"
 awakening = 5
+image-number = "0026"
 rendered-text = "▸Judgment: Banish an ally, then materialize it."
 mandatory-tides = [
   "materialize_tempo",
@@ -70,9 +76,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Nyra, Chain Broker"
+name = "Rael"
+title = "Chain Accelerant"
 id = "84E7020C-7384-4CC3-A20F-AB05F03CC375"
 awakening = 3
+image-number = "0106"
 rendered-text = "When you play your second event in a turn, your events cost 1● less this turn."
 mandatory-tides = [
   "event_chain",
@@ -94,9 +102,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Veya, Figment Regent"
+name = "Serenath Veyl"
+title = "Cantor of the Unreal"
 id = "9E19B3D1-12F2-43C1-9CB1-08DE7CD32E32"
 awakening = 3
+image-number = "0098"
 rendered-text = "Allied figments have +1 spark."
 mandatory-tides = [
   "figment_swarm",
@@ -119,9 +129,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Elara, Echo Conductor"
+name = "Edran"
+title = "the Invocant"
 id = "5E28154D-770A-4B84-8AAC-9DE44F5D7D02"
 awakening = 6
+image-number = "0080"
 rendered-text = "2●, once per turn: Trigger the ▸ Materialized: ability of an ally."
 mandatory-tides = [
   "materialize_tempo",
@@ -144,9 +156,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Naeva, Solitary Arbiter"
+name = "Korrax"
+title = "Iron Sovereign"
 id = "6029BE40-75B9-4C07-912F-9718B6C5C747"
 awakening = 4
+image-number = "0003"
 rendered-text = "▸ Judgment: If you have exactly 1 deployed ally, it gains +2 spark and Unstoppable."
 mandatory-tides = [
   "judgment_engines",
@@ -168,9 +182,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Maelis, Last Muster"
+name = "Kael Voss"
+title = "Recon Commander"
 id = "81954CA0-DA36-49DD-915C-1CCB1B2D7B05"
 awakening = 4
+image-number = "0007"
 rendered-text = "When an allied Survivor is dissolved, materialize a random Survivor from your deck."
 mandatory-tides = [
   "survivor_dissolve",
@@ -190,9 +206,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Ivera, Debt Arbiter"
+name = "Ossian"
+title = "the Reckoning Blade"
 id = "B9BF6D4B-907C-4750-B51C-811AFF29DE59"
 awakening = 5
+image-number = "0022"
 rendered-text = "▸Judgment: You may abandon an ally to gain ● equal to that ally's cost."
 mandatory-tides = [
   "abandon_value",
@@ -215,9 +233,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Serin, Banner Marshal"
+name = "Tensho"
+title = "Daimyo of Lacquered Fury"
 id = "BFC40414-5264-41BF-86E1-A0F41EE4F5B5"
 awakening = 2
+image-number = "0029"
 rendered-text = "Warriors cost you 1● less."
 mandatory-tides = [
   "warrior_pressure",
@@ -239,9 +259,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Ivara, Ember Broker"
+name = "Caedryn"
+title = "Shrouded Inquisitor"
 id = "9D64A4A2-3DC7-456E-9EB2-5FE3A48883C4"
 awakening = 5
+image-number = "0112"
 rendered-text = "Abandon an ally, once per turn: Materialize a random character with cost 1● higher from your deck."
 mandatory-tides = [
   "abandon_ladder",
@@ -263,9 +285,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Selka, Echo Recaller"
+name = "Yveth Coravel"
+title = "Scion of the Returning Tide"
 id = "FE2510D9-BFEE-4C35-97F9-30E0CD2E2851"
 awakening = 6
+image-number = "0084"
 rendered-text = "2●: Return an ally to hand. Its cost is reduced by 2● and it gains +2 spark."
 mandatory-tides = [
   "materialize_tempo",
@@ -287,9 +311,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Marella, Undertow Broker"
+name = "Tessa"
+title = "Gleaner of Dust"
 id = "BA973428-6D90-4847-B779-CB7E25A5AC84"
 awakening = 5
+image-number = "0051"
 rendered-text = "When you discard a card, return another random card from your void to hand."
 mandatory-tides = [
   "discard_velocity",
@@ -310,9 +336,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Veyra, Furnace Shepherd"
+name = "Kragg"
+title = "Spent-Blood Chieftain"
 id = "16B579FE-C15B-4DF6-8262-D45CE44732AE"
 awakening = 4
+image-number = "0064"
 rendered-text = "When you abandon an ally, the next character you play this turn costs 2● less."
 mandatory-tides = [
   "abandon_value",
@@ -335,9 +363,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Ilyra, Downstream Savant"
+name = "Ovanel"
+title = "Lector of the Receding Rite"
 id = "F6208407-C4E9-42AC-B533-346704F5E39E"
 awakening = 5
+image-number = "0078"
 rendered-text = "Once per turn, when you play an event, draw an event with lower cost."
 mandatory-tides = [
   "event_chain",
@@ -357,9 +387,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Aster, Void Broker"
+name = "Zeva"
+title = "the Dredger"
 id = "4D5E3933-7DD6-406B-922D-DD78ACFA044A"
 awakening = 5
+image-number = "0005"
 rendered-text = "When you reclaim a card, draw a card."
 mandatory-tides = [
   "void_recursion",
@@ -381,9 +413,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Sareth, Line Captain"
+name = "Valdren"
+title = "Warhost Exemplar"
 id = "91D4C3B5-FD63-480B-9ED5-979109A227BB"
 awakening = 4
+image-number = "0056"
 rendered-text = "Deployed allies have +1 spark for each other deployed ally."
 mandatory-tides = [
   "ally_formation",
@@ -406,9 +440,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Kaelis, Ash Broker"
+name = "Vrakmoth"
+title = "Ashbroker"
 id = "86026206-1B11-4F38-A24E-FD3C697F5353"
 awakening = 3
+image-number = "0087"
 rendered-text = "Once per turn, when you discard a card, draw a card."
 mandatory-tides = [
   "discard_velocity",
@@ -430,9 +466,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Tamsin, Standard-Bearer"
+name = "Radulf"
+title = "Hegemon of Shattered Thrones"
 id = "3EBABA62-9000-429D-B203-2A5A9724389A"
 awakening = 4
+image-number = "0045"
 rendered-text = "2●, once per turn: Each ally gains +1 spark."
 mandatory-tides = [
   "ally_formation",
@@ -454,9 +492,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Corin, Echo Marshal"
+name = "Gunnar Deepforge"
+title = "The Hammer's Echo"
 id = "BF72ADFF-7D74-4BE8-9B93-1DB7BA13A1DB"
 awakening = 5
+image-number = "0108"
 rendered-text = "Once per turn, when you play a Warrior, materialize a copy of it with 1 spark."
 mandatory-tides = [
   "warrior_pressure",
@@ -478,9 +518,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Calia, Ashwake Witness"
+name = "Seraveth"
+title = "Twice-Mourned"
 id = "6488452D-4E9E-466C-96DF-716D4EC646B1"
 awakening = 5
+image-number = "0017"
 rendered-text = "Allied characters' \"▸ Dissolved\": abilities gain Echo."
 mandatory-tides = [
   "survivor_dissolve",
@@ -502,9 +544,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Riona, Riot Choreographer"
+name = "Calloway Flint"
+title = "Cutthroat Admiral"
 id = "8A2FCD65-BBA7-459C-A6B0-F0391B9293FD"
 awakening = 4
+image-number = "0052"
 rendered-text = "When you discard a card, deployed allies gain +1 spark."
 mandatory-tides = [
   "discard_velocity",
@@ -526,9 +570,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Thessa, Chorus Arbiter"
+name = "Senemhet"
+title = "Lord of the Radiant Court"
 id = "1CC5A88A-134F-42F7-A0AE-95ACE44B3745"
 awakening = 5
+image-number = "0035"
 rendered-text = "▸ Judgment: Each deployed ally gains +1 spark"
 mandatory-tides = [
   "ally_formation",
@@ -550,9 +596,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Mirel, Procession Director"
+name = "Seld Rakor"
+title = "Standing Orders"
 id = "C72CFD7B-408B-47F6-ADF1-1E486A7E20D3"
 awakening = 4
+image-number = "0071"
 rendered-text = "Once per turn, when you deploy an ally, trigger its \"▸ Materialized:\" ability."
 mandatory-tides = [
   "materialize_value",
@@ -572,9 +620,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Velastra, Dusk Intercessor"
+name = "Karev Soltis"
+title = "Breach Respondent"
 id = "9E4862FD-E18C-463E-9D5F-E5D73C29A66F"
 awakening = 5
+image-number = "0037"
 rendered-text = "Cards you play during the opponent's turn cost 1● less."
 mandatory-tides = [
   "fast_tempo",
@@ -597,9 +647,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Neris, Wake Broker"
+name = "Corvath"
+title = "the Salvage-Born"
 id = "B8C1B0AB-0FE6-47D6-B576-0C2231AEB81E"
 awakening = 4
+image-number = "0044"
 rendered-text = "When you discard a card, it gains reclaim until end of turn."
 mandatory-tides = [
   "discard_velocity",
@@ -620,9 +672,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Oren, Echo Broker"
+name = "Vethran"
+title = "Whisperer of Wraiths"
 id = "F0F5449E-01C2-4635-BCE1-76B179FC2108"
 awakening = 5
+image-number = "0061"
 rendered-text = "Once per turn, when you discard a character, materialize a copy of it with 1 spark."
 mandatory-tides = [
   "discard_velocity",
@@ -642,9 +696,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Cassia, Undertow Treasurer"
+name = "Kell Tarn"
+title = "Wreckoner"
 id = "133E22DD-F81B-406D-B4E3-98C346D7FD4E"
 awakening = 5
+image-number = "0013"
 rendered-text = "Characters cost you 1● less for each 3 cards in your void."
 mandatory-tides = [
   "void_threshold",
@@ -666,9 +722,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Aveline, Wave Standard"
+name = "Drusus Calvus"
+title = "Triumphator"
 id = "BDD3A3A7-242C-4D2B-8071-EBE56891A340"
 awakening = 5
+image-number = "0083"
 rendered-text = "When 2 or more allies score points, gain 1✪."
 mandatory-tides = [
   "ally_formation",
@@ -691,9 +749,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Liora, Procession Guide"
+name = "Grath"
+title = "Packmaster"
 id = "94E7C651-25E9-4A62-9DE4-EAF5BA20542C"
 awakening = 4
+image-number = "0095"
 rendered-text = "When you play a character, if you have played another character this turn, draw a card."
 mandatory-tides = [
   "ally_formation",
@@ -715,9 +775,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Meris, Resonant Magistrate"
+name = "Threxan"
+title = "the Resounding Wrath"
 id = "B99936CA-97F9-4930-AF5A-FA9EF92557EF"
 awakening = 6
+image-number = "0025"
 rendered-text = "2●, once per turn: An allied character's \"▸ Judgment:\" ability gains Echo."
 mandatory-tides = [
   "judgment_engines",
@@ -739,9 +801,11 @@ optional-tides = [
 ]
 
 [[dreamcaller]]
-name = "Tessara, Verdict Broker"
+name = "Kasane"
+title = "Wearer of the Stolen Face"
 id = "2B7E921D-0CD7-4C20-A415-9E7EEDE7B477"
 awakening = 5
+image-number = "0060"
 rendered-text = "When you prevent a card, add a copy of that card to your hand."
 mandatory-tides = [
   "prevent_control",
