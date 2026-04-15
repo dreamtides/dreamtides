@@ -13,17 +13,7 @@ export interface DreamsignPoolState {
   templatesById: Map<string, DreamsignTemplate>;
 }
 
-function shufflePick<T>(items: readonly T[], count: number): T[] {
-  const pool = [...items];
-  for (let index = pool.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [pool[index], pool[swapIndex]] = [pool[swapIndex], pool[index]];
-  }
-  return pool.slice(0, count);
-}
-
-/** Returns the canonical remaining Dreamsign ids backed by known templates. */
-export function readDreamsignPool(
+function canonicalizeDreamsignPool(
   remainingDreamsignPool: readonly string[],
   templates: readonly DreamsignTemplate[],
 ): DreamsignPoolState {
@@ -48,19 +38,21 @@ export function readDreamsignPool(
   };
 }
 
-/** Spends Dreamsign ids from the canonical remaining pool. */
-export function consumeDreamsignPoolIds(
+function shufflePick<T>(items: readonly T[], count: number): T[] {
+  const pool = [...items];
+  for (let index = pool.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [pool[index], pool[swapIndex]] = [pool[swapIndex], pool[index]];
+  }
+  return pool.slice(0, count);
+}
+
+/** Returns the canonical remaining Dreamsign ids backed by known templates. */
+export function readDreamsignPool(
   remainingDreamsignPool: readonly string[],
   templates: readonly DreamsignTemplate[],
-  spentIds: readonly string[],
-): string[] {
-  const { availableIds } = readDreamsignPool(remainingDreamsignPool, templates);
-  if (spentIds.length === 0) {
-    return availableIds;
-  }
-
-  const spentIdSet = new Set(spentIds);
-  return availableIds.filter((id) => !spentIdSet.has(id));
+): DreamsignPoolState {
+  return canonicalizeDreamsignPool(remainingDreamsignPool, templates);
 }
 
 /** Draws unique Dreamsigns from the shared run pool and spends them immediately. */
@@ -69,7 +61,7 @@ export function drawDreamsignOptions(
   templates: readonly DreamsignTemplate[],
   count: number,
 ): DreamsignPoolDraw {
-  const { availableIds, templatesById } = readDreamsignPool(
+  const { availableIds, templatesById } = canonicalizeDreamsignPool(
     remainingDreamsignPool,
     templates,
   );
@@ -83,11 +75,10 @@ export function drawDreamsignOptions(
     offeredDreamsigns: offeredIds.map((id) =>
       createDreamsign(templatesById.get(id)!),
     ),
-    remainingDreamsignPool: consumeDreamsignPoolIds(
-      remainingDreamsignPool,
-      templates,
-      offeredIds,
-    ),
+    remainingDreamsignPool:
+      offeredIds.length === 0
+        ? availableIds
+        : availableIds.filter((id) => !offeredIds.includes(id)),
   };
 }
 

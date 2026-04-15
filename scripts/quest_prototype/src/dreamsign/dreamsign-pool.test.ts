@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { DreamsignTemplate } from "../types/content";
 import {
-  consumeDreamsignPoolIds,
   drawDreamsignOptions,
   readDreamsignPool,
   resolveDreamsignTemplates,
@@ -47,23 +46,6 @@ describe("readDreamsignPool", () => {
       "glacial-insight",
       "embers-whisper",
     ]);
-  });
-});
-
-describe("consumeDreamsignPoolIds", () => {
-  it("drops spent, duplicate, and stale ids from the remaining pool", () => {
-    expect(
-      consumeDreamsignPoolIds(
-        [
-          "missing-id",
-          "embers-whisper",
-          "glacial-insight",
-          "embers-whisper",
-        ],
-        DREAMSIGN_TEMPLATES,
-        ["embers-whisper"],
-      ),
-    ).toEqual(["glacial-insight"]);
   });
 });
 
