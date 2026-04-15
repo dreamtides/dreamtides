@@ -13,6 +13,9 @@ import { useQuest } from "../state/quest-context";
 import { selectDreamcallerOffer } from "../data/dreamcaller-selection";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 
+const TIDES_LABEL_HOVER_BLURB =
+  "Each tide adds a themed mini-pool to this Dreamcaller's draft. Those tide pools are shuffled together to build the final draft pool.";
+
 vi.mock("framer-motion", () => ({
   motion: {
     div: ({
@@ -348,6 +351,9 @@ describe("QuestStartScreen", () => {
       container.querySelectorAll("[data-structural-tides-label]"),
     ).toHaveLength(3);
     expect(
+      container.querySelectorAll("[data-structural-tides-label-tooltip]"),
+    ).toHaveLength(3);
+    expect(
       container.querySelectorAll("[data-dreamcaller-tide]"),
     ).toHaveLength(DISPLAYED_TIDES.length);
     expect(
@@ -368,6 +374,11 @@ describe("QuestStartScreen", () => {
       expect((label as HTMLElement | null)?.style.color).toBe(
         "rgb(148, 163, 184)",
       );
+      expect(
+        container.querySelector(
+          `[data-structural-tides-label-tooltip="${dreamcaller.id}"]`,
+        )?.textContent,
+      ).toBe(TIDES_LABEL_HOVER_BLURB);
     }
 
     for (const tide of DISPLAYED_TIDES) {

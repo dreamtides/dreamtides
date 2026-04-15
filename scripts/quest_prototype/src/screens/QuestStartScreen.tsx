@@ -10,6 +10,8 @@ import type { DreamcallerContent } from "../types/content";
 const DREAMCALLER_ACCENTS = ["#c084fc", "#fbbf24", "#7dd3fc"] as const;
 const DREAMCALLER_HOVER_TRANSITION = { duration: 0.12, delay: 0 } as const;
 const DREAMCALLER_TAP_TRANSITION = { duration: 0.08, delay: 0 } as const;
+const TIDES_LABEL_HOVER_BLURB =
+  "These tidal pools are shuffled together to build the final draft pool.";
 
 /** Intro screen where the player picks a dreamcaller to start the quest. */
 export function QuestStartScreen() {
@@ -53,10 +55,12 @@ export function QuestStartScreen() {
       <motion.h1
         className="mb-2 text-center text-5xl font-extrabold tracking-wide md:text-7xl lg:text-8xl"
         style={{
-          background: "linear-gradient(135deg, #a855f7 0%, #7c3aed 40%, #c084fc 100%)",
+          background:
+            "linear-gradient(135deg, #a855f7 0%, #7c3aed 40%, #c084fc 100%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
-          textShadow: "0 0 60px rgba(168, 85, 247, 0.4), 0 0 120px rgba(124, 58, 237, 0.2)",
+          textShadow:
+            "0 0 60px rgba(168, 85, 247, 0.4), 0 0 120px rgba(124, 58, 237, 0.2)",
           filter: "drop-shadow(0 0 40px rgba(168, 85, 247, 0.3))",
         }}
         initial={{ opacity: 0, y: -30 }}
@@ -83,9 +87,8 @@ export function QuestStartScreen() {
         transition={{ duration: 0.6, delay: 0.5 }}
       >
         {offered.map((dreamcaller, index) => {
-          const accentColor = DREAMCALLER_ACCENTS[
-            index % DREAMCALLER_ACCENTS.length
-          ];
+          const accentColor =
+            DREAMCALLER_ACCENTS[index % DREAMCALLER_ACCENTS.length];
           const displayedTides = dreamcallerTidesForDisplay(
             dreamcaller.mandatoryTides,
             dreamcaller.optionalTides,
@@ -101,7 +104,8 @@ export function QuestStartScreen() {
               <motion.button
                 className="flex h-[472px] w-full cursor-pointer flex-col rounded-[22px] px-4 pt-4 pb-5 text-left md:px-5"
                 style={{
-                  background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
+                  background:
+                    "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
                   border: `2px solid ${accentColor}40`,
                   boxShadow: `0 0 20px ${accentColor}15`,
                 }}
@@ -168,11 +172,27 @@ export function QuestStartScreen() {
               {displayedTides.length > 0 && (
                 <div className="flex w-full flex-col gap-2 px-1">
                   <span
-                    className="text-xs font-medium"
-                    data-structural-tides-label={dreamcaller.id}
-                    style={{ color: "#94a3b8" }}
+                    className="group/tides-label relative inline-flex w-fit"
+                    data-structural-tides-label-wrapper={dreamcaller.id}
                   >
-                    Tides:
+                    <span
+                      className="text-xs font-medium"
+                      data-structural-tides-label={dreamcaller.id}
+                      style={{ color: "#94a3b8" }}
+                    >
+                      Tides:
+                    </span>
+                    <span
+                      className="pointer-events-none absolute bottom-full left-0 z-20 mb-2 hidden w-64 rounded-lg border px-3 py-2 text-left text-xs leading-relaxed shadow-2xl group-hover/tides-label:block"
+                      style={{
+                        background: "#000000",
+                        borderColor: "rgba(255, 255, 255, 0.16)",
+                        color: "#ffffff",
+                      }}
+                      data-structural-tides-label-tooltip={dreamcaller.id}
+                    >
+                      {TIDES_LABEL_HOVER_BLURB}
+                    </span>
                   </span>
                   <div className="flex w-full flex-col gap-2">
                     {displayedTides.map((tide) => (
