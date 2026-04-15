@@ -3,6 +3,7 @@ import type { DreamsignTemplate, PackageTideId } from "../types/content";
 import type { DeckEntry, Dreamsign } from "../types/quest";
 
 import { isStarterCard } from "../data/card-database";
+import { countPackageOverlap } from "../data/quest-content";
 import { pickPackageAdjacentItem } from "../data/tide-weights";
 import {
   readDreamsignPool,
@@ -69,14 +70,120 @@ export function rerollCost(rerollCount: number, isEnhanced: boolean): number {
 }
 
 function selectWeightedCard(
+  cardDatabase: ReadonlyMap<number, CardData>,
+  playerDeck: readonly DeckEntry[],
   cards: readonly CardData[],
   selectedPackageTides: readonly PackageTideId[] = [],
+  excludedCardNumbers: ReadonlySet<number> = new Set(),
 ): CardData | null {
-  return pickPackageAdjacentItem(
-    cards,
-    (card) => card.tides,
-    selectedPackageTides,
+  const availableCards = cards.filter(
+    (card) => !excludedCardNumbers.has(card.cardNumber),
   );
+  const fallbackCards = availableCards.length > 0 ? availableCards : cards;
+
+  if (fallbackCards.length === 0) {
+    return null;
+  }
+
+  const deckPackageWeights = buildDeckPackageWeights(cardDatabase, playerDeck);
+  const scoredCards = fallbackCards.map((card) => ({
+    card,
+    deckAffinity: card.tides.reduce(
+      (sum, tide) => sum + (deckPackageWeights.get(tide) ?? 0),
+      0,
+    ),
+    overlapCount: countPackageOverlap(card.tides, selectedPackageTides),
+  }));
+  const maxOverlapCount = Math.max(
+    ...scoredCards.map((candidate) => candidate.overlapCount),
+  );
+  const packageMatchedCards = maxOverlapCount > 0
+    ? scoredCards.filter((candidate) => candidate.overlapCount === maxOverlapCount)
+    : scoredCards;
+  const maxDeckAffinity = Math.max(
+    ...packageMatchedCards.map((candidate) => candidate.deckAffinity),
+  );
+  const deckMatchedCards = maxDeckAffinity > 0
+    ? packageMatchedCards.filter(
+      (candidate) => candidate.deckAffinity >= maxDeckAffinity - 1,
+    )
+    : packageMatchedCards;
+
+  return pickWeightedCard(deckMatchedCards);
+}
+
+function buildDeckPackageWeights(
+  cardDatabase: ReadonlyMap<number, CardData>,
+  playerDeck: readonly DeckEntry[],
+): Map<PackageTideId, number> {
+  const weights = new Map<PackageTideId, number>();
+
+  for (const entry of playerDeck) {
+    const card = cardDatabase.get(entry.cardNumber);
+    if (card === undefined) {
+      continue;
+    }
+
+    for (const tide of new Set(card.tides)) {
+      weights.set(tide, (weights.get(tide) ?? 0) + 1);
+    }
+  }
+
+  return weights;
+}
+
+function pickWeightedCard(
+  candidates: ReadonlyArray<{
+    card: CardData;
+    deckAffinity: number;
+    overlapCount: number;
+  }>,
+): CardData | null {
+  const totalWeight = candidates.reduce(
+    (sum, candidate) =>
+      sum +
+      Math.max(
+        1,
+        candidate.overlapCount * 10 +
+        candidate.deckAffinity * 3 +
+        raritySelectionWeight(candidate.card.rarity),
+      ),
+    0,
+  );
+
+  if (totalWeight <= 0) {
+    return candidates[0]?.card ?? null;
+  }
+
+  let roll = Math.random() * totalWeight;
+  for (const candidate of candidates) {
+    roll -= Math.max(
+      1,
+      candidate.overlapCount * 10 +
+      candidate.deckAffinity * 3 +
+      raritySelectionWeight(candidate.card.rarity),
+    );
+    if (roll <= 0) {
+      return candidate.card;
+    }
+  }
+
+  return candidates[candidates.length - 1]?.card ?? null;
+}
+
+function raritySelectionWeight(rarity: Rarity): number {
+  switch (rarity) {
+    case "Common":
+      return 4;
+    case "Uncommon":
+      return 3;
+    case "Rare":
+      return 2;
+    case "Legendary":
+      return 1;
+    case "Starter":
+      return 0;
+  }
 }
 
 /**
@@ -85,7 +192,7 @@ function selectWeightedCard(
  */
 export function generateShopInventory(
   cardDatabase: Map<number, CardData>,
-  _playerDeck: DeckEntry[],
+  playerDeck: DeckEntry[],
   options: ShopGenerationOptions = {},
 ): ShopInventoryResult {
   const selectedPackageTides = options.selectedPackageTides ?? [];
@@ -93,6 +200,7 @@ export function generateShopInventory(
     (card) => !isStarterCard(card),
   );
   const slots: ShopSlot[] = [];
+  const selectedCardNumbers = new Set<number>();
   let remainingDreamsignPoolIds = [...(options.remainingDreamsignPoolIds ?? [])];
   const spentDreamsignPoolIds: string[] = [];
 
@@ -152,10 +260,14 @@ export function generateShopInventory(
 
     // Default: card slot
     const card = selectWeightedCard(
+      cardDatabase,
+      playerDeck,
       allCards,
       selectedPackageTides,
+      selectedCardNumbers,
     );
     if (card) {
+      selectedCardNumbers.add(card.cardNumber);
       slots.push({
         itemType: "card",
         card,
@@ -194,17 +306,25 @@ export function generateShopInventory(
  */
 export function generateSpecialtyShopInventory(
   cardDatabase: Map<number, CardData>,
-  _playerDeck: DeckEntry[],
+  playerDeck: DeckEntry[],
   selectedPackageTides: readonly PackageTideId[] = [],
 ): ShopSlot[] {
   const rareCards = Array.from(cardDatabase.values()).filter(
     (card) => card.rarity === "Rare",
   );
   const slots: ShopSlot[] = [];
+  const selectedCardNumbers = new Set<number>();
 
   for (let i = 0; i < 4; i += 1) {
-    const card = selectWeightedCard(rareCards, selectedPackageTides);
+    const card = selectWeightedCard(
+      cardDatabase,
+      playerDeck,
+      rareCards,
+      selectedPackageTides,
+      selectedCardNumbers,
+    );
     if (card) {
+      selectedCardNumbers.add(card.cardNumber);
       slots.push({
         itemType: "card",
         card,

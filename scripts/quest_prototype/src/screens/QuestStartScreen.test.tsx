@@ -26,7 +26,11 @@ vi.mock("framer-motion", () => ({
       children: ReactNode;
       initial?: unknown;
       transition?: unknown;
-    } & HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+    } & HTMLAttributes<HTMLDivElement>) => (
+      <div data-transition={JSON.stringify(_transition)} {...props}>
+        {children}
+      </div>
+    ),
     h1: ({
       animate: _animate,
       children,
@@ -251,9 +255,13 @@ describe("QuestStartScreen", () => {
     if (!firstDreamcallerButton) {
       throw new Error("Missing dreamcaller selection button");
     }
+    const firstDreamcallerWrapper = firstDreamcallerButton.parentElement;
+    if (!firstDreamcallerWrapper) {
+      throw new Error("Missing dreamcaller wrapper");
+    }
 
     const transition = JSON.parse(
-      firstDreamcallerButton.getAttribute("data-transition") ?? "null",
+      firstDreamcallerWrapper.getAttribute("data-transition") ?? "null",
     ) as { delay?: number } | null;
     const whileHover = JSON.parse(
       firstDreamcallerButton.getAttribute("data-while-hover") ?? "null",

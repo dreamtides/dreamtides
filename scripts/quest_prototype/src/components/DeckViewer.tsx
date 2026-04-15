@@ -11,6 +11,12 @@ import {
 } from "../data/card-database";
 import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
+import {
+  getPersistedCardSize,
+  persistCardSize,
+  SIZE_PRESETS,
+  type CardSizePreset,
+} from "./card-size";
 import { logEvent } from "../logging";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
 import {
@@ -51,6 +57,9 @@ interface DeckViewerProps {
   isOpen: boolean;
   onClose: () => void;
   cardDatabase: Map<number, CardData>;
+  initialSize?: CardSizePreset;
+  introMode?: boolean;
+  onBeginQuest?: () => void;
 }
 
 /**
@@ -61,6 +70,9 @@ export function DeckViewer({
   isOpen,
   onClose,
   cardDatabase,
+  initialSize = "medium",
+  introMode = false,
+  onBeginQuest,
 }: DeckViewerProps) {
   const { state } = useQuest();
 
@@ -78,6 +90,9 @@ export function DeckViewer({
   const [sortCriteria, setSortCriteria] =
     useState<SortCriteria>("acquisitionOrder");
   const [sortAscending, setSortAscending] = useState(true);
+  const [cardSize, setCardSizeState] = useState<CardSizePreset>(() =>
+    getPersistedCardSize(initialSize),
+  );
   const [overlayCard, setOverlayCard] = useState<CardData | null>(null);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const openTimestampRef = useRef<number>(0);
@@ -92,6 +107,7 @@ export function DeckViewer({
         sortCriteria,
         sortAscending,
         cardTypeFilter,
+        cardSize,
       });
     }
     prevOpenRef.current = isOpen;
@@ -102,6 +118,7 @@ export function DeckViewer({
     sortCriteria,
     sortAscending,
     cardTypeFilter,
+    cardSize,
   ]);
 
   const handleClose = useCallback(() => {
@@ -195,6 +212,11 @@ export function DeckViewer({
     setRarityFilters((prev) => ({ ...prev, [rarity]: !prev[rarity] }));
   }, []);
 
+  const setCardSize = useCallback((size: CardSizePreset) => {
+    setCardSizeState(size);
+    persistCardSize(size);
+  }, []);
+
   const handleCardClick = useCallback((card: CardData) => {
     setOverlayCard(card);
   }, []);
@@ -261,6 +283,46 @@ export function DeckViewer({
               {"\u2715"}
             </button>
           </div>
+
+          {introMode && (
+            <div
+              className="flex flex-col gap-3 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6"
+              style={{
+                borderBottom: "1px solid rgba(124, 58, 237, 0.18)",
+                background:
+                  "linear-gradient(135deg, rgba(124, 58, 237, 0.16) 0%, rgba(30, 18, 46, 0.88) 50%, rgba(10, 6, 18, 0.9) 100%)",
+              }}
+            >
+              <div>
+                <p
+                  className="text-[11px] font-semibold uppercase tracking-[0.24em]"
+                  style={{ color: "#c4b5fd" }}
+                >
+                  Starting Deck
+                </p>
+                <p
+                  className="mt-1 text-sm leading-relaxed md:text-base"
+                  style={{ color: "#e2e8f0" }}
+                >
+                  These are the cards you begin the quest with.
+                </p>
+              </div>
+              <button
+                className="rounded-xl px-5 py-3 text-sm font-bold transition-colors md:text-base"
+                style={{
+                  background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                  border: "1px solid rgba(251, 191, 36, 0.45)",
+                  color: "#ffffff",
+                  boxShadow: "0 0 22px rgba(245, 158, 11, 0.24)",
+                }}
+                onClick={() => {
+                  (onBeginQuest ?? handleClose)();
+                }}
+              >
+                Begin Quest
+              </button>
+            </div>
+          )}
 
           {/* Deck summary */}
           {deckSummary.total > 0 && (
@@ -528,6 +590,36 @@ export function DeckViewer({
                 {sortAscending ? "\u2191" : "\u2193"}
               </button>
             </div>
+
+            <div
+              className="mx-1 hidden h-5 md:block"
+              style={{ borderLeft: "1px solid rgba(255, 255, 255, 0.1)" }}
+            />
+
+            <div className="flex items-center gap-1">
+              <span className="mr-1 text-[10px] uppercase tracking-wider opacity-40">
+                Size
+              </span>
+              {(Object.keys(SIZE_PRESETS) as CardSizePreset[]).map((preset) => (
+                <button
+                  key={preset}
+                  className="cursor-pointer rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                  style={{
+                    background:
+                      cardSize === preset
+                        ? "rgba(168, 85, 247, 0.25)"
+                        : "rgba(255, 255, 255, 0.03)",
+                    border: `1px solid ${cardSize === preset ? "rgba(168, 85, 247, 0.5)" : "rgba(255, 255, 255, 0.1)"}`,
+                    color: cardSize === preset ? "#c084fc" : "#6b7280",
+                  }}
+                  onClick={() => {
+                    setCardSize(preset);
+                  }}
+                >
+                  {SIZE_PRESETS[preset].label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Main content area */}
@@ -543,7 +635,13 @@ export function DeckViewer({
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-3 xl:grid-cols-5">
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: SIZE_PRESETS[cardSize].columns,
+                    gap: SIZE_PRESETS[cardSize].gap,
+                  }}
+                >
                   {sortedEntries.map((resolved) => (
                     <div
                       key={resolved.entry.entryId}
@@ -597,6 +695,7 @@ export function DeckViewer({
                       >
                         <CardDisplay
                           card={resolved.card}
+                          large={cardSize === "large"}
                           onClick={() => {
                             handleCardClick(resolved.card);
                           }}

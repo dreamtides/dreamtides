@@ -23,8 +23,15 @@ vi.mock("./components/HUD", () => ({
 }));
 
 const deckViewerMock = vi.fn<
-  (props: { isOpen: boolean }) => ReactNode
->(({ isOpen }) => <div data-deck-open={String(isOpen)}>Deck Viewer</div>);
+  (props: { introMode?: boolean; isOpen: boolean }) => ReactNode
+>(({ isOpen, introMode }) => (
+  <div
+    data-deck-intro={String(Boolean(introMode))}
+    data-deck-open={String(isOpen)}
+  >
+    Deck Viewer
+  </div>
+));
 
 vi.mock("./components/DeckViewer", () => ({
   DeckViewer: (props: { isOpen: boolean }) => deckViewerMock(props),
@@ -153,7 +160,7 @@ describe("QuestApp", () => {
     });
 
     expect(deckViewerMock).toHaveBeenLastCalledWith(
-      expect.objectContaining({ isOpen: true }),
+      expect.objectContaining({ introMode: true, isOpen: true }),
     );
 
     act(() => {

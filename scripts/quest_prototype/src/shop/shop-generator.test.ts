@@ -204,7 +204,16 @@ describe("generateShopInventory", () => {
   });
 
   it("filters cards to the selected package when adjacent cards exist", () => {
-    const result = generateShopInventory(db, [], {
+    const adjacentDb = makeDatabase([
+      makeCard({ cardNumber: 1, tides: ["Arc"] }),
+      makeCard({ cardNumber: 2, tides: ["Arc"] }),
+      makeCard({ cardNumber: 3, tides: ["Arc"] }),
+      makeCard({ cardNumber: 4, tides: ["Arc"] }),
+      makeCard({ cardNumber: 5, tides: ["Arc"] }),
+      makeCard({ cardNumber: 6, tides: ["Arc"] }),
+      makeCard({ cardNumber: 7, tides: ["Bloom"] }),
+    ]);
+    const result = generateShopInventory(adjacentDb, [], {
       selectedPackageTides: ["Arc"],
     });
 
@@ -213,6 +222,52 @@ describe("generateShopInventory", () => {
         expect(slot.card.tides).toContain("Arc");
       }
     }
+  });
+
+  it("prefers cards with the strongest package overlap in shop inventory", () => {
+    const overlapDb = makeDatabase(
+      Array.from({ length: 6 }, (_, index) =>
+        makeCard({
+          cardNumber: index + 1,
+          tides: ["Arc", "Bloom"],
+        }),
+      ).concat([
+        makeCard({ cardNumber: 11, tides: ["Arc"] }),
+        makeCard({ cardNumber: 12, tides: ["Bloom"] }),
+      ]),
+    );
+
+    const result = generateShopInventory(overlapDb, [], {
+      selectedPackageTides: ["Arc", "Bloom"],
+    });
+
+    for (const slot of result.slots) {
+      if (slot.itemType === "card" && slot.card !== null) {
+        expect(slot.card.tides).toContain("Arc");
+        expect(slot.card.tides).toContain("Bloom");
+      }
+    }
+  });
+
+  it("avoids duplicate card offers when enough cards match the theme", () => {
+    const uniqueDb = makeDatabase(
+      Array.from({ length: 8 }, (_, index) =>
+        makeCard({
+          cardNumber: index + 1,
+          tides: ["Arc"],
+        }),
+      ),
+    );
+
+    const result = generateShopInventory(uniqueDb, [], {
+      selectedPackageTides: ["Arc"],
+    });
+
+    const cardNumbers = result.slots
+      .filter((slot) => slot.itemType === "card" && slot.card !== null)
+      .map((slot) => slot.card!.cardNumber);
+
+    expect(new Set(cardNumbers).size).toBe(cardNumbers.length);
   });
 
   it("never offers starter-rarity cards in normal shop inventory", () => {
@@ -312,7 +367,14 @@ describe("generateSpecialtyShopInventory", () => {
   });
 
   it("uses package-adjacent rare cards when available", () => {
-    const slots = generateSpecialtyShopInventory(db, [], ["Arc"]);
+    const rareAdjacentDb = makeDatabase([
+      makeCard({ cardNumber: 1, rarity: "Rare", tides: ["Arc"] }),
+      makeCard({ cardNumber: 2, rarity: "Rare", tides: ["Arc"] }),
+      makeCard({ cardNumber: 3, rarity: "Rare", tides: ["Arc"] }),
+      makeCard({ cardNumber: 4, rarity: "Rare", tides: ["Arc"] }),
+      makeCard({ cardNumber: 5, rarity: "Rare", tides: ["Rime"] }),
+    ]);
+    const slots = generateSpecialtyShopInventory(rareAdjacentDb, [], ["Arc"]);
     expect(slots).toHaveLength(4);
     for (const slot of slots) {
       expect(slot.card?.tides).toContain("Arc");

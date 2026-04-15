@@ -259,8 +259,7 @@ export function generateInitialAtlas(
     enhancedSiteType: null,
   };
 
-  // 2-3 initial dreamscape nodes
-  const nodeCount = randomInt(2, 3);
+  const nodeCount = 2;
   const baseAngle = randomFloat(0, Math.PI * 2);
 
   const usedBiomeNames = new Set<string>();
@@ -326,7 +325,8 @@ export function generateNewNodes(
     completedNode.position.x,
   );
 
-  const newNodeCount = randomInt(2, 4);
+  const isFirstExpansion = completedDistance <= BASE_RADIUS + 1;
+  const newNodeCount = isFirstExpansion ? 1 : randomInt(2, 3);
   const spread = Math.PI / 3; // 60-degree spread for children
   const usedBiomeNames = new Set<string>(
     Object.values(updatedNodes)

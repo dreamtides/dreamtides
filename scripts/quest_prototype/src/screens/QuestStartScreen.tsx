@@ -85,68 +85,71 @@ export function QuestStartScreen() {
             index % DREAMCALLER_ACCENTS.length
           ];
           return (
-            <motion.button
+            <motion.div
               key={dreamcaller.name}
-              className="flex cursor-pointer flex-col items-center rounded-xl px-5 py-6 md:px-6 md:py-8"
-              style={{
-                background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-                border: `2px solid ${accentColor}40`,
-                boxShadow: `0 0 20px ${accentColor}15`,
-                minWidth: "220px",
-                maxWidth: "320px",
-                flex: "1 1 0",
-              }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-              whileHover={{
-                boxShadow: `0 0 40px ${accentColor}50`,
-                borderColor: `${accentColor}90`,
-                scale: 1.05,
-                transition: DREAMCALLER_HOVER_TRANSITION,
-              }}
-              whileTap={{
-                scale: 0.97,
-                transition: DREAMCALLER_TAP_TRANSITION,
-              }}
-              onClick={() => {
-                handlePickDreamcaller(dreamcaller);
-              }}
             >
-              <div
-                className="mb-3 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black md:h-14 md:w-14 md:text-2xl"
+              <motion.button
+                className="flex cursor-pointer flex-col items-center rounded-xl px-5 py-6 md:px-6 md:py-8"
                 style={{
-                  border: `2px solid ${accentColor}`,
-                  background: "rgba(255, 255, 255, 0.06)",
-                  color: accentColor,
+                  background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
+                  border: `2px solid ${accentColor}40`,
+                  boxShadow: `0 0 20px ${accentColor}15`,
+                  minWidth: "220px",
+                  maxWidth: "320px",
+                  flex: "1 1 0",
                 }}
-                aria-label={`${dreamcaller.name} sigil`}
-              >
-                {dreamcaller.name.charAt(0)}
-              </div>
-              <h3
-                className="mb-2 text-center text-xl font-bold leading-tight md:text-2xl"
-                style={{ color: "#f8fafc" }}
-              >
-                {dreamcaller.name}
-              </h3>
-              <span
-                className="mb-3 rounded-full px-3 py-0.5 text-xs font-medium"
-                style={{
-                  background: `${accentColor}20`,
-                  color: accentColor,
-                  border: `1px solid ${accentColor}30`,
+                whileHover={{
+                  boxShadow: `0 0 40px ${accentColor}50`,
+                  borderColor: `${accentColor}90`,
+                  scale: 1.05,
+                  transition: DREAMCALLER_HOVER_TRANSITION,
+                }}
+                whileTap={{
+                  scale: 0.97,
+                  transition: DREAMCALLER_TAP_TRANSITION,
+                }}
+                onClick={() => {
+                  handlePickDreamcaller(dreamcaller);
                 }}
               >
-                Awakening {String(dreamcaller.awakening)}
-              </span>
-              <p
-                className="mb-4 text-center text-sm leading-relaxed opacity-80"
-                style={{ color: "#e2e8f0" }}
-              >
-                {dreamcaller.renderedText}
-              </p>
-            </motion.button>
+                <div
+                  className="mb-3 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black md:h-14 md:w-14 md:text-2xl"
+                  style={{
+                    border: `2px solid ${accentColor}`,
+                    background: "rgba(255, 255, 255, 0.06)",
+                    color: accentColor,
+                  }}
+                  aria-label={`${dreamcaller.name} sigil`}
+                >
+                  {dreamcaller.name.charAt(0)}
+                </div>
+                <h3
+                  className="mb-2 text-center text-xl font-bold leading-tight md:text-2xl"
+                  style={{ color: "#f8fafc" }}
+                >
+                  {dreamcaller.name}
+                </h3>
+                <span
+                  className="mb-3 rounded-full px-3 py-0.5 text-xs font-medium"
+                  style={{
+                    background: `${accentColor}20`,
+                    color: accentColor,
+                    border: `1px solid ${accentColor}30`,
+                  }}
+                >
+                  Awakening {String(dreamcaller.awakening)}
+                </span>
+                <p
+                  className="mb-4 text-center text-sm leading-relaxed opacity-80"
+                  style={{ color: "#e2e8f0" }}
+                >
+                  {dreamcaller.renderedText}
+                </p>
+              </motion.button>
+            </motion.div>
           );
         })}
       </motion.div>

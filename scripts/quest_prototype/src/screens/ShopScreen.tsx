@@ -4,6 +4,7 @@ import type { CardData } from "../types/cards";
 import type { SiteState } from "../types/quest";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
+import { SIZE_PRESETS } from "../components/card-size";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import {
@@ -194,7 +195,14 @@ export function ShopScreen({ site }: ShopScreenProps) {
       </div>
 
       {/* Item grid: 3 columns desktop, 2 tablet */}
-      <div className="grid w-full max-w-4xl grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
+      <div
+        className="w-full max-w-6xl"
+        style={{
+          display: "grid",
+          gap: SIZE_PRESETS.medium.gap,
+          gridTemplateColumns: SIZE_PRESETS.medium.columns,
+        }}
+      >
         {slots.map((slot, index) => (
           <ShopSlotCard
             key={`shop-slot-${String(index)}`}
@@ -297,7 +305,7 @@ function ShopSlotCard({
           className="w-full rounded-lg px-3 py-2 text-sm font-bold transition-opacity"
           style={{
             background: canAffordReroll ? "#7c3aed" : "#4b5563",
-            color: canAffordReroll ? "#fbbf24" : "#9ca3af",
+            color: canAffordReroll ? "#ffffff" : "#9ca3af",
             opacity: canAffordReroll ? 1 : 0.6,
             cursor: canAffordReroll ? "pointer" : "not-allowed",
           }}
@@ -314,49 +322,52 @@ function ShopSlotCard({
     const ds = slot.dreamsign;
     return (
       <div className="flex flex-col gap-2">
-        <div
-          className="flex flex-col items-center justify-center gap-2 rounded-lg p-3"
-          style={{
-            aspectRatio: "2 / 3",
-            background:
-              "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-            border: "1px solid rgba(168, 85, 247, 0.3)",
-            boxShadow: "0 0 8px rgba(168, 85, 247, 0.12)",
-          }}
-        >
+        <div className="relative">
+          {hasDiscount && <ShopSaleBadge discountPercent={slot.discountPercent} />}
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-full text-lg"
+            className="flex flex-col items-center justify-center gap-2 rounded-lg p-3"
             style={{
-              background: "rgba(255, 255, 255, 0.08)",
-              border: "2px solid rgba(168, 85, 247, 0.35)",
-              color: "#cbd5f5",
+              aspectRatio: "2 / 3",
+              background:
+                "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
+              border: "1px solid rgba(168, 85, 247, 0.3)",
+              boxShadow: "0 0 8px rgba(168, 85, 247, 0.12)",
             }}
-            aria-label={`${ds.name} sigil`}
           >
-            {"\u2726"}
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-full text-lg"
+              style={{
+                background: "rgba(255, 255, 255, 0.08)",
+                border: "2px solid rgba(168, 85, 247, 0.35)",
+                color: "#cbd5f5",
+              }}
+              aria-label={`${ds.name} sigil`}
+            >
+              {"\u2726"}
+            </div>
+            <span
+              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+              style={{
+                background: "rgba(168, 85, 247, 0.16)",
+                color: "#c4b5fd",
+                border: "1px solid rgba(168, 85, 247, 0.35)",
+              }}
+            >
+              Dreamsign
+            </span>
+            <h3
+              className="text-center text-sm font-bold"
+              style={{ color: "#f8fafc" }}
+            >
+              {ds.name}
+            </h3>
+            <p
+              className="text-center text-[10px] leading-tight opacity-70"
+              style={{ color: "#e2e8f0" }}
+            >
+              {ds.effectDescription}
+            </p>
           </div>
-          <span
-            className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-            style={{
-              background: "rgba(168, 85, 247, 0.16)",
-              color: "#c4b5fd",
-              border: "1px solid rgba(168, 85, 247, 0.35)",
-            }}
-          >
-            Dreamsign
-          </span>
-          <h3
-            className="text-center text-sm font-bold"
-            style={{ color: "#f8fafc" }}
-          >
-            {ds.name}
-          </h3>
-          <p
-            className="text-center text-[10px] leading-tight opacity-70"
-            style={{ color: "#e2e8f0" }}
-          >
-            {ds.effectDescription}
-          </p>
         </div>
         <PriceButton
           basePrice={slot.basePrice}
@@ -373,10 +384,13 @@ function ShopSlotCard({
   if (slot.card) {
     return (
       <div className="flex flex-col gap-2">
-        <CardDisplay
-          card={slot.card}
-          onClick={() => onCardClick(slot.card!)}
-        />
+        <div className="relative">
+          {hasDiscount && <ShopSaleBadge discountPercent={slot.discountPercent} />}
+          <CardDisplay
+            card={slot.card}
+            onClick={() => onCardClick(slot.card!)}
+          />
+        </div>
         <PriceButton
           basePrice={slot.basePrice}
           price={price}
@@ -410,7 +424,7 @@ function PriceButton({
       className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-opacity"
       style={{
         background: canAfford ? "#7c3aed" : "#4b5563",
-        color: canAfford ? "#fbbf24" : "#9ca3af",
+        color: canAfford ? "#ffffff" : "#9ca3af",
         opacity: canAfford ? 1 : 0.6,
         cursor: canAfford ? "pointer" : "not-allowed",
       }}
@@ -429,5 +443,21 @@ function PriceButton({
       <span>{String(price)}</span>
       <span className="text-xs opacity-70">Essence</span>
     </button>
+  );
+}
+
+function ShopSaleBadge({ discountPercent }: { discountPercent: number }) {
+  return (
+    <div
+      className="pointer-events-none absolute top-2 left-2 z-10 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em]"
+      style={{
+        background: "rgba(239, 68, 68, 0.92)",
+        border: "1px solid rgba(254, 202, 202, 0.65)",
+        boxShadow: "0 0 18px rgba(239, 68, 68, 0.24)",
+        color: "#ffffff",
+      }}
+    >
+      Sale {String(discountPercent)}% Off
+    </div>
   );
 }

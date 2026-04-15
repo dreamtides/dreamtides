@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuest } from "../state/quest-context";
 import { downloadLog } from "../logging";
+import { DreamcallerPopover } from "./DreamcallerPopover";
 
 /** Duration in ms for the essence count animation. */
 const ESSENCE_ANIM_DURATION = 500;
@@ -107,32 +108,50 @@ export function HUD({ onOpenDeckViewer, onOpenDebugScreen, hasDraftData }: HudPr
         </div>
 
         {/* Dreamcaller portrait */}
-        <div className="flex items-center gap-1.5">
-          <div
-            className="flex h-6 w-6 items-center justify-center rounded md:h-7 md:w-7"
+        <div className="group relative flex items-center gap-1.5">
+          <button
+            type="button"
+            className="flex items-center gap-1.5 rounded-md px-1 py-0.5 text-left"
             style={{
-              border: "2px solid rgba(255, 255, 255, 0.2)",
-              background: "rgba(0, 0, 0, 0.4)",
+              color: dreamcallerColor,
             }}
-            aria-label="Dreamcaller"
           >
-            {dreamcallerName !== null ? (
-              <span
-                className="text-[10px] font-bold md:text-xs"
-                style={{ color: dreamcallerColor }}
-              >
-                {dreamcallerName.charAt(0)}
-              </span>
-            ) : (
-              <span className="text-[10px] opacity-30">{"--"}</span>
-            )}
-          </div>
-          <span
-            className="hidden max-w-[80px] truncate text-xs font-medium lg:inline"
-            style={{ color: dreamcallerColor }}
-          >
-            {dreamcallerName ?? "None"}
-          </span>
+            <div
+              className="flex h-6 w-6 items-center justify-center rounded md:h-7 md:w-7"
+              style={{
+                border: "2px solid rgba(255, 255, 255, 0.2)",
+                background: "rgba(0, 0, 0, 0.4)",
+              }}
+              aria-label="Dreamcaller"
+            >
+              {dreamcallerName !== null ? (
+                <span
+                  className="text-[10px] font-bold md:text-xs"
+                  style={{ color: dreamcallerColor }}
+                >
+                  {dreamcallerName.charAt(0)}
+                </span>
+              ) : (
+                <span className="text-[10px] opacity-30">{"--"}</span>
+              )}
+            </div>
+            <span
+              className="hidden max-w-[80px] truncate text-xs font-medium lg:inline"
+              style={{ color: dreamcallerColor }}
+            >
+              {dreamcallerName ?? "None"}
+            </span>
+          </button>
+          {state.dreamcaller !== null && (
+            <div
+              className="pointer-events-none absolute bottom-full left-0 z-30 mb-3 hidden origin-bottom-left opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 lg:block"
+            >
+              <DreamcallerPopover
+                dreamcaller={state.dreamcaller}
+                resolvedPackage={state.resolvedPackage}
+              />
+            </div>
+          )}
         </div>
 
         {/* Dreamsign count */}

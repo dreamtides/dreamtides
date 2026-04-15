@@ -176,12 +176,11 @@ describe("generateSiteComposition", () => {
 });
 
 describe("generateInitialAtlas", () => {
-  it("creates 2-3 dreamscape nodes plus the nexus", () => {
+  it("creates 2 dreamscape nodes plus the nexus", () => {
     for (let i = 0; i < 20; i++) {
       const atlas = generateInitialAtlas(0, defaultContext());
       const nodeCount = Object.keys(atlas.nodes).length;
-      expect(nodeCount).toBeGreaterThanOrEqual(3);
-      expect(nodeCount).toBeLessThanOrEqual(4);
+      expect(nodeCount).toBe(3);
     }
   });
 
@@ -233,7 +232,7 @@ describe("generateInitialAtlas", () => {
 });
 
 describe("generateNewNodes", () => {
-  it("generates 2-4 new nodes connected to the completed node", () => {
+  it("generates 1 new node after the first completed dreamscape", () => {
     for (let i = 0; i < 20; i++) {
       const atlas = generateInitialAtlas(0, defaultContext());
       const completedId = Object.keys(atlas.nodes).find(
@@ -242,9 +241,21 @@ describe("generateNewNodes", () => {
       const updated = generateNewNodes(atlas, completedId, 0, defaultContext());
       const newNodeCount =
         Object.keys(updated.nodes).length - Object.keys(atlas.nodes).length;
-      expect(newNodeCount).toBeGreaterThanOrEqual(2);
-      expect(newNodeCount).toBeLessThanOrEqual(4);
+      expect(newNodeCount).toBe(1);
     }
+  });
+
+  it("leaves exactly 2 available choices after the first dreamscape", () => {
+    const atlas = generateInitialAtlas(0, defaultContext());
+    const completedId = Object.keys(atlas.nodes).find(
+      (id) => id !== atlas.nexusId,
+    )!;
+    const updated = generateNewNodes(atlas, completedId, 0, defaultContext());
+    const availableNodes = Object.values(updated.nodes).filter(
+      (node) => node.id !== atlas.nexusId && node.status === "available",
+    );
+
+    expect(availableNodes).toHaveLength(2);
   });
 
   it("marks the completed node as completed", () => {

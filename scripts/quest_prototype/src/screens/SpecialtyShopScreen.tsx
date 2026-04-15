@@ -194,7 +194,7 @@ function SpecialtySlotCard({
         className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-opacity"
         style={{
           background: canAfford ? "#7c3aed" : "#4b5563",
-          color: canAfford ? "#fbbf24" : "#9ca3af",
+          color: canAfford ? "#ffffff" : "#9ca3af",
           opacity: canAfford ? 1 : 0.6,
           cursor: canAfford ? "pointer" : "not-allowed",
         }}
@@ -202,7 +202,7 @@ function SpecialtySlotCard({
         onClick={() => onBuy(index)}
       >
         {isEnhanced ? (
-          <span style={{ color: "#fbbf24" }}>FREE</span>
+          <span>FREE</span>
         ) : (
           <>
             <span>Buy</span>

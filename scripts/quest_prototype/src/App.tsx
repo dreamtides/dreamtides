@@ -18,6 +18,7 @@ export function QuestApp({
   const { state, questContent } = useQuest();
   const showHud = state.screen.type !== "questStart";
   const [deckViewerOpen, setDeckViewerOpen] = useState(false);
+  const [starterDeckIntroOpen, setStarterDeckIntroOpen] = useState(false);
   const [debugScreenOpen, setDebugScreenOpen] = useState(false);
   const previousScreenTypeRef = useRef(state.screen.type);
 
@@ -33,6 +34,7 @@ export function QuestApp({
 
     if (leftQuestStart && state.dreamcaller !== null && hasStarterDeck) {
       setDeckViewerOpen(true);
+      setStarterDeckIntroOpen(true);
     }
 
     previousScreenTypeRef.current = state.screen.type;
@@ -40,10 +42,17 @@ export function QuestApp({
 
   const handleOpenDeckViewer = useCallback(() => {
     setDeckViewerOpen(true);
+    setStarterDeckIntroOpen(false);
   }, []);
 
   const handleCloseDeckViewer = useCallback(() => {
     setDeckViewerOpen(false);
+    setStarterDeckIntroOpen(false);
+  }, []);
+
+  const handleBeginQuest = useCallback(() => {
+    setDeckViewerOpen(false);
+    setStarterDeckIntroOpen(false);
   }, []);
 
   const handleOpenDebugScreen = useCallback(() => {
@@ -68,6 +77,8 @@ export function QuestApp({
         isOpen={deckViewerOpen}
         onClose={handleCloseDeckViewer}
         cardDatabase={cardDatabase}
+        introMode={starterDeckIntroOpen}
+        onBeginQuest={handleBeginQuest}
       />
       <DebugScreen
         isOpen={debugScreenOpen}
