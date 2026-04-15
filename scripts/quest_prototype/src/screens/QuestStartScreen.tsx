@@ -1,17 +1,10 @@
 import { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuest } from "../state/quest-context";
-import { generateInitialAtlas } from "../atlas/atlas-generator";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
-import {
-  selectDreamcallerOffer,
-  toQuestDreamcaller,
-} from "../data/dreamcaller-selection";
+import { selectDreamcallerOffer } from "../data/dreamcaller-selection";
 import { dreamcallerAccentTide } from "../data/quest-content";
-import { createDreamsign } from "../data/dreamsigns";
-import { initializeDraftState } from "../draft/draft-engine";
-import { resolveDreamsignTemplates } from "../dreamsign/dreamsign-pool";
-import { logEvent } from "../logging";
+import { bootstrapQuestStart } from "./quest-start-bootstrap";
 import type { DreamcallerContent } from "../types/content";
 
 /** Intro screen where the player picks a dreamcaller to start the quest. */
@@ -26,61 +19,18 @@ export function QuestStartScreen() {
 
   const handlePickDreamcaller = useCallback(
     (dreamcaller: DreamcallerContent) => {
-      const selectedDreamcaller = toQuestDreamcaller(dreamcaller);
-      const resolvedPackage = questContent.resolvedPackagesByDreamcallerId.get(
-        dreamcaller.id,
-      );
-
-      if (resolvedPackage === undefined) {
-        throw new Error(`Missing resolved package for ${dreamcaller.id}`);
-      }
-
-      mutations.setDreamcallerSelection(selectedDreamcaller, resolvedPackage);
-
-      const playerHasBanes =
-        state.deck.some((e) => e.isBane) ||
-        state.dreamsigns.some((d) => d.isBane);
-      const atlas = generateInitialAtlas(state.completionLevel, {
-        cardDatabase,
-        dreamsignPool: resolveDreamsignTemplates(
-          resolvedPackage.dreamsignPoolIds,
-          questContent.dreamsignTemplates,
-        ).map((template) => createDreamsign(template)),
-        playerHasBanes,
-        selectedPackageTides: resolvedPackage.selectedTides,
-      });
-
-      const draftState = initializeDraftState(cardDatabase, resolvedPackage);
-      mutations.setDraftState(draftState, "quest_start");
-      mutations.updateAtlas(atlas);
-
-      // Auto-enter the first available dreamscape
-      const firstNode = Object.values(atlas.nodes).find(
-        (n) => n.status === "available",
-      );
-
-      logEvent("quest_started", {
-        initialEssence: state.essence,
-        dreamcallerId: dreamcaller.id,
-        dreamcallerName: dreamcaller.name,
-        dreamcallerAwakening: dreamcaller.awakening,
-        packageSummary: {
-          mandatoryTides: resolvedPackage.mandatoryTides,
-          optionalSubset: resolvedPackage.optionalSubset,
-          selectedTides: resolvedPackage.selectedTides,
+      bootstrapQuestStart({
+        dreamcaller,
+        state: {
+          completionLevel: state.completionLevel,
+          deck: state.deck,
+          dreamsigns: state.dreamsigns,
+          essence: state.essence,
         },
-        selectedPackageTides: resolvedPackage.selectedTides,
-        draftPoolSize: resolvedPackage.draftPoolSize,
-        dreamsignPoolSize: resolvedPackage.dreamsignPoolIds.length,
-        dreamscapesGenerated: Object.keys(atlas.nodes).length - 1,
+        mutations,
+        cardDatabase,
+        questContent,
       });
-
-      if (firstNode) {
-        mutations.setCurrentDreamscape(firstNode.id);
-        mutations.setScreen({ type: "dreamscape" });
-      } else {
-        mutations.setScreen({ type: "atlas" });
-      }
     },
     [
       state.completionLevel,

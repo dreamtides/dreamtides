@@ -1,0 +1,188 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getLogEntries, resetLog } from "../logging";
+import { bootstrapQuestStart } from "./quest-start-bootstrap";
+import type { QuestContent } from "../data/quest-content";
+import type {
+  DreamcallerContent,
+  DreamsignTemplate,
+  ResolvedDreamcallerPackage,
+} from "../types/content";
+import type { CardData } from "../types/cards";
+import type { QuestMutations } from "../state/quest-context";
+import type { QuestState } from "../types/quest";
+
+function makeDreamcaller(): DreamcallerContent {
+  return {
+    id: "dreamcaller-1",
+    name: "Test Dreamcaller",
+    awakening: 4,
+    renderedText: "Test ability.",
+    mandatoryTides: ["Bloom"],
+    optionalTides: ["Arc", "Ignite", "Pact", "Rime"],
+  };
+}
+
+function makeResolvedPackage(): ResolvedDreamcallerPackage {
+  const dreamcaller = makeDreamcaller();
+  return {
+    dreamcaller,
+    mandatoryTides: ["Bloom"],
+    optionalSubset: ["Arc", "Ignite", "Pact"],
+    selectedTides: ["Bloom", "Arc", "Ignite", "Pact"],
+    draftPoolCopiesByCard: {
+      "101": 2,
+      "202": 1,
+    },
+    dreamsignPoolIds: ["dreamsign-1", "dreamsign-2"],
+    mandatoryOnlyPoolSize: 12,
+    draftPoolSize: 24,
+    doubledCardCount: 1,
+    legalSubsetCount: 4,
+    preferredSubsetCount: 2,
+  };
+}
+
+function makeDreamsignTemplates(): DreamsignTemplate[] {
+  return [
+    {
+      id: "dreamsign-1",
+      name: "Bloom Echo",
+      effectDescription: "Gain a bloom effect.",
+      displayTide: "Bloom",
+      packageTides: ["Bloom"],
+    },
+    {
+      id: "dreamsign-2",
+      name: "Arc Echo",
+      effectDescription: "Gain an arc effect.",
+      displayTide: "Arc",
+      packageTides: ["Arc"],
+    },
+  ];
+}
+
+function makeCard(cardNumber: number, tides: CardData["tides"]): CardData {
+  return {
+    name: `Card ${String(cardNumber)}`,
+    id: `card-${String(cardNumber)}`,
+    cardNumber,
+    cardType: "Character",
+    subtype: "",
+    rarity: "Common",
+    energyCost: 1,
+    spark: 1,
+    isFast: false,
+    tides,
+    renderedText: "Test card.",
+    imageNumber: cardNumber,
+    artOwned: true,
+  };
+}
+
+function makeQuestContent(
+  resolvedPackage: ResolvedDreamcallerPackage,
+): Pick<QuestContent, "dreamsignTemplates" | "resolvedPackagesByDreamcallerId"> {
+  return {
+    dreamsignTemplates: makeDreamsignTemplates(),
+    resolvedPackagesByDreamcallerId: new Map([[resolvedPackage.dreamcaller.id, resolvedPackage]]),
+  };
+}
+
+function makeState(): Pick<
+  QuestState,
+  "completionLevel" | "deck" | "dreamsigns" | "essence"
+> {
+  return {
+    completionLevel: 0,
+    deck: [],
+    dreamsigns: [],
+    essence: 250,
+  };
+}
+
+function makeMutations(): Pick<
+  QuestMutations,
+  | "setCurrentDreamscape"
+  | "setDraftState"
+  | "setDreamcallerSelection"
+  | "setScreen"
+  | "updateAtlas"
+> {
+  return {
+    setCurrentDreamscape: vi.fn(),
+    setDraftState: vi.fn(),
+    setDreamcallerSelection: vi.fn(),
+    setScreen: vi.fn(),
+    updateAtlas: vi.fn(),
+  };
+}
+
+beforeEach(() => {
+  resetLog();
+  vi.restoreAllMocks();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null));
+});
+
+describe("bootstrapQuestStart", () => {
+  it("hands quest start directly into the first dreamscape with one resolved package", () => {
+    const resolvedPackage = makeResolvedPackage();
+    const state = makeState();
+    const mutations = makeMutations();
+    const cardDatabase = new Map<number, CardData>([
+      [101, makeCard(101, ["Bloom"])],
+      [202, makeCard(202, ["Arc"])],
+    ]);
+
+    bootstrapQuestStart({
+      dreamcaller: resolvedPackage.dreamcaller,
+      state,
+      mutations,
+      cardDatabase,
+      questContent: makeQuestContent(resolvedPackage),
+    });
+
+    expect(mutations.setDreamcallerSelection).toHaveBeenCalledOnce();
+    expect(mutations.setDreamcallerSelection).toHaveBeenCalledWith(resolvedPackage);
+
+    expect(mutations.setDraftState).toHaveBeenCalledOnce();
+    expect(mutations.setDraftState).toHaveBeenCalledWith(
+      {
+        remainingCopiesByCard: { "101": 2, "202": 1 },
+        currentOffer: [],
+        draftedCardNumbers: [],
+        pickNumber: 1,
+        sitePicksCompleted: 0,
+      },
+      "quest_start",
+    );
+
+    expect(mutations.updateAtlas).toHaveBeenCalledOnce();
+    const atlas = vi.mocked(mutations.updateAtlas).mock.calls[0][0];
+    const availableNode = Object.values(atlas.nodes).find(
+      (node) => node.status === "available",
+    );
+    expect(availableNode).toBeDefined();
+    expect(mutations.setCurrentDreamscape).toHaveBeenCalledWith(availableNode?.id);
+    expect(mutations.setScreen).toHaveBeenCalledWith({ type: "dreamscape" });
+
+    const entries = getLogEntries();
+    expect(entries.some((entry) => entry.event === "dreamcaller_selected")).toBe(false);
+    expect(entries.some((entry) => entry.event === "draft_pool_initialized")).toBe(true);
+    const questStartedEntry = entries.find(
+      (entry) => entry.event === "quest_started",
+    );
+    expect(questStartedEntry).toBeDefined();
+    expect(questStartedEntry).toMatchObject({
+      event: "quest_started",
+      dreamcallerId: resolvedPackage.dreamcaller.id,
+      dreamcallerName: resolvedPackage.dreamcaller.name,
+      packageSummary: {
+        mandatoryTides: resolvedPackage.mandatoryTides,
+        optionalSubset: resolvedPackage.optionalSubset,
+        selectedTides: resolvedPackage.selectedTides,
+      },
+      selectedPackageTides: resolvedPackage.selectedTides,
+    });
+  });
+});

@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { QuestContent } from "../data/quest-content";
+import { toQuestDreamcaller } from "../data/dreamcaller-selection";
 import type { ResolvedDreamcallerPackage } from "../types/content";
 import type { DraftState } from "../types/draft";
 import type { Dreamcaller, QuestState } from "../types/quest";
@@ -128,15 +129,13 @@ describe("QuestProvider default state contract", () => {
 
 describe("Task 02 state transitions", () => {
   it("stores the resolved package and initializes the shared Dreamsign pool from it", () => {
-    const dreamcaller = makeDreamcaller();
     const resolvedPackage = makeResolvedPackage();
     const next = applyDreamcallerSelection(
       createDefaultState(),
-      dreamcaller,
       resolvedPackage,
     );
 
-    expect(next.dreamcaller).toEqual(dreamcaller);
+    expect(next.dreamcaller).toEqual(toQuestDreamcaller(resolvedPackage.dreamcaller));
     expect(next.resolvedPackage).toEqual(resolvedPackage);
     expect(next.remainingDreamsignPool).toEqual(resolvedPackage.dreamsignPoolIds);
 
@@ -151,7 +150,6 @@ describe("Task 02 state transitions", () => {
   it("updates the remaining Dreamsign pool without mutating prior state", () => {
     const initial = applyDreamcallerSelection(
       createDefaultState(),
-      makeDreamcaller(),
       makeResolvedPackage(),
     );
     const nextPool = ["glacial-insight"];

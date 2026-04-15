@@ -8,12 +8,12 @@ import {
   type ReactNode,
 } from "react";
 import type { QuestContent } from "../data/quest-content";
+import { toQuestDreamcaller } from "../data/dreamcaller-selection";
 import type { CardData } from "../types/cards";
 import type { ResolvedDreamcallerPackage } from "../types/content";
 import type {
   DeckEntry,
   DreamAtlas,
-  Dreamcaller,
   Dreamsign,
   QuestState,
   Screen,
@@ -36,10 +36,7 @@ export interface QuestMutations {
     effectDescription: string,
     effectDetails: Record<string, unknown>,
   ) => void;
-  setDreamcallerSelection: (
-    dreamcaller: Dreamcaller,
-    resolvedPackage: ResolvedDreamcallerPackage,
-  ) => void;
+  setDreamcallerSelection: (resolvedPackage: ResolvedDreamcallerPackage) => void;
   addDreamsign: (dreamsign: Dreamsign, sourceSiteType: string) => void;
   removeDreamsign: (index: number, reason: string) => void;
   setRemainingDreamsignPool: (
@@ -105,12 +102,11 @@ export function createDefaultState(): QuestState {
 
 export function applyDreamcallerSelection(
   prev: QuestState,
-  dreamcaller: Dreamcaller,
   resolvedPackage: ResolvedDreamcallerPackage,
 ): QuestState {
   return {
     ...prev,
-    dreamcaller,
+    dreamcaller: toQuestDreamcaller(resolvedPackage.dreamcaller),
     resolvedPackage,
     remainingDreamsignPool: [...resolvedPackage.dreamsignPoolIds],
   };
@@ -265,24 +261,8 @@ export function QuestProvider({
   );
 
   const setDreamcallerSelection = useCallback(
-    (
-      dreamcaller: Dreamcaller,
-      resolvedPackage: ResolvedDreamcallerPackage,
-    ) => {
-      logEvent("dreamcaller_selected", {
-        id: dreamcaller.id,
-        name: dreamcaller.name,
-        awakening: dreamcaller.awakening,
-        accentTide: dreamcaller.accentTide,
-        dreamcallerId: resolvedPackage.dreamcaller.id,
-        optionalSubset: resolvedPackage.optionalSubset,
-        selectedPackageTides: resolvedPackage.selectedTides,
-        draftPoolSize: resolvedPackage.draftPoolSize,
-        dreamsignPoolSize: resolvedPackage.dreamsignPoolIds.length,
-      });
-      setState((prev) =>
-        applyDreamcallerSelection(prev, dreamcaller, resolvedPackage),
-      );
+    (resolvedPackage: ResolvedDreamcallerPackage) => {
+      setState((prev) => applyDreamcallerSelection(prev, resolvedPackage));
     },
     [],
   );
