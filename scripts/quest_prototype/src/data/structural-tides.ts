@@ -76,7 +76,7 @@ export const STRUCTURAL_TIDE_META: Readonly<
   event_chain: {
     displayName: "Arc Cascade",
     hoverBlurb:
-      "One spell cracks the air open for the next. The turn keeps surging, costs fall away, and the chain ends only when something decisive breaks.",
+      "One event cracks the air open for the next. The turn keeps surging, costs fall away, and the chain ends only when something decisive breaks.",
     iconClass: "bx-meteor",
   },
   prevent_control: {
@@ -206,7 +206,7 @@ const SUPPORT_TIDE_META: Readonly<Partial<Record<PackageTideId, SupportTideMeta>
     {
       displayName: "Echo Script",
       hoverBlurb:
-        "Effects that duplicate a useful spell, trigger, or permanent to increase the deck's best outputs.",
+        "Effects that duplicate a useful event, trigger, or permanent to increase the deck's best outputs.",
     },
   cost_reduction:
     {
@@ -236,7 +236,7 @@ const SUPPORT_TIDE_META: Readonly<Partial<Record<PackageTideId, SupportTideMeta>
     {
       displayName: "Ritual Staging",
       hoverBlurb:
-        "Support cards that make spell-heavy turns easier to assemble and more rewarding to fire off.",
+        "Support cards that make event-heavy turns easier to assemble and more rewarding to fire off.",
     },
   fast_interaction:
     {
@@ -324,9 +324,9 @@ const SUPPORT_TIDE_META: Readonly<Partial<Record<PackageTideId, SupportTideMeta>
     },
   reclaim_events:
     {
-      displayName: "Spell Recall",
+      displayName: "Event Recall",
       hoverBlurb:
-        "Spell recursion that lets the deck reuse its strongest events instead of exhausting them once.",
+        "Event recursion that lets the deck reuse its strongest events instead of exhausting them once.",
     },
   recursion_fuel:
     {
@@ -424,19 +424,16 @@ export function dreamcallerTidesForDisplay(
       (mandatoryStructuralTides.length + optionalStructuralTides.length),
   );
 
+  const optionalSupportTides = supportTidesForDisplay(
+    optionalTides,
+    "optional",
+    new Set([...displayedIds, ...mandatoryTides]),
+  ).slice(0, supportFillCount);
   const mandatorySupportTides = supportTidesForDisplay(
     mandatoryTides,
     "mandatory",
     displayedIds,
-  ).slice(0, supportFillCount);
-  const optionalSupportTides = supportTidesForDisplay(
-    optionalTides,
-    "optional",
-    displayedIds,
-  ).slice(
-    0,
-    Math.max(0, supportFillCount - mandatorySupportTides.length),
-  );
+  ).slice(0, Math.max(0, supportFillCount - optionalSupportTides.length));
 
   return [
     ...mandatoryStructuralTides,

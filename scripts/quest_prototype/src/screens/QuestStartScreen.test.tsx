@@ -104,7 +104,7 @@ const OFFERED_DREAMCALLERS: readonly DreamcallerContent[] = [
     renderedText: "First dreamcaller.",
     imageNumber: "0009",
     mandatoryTides: ["materialize_value", "ally_formation", "cheap_curve"],
-    optionalTides: ["cheap_curve", "spirit_growth", "topdeck_setup"],
+    optionalTides: ["spirit_growth", "topdeck_setup", "resource_burst"],
   },
   {
     id: "caller-2",
@@ -148,15 +148,6 @@ const DISPLAYED_TIDES = [
     kind: "structural",
   },
   {
-    appearance: "mandatory",
-    displayName: "First-Light Muster",
-    dreamcallerId: "caller-1",
-    hoverBlurb:
-      "Low-cost plays that let the deck start affecting the board before slower engines come online.",
-    id: "cheap_curve",
-    kind: "support",
-  },
-  {
     appearance: "optional",
     displayName: "Verdant Ascent",
     dreamcallerId: "caller-1",
@@ -164,6 +155,15 @@ const DISPLAYED_TIDES = [
       "Life gathers momentum in secret roots. Small turns become rich turns, rich turns become overwhelming ones, and the dream keeps flowering upward.",
     id: "spirit_growth",
     kind: "structural",
+  },
+  {
+    appearance: "optional",
+    displayName: "Crown the Draw",
+    dreamcallerId: "caller-1",
+    hoverBlurb:
+      "Tools that prepare the top of the deck so future draws and reveals land where they should.",
+    id: "topdeck_setup",
+    kind: "support",
   },
   {
     appearance: "mandatory",
@@ -184,15 +184,6 @@ const DISPLAYED_TIDES = [
     kind: "structural",
   },
   {
-    appearance: "mandatory",
-    displayName: "Backstep Tide",
-    dreamcallerId: "caller-2",
-    hoverBlurb:
-      "Bounce and reset effects that erase enemy setup and reopen the race on your terms.",
-    id: "tempo_resets",
-    kind: "support",
-  },
-  {
     appearance: "optional",
     displayName: "Quickened Edge",
     dreamcallerId: "caller-2",
@@ -200,6 +191,15 @@ const DISPLAYED_TIDES = [
       "Victory lives in the half-second before the rival is ready. This tide steals initiative, acts at impossible moments, and never gives it back.",
     id: "fast_tempo",
     kind: "structural",
+  },
+  {
+    appearance: "optional",
+    displayName: "Sudden Windfall",
+    dreamcallerId: "caller-2",
+    hoverBlurb:
+      "Temporary acceleration that creates one oversized turn even if the deck cannot sustain it forever.",
+    id: "resource_burst",
+    kind: "support",
   },
   {
     appearance: "mandatory",
@@ -220,15 +220,6 @@ const DISPLAYED_TIDES = [
     kind: "structural",
   },
   {
-    appearance: "mandatory",
-    displayName: "Echo Harness",
-    dreamcallerId: "caller-3",
-    hoverBlurb:
-      "Cards that replay, copy, or refresh important triggers so core synergies keep firing.",
-    id: "trigger_reuse",
-    kind: "support",
-  },
-  {
     appearance: "optional",
     displayName: "Living Procession",
     dreamcallerId: "caller-3",
@@ -236,6 +227,15 @@ const DISPLAYED_TIDES = [
       "Each body invites the next. The turn becomes a procession of arrivals, rebates, and chained deployments that never quite stop on schedule.",
     id: "character_chain",
     kind: "structural",
+  },
+  {
+    appearance: "optional",
+    displayName: "Grave Preparation",
+    dreamcallerId: "caller-3",
+    hoverBlurb:
+      "Self-mill and discard support that makes void payoffs turn on earlier and more reliably.",
+    id: "void_setup",
+    kind: "support",
   },
 ] as const;
 
@@ -414,12 +414,12 @@ describe("QuestStartScreen", () => {
       }
     }
 
-    expect(container.textContent).not.toContain("cheap_curve");
     expect(container.textContent).not.toContain("topdeck_setup");
     expect(container.textContent).not.toContain("tempo_resets");
     expect(container.textContent).not.toContain("resource_burst");
     expect(container.textContent).not.toContain("trigger_reuse");
     expect(container.textContent).not.toContain("void_setup");
+    expect(container.textContent).not.toContain("cheap_curve");
 
     const secondDreamcallerButton = Array.from(
       container.querySelectorAll("button"),
