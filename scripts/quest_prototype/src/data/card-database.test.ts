@@ -140,8 +140,9 @@ describe("TIDE_COLORS", () => {
 });
 
 describe("RARITY_COLORS", () => {
-  it("maps all 4 rarities to hex colors", () => {
+  it("maps all 5 rarities to hex colors", () => {
     const expected: Record<Rarity, string> = {
+      Starter: "#f59e0b",
       Common: "#ffffff",
       Uncommon: "#10b981",
       Rare: "#3b82f6",
@@ -191,7 +192,7 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
     );
 
     const db = await loadCardDatabase();
-    expect(db.size).toBe(582);
+    expect(db.size).toBe(592);
   });
 
   it("every card has all required fields with correct types", async () => {
@@ -209,6 +210,7 @@ describe("loadCardDatabase integration (real card-data.json)", () => {
     const db = await loadCardDatabase();
     const validCardTypes = new Set(["Character", "Event"]);
     const validRarities = new Set([
+      "Starter",
       "Common",
       "Uncommon",
       "Rare",

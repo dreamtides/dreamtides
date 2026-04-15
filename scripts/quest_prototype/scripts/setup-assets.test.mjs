@@ -135,6 +135,21 @@ optional-tides = ["support", "tempo", "finish", "value"]
         imageNumber: 102,
         artOwned: false,
       },
+      {
+        name: "Starter Card",
+        id: "starter-card",
+        cardNumber: 3,
+        cardType: "Character",
+        subtype: "Beast",
+        rarity: "Starter",
+        energyCost: 1,
+        spark: 1,
+        isFast: false,
+        tides: ["ignored"],
+        renderedText: "",
+        imageNumber: 103,
+        artOwned: true,
+      },
     ]);
     expect(dreamcallers).toEqual([
       {

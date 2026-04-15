@@ -2,6 +2,7 @@ import type { CardData, Rarity } from "../types/cards";
 import type { DreamsignTemplate, PackageTideId } from "../types/content";
 import type { DeckEntry, Dreamsign } from "../types/quest";
 
+import { isStarterCard } from "../data/card-database";
 import { pickPackageAdjacentItem } from "../data/tide-weights";
 import {
   readDreamsignPool,
@@ -11,6 +12,7 @@ import { createDreamsign } from "../data/dreamsigns";
 
 /** Prices by rarity for card items. */
 const RARITY_PRICES: Readonly<Record<Rarity, number>> = {
+  Starter: 50,
   Common: 50,
   Uncommon: 100,
   Rare: 200,
@@ -87,7 +89,9 @@ export function generateShopInventory(
   options: ShopGenerationOptions = {},
 ): ShopInventoryResult {
   const selectedPackageTides = options.selectedPackageTides ?? [];
-  const allCards = Array.from(cardDatabase.values());
+  const allCards = Array.from(cardDatabase.values()).filter(
+    (card) => !isStarterCard(card),
+  );
   const slots: ShopSlot[] = [];
   let remainingDreamsignPoolIds = [...(options.remainingDreamsignPoolIds ?? [])];
   const spentDreamsignPoolIds: string[] = [];

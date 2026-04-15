@@ -46,6 +46,7 @@ vi.mock("../data/card-database", () => ({
     Bloom: "#34d399",
     Arc: "#a78bfa",
   },
+  isStarterCard: (card: { rarity: string }) => card.rarity === "Starter",
   tideIconUrl: (tide: string) => `/mock/${tide}.png`,
 }));
 

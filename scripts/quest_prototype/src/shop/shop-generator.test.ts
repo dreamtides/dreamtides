@@ -214,6 +214,22 @@ describe("generateShopInventory", () => {
       }
     }
   });
+
+  it("never offers starter-rarity cards in normal shop inventory", () => {
+    const starterDb = makeDatabase([
+      makeCard({ cardNumber: 1, rarity: "Starter", tides: ["Bloom"] }),
+      makeCard({ cardNumber: 2, rarity: "Common", tides: ["Arc"] }),
+    ]);
+
+    for (let i = 0; i < 10; i += 1) {
+      const result = generateShopInventory(starterDb, []);
+      for (const slot of result.slots) {
+        if (slot.itemType === "card" && slot.card !== null) {
+          expect(slot.card.rarity).not.toBe("Starter");
+        }
+      }
+    }
+  });
 });
 
 describe("generateShopInventory with empty database", () => {

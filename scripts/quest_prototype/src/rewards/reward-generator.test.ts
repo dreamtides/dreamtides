@@ -69,6 +69,26 @@ describe("generateRewardSiteData", () => {
     expect(result.spentDreamsignPoolIds).toEqual([]);
   });
 
+  it("skips starter-rarity cards when picking a card reward", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+
+    const result = generateRewardSiteData({
+      cardDatabase: makeDatabase([
+        makeCard({ cardNumber: 1, rarity: "Starter", tides: ["alpha"] }),
+        makeCard({ cardNumber: 2, name: "Real Reward", tides: ["alpha"] }),
+      ]),
+      dreamsignTemplates: DREAMSIGN_TEMPLATES,
+      remainingDreamsignPoolIds: [],
+      selectedPackageTides: ["alpha"],
+    });
+
+    expect(result.reward).toEqual({
+      rewardType: "card",
+      cardNumber: 2,
+      cardName: "Real Reward",
+    });
+  });
+
   it("spends a shown dreamsign from the shared pool", () => {
     vi.spyOn(Math, "random")
       .mockReturnValueOnce(0)

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { STARTER_CARD_NUMBERS } from "../data/starter-cards";
 import { getLogEntries, resetLog } from "../logging";
 import { bootstrapQuestStart } from "./quest-start-bootstrap";
 import type { QuestContent } from "../data/quest-content";
@@ -102,6 +103,7 @@ function makeState(): Pick<
 
 function makeMutations(): Pick<
   QuestMutations,
+  | "addCard"
   | "setCurrentDreamscape"
   | "setDraftState"
   | "setDreamcallerSelection"
@@ -109,6 +111,7 @@ function makeMutations(): Pick<
   | "updateAtlas"
 > {
   return {
+    addCard: vi.fn(),
     setCurrentDreamscape: vi.fn(),
     setDraftState: vi.fn(),
     setDreamcallerSelection: vi.fn(),
@@ -144,6 +147,10 @@ describe("bootstrapQuestStart", () => {
 
     expect(mutations.setDreamcallerSelection).toHaveBeenCalledOnce();
     expect(mutations.setDreamcallerSelection).toHaveBeenCalledWith(resolvedPackage);
+    expect(mutations.addCard).toHaveBeenCalledTimes(STARTER_CARD_NUMBERS.length);
+    expect(
+      vi.mocked(mutations.addCard).mock.calls.map(([cardNumber]) => cardNumber),
+    ).toEqual([...STARTER_CARD_NUMBERS]);
 
     expect(mutations.setDraftState).toHaveBeenCalledOnce();
     expect(mutations.setDraftState).toHaveBeenCalledWith(
@@ -172,9 +179,19 @@ describe("bootstrapQuestStart", () => {
     const questStartedEntry = entries.find(
       (entry) => entry.event === "quest_started",
     );
+    const starterDeckEntry = entries.find(
+      (entry) => entry.event === "starter_deck_initialized",
+    );
+    expect(starterDeckEntry).toBeDefined();
+    expect(starterDeckEntry).toMatchObject({
+      event: "starter_deck_initialized",
+      starterCardNumbers: [...STARTER_CARD_NUMBERS],
+      totalDeckSize: STARTER_CARD_NUMBERS.length,
+    });
     expect(questStartedEntry).toBeDefined();
     expect(questStartedEntry).toMatchObject({
       event: "quest_started",
+      startingDeckSize: STARTER_CARD_NUMBERS.length,
       dreamcallerId: resolvedPackage.dreamcaller.id,
       dreamcallerName: resolvedPackage.dreamcaller.name,
       packageSummary: {

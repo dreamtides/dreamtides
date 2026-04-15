@@ -1,3 +1,4 @@
+import { STARTER_CARD_NUMBERS } from "../data/starter-cards";
 import { generateInitialAtlas } from "../atlas/atlas-generator";
 import { initializeDraftState } from "../draft/draft-engine";
 import { logEvent } from "../logging";
@@ -15,6 +16,7 @@ export interface QuestStartBootstrapArgs {
   >;
   mutations: Pick<
     QuestMutations,
+    | "addCard"
     | "setCurrentDreamscape"
     | "setDraftState"
     | "setDreamcallerSelection"
@@ -43,6 +45,22 @@ export function bootstrapQuestStart({
     throw new Error(`Missing resolved package for ${dreamcaller.id}`);
   }
 
+  const starterCardNumbers = STARTER_CARD_NUMBERS.filter(
+    (cardNumber) => !state.deck.some((entry) => entry.cardNumber === cardNumber),
+  );
+
+  for (const cardNumber of starterCardNumbers) {
+    mutations.addCard(cardNumber, "quest_start_starter_deck");
+  }
+
+  logEvent("starter_deck_initialized", {
+    starterCardNumbers,
+    starterCardNames: starterCardNumbers.map(
+      (cardNumber) => cardDatabase.get(cardNumber)?.name ?? `Unknown Card #${String(cardNumber)}`,
+    ),
+    totalDeckSize: state.deck.length + starterCardNumbers.length,
+  });
+
   mutations.setDreamcallerSelection(resolvedPackage);
 
   const playerHasBanes =
@@ -62,6 +80,7 @@ export function bootstrapQuestStart({
 
   logEvent("quest_started", {
     initialEssence: state.essence,
+    startingDeckSize: state.deck.length + starterCardNumbers.length,
     dreamcallerId: dreamcaller.id,
     dreamcallerName: dreamcaller.name,
     dreamcallerAwakening: dreamcaller.awakening,

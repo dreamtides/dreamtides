@@ -11,8 +11,13 @@ export type Tide =
   | "Surge"
   | "Neutral";
 
-/** Card rarity levels (Special excluded from the draft pool). */
-export type Rarity = "Common" | "Uncommon" | "Rare" | "Legendary";
+/** Card rarity levels (Special excluded from the runtime card pool). */
+export type Rarity =
+  | "Starter"
+  | "Common"
+  | "Uncommon"
+  | "Rare"
+  | "Legendary";
 
 /** The two card types in Dreamtides. */
 export type CardType = "Character" | "Event";

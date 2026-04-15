@@ -30,6 +30,7 @@ export const TIDE_COLORS: Readonly<Record<Tide, string>> = {
 
 /** Display color hex value for each rarity. */
 export const RARITY_COLORS: Readonly<Record<Rarity, string>> = {
+  Starter: "#f59e0b",
   Common: "#ffffff",
   Uncommon: "#10b981",
   Rare: "#3b82f6",
@@ -61,6 +62,10 @@ export function packageTideAccent(packageTideId: PackageTideId): Tide {
     hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
   }
   return PACKAGE_TIDE_ACCENT_PALETTE[hash % PACKAGE_TIDE_ACCENT_PALETTE.length];
+}
+
+export function isStarterCard(card: Pick<CardData, "rarity">): boolean {
+  return card.rarity === "Starter";
 }
 
 /** Returns the accent tide used for legacy display surfaces. */

@@ -17,7 +17,13 @@ const ALL_TIDES: Tide[] = [
   "Surge",
   "Neutral",
 ];
-const ALL_RARITIES: Rarity[] = ["Common", "Uncommon", "Rare", "Legendary"];
+const ALL_RARITIES: Rarity[] = [
+  "Starter",
+  "Common",
+  "Uncommon",
+  "Rare",
+  "Legendary",
+];
 const tideSet = new Set<string>(ALL_TIDES);
 const raritySet = new Set<string>(ALL_RARITIES);
 

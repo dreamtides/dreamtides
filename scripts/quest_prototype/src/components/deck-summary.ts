@@ -2,6 +2,7 @@ import type { CardData, Rarity } from "../types/cards";
 import type { DeckEntry } from "../types/quest";
 
 export const ALL_RARITIES: readonly Rarity[] = [
+  "Starter",
   "Common",
   "Uncommon",
   "Rare",
@@ -9,10 +10,11 @@ export const ALL_RARITIES: readonly Rarity[] = [
 ] as const;
 
 export const RARITY_ORDER: Readonly<Record<Rarity, number>> = {
-  Common: 0,
-  Uncommon: 1,
-  Rare: 2,
-  Legendary: 3,
+  Starter: 0,
+  Common: 1,
+  Uncommon: 2,
+  Rare: 3,
+  Legendary: 4,
 };
 
 export interface DeckSummaryEntry {
@@ -40,6 +42,7 @@ export function computeDeckSummary(
   cardDatabase: Map<number, CardData>,
 ): DeckSummary {
   const rarityCounts: Record<Rarity, number> = {
+    Starter: 0,
     Common: 0,
     Uncommon: 0,
     Rare: 0,

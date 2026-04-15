@@ -147,9 +147,9 @@ export function setupAssets({
 
   console.log(`Found ${allCards.length} total cards`);
 
-  // Filter out Special and Starter-rarity cards
-  const cards = allCards.filter((c) => c.rarity !== "Special" && c.rarity !== "Starter");
-  console.log(`Filtered to ${cards.length} draftable cards`);
+  // Filter out Special-rarity cards
+  const cards = allCards.filter((c) => c.rarity !== "Special");
+  console.log(`Filtered to ${cards.length} runtime cards`);
 
   // Transform to camelCase JSON
   const jsonCards = cards.map(transformCard);

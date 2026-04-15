@@ -1,4 +1,8 @@
-import { loadCardDatabase, packageTideAccent } from "./card-database";
+import {
+  isStarterCard,
+  loadCardDatabase,
+  packageTideAccent,
+} from "./card-database";
 import { DREAMSIGN_TEMPLATES } from "./dreamsigns";
 import { logEvent } from "../logging";
 import type {
@@ -148,8 +152,10 @@ export async function loadQuestContent(): Promise<QuestContent> {
     loadCardDatabase(),
     loadDreamcallerContent(),
   ]);
-  const cards = Array.from(cardDatabase.values());
-  const cardsByPackageTide = buildCardsByPackageTideIndex(cards);
+  const draftableCards = Array.from(cardDatabase.values()).filter(
+    (card) => !isStarterCard(card),
+  );
+  const cardsByPackageTide = buildCardsByPackageTideIndex(draftableCards);
   const resolvedPackagesByDreamcallerId = new Map<
     string,
     ResolvedDreamcallerPackage
@@ -163,7 +169,7 @@ export async function loadQuestContent(): Promise<QuestContent> {
         dreamcaller.id,
         resolveDreamcallerPackage(
           dreamcaller,
-          cards,
+          draftableCards,
           DREAMSIGN_TEMPLATES,
         ),
       );

@@ -1,5 +1,6 @@
 import type { CardData } from "../types/cards";
 import type { DreamsignTemplate, PackageTideId } from "../types/content";
+import { isStarterCard } from "../data/card-database";
 import { pickPackageAdjacentItem } from "../data/tide-weights";
 import {
   readDreamsignPool,
@@ -44,7 +45,7 @@ export function generateRewardSiteData({
   selectedPackageTides,
 }: RewardGenerationOptions): RewardGenerationResult {
   const card = pickPackageAdjacentItem(
-    Array.from(cardDatabase.values()),
+    Array.from(cardDatabase.values()).filter((candidate) => !isStarterCard(candidate)),
     (candidate) => candidate.tides,
     selectedPackageTides,
   );

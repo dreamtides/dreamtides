@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CardData } from "./types/cards";
 import type { QuestContent } from "./data/quest-content";
 import { loadQuestContent } from "./data/quest-content";
@@ -7,9 +7,10 @@ import { ScreenRouter } from "./components/ScreenRouter";
 import { HUD } from "./components/HUD";
 import { DeckViewer } from "./components/DeckViewer";
 import { DebugScreen } from "./screens/DebugScreen";
+import { STARTER_CARD_NUMBERS } from "./data/starter-cards";
 
 /** Inner component that renders the screen router and HUD. */
-function QuestApp({
+export function QuestApp({
   cardDatabase,
 }: {
   cardDatabase: Map<number, CardData>;
@@ -18,8 +19,24 @@ function QuestApp({
   const showHud = state.screen.type !== "questStart";
   const [deckViewerOpen, setDeckViewerOpen] = useState(false);
   const [debugScreenOpen, setDebugScreenOpen] = useState(false);
+  const previousScreenTypeRef = useRef(state.screen.type);
 
   const hasDraftData = state.resolvedPackage !== null;
+
+  useEffect(() => {
+    const leftQuestStart =
+      previousScreenTypeRef.current === "questStart"
+      && state.screen.type !== "questStart";
+    const hasStarterDeck = STARTER_CARD_NUMBERS.every((cardNumber) =>
+      state.deck.some((entry) => entry.cardNumber === cardNumber),
+    );
+
+    if (leftQuestStart && state.dreamcaller !== null && hasStarterDeck) {
+      setDeckViewerOpen(true);
+    }
+
+    previousScreenTypeRef.current = state.screen.type;
+  }, [state.deck, state.dreamcaller, state.screen.type]);
 
   const handleOpenDeckViewer = useCallback(() => {
     setDeckViewerOpen(true);
