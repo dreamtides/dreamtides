@@ -226,7 +226,7 @@ describe("QuestStartScreen", () => {
     expect(container.textContent).toContain("Vey of Embers");
     expect(container.textContent).toContain("Noctis of Tides");
     expect(container.textContent).toContain("Choose Your Dreamcaller");
-    expect(container.textContent).toContain("Structural Tides");
+    expect(container.textContent).not.toContain("Structural Tides");
     expect(container.textContent).not.toContain("Bloom");
     expect(container.textContent).not.toContain("Ignite");
     expect(container.textContent).not.toContain("DreamcallerDraft");
