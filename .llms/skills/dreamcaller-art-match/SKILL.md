@@ -114,6 +114,14 @@ Do not hallucinate lore from ambiguous details. Build from visible facts first.
 For these dreamcaller portrait sheets, most of the usable signal is in wardrobe,
 ornament, stance, and facial or bodily bearing rather than scene context.
 
+When the image strongly signals a recognizable real-world or genre-coded visual
+language through armor, weapons, dress, architecture, styling, or naming
+patterns, name that influence directly in qualified terms such as
+`samurai-coded`, `Japanese-coded court dress`, or `Roman military silhouette`.
+Do not flatten specific visual identity into generic fantasy language when the
+signal is strong. Prefer `samurai-coded armored retainer` over `formal warrior`
+if the art clearly supports it.
+
 ### 2. Extract the dramatic role
 
 Write a short narrative anchor in plain story terms:
@@ -161,12 +169,18 @@ Good pattern:
 - `Ilya, Keeper of the Last Choir`
 - `Seren Vale, Twice-Bound Herald`
 - `Morrow, Judge of Empty Thrones`
+- `Kazue Tsuki, Champion of the Solitary Vow`
 
 Bad pattern:
 
 - `Void Reclaimer`
 - `The Discard Person`
 - `Event Discount Mage`
+
+Before finalizing, ask whether the title sounds like an earned office, epithet,
+vow, sobriquet, or ceremonial role that a person in the world could actually
+bear. If it reads like a deck label, a custom keyword, or a compressed mechanic
+summary, discard it and try again.
 
 ### 5. Enforce total naming uniqueness
 
@@ -196,6 +210,25 @@ into a diegetic role:
 - group spark scaling might suggest a standard-bearer, choir-leader, field marshal, or saint of the host
 - prevent copying a card might suggest an interceptor, mirror-magistrate, oath-thief, or counterseer
 - Judgment Echo might suggest a judge, oracle, final witness, or keeper of verdicts
+
+The title must evoke the fantasy of the mechanic, not encode its condition
+literally. Do not build titles out of disguised rules text, exact counts,
+target restrictions, or deployment conditions.
+
+Bad title habits:
+
+- invented compounds whose only job is to smuggle mechanics into the title, such as `Singlegate`
+- titles that secretly mean `cares about exactly one ally`, `discounts events`, or `copies prevented cards`
+- phrases that only make sense if the reader already knows the exact ability text
+
+Prefer titles that imply the story logic behind the mechanic: champion,
+arbiter, witness, mourner, herald, keeper, magistrate, ferryman, executioner,
+oath-bearer, or standard-bearer. A good title should make the ability feel
+inevitable without sounding like paraphrased rules text.
+
+If the art strongly suggests a specific cultural register, let that shape the
+name and title choices as well. Do not default to vague pan-fantasy naming when
+the visual language clearly points somewhere more specific.
 
 The title should make a player feel, "Of course this person has that ability."
 
@@ -239,6 +272,13 @@ The final pairing should satisfy all of these:
 - the character feels like a person with a role in the dream, not a trope stub
 - the story justification explains why this exact ability belongs to them
 - the answer is anchored in visible art details
+
+Failure modes to avoid:
+
+- flattening strong cultural visual cues into generic fantasy description
+- inventing clever-looking title words that are not plausible human titles
+- hiding rules conditions inside pseudo-poetic compounds or abstract jargon
+- choosing a title that explains the mechanic instead of expressing its fantasy
 
 If none of the abilities fit well, say so plainly and explain what kind of
 dreamcaller art or ability would fit better. Do not force a weak match.
