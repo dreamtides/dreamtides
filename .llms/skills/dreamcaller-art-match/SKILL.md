@@ -65,20 +65,25 @@ project docs before finalizing the match. Do not guess on core mechanic terms.
 
 Game rules are in `docs/battle_rules/battle_rules.md`.
 
-## Local Name Registry
+## Local Registry
 
-Every run must produce a totally unique dreamcaller name and title.
+Every run must produce a totally unique dreamcaller name and title, and should
+avoid overused abilities.
 
 Use this local-only registry file:
 
 `/tmp/dreamcaller_art_match_registry.json`
 
 That file lives outside the repo. It is the centralized source of truth for
-previously used dreamcaller naming words.
+previously used dreamcaller naming words and prior art-to-ability matches.
 
 Before finalizing any candidate, check it with:
 
 `python3 .llms/skills/dreamcaller-art-match/scripts/name_registry.py check --name "Proper Name, Title"`
+
+Before finalizing any ability, check its current usage with:
+
+`python3 .llms/skills/dreamcaller-art-match/scripts/name_registry.py check-ability --ability "<exact ability quote>"`
 
 After choosing the final name, immediately claim it with:
 
@@ -96,6 +101,19 @@ history has been reset and must begin fresh.
 
 If `claim` reports a conflict, assume another run claimed that word first.
 Generate a new name, re-check it, and only then continue.
+
+Ability usage counts are tracked by distinct art image, not by raw run count.
+This prevents reruns of the same image from consuming extra quota.
+
+Ability repetition caps:
+
+- Soft cap: once an ability has already been used for 3 distinct art images, treat it as overused and actively prefer a different strong fit.
+- Hard cap: once an ability has already been used for 5 distinct art images, it is banned for future runs.
+
+The soft cap is a steering rule, not an automatic rejection. If an over-soft-cap
+ability is still the best candidate, you may keep it only after checking other
+serious fits and concluding they are materially worse on visual and narrative
+grounds. The hard cap is absolute; do not use that ability.
 
 ## Workflow
 
@@ -154,6 +172,18 @@ Internally shortlist several candidates, then choose the single strongest final
 match. Do not pick by mechanic alone; pick by combined visual, emotional, and
 story fit.
 
+After building the shortlist, run `check-ability` on each serious finalist using
+the exact ability text from `notes/dreamcallers.md`.
+
+- If an ability is below the soft cap, treat it normally.
+- If an ability has hit the soft cap, downgrade it and look for a fresher fit.
+- If multiple candidates fit similarly well, break the tie in favor of the less-used ability.
+- If an ability has hit the hard cap, remove it from consideration entirely.
+
+Do not let one visually broad ability become the default answer for every armored
+warrior, judge, or lone champion portrait just because it is an easy thematic
+fit. Repetition pressure is part of the selection problem.
+
 ### 4. Invent the dreamcaller identity
 
 Produce a dreamcaller name in this format:
@@ -194,8 +224,20 @@ After you have the final match:
 
 - run `python3 .llms/skills/dreamcaller-art-match/scripts/name_registry.py claim --name "Proper Name, Title" --image "<image path or label>" --ability "<short ability excerpt>"`
 - if the claim fails, generate a different name and title and try again
+- if the claim fails because the ability has reached the hard cap, choose a different ability
 
 Never present an unclaimed name as final output.
+
+**Examples in this skill are illustrative, not a vocabulary to draw from.**
+Every word like `ragpicker`, `ferryman`, `mourner`, `herald`, `keeper`,
+`magistrate`, `standard-bearer`, `choir-leader`, `arbiter`, `witness`,
+`midwife`, `oath-bearer`, etc. that appears anywhere in this SKILL.md is shown
+to demonstrate the *shape* of a good title — a diegetic role that implies a
+mechanic without paraphrasing it. Do not lift those words into your final
+answer. If you find yourself reaching for a word because you just read it in
+the skill text, reject that word and invent a different role-noun grounded in
+the specific art and ability in front of you. Treat the example list as a
+worked exercise you have already seen the answers to, not as a menu.
 
 ### 6. Make the title carry the mechanic
 
