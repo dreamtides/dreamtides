@@ -3441,6 +3441,7 @@ card-number = 220
 [[cards]]
 name = "Void Indicator Card"
 id = "c0ae09e9-e4c7-423f-9f23-35a5c927d8c0"
+tides = []
 rendered-text = ""
 energy-cost = 0
 card-type = "Event"
@@ -3455,6 +3456,7 @@ card-number = 221
 [[cards]]
 name = "Nightmare"
 id = "b4fd32f8-fbb0-42c9-a794-f0949d4062c5"
+tides = []
 rendered-text = "Draw a card."
 energy-cost = 2
 card-type = "Event"
@@ -8978,6 +8980,7 @@ card-number = 710
 [[cards]]
 name = "Nocturne Strummer"
 id = "419ab4dc-01f0-46fe-a9bc-503d2121af8b"
+tides = ["spark_growth"]
 rendered-text = "Supported allies have +2 spark."
 energy-cost = 2
 card-type = "Character"
@@ -8992,6 +8995,7 @@ card-number = 711
 [[cards]]
 name = "Ringwatcher"
 id = "f744d472-294f-478d-85f9-43327b8a6052"
+tides = ["foresee_selection", "materialize_value"]
 rendered-text = """
 ▸ Materialized: Foresee 1.
 """
@@ -9008,6 +9012,7 @@ card-number = 712
 [[cards]]
 name = "Marked Direwolf"
 id = "9e597889-2814-4beb-b32f-5095663f11bc"
+tides = ["defensive_curve"]
 rendered-text = ""
 energy-cost = 4
 card-type = "Character"
@@ -9022,6 +9027,7 @@ card-number = 713
 [[cards]]
 name = "Runebound Champion"
 id = "bb0b569b-2e25-4657-802d-c2057cb59f86"
+tides = ["point_pressure", "judgment_bodies"]
 rendered-text = """
 ▸ Judgment: Gain 1 point.
 """
@@ -9038,6 +9044,7 @@ card-number = 714
 [[cards]]
 name = "Final Witness"
 id = "abc36d31-c4c8-42bf-afe9-1bcf99827dde"
+tides = ["attrition_trade", "card_flow"]
 rendered-text = """
 ▸ Dissolved: Draw a card.
 """
@@ -9054,6 +9061,7 @@ card-number = 715
 [[cards]]
 name = "Wildflower Colossus"
 id = "cba7f18a-9f50-4cab-8f73-9dac744f7424"
+tides = ["ally_wide", "spark_tall"]
 rendered-text = "This character has +2 spark per supporting ally."
 energy-cost = 6
 card-type = "Character"
@@ -9068,6 +9076,7 @@ card-number = 716
 [[cards]]
 name = "Flashpoint Detonation"
 id = "5665039f-8bbb-4c05-ac91-34e40cffe839"
+tides = ["cheap_removal"]
 rendered-text = "Dissolve a character with cost 3● or less."
 energy-cost = 2
 card-type = "Event"
@@ -9082,6 +9091,7 @@ card-number = 717
 [[cards]]
 name = "Glimpse of What Was"
 id = "58613cf5-32bb-46fd-ae6f-56bc46516236"
+tides = ["card_flow", "foresee_selection"]
 rendered-text = """
 Draw a card. Foresee 1.
 """
@@ -9098,6 +9108,7 @@ card-number = 718
 [[cards]]
 name = "Sign of Arrival"
 id = "f7c254d1-b85a-4da7-bce1-9b2ab31ed75f"
+tides = ["discover_toolbox", "character_tutors"]
 rendered-text = "Discover a character."
 energy-cost = 2
 card-type = "Event"
@@ -9112,6 +9123,7 @@ card-number = 719
 [[cards]]
 name = "Worlds Await"
 id = "95038dac-b156-4eb6-a0d6-f34a74b9f04f"
+tides = ["spark_growth"]
 rendered-text = "An ally gains +3 spark."
 energy-cost = 1
 card-type = "Event"
