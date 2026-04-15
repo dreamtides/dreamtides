@@ -30,18 +30,19 @@ mandatory-tides = [
   "materialize_value",
   "ally_formation",
   "trigger_reuse",
+  "bounce_blink_tools",
 ]
 optional-tides = [
-  "bounce_blink_tools",
   "copy_effects",
   "character_tutors",
   "event_setup",
   "fast_setup",
   "premium_removal",
-  "finishers",
   "topdeck_setup",
   "cheap_curve",
   "foresee_selection",
+  "materialized_staples",
+  "attrition_trade",
 ]
 
 [[dreamcaller]]
@@ -51,21 +52,21 @@ awakening = 5
 rendered-text = "0●, once per turn: Return an ally to hand."
 mandatory-tides = [
   "materialize_tempo",
-  "character_velocity",
+  "character_chain",
   "bounce_blink_tools",
   "cheap_curve",
+  "leave_play_enablers",
+  "trigger_reuse",
+  "ally_formation",
 ]
 optional-tides = [
   "materialize_value",
   "card_flow",
   "resource_burst",
   "fast_setup",
-  "leave_play_enablers",
-  "trigger_reuse",
   "character_tutors",
   "finishers",
   "cheap_removal",
-  "ally_formation",
 ]
 
 [[dreamcaller]]
@@ -102,9 +103,9 @@ mandatory-tides = [
   "warrior_pressure",
   "go_wide_enablers",
   "cheap_curve",
+  "ally_wide",
 ]
 optional-tides = [
-  "ally_formation",
   "fast_setup",
   "card_flow",
   "resource_burst",
@@ -114,6 +115,7 @@ optional-tides = [
   "foresee_selection",
   "cheap_removal",
   "fast_interaction",
+  "spirit_growth",
 ]
 
 [[dreamcaller]]
@@ -125,7 +127,7 @@ mandatory-tides = [
   "materialize_tempo",
   "ally_formation",
   "trigger_reuse",
-  "materialized_staples",
+  "materialize_value",
 ]
 optional-tides = [
   "bounce_blink_tools",
@@ -138,6 +140,7 @@ optional-tides = [
   "spirit_growth",
   "card_flow",
   "foresee_selection",
+  "recursion_fuel",
 ]
 
 [[dreamcaller]]
@@ -149,7 +152,6 @@ mandatory-tides = [
   "judgment_engines",
   "spark_tall",
   "spark_growth",
-  "defensive_curve",
 ]
 optional-tides = [
   "bounce_blink_tools",
@@ -162,6 +164,7 @@ optional-tides = [
   "topdeck_setup",
   "spirit_growth",
   "judgment_repeaters",
+  "defensive_curve",
 ]
 
 [[dreamcaller]]
@@ -181,11 +184,9 @@ optional-tides = [
   "void_setup",
   "premium_removal",
   "cheap_removal",
-  "fast_interaction",
-  "card_flow",
   "resource_burst",
-  "judgment_engines",
   "leave_play_enablers",
+  "recursion_fuel",
 ]
 
 [[dreamcaller]]
@@ -194,14 +195,14 @@ id = "B9BF6D4B-907C-4750-B51C-811AFF29DE59"
 awakening = 5
 rendered-text = "▸ Judgment: You may abandon an ally. If you do, gain ● equal to that ally's cost."
 mandatory-tides = [
-  "abandon_furnace",
+  "abandon_value",
   "ally_formation",
   "abandon_fodder",
   "leave_play_enablers",
+  "big_energy",
 ]
 optional-tides = [
-  "big_energy",
-  "character_velocity",
+  "character_curve",
   "figment_swarm",
   "spark_tall",
   "topdeck_setup",
@@ -210,6 +211,7 @@ optional-tides = [
   "reclaim_characters",
   "go_wide_enablers",
   "resource_burst",
+  "attrition_trade",
 ]
 
 [[dreamcaller]]
@@ -224,7 +226,7 @@ mandatory-tides = [
   "cheap_curve",
 ]
 optional-tides = [
-  "character_velocity",
+  "character_chain",
   "spark_tall",
   "figment_swarm",
   "character_tutors",
@@ -242,21 +244,22 @@ id = "9D64A4A2-3DC7-456E-9EB2-5FE3A48883C4"
 awakening = 5
 rendered-text = "Once per turn, abandon an ally: Materialize a random character with cost 1● higher from your deck."
 mandatory-tides = [
-  "abandon_furnace",
-  "character_velocity",
+  "abandon_ladder",
   "abandon_fodder",
+  "abandon_value",
+  "topdeck_setup",
+  "big_energy",
 ]
 optional-tides = [
   "cheap_curve",
   "ally_formation",
   "character_tutors",
-  "topdeck_setup",
   "leave_play_enablers",
   "resource_burst",
   "cheap_removal",
   "finishers",
   "reclaim_characters",
-  "big_energy",
+  "character_chain",
 ]
 
 [[dreamcaller]]
@@ -268,7 +271,7 @@ mandatory-tides = [
   "materialize_tempo",
   "spark_tall",
   "bounce_blink_tools",
-  "cheap_curve",
+  "leave_play_enablers",
 ]
 optional-tides = [
   "cost_reduction",
@@ -276,11 +279,11 @@ optional-tides = [
   "leave_play_enablers",
   "topdeck_setup",
   "event_setup",
-  "discover_toolbox",
   "premium_removal",
   "character_tutors",
   "resource_burst",
-  "foresee_selection",
+  "cheap_curve",
+  "ally_formation",
 ]
 
 [[dreamcaller]]
@@ -312,22 +315,23 @@ id = "16B579FE-C15B-4DF6-8262-D45CE44732AE"
 awakening = 4
 rendered-text = "When you abandon an ally, the next character you play this turn costs 2● less."
 mandatory-tides = [
-  "abandon_furnace",
-  "character_velocity",
+  "abandon_value",
   "cost_reduction",
-  "go_wide_enablers",
-]
-optional-tides = [
   "abandon_fodder",
   "leave_play_enablers",
+  "big_energy",
+]
+optional-tides = [
   "character_tutors",
   "cheap_curve",
   "reclaim_characters",
   "topdeck_setup",
   "cheap_removal",
   "bounce_blink_tools",
-  "midcurve_glue",
   "ally_formation",
+  "character_chain",
+  "go_wide_enablers",
+  "attrition_trade",
 ]
 
 [[dreamcaller]]
@@ -339,18 +343,17 @@ mandatory-tides = [
   "event_chain",
   "prevent_control",
   "event_setup",
+  "fast_interaction",
 ]
 optional-tides = [
-  "fast_interaction",
   "reclaim_events",
   "cost_reduction",
   "foresee_selection",
   "discover_toolbox",
   "hand_disruption",
   "tempo_resets",
-  "fast_setup",
-  "cheap_curve",
   "resource_burst",
+  "card_flow",
 ]
 
 [[dreamcaller]]
@@ -384,9 +387,9 @@ awakening = 4
 rendered-text = "Deployed allies have +1 spark for each other deployed ally."
 mandatory-tides = [
   "ally_formation",
-  "character_velocity",
-  "cheap_curve",
   "card_flow",
+  "spark_growth",
+  "spark_tall",
 ]
 optional-tides = [
   "go_wide_enablers",
@@ -396,9 +399,10 @@ optional-tides = [
   "fast_interaction",
   "materialized_staples",
   "big_energy",
-  "spark_growth",
   "warrior_pressure",
-  "spirit_growth",
+  "cheap_curve",
+  "character_curve",
+  "character_chain",
 ]
 
 [[dreamcaller]]
@@ -408,7 +412,7 @@ awakening = 3
 rendered-text = "Discard a card, once per turn: Gain 1●."
 mandatory-tides = [
   "discard_velocity",
-  "character_velocity",
+  "character_chain",
   "hand_cycling",
   "cheap_removal",
 ]
@@ -432,13 +436,13 @@ awakening = 4
 rendered-text = "2●, once per turn: Each ally gains +1 spark."
 mandatory-tides = [
   "ally_formation",
-  "character_velocity",
   "go_wide_enablers",
   "fast_interaction",
+  "spark_growth",
+  "figment_swarm",
 ]
 optional-tides = [
   "big_energy",
-  "figment_swarm",
   "materialize_tempo",
   "card_flow",
   "finishers",
@@ -446,7 +450,7 @@ optional-tides = [
   "cheap_curve",
   "resource_burst",
   "fast_setup",
-  "spark_growth",
+  "character_chain",
 ]
 
 [[dreamcaller]]
@@ -505,11 +509,10 @@ rendered-text = "When you discard a card, deployed allies gain +1 spark."
 mandatory-tides = [
   "discard_velocity",
   "ally_formation",
-  "character_velocity",
   "cheap_removal",
+  "hand_cycling",
 ]
 optional-tides = [
-  "hand_cycling",
   "go_wide_enablers",
   "cheap_curve",
   "fast_interaction",
@@ -517,8 +520,9 @@ optional-tides = [
   "spark_growth",
   "finishers",
   "void_setup",
-  "judgment_repeaters",
   "premium_removal",
+  "character_chain",
+  "discard_outlets",
 ]
 
 [[dreamcaller]]
@@ -529,11 +533,11 @@ rendered-text = "▸ Judgment: Each deployed ally gains +1 spark for each other 
 mandatory-tides = [
   "ally_formation",
   "judgment_engines",
-  "go_wide_enablers",
   "cheap_curve",
+  "spark_growth",
 ]
 optional-tides = [
-  "character_velocity",
+  "character_chain",
   "materialize_tempo",
   "card_flow",
   "resource_burst",
@@ -541,8 +545,8 @@ optional-tides = [
   "cheap_removal",
   "judgment_repeaters",
   "finishers",
-  "spark_growth",
   "foresee_selection",
+  "go_wide_enablers",
 ]
 
 [[dreamcaller]]
@@ -562,10 +566,9 @@ optional-tides = [
   "copy_effects",
   "go_wide_enablers",
   "spark_growth",
-  "discover_toolbox",
-  "point_pressure",
   "cost_reduction",
   "cheap_curve",
+  "materialize_tempo",
 ]
 
 [[dreamcaller]]
@@ -578,10 +581,10 @@ mandatory-tides = [
   "prevent_control",
   "fast_setup",
   "fast_interaction",
+  "materialize_tempo",
 ]
 optional-tides = [
-  "materialize_tempo",
-  "character_velocity",
+  "character_chain",
   "card_flow",
   "resource_burst",
   "materialized_staples",
@@ -590,6 +593,7 @@ optional-tides = [
   "hand_disruption",
   "tempo_resets",
   "premium_removal",
+  "tax_pressure",
 ]
 
 [[dreamcaller]]
@@ -622,8 +626,9 @@ awakening = 5
 rendered-text = "Once per turn, when you discard a character from your hand, materialize a 1-spark copy of it."
 mandatory-tides = [
   "discard_velocity",
-  "character_velocity",
+  "character_chain",
   "hand_cycling",
+  "materialize_tempo",
 ]
 optional-tides = [
   "reclaim_characters",
@@ -632,10 +637,8 @@ optional-tides = [
   "void_setup",
   "cost_reduction",
   "spark_growth",
-  "cheap_curve",
-  "materialized_staples",
-  "materialize_tempo",
   "ally_formation",
+  "discard_outlets",
 ]
 
 [[dreamcaller]]
@@ -644,21 +647,22 @@ id = "133E22DD-F81B-406D-B4E3-98C346D7FD4E"
 awakening = 5
 rendered-text = "Characters cost you 1● less for each 3 cards in your void."
 mandatory-tides = [
+  "void_threshold",
   "void_recursion",
-  "character_velocity",
-  "cost_reduction",
+  "recursion_fuel",
+  "discard_velocity",
 ]
 optional-tides = [
-  "void_setup",
   "cheap_curve",
   "reclaim_characters",
   "materialized_staples",
-  "hand_cycling",
   "resource_burst",
   "cheap_removal",
   "premium_removal",
   "character_tutors",
   "finishers",
+  "character_chain",
+  "cost_reduction",
 ]
 
 [[dreamcaller]]
@@ -669,20 +673,21 @@ rendered-text = "When 2 or more allies score points, gain 1✪."
 mandatory-tides = [
   "ally_formation",
   "figment_swarm",
-  "character_velocity",
-  "cheap_curve",
+  "point_pressure",
+  "spark_growth",
+  "ally_wide",
+  "go_wide_enablers",
 ]
 optional-tides = [
   "big_energy",
-  "spark_growth",
-  "go_wide_enablers",
   "cheap_removal",
   "premium_removal",
-  "card_flow",
   "resource_burst",
   "materialized_staples",
   "point_pressure",
   "fast_interaction",
+  "character_curve",
+  "cheap_curve",
 ]
 
 [[dreamcaller]]
@@ -691,22 +696,22 @@ id = "94E7C651-25E9-4A62-9DE4-EAF5BA20542C"
 awakening = 4
 rendered-text = "When you play a character, if you have played another character this turn, draw a card."
 mandatory-tides = [
-  "character_velocity",
   "ally_formation",
-  "reclaim_characters",
-  "cheap_curve",
+  "card_flow",
+  "spark_growth",
+  "hand_cycling",
 ]
 optional-tides = [
-  "character_tutors",
   "go_wide_enablers",
-  "spark_growth",
   "finishers",
   "premium_removal",
   "bounce_blink_tools",
   "cheap_removal",
-  "cost_reduction",
-  "materialized_staples",
   "resource_burst",
+  "character_chain",
+  "cheap_curve",
+  "character_curve",
+  "reclaim_characters",
 ]
 
 [[dreamcaller]]
@@ -742,18 +747,16 @@ mandatory-tides = [
   "prevent_control",
   "fast_tempo",
   "materialize_tempo",
+  "hand_disruption",
 ]
 optional-tides = [
   "fast_interaction",
-  "fast_setup",
   "hand_disruption",
-  "discover_toolbox",
   "bounce_blink_tools",
   "event_setup",
-  "tempo_resets",
-  "cheap_curve",
   "resource_burst",
   "premium_removal",
+  "attrition_trade",
 ]
 
 [metadata]

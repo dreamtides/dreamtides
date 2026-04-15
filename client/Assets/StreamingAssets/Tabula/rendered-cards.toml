@@ -1,7 +1,7 @@
 [[cards]]
 name = "Titan of Forgotten Echoes"
 id = "d31723e7-8faa-41e3-89b6-c30d8fdf9cca"
-tides = ["event_chain", "character_velocity"]
+tides = ["event_chain", "void_recursion"]
 rendered-text = "When you play 2 cards in a turn, reclaim this character."
 energy-cost = 6
 card-type = "Character"
@@ -48,7 +48,7 @@ card-number = 3
 [[cards]]
 name = "Evacuation Enforcer"
 id = "5aee5a0d-c22a-4c09-9612-248d28c3df2f"
-tides = ["discard_velocity", "void_recursion", "void_setup", "judgment_engines", "hand_cycling"]
+tides = ["discard_velocity", "void_setup", "judgment_engines", "hand_cycling", "recursion_fuel"]
 rendered-text = """
 ▸ Judgment: You may draw 2 cards, then discard 3 cards.
 """
@@ -65,7 +65,7 @@ card-number = 4
 [[cards]]
 name = "Moonlit Voyage"
 id = "8cc1a7da-42f8-4ab8-a41a-b9c8867f2dc4"
-tides = ["discard_velocity", "hand_cycling", "void_recursion", "void_setup", "reclaim_events"]
+tides = ["discard_velocity", "hand_cycling", "void_setup", "reclaim_events"]
 rendered-text = """
 Draw 2 cards. Discard 2 cards.
 
@@ -83,7 +83,7 @@ card-number = 5
 [[cards]]
 name = "Ridge Vortex Explorer"
 id = "46634b47-e83c-4eda-a0ff-7f1ba4e1ce89"
-tides = ["discard_velocity", "character_velocity"]
+tides = ["discard_velocity"]
 rendered-text = """
 When you discard this character, materialize it.
 """
@@ -145,7 +145,7 @@ card-number = 9
 [[cards]]
 name = "The Rising God"
 id = "fb2661ee-387c-4a8f-965e-dd89be65cfe0"
-tides = ["abandon_furnace"]
+tides = ["abandon_value", "void_recursion"]
 rendered-text = "Abandon 2 allies: Reclaim this character."
 energy-cost = 9
 card-type = "Character"
@@ -160,7 +160,7 @@ card-number = 10
 [[cards]]
 name = "Apocalypse Vigilante"
 id = "b6c8065c-ddc0-4eb1-9243-a3dcdcc870a4"
-tides = ["discard_velocity"]
+tides = ["discard_velocity", "point_pressure"]
 rendered-text = """
 When you discard a card, gain 1✪.
 """
@@ -224,7 +224,7 @@ card-number = 14
 [[cards]]
 name = "Forgotten Titan"
 id = "8fb2e9d0-28e5-4253-a61c-59f7d4044d59"
-tides = ["discard_velocity", "character_velocity"]
+tides = ["discard_velocity", "cost_reduction"]
 rendered-text = "This character costs 1● if you have discarded a card this turn."
 energy-cost = 5
 card-type = "Character"
@@ -239,7 +239,7 @@ card-number = 15
 [[cards]]
 name = "Eclipse Herald"
 id = "e5ac026b-a397-47ee-929d-46de1177784c"
-tides = ["warrior_bastion", "judgment_engines"]
+tides = ["warrior_bastion", "judgment_engines", "void_recursion"]
 rendered-text = "▸ Judgment: You may banish 3 cards from your void to dissolve an enemy with cost 2● or less. "
 energy-cost = 2
 card-type = "Character"
@@ -271,7 +271,7 @@ card-number = 17
 [[cards]]
 name = "Apocalypse"
 id = "d122f4a5-c8a9-49bf-9c8a-a16b8d9567a6"
-tides = ["sweepers", "prevent_control", "warrior_bastion", "survivor_dissolve"]
+tides = ["finishers", "prevent_control", "survivor_dissolve"]
 rendered-text = """
 Dissolve all characters.
 """
@@ -303,7 +303,7 @@ card-number = 19
 [[cards]]
 name = "The Calling Night"
 id = "be97e5e0-eebb-4b90-a676-fcf909b35600"
-tides = ["judgment_bodies", "card_flow", "judgment_engines", "cheap_curve"]
+tides = ["judgment_bodies", "card_flow", "judgment_engines"]
 rendered-text = "▸ Judgment: Draw a card, then the opponent gains 2✪."
 energy-cost = 2
 card-type = "Character"
@@ -318,7 +318,7 @@ card-number = 20
 [[cards]]
 name = "Starsea Traveler"
 id = "f06932ac-6d8a-493f-b47e-9134676ea396"
-tides = ["void_recursion", "character_velocity"]
+tides = ["void_recursion"]
 rendered-text = """
 Once per turn, you may play a character with cost 2● or less from your void.
 """
@@ -335,7 +335,7 @@ card-number = 21
 [[cards]]
 name = "Urban Cipher"
 id = "aa0cd61a-13ce-4d61-b063-578686d1445a"
-tides = ["materialize_value", "materialize_tempo", "discard_velocity", "hand_cycling", "void_setup"]
+tides = ["materialize_value", "discard_velocity", "hand_cycling", "void_setup"]
 rendered-text = """
 ▸ Materialized: Discard 2 cards, then draw 2 cards.
 """
@@ -414,7 +414,7 @@ card-number = 26
 [[cards]]
 name = "The Devourer"
 id = "99720e39-6bad-4c6c-867c-7bc5c326195e"
-tides = ["void_recursion"]
+tides = ["void_recursion", "finishers"]
 rendered-text = "Banish your void with 8 or more cards: Reclaim this character."
 energy-cost = 8
 card-type = "Character"
@@ -429,7 +429,7 @@ card-number = 27
 [[cards]]
 name = "Nocturne"
 id = "cb445b05-ea7b-4a1b-9484-110021e266f3"
-tides = ["materialize_value", "materialize_tempo", "reclaim_characters", "void_recursion", "hand_cycling"]
+tides = ["materialize_value", "void_recursion", "hand_cycling", "discard_outlets"]
 rendered-text = """
 ▸ Materialized: Draw a card, then discard a card.
 
@@ -447,7 +447,7 @@ card-number = 28
 [[cards]]
 name = "Abomination of Memory"
 id = "86e7ff73-90bf-4e3d-9069-d6533f4407b8"
-tides = ["void_recursion"]
+tides = ["void_threshold"]
 rendered-text = "This character's spark is equal to the number of cards in your void."
 energy-cost = 5
 card-type = "Character"
@@ -462,7 +462,7 @@ card-number = 29
 [[cards]]
 name = "Aspiring Guardian"
 id = "b8b94c40-108d-4beb-9e71-6c8e9d00554e"
-tides = ["warrior_pressure", "character_velocity", "go_wide_enablers", "abandon_fodder"]
+tides = ["warrior_pressure", "character_curve", "go_wide_enablers", "abandon_fodder"]
 rendered-text = ""
 energy-cost = 0
 card-type = "Character"
@@ -477,7 +477,7 @@ card-number = 30
 [[cards]]
 name = "The Dread Sovereign"
 id = "521b912b-1dfb-4440-a1e0-7181bac6aa58"
-tides = ["abandon_furnace", "warrior_pressure", "warrior_bastion"]
+tides = ["abandon_ladder", "warrior_pressure", "warrior_bastion"]
 rendered-text = "▸ Judgment: You may abandon a Warrior to discover a Warrior with cost 1● higher and materialize it."
 energy-cost = 3
 card-type = "Character"
@@ -492,7 +492,7 @@ card-number = 31
 [[cards]]
 name = "Tranquil Duelist"
 id = "84eedef8-9dc9-42ef-afe8-07bc1882f7ee"
-tides = ["materialize_value", "warrior_bastion", "materialized_staples", "card_flow", "survivor_dissolve"]
+tides = ["materialize_value", "warrior_bastion", "card_flow", "survivor_dissolve"]
 rendered-text = "▸ Materialized, Dissolved: Draw a card."
 energy-cost = 3
 card-type = "Character"
@@ -569,7 +569,7 @@ card-number = 36
 [[cards]]
 name = "Lumin-Gate Seer"
 id = "d4123a89-fa76-46f9-a8b7-6a1d4ecc4c4f"
-tides = ["materialize_tempo", "materialize_value", "character_velocity"]
+tides = ["materialize_value", "character_chain"]
 rendered-text = """
 Once per turn, when you materialize a character with cost 2● or less, draw a card.
 """
@@ -631,7 +631,7 @@ card-number = 40
 [[cards]]
 name = "Fury of the Clan"
 id = "cd3d7b81-de72-4668-b505-e09848a477be"
-tides = ["warrior_pressure", "warrior_bastion"]
+tides = ["warrior_pressure", "warrior_bastion", "cheap_removal"]
 rendered-text = "Dissolve an enemy with cost less than the number of allied Warriors."
 energy-cost = 1
 card-type = "Event"
@@ -646,7 +646,7 @@ card-number = 41
 [[cards]]
 name = "Summons of the Bonded"
 id = "ff0fc84e-5d40-4317-820d-76d2a660c453"
-tides = ["warrior_pressure", "warrior_bastion"]
+tides = ["warrior_pressure", "warrior_bastion", "character_tutors"]
 rendered-text = "Discover a Warrior."
 energy-cost = 1
 card-type = "Event"
@@ -676,7 +676,7 @@ card-number = 43
 [[cards]]
 name = "Dreadcall Warden"
 id = "eb84ba88-8352-45e8-8cf9-d160227db3ad"
-tides = ["abandon_fodder", "abandon_furnace", "warrior_pressure"]
+tides = ["abandon_fodder", "abandon_value", "warrior_pressure"]
 rendered-text = "2●, Abandon an ally with spark 1 or less: Draw 2 cards."
 energy-cost = 2
 card-type = "Character"
@@ -706,7 +706,7 @@ card-number = 45
 [[cards]]
 name = "Dawnblade Wanderer"
 id = "d8f9abc2-a864-47b9-96e6-2ced9f9ba208"
-tides = ["big_energy", "judgment_bodies", "materialized_staples", "warrior_pressure", "warrior_bastion"]
+tides = ["big_energy", "judgment_bodies", "warrior_bastion"]
 rendered-text = "▸ Materialized, Judgment: Gain 2●."
 energy-cost = 1
 card-type = "Character"
@@ -721,7 +721,7 @@ card-number = 46
 [[cards]]
 name = "Bloomweaver"
 id = "725cf0ad-b5d1-400e-9a55-31e0bb62f612"
-tides = ["materialize_tempo", "materialize_value"]
+tides = ["materialize_value"]
 rendered-text = """
 Once per turn, when you materialize a character, gain 1●.
 """
@@ -738,7 +738,7 @@ card-number = 47
 [[cards]]
 name = "Seeker for the Way"
 id = "a42e3d7a-35a0-4dbc-a85d-c71b191d44a8"
-tides = ["warrior_pressure", "warrior_bastion", "materialize_value"]
+tides = ["warrior_pressure", "warrior_bastion", "materialize_value", "character_tutors"]
 rendered-text = "▸ Materialized: Draw a Warrior from your deck."
 energy-cost = 3
 card-type = "Character"
@@ -753,7 +753,7 @@ card-number = 48
 [[cards]]
 name = "Rebirth Ritualist"
 id = "1b69b697-4829-4e25-8d53-7462572cbb55"
-tides = ["abandon_furnace", "discard_velocity"]
+tides = ["abandon_value", "discard_velocity", "hand_cycling"]
 rendered-text = "2●, Abandon a character, Discard your hand: Draw 3 cards."
 energy-cost = 2
 card-type = "Character"
@@ -800,7 +800,7 @@ card-number = 51
 [[cards]]
 name = "Spirit Field Reclaimer"
 id = "7d1820ef-80c4-415e-bc36-7d361259225c"
-tides = ["warrior_bastion", "void_denial", "judgment_engines", "spark_tall"]
+tides = ["warrior_bastion", "void_denial", "judgment_engines", "spark_growth"]
 rendered-text = "▸ Judgment: You may pay 1● to kindle 1 and banish a card from the opponent's void."
 energy-cost = 2
 card-type = "Character"
@@ -815,7 +815,7 @@ card-number = 52
 [[cards]]
 name = "Cloaked Sentinel"
 id = "f453990c-934d-42c6-a12c-2a7d50689909"
-tides = ["prevent_control", "hand_disruption", "midcurve_glue"]
+tides = ["tax_pressure"]
 rendered-text = "The opponent's events cost 1● more."
 energy-cost = 3
 card-type = "Character"
@@ -830,7 +830,7 @@ card-number = 53
 [[cards]]
 name = "Twilight Suppressor"
 id = "4e3420f2-6f0d-4381-b2b1-afb16af7549f"
-tides = ["warrior_bastion", "prevent_control", "materialize_tempo"]
+tides = ["warrior_bastion", "prevent_control"]
 rendered-text = "▸ Materialized: Disable the activated abilities of an enemy while this character is in play."
 energy-cost = 3
 card-type = "Character"
@@ -845,7 +845,7 @@ card-number = 54
 [[cards]]
 name = "Frost Visionary"
 id = "80076dbf-efdb-4130-80b9-45ebc8b3a235"
-tides = ["warrior_pressure", "warrior_bastion", "materialized_staples", "materialize_value", "card_flow"]
+tides = ["warrior_pressure", "warrior_bastion", "materialize_value", "card_flow"]
 rendered-text = "▸ Materialized: Draw a card."
 energy-cost = 2
 card-type = "Character"
@@ -860,7 +860,7 @@ card-number = 55
 [[cards]]
 name = "Forsworn Champion"
 id = "3baa112c-951f-4552-bc9e-0a3ee61543fa"
-tides = ["abandon_furnace", "warrior_pressure", "spark_tall"]
+tides = ["abandon_value", "warrior_pressure", "spark_tall"]
 rendered-text = "Abandon an ally: This character gains +1 spark."
 energy-cost = 4
 card-type = "Character"
@@ -920,7 +920,7 @@ card-number = 59
 [[cards]]
 name = "Infernal Rest"
 id = "d02cc851-4c89-463a-b988-a94dfefef797"
-tides = ["prevent_control", "fast_interaction", "fast_setup", "fast_tempo"]
+tides = ["prevent_control", "fast_interaction", "fast_tempo"]
 rendered-text = """
 Lose 1 maximum ●: Play this event for 0●.
 
@@ -938,7 +938,7 @@ card-number = 60
 [[cards]]
 name = "Echoing Denial"
 id = "4666416e-5f12-47a3-9e7e-56943c0d6e44"
-tides = ["prevent_control", "fast_interaction", "fast_setup", "fast_tempo"]
+tides = ["prevent_control", "fast_interaction", "discard_outlets"]
 rendered-text = """
 Banish a card from hand: Play this event for 0●.
 
@@ -956,7 +956,7 @@ card-number = 61
 [[cards]]
 name = "Ripple of Defiance"
 id = "9c605a08-dac4-4c3e-8aff-437b79809937"
-tides = ["prevent_control", "fast_interaction", "fast_setup"]
+tides = ["prevent_control", "fast_interaction", "tax_pressure"]
 rendered-text = """
 Prevent a played event unless the opponent pays 2●.
 """
@@ -973,7 +973,7 @@ card-number = 62
 [[cards]]
 name = "Break the Veil"
 id = "129bd326-ec4d-4da6-aff6-f1c2b78f10e4"
-tides = ["hand_disruption", "prevent_control"]
+tides = ["hand_disruption"]
 rendered-text = "Discard a chosen card with cost 3● or less from the opponent's hand."
 energy-cost = 1
 card-type = "Event"
@@ -988,7 +988,7 @@ card-number = 63
 [[cards]]
 name = "Lurking Dread"
 id = "89d54c43-ffd6-4e0f-94ec-9e08f59e8891"
-tides = ["hand_disruption", "prevent_control"]
+tides = ["hand_disruption"]
 rendered-text = "Discard a chosen character from the opponent's hand."
 energy-cost = 1
 card-type = "Event"
@@ -1003,7 +1003,7 @@ card-number = 64
 [[cards]]
 name = "Fell the Mighty"
 id = "ff10c460-125f-4f77-b9e2-4c4f33adff3e"
-tides = ["fast_interaction", "premium_removal", "prevent_control", "fast_tempo"]
+tides = ["fast_interaction", "premium_removal", "fast_tempo"]
 rendered-text = """
 Banish a card from hand: Play this event for 0●.
 
@@ -1069,7 +1069,7 @@ card-number = 68
 [[cards]]
 name = "Pyrokinetic Surge"
 id = "f83a0657-f55a-4ee6-8630-c2ca2d8429ac"
-tides = ["abandon_furnace", "discard_velocity", "leave_play_enablers"]
+tides = ["abandon_value", "discard_velocity", "leave_play_enablers", "cheap_removal"]
 rendered-text = "Abandon an ally or discard a card: Dissolve an enemy."
 energy-cost = 1
 card-type = "Event"
@@ -1084,7 +1084,7 @@ card-number = 69
 [[cards]]
 name = "Threadbreaker"
 id = "6e757f74-08e4-4f4e-ab27-70106b93a159"
-tides = ["materialize_tempo", "prevent_control", "materialized_staples", "fast_tempo"]
+tides = ["prevent_control", "fast_tempo"]
 rendered-text = """
 ▸ Materialized: Prevent a played card with cost 2● or less.
 """
@@ -1101,7 +1101,7 @@ card-number = 70
 [[cards]]
 name = "Cosmic Puppeteer"
 id = "e4aff892-1a6d-40b7-901d-1d57a9a21807"
-tides = ["materialize_tempo", "materialize_value", "materialized_staples"]
+tides = ["materialize_value"]
 rendered-text = "▸ Materialized: Gain control of an enemy with cost 2● or less."
 energy-cost = 5
 card-type = "Character"
@@ -1116,7 +1116,7 @@ card-number = 71
 [[cards]]
 name = "Obliterator of Worlds"
 id = "5aea70af-2df6-411f-b513-cb9ee8b18fb4"
-tides = ["abandon_furnace", "materialize_value", "leave_play_enablers"]
+tides = ["materialize_value", "leave_play_enablers", "abandon_value"]
 rendered-text = """
 Abandon an ally: Play this character for 0●, then abandon it.
 
@@ -1151,7 +1151,7 @@ card-number = 73
 [[cards]]
 name = "Astral Navigators"
 id = "03f73699-bf4d-4f36-a811-0e1f847b55f7"
-tides = ["materialized_staples", "materialize_value", "materialize_tempo", "foresee_selection"]
+tides = ["materialize_value", "foresee_selection"]
 rendered-text = "▸ Materialized: Foresee 2."
 energy-cost = 3
 card-type = "Character"
@@ -1166,7 +1166,7 @@ card-number = 74
 [[cards]]
 name = "Boundless Wanderer"
 id = "bd99da06-6591-4458-a4f6-d372a2def6bb"
-tides = ["ally_formation", "warrior_pressure", "warrior_bastion", "spirit_growth", "survivor_dissolve"]
+tides = ["ally_formation", "warrior_pressure", "spirit_growth", "survivor_dissolve"]
 rendered-text = """
 Has all character types.
 
@@ -1214,7 +1214,7 @@ card-number = 77
 [[cards]]
 name = "Melodist of the Finale"
 id = "bca1b98b-729b-480b-8375-04db7b1be6f1"
-tides = ["fast_tempo"]
+tides = ["fast_tempo", "point_pressure"]
 rendered-text = "When you play a ↯fast card, gain 1✪."
 energy-cost = 4
 card-type = "Character"
@@ -1229,7 +1229,7 @@ card-number = 78
 [[cards]]
 name = "The Waking Titan"
 id = "76435ef9-18df-4c2d-bf5a-c92d997e86b5"
-tides = ["materialize_value", "judgment_engines", "materialize_tempo"]
+tides = ["judgment_engines", "materialize_tempo"]
 rendered-text = """
 To play this card, return an ally with cost 3● or more to hand.
 
@@ -1247,7 +1247,7 @@ card-number = 79
 [[cards]]
 name = "Virtuoso of Harmony"
 id = "a916abc5-97ad-49dc-8d61-5f68f739d44b"
-tides = ["big_energy", "resource_burst", "cheap_curve"]
+tides = ["big_energy", "resource_burst"]
 rendered-text = "At the end of your turn, gain 2●."
 energy-cost = 2
 card-type = "Character"
@@ -1262,7 +1262,7 @@ card-number = 80
 [[cards]]
 name = "Moonlit Dancer"
 id = "1f5024e3-aa36-4a44-b257-0caf35484cf8"
-tides = ["character_velocity", "fast_tempo"]
+tides = ["character_chain", "fast_tempo"]
 rendered-text = """
 Characters in your hand have ↯fast.
 
@@ -1295,7 +1295,7 @@ card-number = 82
 [[cards]]
 name = "Abyssal Enforcer"
 id = "0bc5151d-cf48-4c15-bc44-673cb1663a52"
-tides = ["materialize_tempo", "tempo_resets", "materialized_staples", "fast_tempo"]
+tides = ["materialize_tempo", "tempo_resets", "fast_tempo"]
 rendered-text = "▸ Materialized: Return an enemy to hand."
 energy-cost = 4
 card-type = "Character"
@@ -1370,7 +1370,7 @@ card-number = 87
 [[cards]]
 name = "Return to Nowhere"
 id = "3e93788c-bae3-4fda-a94c-a387cf0f386d"
-tides = ["bounce_blink_tools", "materialize_tempo", "tempo_resets", "fast_interaction", "fast_setup"]
+tides = ["bounce_blink_tools", "materialize_tempo", "tempo_resets", "fast_interaction"]
 rendered-text = """
 Return an enemy or ally to hand. Draw a card.
 """
@@ -1402,7 +1402,7 @@ card-number = 89
 [[cards]]
 name = "Illumination of Glory"
 id = "a2381225-b97f-4a38-845b-cefd8b86d499"
-tides = ["event_chain", "character_velocity"]
+tides = ["event_chain", "character_chain", "point_pressure"]
 rendered-text = "Gain 1✪ for each card you have played this turn."
 energy-cost = 5
 card-type = "Event"
@@ -1417,7 +1417,7 @@ card-number = 90
 [[cards]]
 name = "Echoes of the Journey"
 id = "5ddbb693-5fc3-4e5a-8040-944fa9e9755d"
-tides = ["event_chain", "character_velocity"]
+tides = ["event_chain", "card_flow"]
 rendered-text = "Draw a card for each card you have played this turn."
 energy-cost = 3
 card-type = "Event"
@@ -1467,7 +1467,7 @@ card-number = 93
 [[cards]]
 name = "Echoes of Eternity"
 id = "5ce29518-6ccd-420c-9fbf-c4b882266593"
-tides = ["event_chain"]
+tides = ["event_chain", "copy_effects"]
 rendered-text = """
 Copy the next event you play this turn three times.
 
@@ -1515,7 +1515,7 @@ card-number = 96
 [[cards]]
 name = "The Power Within"
 id = "be92ff6f-a468-4545-8ea2-cd8c3c53cb9a"
-tides = ["event_chain"]
+tides = ["event_chain", "card_flow"]
 rendered-text = "Double the number of cards you draw from card effects this turn."
 energy-cost = 1
 card-type = "Event"
@@ -1530,7 +1530,7 @@ card-number = 97
 [[cards]]
 name = "Whisper of the Past"
 id = "35cc788c-b7f1-46ae-b398-7ad37a624247"
-tides = ["reclaim_events", "void_recursion", "event_chain"]
+tides = ["reclaim_events", "void_recursion"]
 rendered-text = "An event in your void gains reclaim 0● this turn."
 energy-cost = 3
 card-type = "Event"
@@ -1560,7 +1560,7 @@ card-number = 99
 [[cards]]
 name = "Moment Rewound"
 id = "214169c7-dc03-487f-bd85-d560f68031a1"
-tides = ["finishers", "event_chain", "judgment_engines"]
+tides = ["finishers", "event_chain"]
 rendered-text = """
 Take an extra turn after this one.
 """
@@ -1654,7 +1654,7 @@ card-number = 105
 [[cards]]
 name = "Data Pulse"
 id = "c27871a8-5256-4505-bdd1-8f5c8c222153"
-tides = ["resource_burst", "big_energy", "event_setup", "card_flow", "event_chain"]
+tides = ["resource_burst", "event_setup", "card_flow", "event_chain"]
 rendered-text = """
 Gain 2●. Draw a card.
 """
@@ -1671,7 +1671,7 @@ card-number = 106
 [[cards]]
 name = "A New Advenure"
 id = "7d1b1516-f89a-4a27-b9b6-54afaa85c217"
-tides = ["hand_cycling", "discard_velocity", "big_energy", "card_flow", "resource_burst"]
+tides = ["hand_cycling", "discard_velocity", "card_flow", "resource_burst"]
 rendered-text = """
 Draw 2 cards. Discard 2 cards. Gain 2●.
 """
@@ -1688,7 +1688,7 @@ card-number = 107
 [[cards]]
 name = "The Ringleader"
 id = "afee62e2-7768-47d5-87bd-eaea08400fad"
-tides = ["event_chain", "materialize_value"]
+tides = ["event_chain", "materialize_value", "copy_effects"]
 rendered-text = "▸ Materialized: Copy the next event you play this turn three times."
 energy-cost = 6
 card-type = "Character"
@@ -1735,7 +1735,7 @@ card-number = 110
 [[cards]]
 name = "Spirit Reaping"
 id = "36c59908-aae7-42fb-9419-4a6aa1255211"
-tides = ["abandon_fodder", "abandon_furnace", "leave_play_enablers", "big_energy"]
+tides = ["abandon_fodder", "abandon_value", "leave_play_enablers", "big_energy"]
 rendered-text = "Abandon an ally: Gain ● equal to that character's cost."
 energy-cost = 1
 card-type = "Event"
@@ -1750,7 +1750,7 @@ card-number = 111
 [[cards]]
 name = "Weight of Memory"
 id = "6897e6d5-2ab6-4faa-a221-dfa5ffe0a0a7"
-tides = ["void_recursion"]
+tides = ["void_threshold"]
 rendered-text = "Dissolve an enemy with cost less than the number of cards in your void."
 energy-cost = 0
 card-type = "Event"
@@ -1780,7 +1780,7 @@ card-number = 113
 [[cards]]
 name = "Harvest the Forgotten"
 id = "540cd70f-4fc8-417b-ac0d-3b337bfe8f01"
-tides = ["void_setup", "void_recursion", "reclaim_events", "reclaim_characters"]
+tides = ["void_setup", "recursion_fuel", "reclaim_events", "reclaim_characters"]
 rendered-text = "Put the top 3 cards of your deck into your void. Draw a card."
 energy-cost = 1
 card-type = "Event"
@@ -1872,7 +1872,7 @@ card-number = 119
 [[cards]]
 name = "Spirit of Smoldering Echoes"
 id = "fe13ba87-8935-4740-b762-23c8ccd89ff9"
-tides = ["event_chain"]
+tides = ["event_chain", "spark_tall"]
 rendered-text = "When an event is put into your void, this character gains +1 spark."
 energy-cost = 4
 card-type = "Character"
@@ -1887,7 +1887,7 @@ card-number = 120
 [[cards]]
 name = "Nexus Wayfinder"
 id = "30e50754-0903-45ef-8569-b9032a93ed8f"
-tides = ["cost_reduction", "character_velocity"]
+tides = ["cost_reduction", "character_curve"]
 rendered-text = "Characters cost you 2● less."
 energy-cost = 5
 card-type = "Character"
@@ -1902,7 +1902,7 @@ card-number = 121
 [[cards]]
 name = "Conduit of Resonance"
 id = "cb474c3f-1670-4e44-88d9-bef6475a4199"
-tides = ["judgment_engines", "materialize_value"]
+tides = ["judgment_engines", "judgment_repeaters", "character_chain", "trigger_reuse"]
 rendered-text = "When you materialize a character, trigger the ▸ Judgment: ability of each ally."
 energy-cost = 5
 card-type = "Character"
@@ -1917,7 +1917,7 @@ card-number = 122
 [[cards]]
 name = "Celestial Reverie"
 id = "85eaf1ac-bcb4-4266-84be-844965bce25d"
-tides = ["character_velocity"]
+tides = ["character_chain"]
 rendered-text = "Until end of turn, when you play a character, draw a card."
 energy-cost = 1
 card-type = "Event"
@@ -1964,7 +1964,7 @@ card-number = 125
 [[cards]]
 name = "Nomad of Endless Paths"
 id = "a4322fb3-6195-41e5-9cb2-74113f961f4d"
-tides = ["materialize_tempo", "bounce_blink_tools", "fast_setup"]
+tides = ["materialize_tempo", "bounce_blink_tools"]
 rendered-text = "▸ Materialized: Return an ally to hand."
 energy-cost = 2
 card-type = "Character"
@@ -1979,7 +1979,7 @@ card-number = 126
 [[cards]]
 name = "Blazing Emberwing"
 id = "5ed4d321-07d9-4607-9897-3a645df8c012"
-tides = ["judgment_engines", "spirit_growth"]
+tides = ["judgment_engines", "spirit_growth", "trigger_reuse"]
 rendered-text = "The '▸ Judgment:' ability of allies triggers when you materialize them."
 energy-cost = 3
 card-type = "Character"
@@ -2054,7 +2054,7 @@ card-number = 131
 [[cards]]
 name = "Lumineth"
 id = "cd398e35-fd5d-46df-8adb-5d2595df612d"
-tides = ["event_chain", "character_velocity"]
+tides = ["finishers"]
 rendered-text = "When you have no cards in your deck, you win the game."
 energy-cost = 2
 card-type = "Character"
@@ -2069,7 +2069,7 @@ card-number = 132
 [[cards]]
 name = "Key to the Moment"
 id = "ff0bdb02-7d2b-448d-98e3-f360f39aafc3"
-tides = ["materialize_value", "materialize_tempo"]
+tides = ["materialize_tempo", "card_flow", "bounce_blink_tools"]
 rendered-text = "Return all but one ally to hand: Draw a card for each ally returned."
 energy-cost = 3
 card-type = "Event"
@@ -2084,7 +2084,7 @@ card-number = 133
 [[cards]]
 name = "The Bondweaver"
 id = "baae7f70-226f-48af-94c8-b8b211fd5087"
-tides = ["materialize_tempo", "materialize_value"]
+tides = ["character_chain", "spark_growth"]
 rendered-text = "When you materialize a character, this character gains +1 spark."
 energy-cost = 3
 card-type = "Character"
@@ -2099,7 +2099,7 @@ card-number = 134
 [[cards]]
 name = "Eternal Stag"
 id = "ec80cc3c-a23d-465e-a2cf-4eed6fb89e1d"
-tides = ["spirit_growth", "character_velocity"]
+tides = ["spirit_growth", "character_chain"]
 rendered-text = """
 When you play a Spirit Animal, draw a card.
 """
@@ -2131,7 +2131,7 @@ card-number = 136
 [[cards]]
 name = "Sunshadow Eagle"
 id = "b8b55ef4-2f79-4c62-b347-e91bea3a40bd"
-tides = ["spirit_growth", "materialize_tempo"]
+tides = ["spirit_growth"]
 rendered-text = """
 When you materialize an allied Spirit Animal, that character gains +1 spark.
 """
@@ -2165,7 +2165,7 @@ card-number = 138
 [[cards]]
 name = "Shadowpaw"
 id = "a52a502f-558b-4e33-bd33-44a866582f17"
-tides = ["reclaim_characters", "spirit_growth", "void_recursion", "materialize_value"]
+tides = ["reclaim_characters", "void_recursion", "materialize_tempo"]
 rendered-text = """
 ▸ Materialized: Return a character from your void to your hand.
 """
@@ -2197,7 +2197,7 @@ card-number = 140
 [[cards]]
 name = "Driftcaller Sovereign"
 id = "919f4169-7a9d-4004-871f-9f36e3761e72"
-tides = ["judgment_bodies", "spirit_growth", "materialized_staples", "resource_burst"]
+tides = ["judgment_bodies", "spirit_growth", "resource_burst"]
 rendered-text = "▸ Materialized, Judgment: Gain 1●."
 energy-cost = 1
 card-type = "Character"
@@ -2212,7 +2212,7 @@ card-number = 141
 [[cards]]
 name = "Emerald Guardian"
 id = "08daba86-8d26-416c-ac16-4c7c2185951f"
-tides = ["judgment_bodies", "spirit_growth", "resource_burst", "judgment_engines"]
+tides = ["judgment_bodies", "spirit_growth", "judgment_engines"]
 rendered-text = "▸ Judgment: Gain 2●."
 energy-cost = 3
 card-type = "Character"
@@ -2227,7 +2227,7 @@ card-number = 142
 [[cards]]
 name = "Dreamborne Leviathan"
 id = "64b5552f-1fc3-4aee-a79c-cebc19792044"
-tides = ["spirit_growth", "character_velocity"]
+tides = ["spirit_growth", "topdeck_setup"]
 rendered-text = """
 Reveal the top card of your deck.
 
@@ -2292,7 +2292,7 @@ card-number = 146
 [[cards]]
 name = "Starlight Guide"
 id = "3d9f38a4-6ae8-4e90-bc75-84d711b5fef9"
-tides = ["materialize_tempo", "bounce_blink_tools", "fast_setup", "materialize_value"]
+tides = ["materialize_tempo", "bounce_blink_tools"]
 rendered-text = "▸ Materialized: You may banish an ally, then materialize it."
 energy-cost = 5
 card-type = "Character"
@@ -2307,7 +2307,7 @@ card-number = 147
 [[cards]]
 name = "Flickerveil Adept"
 id = "d8017d8f-7855-47e5-bfe5-89ca2e7c5203"
-tides = ["materialize_value", "judgment_engines", "bounce_blink_tools", "trigger_reuse"]
+tides = ["judgment_engines", "bounce_blink_tools", "trigger_reuse", "materialize_tempo"]
 rendered-text = "▸ Materialized, Judgment: Banish an ally with spark 2 or less, then materialize it."
 energy-cost = 4
 card-type = "Character"
@@ -2322,7 +2322,7 @@ card-number = 148
 [[cards]]
 name = "Reclaimer of Lost Paths"
 id = "0ad4ca5c-f723-4494-8dec-1e058c37a099"
-tides = ["void_recursion", "materialize_value", "reclaim_characters"]
+tides = ["void_recursion", "reclaim_characters"]
 rendered-text = "▸ Materialized: A card with cost 3● or less in your void gains reclaim 0●."
 energy-cost = 4
 card-type = "Character"
@@ -2337,7 +2337,7 @@ card-number = 149
 [[cards]]
 name = "Aurora Rider"
 id = "c4766fc9-9d67-49b6-89d1-e457aa9a415d"
-tides = ["materialize_value", "materialize_tempo"]
+tides = ["materialize_tempo", "bounce_blink_tools", "trigger_reuse"]
 rendered-text = "▸ Materialized: Banish any number of allies, then materialize them."
 energy-cost = 6
 card-type = "Character"
@@ -2352,7 +2352,7 @@ card-number = 150
 [[cards]]
 name = "Wraith of Twisting Shadows"
 id = "f649bc96-1d35-4665-97d9-799208558ff3"
-tides = ["prevent_control", "hand_disruption", "materialize_value"]
+tides = ["hand_disruption", "materialize_value"]
 rendered-text = "▸ Materialized: Discard a chosen card from the opponent's hand. They draw a card."
 energy-cost = 3
 card-type = "Character"
@@ -2367,7 +2367,7 @@ card-number = 151
 [[cards]]
 name = "Keeper of Forgotten Light"
 id = "b1eb6004-c379-4b87-93be-3fe527b830b7"
-tides = ["materialized_staples", "materialize_value", "card_flow"]
+tides = ["materialize_value", "card_flow"]
 rendered-text = "▸ Materialized: Draw 2 cards."
 energy-cost = 6
 card-type = "Character"
@@ -2382,7 +2382,7 @@ card-number = 152
 [[cards]]
 name = "Paradox Enforcer"
 id = "e3beadd0-4248-4835-a1c5-d41f85737d4d"
-tides = ["premium_removal", "materialize_value", "materialized_staples"]
+tides = ["premium_removal", "materialize_tempo"]
 rendered-text = """
 ▸ Materialized: Banish an enemy until this character leaves play.
 """
@@ -2399,7 +2399,7 @@ card-number = 153
 [[cards]]
 name = "Passage Through Oblivion"
 id = "59f826ee-55d1-499e-86bb-8266c382f5fa"
-tides = ["bounce_blink_tools", "materialize_tempo", "materialize_value", "leave_play_enablers"]
+tides = ["bounce_blink_tools", "materialize_tempo", "leave_play_enablers"]
 rendered-text = """
 Banish an ally. Materialize it at end of turn.
 
@@ -2417,7 +2417,7 @@ card-number = 154
 [[cards]]
 name = "Herald of the Last Light"
 id = "cf339e0b-685a-4a06-abb2-2fad01916ca7"
-tides = ["prevent_control", "fast_interaction", "cheap_curve", "abandon_fodder"]
+tides = ["prevent_control", "fast_interaction", "abandon_fodder"]
 rendered-text = "↯fast -- Abandon this character: Prevent a played event."
 energy-cost = 1
 card-type = "Character"
@@ -2432,7 +2432,7 @@ card-number = 155
 [[cards]]
 name = "Call to the Unknown"
 id = "66ae76ab-13ba-473c-891d-9d53403c300e"
-tides = ["character_tutors", "discover_toolbox", "materialize_value", "materialize_tempo"]
+tides = ["character_tutors", "discover_toolbox", "materialize_value"]
 rendered-text = "Discover a character with a ▸ Materialized: ability."
 energy-cost = 2
 card-type = "Event"
@@ -2447,7 +2447,7 @@ card-number = 156
 [[cards]]
 name = "Blooming Path Wanderer"
 id = "dce8efc8-2643-47a4-ae13-4b9a7e4ba8bb"
-tides = ["judgment_engines", "materialize_value", "bounce_blink_tools", "trigger_reuse"]
+tides = ["judgment_engines", "bounce_blink_tools", "trigger_reuse", "materialize_tempo"]
 rendered-text = """
 ▸ Judgment: You may banish an ally, then materialize it.
 """
@@ -2464,7 +2464,7 @@ card-number = 157
 [[cards]]
 name = "Tideborne Voyager"
 id = "522368e5-38cc-480c-930a-f8e1bc5a1f68"
-tides = ["materialize_tempo", "materialize_value"]
+tides = ["materialize_tempo"]
 rendered-text = "When an ally is banished, this character gains +1 spark."
 energy-cost = 4
 card-type = "Character"
@@ -2479,7 +2479,7 @@ card-number = 158
 [[cards]]
 name = "Pyrestone Avatar"
 id = "c85de002-4b55-4975-b800-a627fb699615"
-tides = ["materialize_tempo", "spark_tall", "materialize_value"]
+tides = ["leave_play_enablers", "spark_growth"]
 rendered-text = """
 When an ally is banished, kindle 1.
 """
@@ -2496,7 +2496,7 @@ card-number = 159
 [[cards]]
 name = "Light of Emergence"
 id = "3f98591f-5ede-4add-9df6-536e39780ec3"
-tides = ["character_velocity", "ally_formation", "materialize_value"]
+tides = ["character_chain", "ally_wide", "materialize_value"]
 rendered-text = "Materialize two random characters with cost 3● or less from your deck."
 energy-cost = 5
 card-type = "Event"
@@ -2526,7 +2526,7 @@ card-number = 161
 [[cards]]
 name = "Scorched Reckoning"
 id = "2b0d4a5a-83f0-4cae-a7e3-aefbb595fd1d"
-tides = ["cheap_removal", "spark_disruption"]
+tides = ["cheap_removal"]
 rendered-text = "Dissolve an enemy with spark 3 or more."
 energy-cost = 2
 card-type = "Event"
@@ -2541,7 +2541,7 @@ card-number = 162
 [[cards]]
 name = "Abyssal Plunge"
 id = "810764f4-fda3-414a-9364-9ce3f2092710"
-tides = ["cheap_removal", "reclaim_events", "event_chain"]
+tides = ["premium_removal", "reclaim_events", "event_chain"]
 rendered-text = """
 Dissolve an enemy with cost 3● or more.
 
@@ -2559,7 +2559,7 @@ card-number = 163
 [[cards]]
 name = "Burst of Obliteration"
 id = "f841dd11-102c-42b2-b85a-492930189fbd"
-tides = ["sweepers", "spark_disruption", "big_energy", "resource_burst"]
+tides = ["finishers"]
 rendered-text = "Pay 1 or more ●: Dissolve all characters with spark less than the amount of ● paid."
 energy-cost = 2
 card-type = "Event"
@@ -2574,7 +2574,7 @@ card-number = 164
 [[cards]]
 name = "Dimensional Pathfinder"
 id = "6e7c552f-23b5-431a-9d50-f7706e27166a"
-tides = ["judgment_engines", "materialize_value", "bounce_blink_tools", "trigger_reuse", "big_energy"]
+tides = ["judgment_engines", "materialize_tempo", "bounce_blink_tools", "trigger_reuse", "big_energy"]
 rendered-text = "▸ Judgment: You may pay 3● to banish up to 2 allies, then materialize them."
 energy-cost = 3
 card-type = "Character"
@@ -2589,7 +2589,7 @@ card-number = 165
 [[cards]]
 name = "Riftwalker"
 id = "e4b6ce4c-363e-4483-8246-a4b7ac368d17"
-tides = ["tempo_resets", "materialize_tempo", "materialized_staples"]
+tides = ["tempo_resets", "materialize_tempo"]
 rendered-text = "▸ Materialized: Banish an enemy until your next main phase."
 energy-cost = 5
 card-type = "Character"
@@ -2604,7 +2604,7 @@ card-number = 166
 [[cards]]
 name = "Portal of Twin Paths"
 id = "5af14769-48c7-45eb-a73d-52fdea4405c4"
-tides = ["bounce_blink_tools", "materialize_value", "materialize_tempo", "leave_play_enablers"]
+tides = ["bounce_blink_tools", "materialize_tempo", "leave_play_enablers"]
 rendered-text = "Banish up to 2 allies, then materialize them."
 energy-cost = 3
 card-type = "Event"
@@ -2619,7 +2619,7 @@ card-number = 167
 [[cards]]
 name = "Aurora Channeler"
 id = "d12cbf86-5b50-4654-8c33-ff4428537c71"
-tides = ["materialized_staples", "materialize_value", "resource_burst", "big_energy"]
+tides = ["materialize_value", "big_energy"]
 rendered-text = "▸ Materialized: Gain 3●."
 energy-cost = 4
 card-type = "Character"
@@ -2634,7 +2634,7 @@ card-number = 168
 [[cards]]
 name = "Mirrorlight Architect"
 id = "476638a3-6ed9-47bc-b129-ad8b6662f41e"
-tides = ["materialize_value", "ally_formation"]
+tides = ["materialize_value", "copy_effects"]
 rendered-text = """
 4●: Materialize a copy of an ally.
 """
@@ -2651,7 +2651,7 @@ card-number = 169
 [[cards]]
 name = "Starlit Cascade"
 id = "5de09339-b7de-45bd-abc0-1ab3a09e859d"
-tides = ["leave_play_enablers", "abandon_furnace", "materialize_tempo", "materialize_value"]
+tides = ["leave_play_enablers", "abandon_value", "materialize_tempo"]
 rendered-text = "Until end of turn, when an ally leaves play, gain 2●."
 energy-cost = 1
 card-type = "Event"
@@ -2681,7 +2681,7 @@ card-number = 171
 [[cards]]
 name = "Emberwatch Veteran"
 id = "4a558573-ddf0-478e-b5ac-75401cbc74f7"
-tides = ["discard_velocity", "spark_tall"]
+tides = ["discard_velocity", "spark_tall", "discard_outlets"]
 rendered-text = "1●, Discard a card: Kindle 2."
 energy-cost = 1
 card-type = "Character"
@@ -2711,7 +2711,7 @@ card-number = 173
 [[cards]]
 name = "Silent Avenger"
 id = "36ca76ae-0202-495f-bf99-d0ce98da6352"
-tides = ["survivor_dissolve", "spark_tall", "void_recursion"]
+tides = ["survivor_dissolve", "spark_tall"]
 rendered-text = """
 ▸ Dissolved: Kindle 2.
 
@@ -2729,7 +2729,7 @@ card-number = 174
 [[cards]]
 name = "Soulbinder"
 id = "ad04efcb-158b-4ac7-a48f-7d15d7e9daff"
-tides = ["abandon_furnace", "abandon_fodder", "leave_play_enablers"]
+tides = ["abandon_value", "abandon_fodder", "leave_play_enablers"]
 rendered-text = "Abandon an ally: Gain 1●."
 energy-cost = 3
 card-type = "Character"
@@ -2744,7 +2744,7 @@ card-number = 175
 [[cards]]
 name = "Seer of the Fallen"
 id = "233f67e8-2715-4b30-8985-2b5b15f851ac"
-tides = ["survivor_dissolve", "void_recursion"]
+tides = ["survivor_dissolve"]
 rendered-text = """
 ▸ Dissolved: Draw a card.
 
@@ -2762,7 +2762,7 @@ card-number = 176
 [[cards]]
 name = "Ashborn Necromancer"
 id = "5511b4b5-a7e3-48df-978d-c09673b39f42"
-tides = ["abandon_furnace", "leave_play_enablers", "void_setup"]
+tides = ["abandon_value", "leave_play_enablers", "void_setup", "recursion_fuel"]
 rendered-text = "Abandon an ally: Put the top 2 cards of your deck into your void."
 energy-cost = 4
 card-type = "Character"
@@ -2777,7 +2777,7 @@ card-number = 177
 [[cards]]
 name = "Sunset Chronicler"
 id = "ef74faa0-b550-4134-9afc-c6898f7af44c"
-tides = ["survivor_dissolve", "abandon_furnace"]
+tides = ["survivor_dissolve"]
 rendered-text = "When an ally is ▸ Dissolved:, draw a card."
 energy-cost = 4
 card-type = "Character"
@@ -2792,7 +2792,7 @@ card-number = 178
 [[cards]]
 name = "Wasteland Arbitrator"
 id = "2246466d-341e-4fe2-a804-5bc4ed3541e2"
-tides = ["prevent_control", "hand_disruption", "discard_velocity"]
+tides = ["hand_disruption", "discard_velocity"]
 rendered-text = "▸ Materialized: Each player discards a card."
 energy-cost = 1
 card-type = "Character"
@@ -2807,7 +2807,7 @@ card-number = 179
 [[cards]]
 name = "Dustborn Veteran"
 id = "dce9ebda-da62-4304-a4e9-21170c98e2a6"
-tides = ["survivor_dissolve", "abandon_furnace", "void_recursion"]
+tides = ["survivor_dissolve", "void_recursion"]
 rendered-text = "When an ally is ▸ Dissolved, this card gains reclaim 1● this turn."
 energy-cost = 3
 card-type = "Character"
@@ -2822,7 +2822,7 @@ card-number = 180
 [[cards]]
 name = "Avatar of Cosmic Reckoning"
 id = "0ebb38a7-5a30-40b3-b2f0-b6516a53303c"
-tides = ["survivor_dissolve", "abandon_furnace"]
+tides = ["survivor_dissolve", "abandon_value"]
 rendered-text = "When an ally is ▸ Dissolved, gain 1✪."
 energy-cost = 6
 card-type = "Character"
@@ -2837,7 +2837,7 @@ card-number = 181
 [[cards]]
 name = "Resilient Wanderer"
 id = "c85edc15-ff74-45d5-aed5-7ca488b6d100"
-tides = ["survivor_dissolve", "abandon_furnace"]
+tides = ["survivor_dissolve", "attrition_trade"]
 rendered-text = "▸ Dissolved: You may pay 1● to return this character to your hand."
 energy-cost = 2
 card-type = "Character"
@@ -2852,7 +2852,7 @@ card-number = 182
 [[cards]]
 name = "Twilight Reclaimer"
 id = "fb3029e1-7f43-4284-bcdd-11dfe6711f96"
-tides = ["survivor_dissolve"]
+tides = ["survivor_dissolve", "void_recursion"]
 rendered-text = "▸ Dissolved: A Survivor in your void gains reclaim equal to its cost."
 energy-cost = 1
 card-type = "Character"
@@ -2912,7 +2912,7 @@ card-number = 186
 [[cards]]
 name = "Exiles of the Last Light"
 id = "37c39729-f5f9-45ac-a01a-9f65c09c731c"
-tides = ["abandon_furnace", "spark_tall"]
+tides = ["abandon_value", "spark_tall"]
 rendered-text = "Abandon an ally: Kindle 1."
 energy-cost = 3
 card-type = "Character"
@@ -2942,7 +2942,7 @@ card-number = 188
 [[cards]]
 name = "Unleashed Destruction"
 id = "24388863-1b0b-477d-aa06-faf33cba6176"
-tides = ["cheap_removal", "abandon_furnace"]
+tides = ["cheap_removal", "abandon_value"]
 rendered-text = """
 Dissolve an enemy with cost 2● or less.
 
@@ -2960,7 +2960,7 @@ card-number = 189
 [[cards]]
 name = "Searcher in the Mists"
 id = "560ad530-9ad9-452c-b80e-902d9a76af0c"
-tides = ["void_setup", "void_recursion", "survivor_dissolve"]
+tides = ["void_setup", "survivor_dissolve", "recursion_fuel"]
 rendered-text = """
 ▸ Materialized, Dissolved: Put the top 4 cards of your deck into your void.
 """
@@ -2977,7 +2977,7 @@ card-number = 190
 [[cards]]
 name = "Veil of the Wastes"
 id = "10ad7a9e-401d-494e-b4f3-5580b8d850d0"
-tides = ["survivor_dissolve", "materialize_value", "void_recursion"]
+tides = ["survivor_dissolve", "void_recursion"]
 rendered-text = "When you materialize a Survivor, reclaim this character."
 energy-cost = 3
 card-type = "Character"
@@ -3007,7 +3007,7 @@ card-number = 192
 [[cards]]
 name = "Flagbearer of Decay"
 id = "9979e005-3a9e-4c98-ae7b-d8a25307c959"
-tides = ["survivor_dissolve", "void_setup", "void_recursion"]
+tides = ["survivor_dissolve", "void_setup", "recursion_fuel"]
 rendered-text = "When you play a Survivor, put the top 2 cards of your deck into your void."
 energy-cost = 2
 card-type = "Character"
@@ -3022,7 +3022,7 @@ card-number = 193
 [[cards]]
 name = "Harvester of Despair"
 id = "0fb45922-4d27-4d01-9372-86e991164006"
-tides = ["abandon_furnace", "spark_tall"]
+tides = ["abandon_value", "spark_tall"]
 rendered-text = "When you abandon an ally, this character gains +1 spark."
 energy-cost = 3
 card-type = "Character"
@@ -3037,7 +3037,7 @@ card-number = 194
 [[cards]]
 name = "Blade of Oblivion"
 id = "86eed140-60b0-4e69-b868-332fcf25b8b3"
-tides = ["abandon_furnace"]
+tides = ["abandon_value"]
 rendered-text = "When you abandon a second ally in a turn, dissolve an enemy."
 energy-cost = 2
 card-type = "Character"
@@ -3052,7 +3052,7 @@ card-number = 195
 [[cards]]
 name = "Fathomless Maw"
 id = "fc294a5d-7239-4fd2-9d5e-e1760d342f60"
-tides = ["abandon_furnace"]
+tides = ["abandon_value", "point_pressure"]
 rendered-text = "When you abandon a character, gain 1✪."
 energy-cost = 4
 card-type = "Character"
@@ -3067,7 +3067,7 @@ card-number = 196
 [[cards]]
 name = "The Forsaker"
 id = "7263c37a-85c2-403a-8254-8ebd4b42a60d"
-tides = ["abandon_furnace"]
+tides = ["abandon_value", "point_pressure"]
 rendered-text = "Abandon an ally, once per turn: Gain 1✪."
 energy-cost = 2
 card-type = "Character"
@@ -3082,7 +3082,7 @@ card-number = 197
 [[cards]]
 name = "Infernal Ascendant"
 id = "e89e3b97-984b-40a2-a74b-3c0489511eba"
-tides = ["abandon_furnace", "spark_tall"]
+tides = ["abandon_value", "spark_tall"]
 rendered-text = """
 When you abandon an ally, kindle 2.
 """
@@ -3099,7 +3099,7 @@ card-number = 198
 [[cards]]
 name = "Ashen Remnant"
 id = "5ed8b4b4-abd4-410b-8c41-e94ac7609567"
-tides = ["abandon_furnace", "void_recursion", "topdeck_setup"]
+tides = ["abandon_value", "void_recursion", "topdeck_setup"]
 rendered-text = "Abandon an ally: You may put a character from your void on top of your deck."
 energy-cost = 2
 card-type = "Character"
@@ -3114,7 +3114,7 @@ card-number = 199
 [[cards]]
 name = "Shardwoven Tyrant"
 id = "b8bc35ae-4a4a-402e-a570-707bedceb5ce"
-tides = ["abandon_furnace"]
+tides = ["abandon_value", "cheap_removal"]
 rendered-text = "Abandon an ally: You may dissolve an enemy with spark less than that ally's spark."
 energy-cost = 3
 card-type = "Character"
@@ -3129,7 +3129,7 @@ card-number = 200
 [[cards]]
 name = "Volcanic Channeler"
 id = "eb8f817b-ca18-4edd-b278-05b54b890364"
-tides = ["abandon_furnace", "survivor_dissolve"]
+tides = ["survivor_dissolve"]
 rendered-text = """
 When an ally is ▸ Dissolved:, gain 1●.
 """
@@ -3146,7 +3146,7 @@ card-number = 201
 [[cards]]
 name = "Grim Reclaimer"
 id = "61c9fa98-dda1-4f45-976e-b3fc89987b11"
-tides = ["abandon_furnace", "warrior_bastion"]
+tides = ["abandon_value", "warrior_bastion", "reclaim_characters"]
 rendered-text = "Abandon an ally, once per turn: Reclaim a Warrior."
 energy-cost = 2
 card-type = "Character"
@@ -3161,7 +3161,7 @@ card-number = 202
 [[cards]]
 name = "Angel of the Eclipse"
 id = "d70473b6-ef2b-4fae-bc64-6043c7a7f2be"
-tides = ["materialize_value", "materialize_tempo"]
+tides = ["materialize_value"]
 rendered-text = "When you materialize an ally, gain 1●."
 energy-cost = 4
 card-type = "Character"
@@ -3206,7 +3206,7 @@ card-number = 205
 [[cards]]
 name = "Endless Projection"
 id = "3ab4dd0d-28c6-42e7-ab47-691781d458c5"
-tides = ["figment_swarm", "character_velocity"]
+tides = ["figment_swarm", "character_chain"]
 rendered-text = "When you play a character, materialize a Celestial figment."
 energy-cost = 4
 card-type = "Character"
@@ -3221,7 +3221,7 @@ card-number = 206
 [[cards]]
 name = "Prophet of the Consumed"
 id = "b0ee552a-3a4f-434f-903d-165ebfe3d072"
-tides = ["abandon_furnace"]
+tides = ["abandon_value", "card_flow"]
 rendered-text = "▸ Materialized: Draw a card for each ally abandoned this turn."
 energy-cost = 3
 card-type = "Character"
@@ -3236,7 +3236,7 @@ card-number = 207
 [[cards]]
 name = "Specter of Silent Snow"
 id = "06e86fc5-b501-49eb-bdbe-0445fc56fa65"
-tides = ["abandon_furnace"]
+tides = ["abandon_value"]
 rendered-text = "When you abandon a character, draw a card."
 energy-cost = 4
 card-type = "Character"
@@ -3251,7 +3251,7 @@ card-number = 208
 [[cards]]
 name = "Desperation"
 id = "39bbbc92-34d0-4699-8ac6-99805a1248fb"
-tides = ["abandon_furnace"]
+tides = ["abandon_value"]
 rendered-text = "Abandon any number of allies: Draw a card for each ally abandoned."
 energy-cost = 2
 card-type = "Event"
@@ -3283,7 +3283,7 @@ card-number = 210
 [[cards]]
 name = "Architect of Memory"
 id = "2530adcc-5ae2-486a-94b2-f40dd62f3755"
-tides = ["void_recursion"]
+tides = ["void_threshold"]
 rendered-text = "While you have 7 or more cards in your void, they have reclaim equal to their cost."
 energy-cost = 2
 card-type = "Character"
@@ -3298,7 +3298,7 @@ card-number = 211
 [[cards]]
 name = "Momentum of the Fallen"
 id = "dfd2523a-ff26-4c8c-9197-ba60f492d819"
-tides = ["premium_removal", "card_flow", "survivor_dissolve", "abandon_furnace"]
+tides = ["premium_removal", "card_flow", "survivor_dissolve"]
 rendered-text = """
 Dissolve an enemy. Draw a card.
 
@@ -3316,7 +3316,7 @@ card-number = 212
 [[cards]]
 name = "Pulse of Sacrifice"
 id = "12a59f07-7ff4-4a3b-9e9f-4f9b524d26af"
-tides = ["abandon_furnace", "discard_velocity"]
+tides = ["abandon_value", "discard_velocity", "big_energy"]
 rendered-text = "Abandon a character, Discard your hand: Gain 5●."
 energy-cost = 0
 card-type = "Event"
@@ -3331,7 +3331,7 @@ card-number = 213
 [[cards]]
 name = "Nightmare Manifest"
 id = "cc474374-2538-4e5d-9b84-15ed70b0c774"
-tides = ["abandon_furnace", "judgment_engines", "leave_play_enablers"]
+tides = ["abandon_value", "judgment_engines", "leave_play_enablers"]
 rendered-text = "▸ Judgment: Each player abandons a character."
 energy-cost = 1
 card-type = "Character"
@@ -3346,7 +3346,7 @@ card-number = 214
 [[cards]]
 name = "Dreamscatter"
 id = "a6e8e100-9aa6-4a53-82ec-4ab161829533"
-tides = ["card_flow", "resource_burst", "fast_setup", "event_chain"]
+tides = ["card_flow", "fast_setup", "event_chain"]
 rendered-text = "Pay 1 or more ●: Draw a card for each ● spent."
 energy-cost = 2
 card-type = "Event"
@@ -3361,7 +3361,7 @@ card-number = 215
 [[cards]]
 name = "Minstrel of Falling Light"
 id = "7285732f-7460-4544-8c74-9300a078a337"
-tides = ["card_flow", "resource_burst"]
+tides = ["card_flow"]
 rendered-text = "3●: Draw a card."
 energy-cost = 2
 card-type = "Character"
@@ -3469,7 +3469,7 @@ card-number = 222
 [[cards]]
 name = "Fangbound"
 id = "4bf0723b-ff81-4748-8253-a6b3540110e2"
-tides = ["spirit_growth", "materialize_tempo", "materialized_staples"]
+tides = ["spirit_growth", "materialize_tempo"]
 rendered-text = "▸ Materialized: Banish an enemy with cost 3● or less until this character leaves play."
 energy-cost = 3
 card-type = "Character"
@@ -3484,7 +3484,7 @@ card-number = 223
 [[cards]]
 name = "Infernal Cavalier"
 id = "a9d5a6b0-e6fe-4f34-b955-4e5129c1ab0f"
-tides = ["warrior_bastion", "abandon_furnace"]
+tides = ["warrior_bastion", "abandon_value"]
 rendered-text = "▸ Dissolved: Return all enemies to hand."
 energy-cost = 5
 card-type = "Character"
@@ -3499,7 +3499,7 @@ card-number = 224
 [[cards]]
 name = "Grim Pursuer"
 id = "5bfed3c9-cd1b-4fe7-a40b-dcec654db206"
-tides = ["prevent_control", "hand_disruption", "materialize_tempo"]
+tides = ["hand_disruption", "materialize_tempo"]
 rendered-text = "▸ Materialized: Banish a chosen card from the opponent's hand until this character leaves play."
 energy-cost = 2
 card-type = "Character"
@@ -3532,7 +3532,7 @@ card-number = 226
 [[cards]]
 name = "Breach Artist"
 id = "78e2c238-58c7-4bd7-b8f2-5415eda2f6cb"
-tides = ["fast_tempo", "materialize_tempo", "character_velocity", "tempo_resets"]
+tides = ["fast_tempo", "materialize_tempo", "tempo_resets", "discard_outlets"]
 rendered-text = """
 Banish a card from hand: Play this character for 0●, then abandon it.
 
@@ -3550,7 +3550,7 @@ card-number = 227
 [[cards]]
 name = "Vanishing Inquisitor"
 id = "c9862d86-5a1f-46c1-b45a-0c2549eb5b25"
-tides = ["prevent_control", "hand_disruption", "character_velocity"]
+tides = ["hand_disruption", "character_curve", "fast_tempo"]
 rendered-text = """
 Banish a card from hand: Play this character for 0●, then abandon it.
 
@@ -3568,7 +3568,7 @@ card-number = 228
 [[cards]]
 name = "Gloomantler"
 id = "25ee7d34-d1b0-4164-b0c2-e07e15c8d4cd"
-tides = ["cheap_removal", "character_velocity", "materialized_staples"]
+tides = ["cheap_removal", "materialize_tempo"]
 rendered-text = """
 Banish a card from hand: Play this character for 0●, then abandon it.
 
@@ -3586,7 +3586,7 @@ card-number = 229
 [[cards]]
 name = "Ember Shepherd"
 id = "1a25ed29-5681-4d13-9752-aeb3628c190c"
-tides = ["prevent_control", "abandon_furnace"]
+tides = ["prevent_control", "abandon_value"]
 rendered-text = "↯fast -- Abandon an ally: Prevent a played event which could dissolve an ally."
 energy-cost = 1
 card-type = "Character"
@@ -3616,7 +3616,7 @@ card-number = 232
 [[cards]]
 name = "Planetgazer"
 id = "e6ad4cf5-b8dd-4eb0-b713-2a9db71c866e"
-tides = ["judgment_bodies", "foresee_selection", "materialized_staples", "judgment_engines"]
+tides = ["judgment_bodies", "foresee_selection", "judgment_engines"]
 rendered-text = "▸ Materialized, Judgment: Foresee 1."
 energy-cost = 1
 card-type = "Character"
@@ -3664,7 +3664,7 @@ card-number = 235
 [[cards]]
 name = "Sylvan Matriarch"
 id = "5a596f0b-8bb8-4d00-bf41-1d2fd272b86e"
-tides = ["materialize_tempo", "materialize_value", "spark_tall"]
+tides = ["materialize_value", "spark_tall"]
 rendered-text = "When you materialize an ally, that ally gains +1 spark."
 energy-cost = 3
 card-type = "Character"
@@ -3679,7 +3679,7 @@ card-number = 236
 [[cards]]
 name = "Gateway Defender"
 id = "8c16cd05-1925-4df1-ac08-86c3d84c45ee"
-tides = ["spark_tall", "judgment_bodies", "spark_growth", "warrior_pressure"]
+tides = ["judgment_bodies", "spark_growth", "warrior_pressure"]
 rendered-text = "▸ Judgment: Kindle 1."
 energy-cost = 2
 card-type = "Character"
@@ -3712,7 +3712,7 @@ card-number = 239
 [[cards]]
 name = "Wired Duelist"
 id = "cab4266f-6671-4170-8ef3-6aea5054c452"
-tides = ["void_recursion"]
+tides = ["void_recursion", "spark_growth"]
 rendered-text = """
 ▸ Judgment: This character gains +1 spark.
 
@@ -3730,7 +3730,7 @@ card-number = 240
 [[cards]]
 name = "Sundown Ronin"
 id = "c8ad42f8-39d4-4bd4-9100-d9afeb31c11c"
-tides = ["warrior_pressure", "warrior_bastion"]
+tides = ["warrior_pressure", "warrior_bastion", "cost_reduction"]
 rendered-text = "Allied Warriors cost you 1● less."
 energy-cost = 2
 card-type = "Character"
@@ -3745,7 +3745,7 @@ card-number = 241
 [[cards]]
 name = "Verdant Wayfarer"
 id = "987aaa03-962d-4549-8149-8dbeccfc9911"
-tides = ["character_velocity", "cost_reduction", "materialize_value", "materialized_staples"]
+tides = ["character_curve", "cost_reduction", "materialize_value"]
 rendered-text = """
 Characters cost you 1● less.
 
@@ -3778,7 +3778,7 @@ card-number = 244
 [[cards]]
 name = "Dragonward"
 id = "6e6fc45d-3505-4119-af15-bbed67fa059a"
-tides = ["character_velocity", "character_tutors", "materialize_value", "warrior_pressure", "warrior_bastion"]
+tides = ["materialize_value", "warrior_pressure", "warrior_bastion", "card_flow"]
 rendered-text = "▸ Materialized: Draw a character with cost 2● or less."
 energy-cost = 3
 card-type = "Character"
@@ -3793,7 +3793,7 @@ card-number = 245
 [[cards]]
 name = "Glimmerwood Scout"
 id = "a27275ba-252f-41ba-a98b-be23c0b28cba"
-tides = ["character_velocity", "character_tutors", "materialize_value", "warrior_pressure", "warrior_bastion"]
+tides = ["materialize_value", "warrior_pressure", "warrior_bastion", "card_flow"]
 rendered-text = "▸ Materialized: Draw a character with spark 2 or less."
 energy-cost = 3
 card-type = "Character"
@@ -3838,7 +3838,7 @@ card-number = 248
 [[cards]]
 name = "Thornwood Delver"
 id = "226addd8-f09a-4237-ba75-c40635fbdb3b"
-tides = ["judgment_engines", "void_recursion", "materialize_value"]
+tides = ["judgment_engines", "void_recursion"]
 rendered-text = """
 ▸ Materialized: This character gains +1 spark.
 ▸ Judgment: Reclaim a character with cost up to this character's spark ●."""
@@ -3870,7 +3870,7 @@ card-number = 250
 [[cards]]
 name = "Toll of Passage"
 id = "9daf5b3e-76e4-4e7e-aa74-1b4b9f5d9e3e"
-tides = ["prevent_control", "materialize_tempo", "bounce_blink_tools"]
+tides = ["prevent_control", "bounce_blink_tools", "tax_pressure"]
 rendered-text = "Return an ally to hand: Play this event for 0●. Prevent a played card unless the opponent pays 2●."
 energy-cost = 1
 card-type = "Event"
@@ -3900,7 +3900,7 @@ card-number = 252
 [[cards]]
 name = "Maze"
 id = "a9d7abc1-c290-49c6-8153-83f097942b45"
-tides = ["tempo_resets", "fast_interaction", "materialize_tempo", "fast_tempo"]
+tides = ["tempo_resets", "fast_interaction", "fast_tempo"]
 rendered-text = "Banish an enemy until your next main phase."
 energy-cost = 3
 card-type = "Event"
@@ -3930,7 +3930,7 @@ card-number = 254
 [[cards]]
 name = "Part the Veil"
 id = "a0fd3b74-ae21-4a07-8306-7df3645c28d9"
-tides = ["void_recursion", "character_velocity", "abandon_furnace"]
+tides = ["void_recursion", "abandon_value", "character_curve"]
 rendered-text = "Reclaim all characters with cost 3● or less. At end of your next turn, abandon all reclaimed characters."
 energy-cost = 4
 card-type = "Event"
@@ -3945,7 +3945,7 @@ card-number = 255
 [[cards]]
 name = "Phantom Flotilla"
 id = "795a060f-ef43-42e3-96b7-b5bdb7266434"
-tides = ["void_recursion", "reclaim_characters", "character_velocity"]
+tides = ["void_recursion", "reclaim_characters", "character_curve"]
 rendered-text = "Reclaim up to 3 characters with cost 2● or less."
 energy-cost = 4
 card-type = "Event"
@@ -3993,7 +3993,7 @@ card-number = 259
 [[cards]]
 name = "Derelict Voyage"
 id = "98db4d6d-842c-401f-8037-699a518f96d5"
-tides = ["void_recursion", "reclaim_characters", "character_velocity"]
+tides = ["void_recursion", "reclaim_characters"]
 rendered-text = "Reclaim a character. Lose 1 maximum ●."
 energy-cost = 1
 card-type = "Event"
@@ -4023,7 +4023,7 @@ card-number = 262
 [[cards]]
 name = "Gleamharvester"
 id = "564ef717-7898-4623-9c94-e3fc986701e4"
-tides = ["hand_cycling", "discard_velocity", "character_tutors", "materialize_value"]
+tides = ["hand_cycling", "discard_velocity", "materialize_value", "discard_outlets"]
 rendered-text = "▸ Materialized: You may discard a card to draw a character."
 energy-cost = 3
 card-type = "Character"
@@ -4068,7 +4068,7 @@ card-number = 265
 [[cards]]
 name = "Starlight Reckoner"
 id = "f04e32b3-d897-4c24-9999-3f0557482ba1"
-tides = ["judgment_engines"]
+tides = ["judgment_engines", "card_flow"]
 rendered-text = "▸ Judgment: Draw a card."
 energy-cost = 5
 card-type = "Character"
@@ -4083,7 +4083,7 @@ card-number = 266
 [[cards]]
 name = "Twice-Lit Portal"
 id = "238a405b-1eb9-4f0e-9904-4da39a7c810e"
-tides = ["event_chain", "copy_effects"]
+tides = ["event_chain", "copy_effects", "reclaim_events"]
 rendered-text = """
 Copy the next event you play this turn. If this event was reclaimed, copy it twice instead.
 
@@ -4116,7 +4116,7 @@ card-number = 269
 [[cards]]
 name = "Gleam Below"
 id = "37711e14-b1b6-47e4-8f40-4293c1a49429"
-tides = ["foresee_selection", "card_flow", "event_setup", "event_chain"]
+tides = ["foresee_selection", "card_flow", "event_setup"]
 rendered-text = "Draw a card. Foresee 2."
 energy-cost = 1
 card-type = "Event"
@@ -4146,7 +4146,7 @@ card-number = 271
 [[cards]]
 name = "Ridgecutter"
 id = "435a6ac4-58a6-4d63-acc7-17377496acf4"
-tides = ["tempo_resets", "fast_interaction", "resource_burst", "fast_tempo"]
+tides = ["tempo_resets", "fast_interaction", "fast_tempo"]
 rendered-text = "Return an enemy to hand. Gain 2●."
 energy-cost = 3
 card-type = "Event"
@@ -4161,7 +4161,7 @@ card-number = 272
 [[cards]]
 name = "Hatching Ground"
 id = "6014454b-9fdc-4f6a-9dcf-20f908bc90f9"
-tides = ["void_setup", "void_recursion", "event_chain"]
+tides = ["void_setup", "event_chain", "recursion_fuel"]
 rendered-text = "Put the top 3 cards of your deck into your void, plus 1 more for each card you have played this turn."
 energy-cost = 2
 card-type = "Event"
@@ -4176,7 +4176,7 @@ card-number = 274
 [[cards]]
 name = "Depthwalker"
 id = "885a7b29-82de-400b-b961-aff3df3c6ee0"
-tides = ["void_recursion", "void_setup", "survivor_dissolve", "abandon_furnace"]
+tides = ["void_recursion", "void_setup", "survivor_dissolve", "recursion_fuel"]
 rendered-text = """
 ▸ Materialized: Put the top 3 cards of your deck into your void.
 
@@ -4194,7 +4194,7 @@ card-number = 275
 [[cards]]
 name = "Dreadwood Emissary"
 id = "e1e7c403-251e-4db1-bd3b-5ee03124e681"
-tides = ["void_recursion", "abandon_furnace", "void_setup"]
+tides = ["void_recursion", "abandon_value", "void_setup"]
 rendered-text = """
 ▸ Materialized: Put the top 3 cards of your deck into your void.
 2●, Abandon an ally: Reclaim a character with cost 3● or less."""
@@ -4211,7 +4211,7 @@ card-number = 276
 [[cards]]
 name = "Dream Garden Visitor"
 id = "5fc8b425-5170-4281-bcef-230d82af20f9"
-tides = ["void_setup", "void_recursion"]
+tides = ["void_setup", "recursion_fuel"]
 rendered-text = "▸ Materialized: Put the top 3 cards of your deck into your void."
 energy-cost = 2
 card-type = "Character"
@@ -4241,7 +4241,7 @@ card-number = 278
 [[cards]]
 name = "Silent Gatherer"
 id = "fec40d51-abbe-49b2-bed3-ad4f7f8069a1"
-tides = ["spirit_growth", "void_recursion", "reclaim_characters"]
+tides = ["spirit_growth", "void_recursion", "reclaim_characters", "recursion_fuel"]
 rendered-text = "▸ Judgment: Put the top 2 cards of your deck into your void. You may return a character from your void to your hand."
 energy-cost = 4
 card-type = "Character"
@@ -4256,7 +4256,7 @@ card-number = 279
 [[cards]]
 name = "Across the Void"
 id = "fba9d90d-3e44-417e-bf25-1d1d4a2e81ce"
-tides = ["void_recursion", "reclaim_characters", "void_setup"]
+tides = ["void_recursion", "reclaim_characters", "void_setup", "recursion_fuel"]
 rendered-text = """
 Return up to 2 characters from your void to your hand.
 
@@ -4274,7 +4274,7 @@ card-number = 280
 [[cards]]
 name = "Defiant Parry"
 id = "38147bfd-8410-4293-a952-e348258c0542"
-tides = ["prevent_control", "fast_interaction", "resource_burst", "big_energy"]
+tides = ["prevent_control", "fast_interaction", "resource_burst"]
 rendered-text = "Prevent a played card. Gain ● equal to that card's cost."
 energy-cost = 2
 card-type = "Event"
@@ -4289,7 +4289,7 @@ card-number = 281
 [[cards]]
 name = "Call of Calamity"
 id = "31d222f7-40c8-480d-82b0-d235f57d53c2"
-tides = ["prevent_control", "fast_interaction", "fast_setup"]
+tides = ["prevent_control", "fast_interaction", "hand_cycling"]
 rendered-text = "Prevent a played card. The opponent draws a card, then discards a card."
 energy-cost = 2
 card-type = "Event"
@@ -4304,7 +4304,7 @@ card-number = 282
 [[cards]]
 name = "Standoff"
 id = "5b2c6dca-8bb0-412e-87ef-d98ad31ad986"
-tides = ["prevent_control", "fast_interaction", "fast_setup"]
+tides = ["prevent_control", "fast_interaction"]
 rendered-text = "Prevent a played card. The opponent draws 2 cards."
 energy-cost = 0
 card-type = "Event"
@@ -4334,7 +4334,7 @@ card-number = 284
 [[cards]]
 name = "Spiral Offering"
 id = "fdb9bb58-df8b-47ac-9d53-89d2ba4d0969"
-tides = ["discard_velocity", "hand_cycling", "void_setup", "card_flow"]
+tides = ["discard_velocity", "hand_cycling", "void_setup", "card_flow", "discard_outlets"]
 rendered-text = "Discard 2 cards: Draw 3 cards."
 energy-cost = 2
 card-type = "Event"
@@ -4364,7 +4364,7 @@ card-number = 286
 [[cards]]
 name = "Wreckland Maverick"
 id = "d52909bf-0278-4e8a-b869-34399501c442"
-tides = ["survivor_dissolve", "defensive_curve", "cheap_curve"]
+tides = ["survivor_dissolve", "defensive_curve"]
 rendered-text = "▸ Dissolved: Return this character to your hand."
 energy-cost = 2
 card-type = "Character"
@@ -4379,7 +4379,7 @@ card-number = 287
 [[cards]]
 name = "Wasteland Tamer"
 id = "2280b92e-4444-4655-b398-f5bfa458dc62"
-tides = ["discard_velocity", "figment_swarm"]
+tides = ["discard_velocity", "figment_swarm", "discard_outlets"]
 rendered-text = "Discard 2 cards: Materialize a Shadow Figment."
 energy-cost = 2
 card-type = "Character"
@@ -4424,7 +4424,7 @@ card-number = 290
 [[cards]]
 name = "Shadowcaller"
 id = "dd75b7d9-0861-4fa8-a882-8d0b4e104111"
-tides = ["figment_swarm", "survivor_dissolve", "abandon_furnace"]
+tides = ["figment_swarm", "survivor_dissolve"]
 rendered-text = """
 When an ally is dissolved, materialize a Shadow Figment.
 
@@ -4457,7 +4457,7 @@ card-number = 292
 [[cards]]
 name = "Stargazer Adrift"
 id = "0cce3648-d2a8-481c-8521-8565853f664a"
-tides = ["abandon_furnace", "abandon_fodder", "topdeck_setup"]
+tides = ["abandon_value", "abandon_fodder", "topdeck_setup"]
 rendered-text = "Abandon an ally: Foresee 2."
 energy-cost = 1
 card-type = "Character"
@@ -4487,7 +4487,7 @@ card-number = 296
 [[cards]]
 name = "Nebula's Wake"
 id = "eb47dd55-748f-44f8-9edc-3476182c4396"
-tides = ["resource_burst", "big_energy", "void_setup"]
+tides = ["big_energy", "void_threshold"]
 rendered-text = "Gain 3●. If you have 7 or more cards in your void, gain 5● instead."
 energy-cost = 2
 card-type = "Event"
@@ -4502,7 +4502,7 @@ card-number = 297
 [[cards]]
 name = "Sunset Chapel Rest"
 id = "1f600865-4f4d-4d3a-82ed-b4b37a8bedb6"
-tides = ["abandon_furnace", "abandon_fodder", "character_tutors"]
+tides = ["abandon_value", "abandon_fodder", "card_flow"]
 rendered-text = "Abandon an ally: Draw a character."
 energy-cost = 2
 card-type = "Event"
@@ -4517,7 +4517,7 @@ card-number = 298
 [[cards]]
 name = "Immolate and Rise"
 id = "12aedbb7-c14d-4a89-a9d9-ca4d7c557676"
-tides = ["abandon_furnace", "abandon_fodder", "character_tutors", "fast_setup"]
+tides = ["abandon_fodder", "card_flow", "abandon_value"]
 rendered-text = "Abandon an ally: Draw a character with cost equal to that ally's cost."
 energy-cost = 1
 card-type = "Event"
@@ -4532,7 +4532,7 @@ card-number = 299
 [[cards]]
 name = "Junkfield Renegade"
 id = "b696de0b-420a-4e2b-b1e7-adf9644a18e6"
-tides = ["abandon_furnace", "abandon_fodder"]
+tides = ["abandon_value", "abandon_fodder"]
 rendered-text = "Abandon an ally: Draw a card."
 energy-cost = 1
 card-type = "Character"
@@ -4622,7 +4622,7 @@ card-number = 305
 [[cards]]
 name = "Molten Duel"
 id = "102c3047-58d9-4b2b-bea9-10739e84b9cd"
-tides = ["cheap_removal", "fast_interaction", "fast_setup", "fast_tempo"]
+tides = ["cheap_removal", "fast_interaction", "fast_tempo"]
 rendered-text = "Dissolve an enemy with spark 3 or less."
 energy-cost = 1
 card-type = "Event"
@@ -4637,7 +4637,7 @@ card-number = 306
 [[cards]]
 name = "Forsaken Skyline"
 id = "528ac63c-9928-4c8e-bfea-610b33c8b0d7"
-tides = ["sweepers", "premium_removal", "void_recursion"]
+tides = ["premium_removal", "void_recursion", "finishers"]
 rendered-text = """
 Dissolve all characters with spark 2 or less. When you reclaim this card, dissolve all characters instead.
 
@@ -4655,7 +4655,7 @@ card-number = 307
 [[cards]]
 name = "Sky Voyager"
 id = "62c9493d-6810-4cff-bd9d-2f8c65473ec7"
-tides = ["judgment_bodies", "big_energy", "resource_burst", "judgment_engines"]
+tides = ["judgment_bodies", "big_energy", "judgment_engines"]
 rendered-text = "▸ Judgment: Gain 1●. 4●: Gain 1 maximum ●."
 energy-cost = 1
 card-type = "Character"
@@ -4670,7 +4670,7 @@ card-number = 308
 [[cards]]
 name = "Emberfang"
 id = "e06f42fb-b7ec-401f-b374-76c889f697f2"
-tides = ["spirit_growth", "big_energy", "judgment_engines", "materialized_staples"]
+tides = ["spirit_growth", "big_energy", "judgment_engines"]
 rendered-text = "▸ Materialized, Judgment: Gain 2●. The opponent gains 1✪."
 energy-cost = 2
 card-type = "Character"
@@ -4685,7 +4685,7 @@ card-number = 309
 [[cards]]
 name = "Moonbound Wolf"
 id = "4413a3c5-ef54-4253-b6fa-e8da64baf63f"
-tides = ["spirit_growth", "bounce_blink_tools", "big_energy", "judgment_engines", "materialize_tempo"]
+tides = ["spirit_growth", "bounce_blink_tools", "big_energy", "judgment_engines"]
 rendered-text = "▸ Judgment: You may return a character to hand to gain 3●."
 energy-cost = 1
 card-type = "Character"
@@ -4730,7 +4730,7 @@ card-number = 312
 [[cards]]
 name = "Fern Treader"
 id = "45914018-3210-4b1b-81a5-0a819e04df1a"
-tides = ["big_energy", "judgment_bodies", "judgment_engines", "resource_burst"]
+tides = ["big_energy", "judgment_bodies", "judgment_engines"]
 rendered-text = "▸ Judgment: Gain 1 maximum ●."
 energy-cost = 2
 card-type = "Character"
@@ -4745,7 +4745,7 @@ card-number = 313
 [[cards]]
 name = "Ancient Descent"
 id = "ec5a996e-6d43-48ca-adba-01fee6a64d4d"
-tides = ["topdeck_setup", "big_energy", "foresee_selection", "spirit_growth", "resource_burst"]
+tides = ["topdeck_setup", "big_energy", "foresee_selection", "resource_burst"]
 rendered-text = "Foresee 3. Gain 1 maximum ●."
 energy-cost = 2
 card-type = "Event"
@@ -4760,7 +4760,7 @@ card-number = 315
 [[cards]]
 name = "Starlift"
 id = "f0079658-f08f-4d85-979c-63c9f75cffa1"
-tides = ["fast_interaction", "tempo_resets", "fast_setup", "fast_tempo", "prevent_control"]
+tides = ["fast_interaction", "tempo_resets", "fast_setup", "fast_tempo"]
 rendered-text = "Banish an enemy until your next main phase."
 energy-cost = 5
 card-type = "Event"
@@ -4775,7 +4775,7 @@ card-number = 316
 [[cards]]
 name = "Mirror Protocol"
 id = "d2306c6b-45de-4f67-8a47-ae13de98293e"
-tides = ["materialize_value", "trigger_reuse", "leave_play_enablers", "abandon_furnace"]
+tides = ["materialize_value", "trigger_reuse", "leave_play_enablers", "abandon_ladder"]
 rendered-text = "▸ Materialized: Materialize a copy of an ally. Abandon this character."
 energy-cost = 2
 card-type = "Character"
@@ -4820,7 +4820,7 @@ card-number = 319
 [[cards]]
 name = "Lunar Hart"
 id = "e264a35e-7c8a-4c67-9a63-b23f3416c196"
-tides = ["spirit_growth", "big_energy", "judgment_bodies", "materialized_staples", "resource_burst"]
+tides = ["spirit_growth", "big_energy", "judgment_bodies"]
 rendered-text = "▸ Materialized: Gain 1 maximum ●. ▸ Judgment: Gain 1●."
 energy-cost = 2
 card-type = "Character"
@@ -4865,7 +4865,7 @@ card-number = 323
 [[cards]]
 name = "Inspiring Templar"
 id = "c77ead7a-e7a4-4c92-819c-558bc26773f3"
-tides = ["ally_formation", "warrior_pressure", "figment_swarm"]
+tides = ["ally_wide", "warrior_pressure", "figment_swarm"]
 rendered-text = "▸ Judgment: You may pay 2● to have each ally gain +2 spark."
 energy-cost = 3
 card-type = "Character"
@@ -4880,7 +4880,7 @@ card-number = 324
 [[cards]]
 name = "Wake the Fallen"
 id = "2f932c14-02cb-4c93-be06-03e067496cb6"
-tides = ["survivor_dissolve", "abandon_furnace"]
+tides = ["survivor_dissolve", "void_recursion", "reclaim_characters"]
 rendered-text = "Reclaim each character dissolved this turn."
 energy-cost = 4
 card-type = "Event"
@@ -4895,7 +4895,7 @@ card-number = 325
 [[cards]]
 name = "Last Beacon"
 id = "cc5e770a-210d-4737-8aa7-6be7328b0dbd"
-tides = ["figment_swarm"]
+tides = ["figment_swarm", "card_flow"]
 rendered-text = """
 ▸ Materialized: Materialize a Warrior figment.
 When you materialize a Figment, draw a card."""
@@ -4927,7 +4927,7 @@ card-number = 328
 [[cards]]
 name = "Miraculous Arrival"
 id = "56f1e5d2-f15e-40e4-85de-f18607f4de4e"
-tides = ["materialize_tempo", "bounce_blink_tools", "fast_setup", "card_flow", "ally_formation"]
+tides = ["materialize_tempo", "bounce_blink_tools", "card_flow", "ally_wide"]
 rendered-text = "Return 2 allies to hand: Play this event for 0●. Draw 2 cards."
 energy-cost = 4
 card-type = "Event"
@@ -4942,7 +4942,7 @@ card-number = 329
 [[cards]]
 name = "Gathering Stride"
 id = "4c8e736b-312f-4196-9106-1f8983ee9fff"
-tides = ["event_chain"]
+tides = ["event_chain", "big_energy"]
 rendered-text = "Until end of turn, gain 2● whenever you play a card."
 energy-cost = 2
 card-type = "Event"
@@ -4972,7 +4972,7 @@ card-number = 331
 [[cards]]
 name = "Crimson Pilgrimage"
 id = "cb77c2ab-e325-4c6c-90c1-4bc8f03a6e66"
-tides = ["void_setup", "foresee_selection", "topdeck_setup", "discover_toolbox"]
+tides = ["void_setup", "foresee_selection", "topdeck_setup", "recursion_fuel"]
 rendered-text = "Look at the top four cards of your deck. Put one of them into your hand and the rest into your void."
 energy-cost = 2
 card-type = "Event"
@@ -5035,7 +5035,7 @@ card-number = 335
 [[cards]]
 name = "Vaultbreaker"
 id = "cd0d7da1-d3bc-4978-860d-42ce4bd38772"
-tides = ["ally_formation", "figment_swarm", "finishers"]
+tides = ["figment_swarm", "finishers", "cost_reduction", "ally_formation"]
 rendered-text = "This character costs 1● less for each ally."
 energy-cost = 6
 card-type = "Character"
@@ -5065,7 +5065,7 @@ card-number = 337
 [[cards]]
 name = "Dreadweaver"
 id = "029e7b87-fa96-4c0c-abdd-1c8b532f0477"
-tides = ["abandon_furnace", "ally_formation", "figment_swarm"]
+tides = ["abandon_value", "figment_swarm"]
 rendered-text = "▸ Judgment: You may abandon 2 allies to gain 2● and draw 2 cards."
 energy-cost = 3
 card-type = "Character"
@@ -5095,7 +5095,7 @@ card-number = 339
 [[cards]]
 name = "Burning Pursuit"
 id = "a99a5101-0fe3-43cd-a63b-44f6aba62682"
-tides = ["ally_formation", "figment_swarm", "premium_removal"]
+tides = ["figment_swarm", "premium_removal", "ally_formation"]
 rendered-text = "This event costs 1● less for each ally. Dissolve an enemy. Draw a card."
 energy-cost = 5
 card-type = "Event"
@@ -5110,7 +5110,7 @@ card-number = 341
 [[cards]]
 name = "Voidsire"
 id = "521f2592-3539-47fc-b0c9-f236ad06b29c"
-tides = ["abandon_furnace", "figment_swarm"]
+tides = ["figment_swarm", "abandon_ladder"]
 rendered-text = "If this card is in your void, when you abandon an ally, materialize a Shadow Figment."
 energy-cost = 3
 card-type = "Character"
@@ -5125,7 +5125,7 @@ card-number = 343
 [[cards]]
 name = "Mourning Rite"
 id = "678733f0-1685-40fe-84c4-629bb07fcb55"
-tides = ["abandon_furnace"]
+tides = ["abandon_value", "point_pressure"]
 rendered-text = "When an ally is abandoned this turn, gain 1✪."
 energy-cost = 3
 card-type = "Event"
@@ -5140,7 +5140,7 @@ card-number = 344
 [[cards]]
 name = "Seaside Requiem"
 id = "1105e04f-a048-4ac3-a144-632995663865"
-tides = ["hand_cycling", "discard_velocity", "abandon_furnace", "void_setup"]
+tides = ["hand_cycling", "discard_velocity", "abandon_value", "void_setup"]
 rendered-text = "Discard a card or abandon an ally: Draw 2 cards."
 energy-cost = 2
 card-type = "Event"
@@ -5170,7 +5170,7 @@ card-number = 350
 [[cards]]
 name = "Lumen Rover"
 id = "1824049c-8af9-4dc3-94e6-09ac90c1ee85"
-tides = ["topdeck_setup", "spirit_growth"]
+tides = ["topdeck_setup"]
 rendered-text = "▸ Materialized: You may play cards from the top of your deck this turn."
 energy-cost = 1
 card-type = "Character"
@@ -5185,7 +5185,7 @@ card-number = 352
 [[cards]]
 name = "Saffron Trailblazer"
 id = "b2ae8947-1fca-47b7-9b93-4454584fead3"
-tides = ["big_energy", "materialized_staples", "cheap_curve", "resource_burst"]
+tides = ["big_energy", "resource_burst"]
 rendered-text = "▸ Materialized: Gain 1 maximum ●."
 energy-cost = 1
 card-type = "Character"
@@ -5200,7 +5200,7 @@ card-number = 354
 [[cards]]
 name = "Ironclad Holdout"
 id = "d610b91d-61c3-494f-8cf5-ab37847fa171"
-tides = ["warrior_pressure", "warrior_bastion", "void_recursion"]
+tides = ["warrior_bastion", "void_threshold"]
 rendered-text = "▸ Judgment: With 3 cards in your void, this character gains +2 spark."
 energy-cost = 1
 card-type = "Character"
@@ -5215,7 +5215,7 @@ card-number = 355
 [[cards]]
 name = "Crumbling Covenant"
 id = "018c304f-90b1-4365-8568-8f527279b703"
-tides = ["abandon_furnace", "abandon_fodder", "big_energy", "leave_play_enablers"]
+tides = ["abandon_value", "abandon_fodder", "big_energy", "leave_play_enablers"]
 rendered-text = "Abandon an ally: Gain 1 maximum ●."
 energy-cost = 2
 card-type = "Event"
@@ -5230,7 +5230,7 @@ card-number = 356
 [[cards]]
 name = "Void Pilgrim"
 id = "c2a48aa4-c818-4551-af44-f29b865f5d1c"
-tides = ["character_tutors", "hand_cycling", "discard_velocity", "judgment_engines"]
+tides = ["card_flow", "hand_cycling", "discard_velocity", "judgment_engines"]
 rendered-text = "▸ Judgment: You may discard a card to draw a character."
 energy-cost = 2
 card-type = "Character"
@@ -5245,7 +5245,7 @@ card-number = 357
 [[cards]]
 name = "Overstory Explorer"
 id = "cc0151d5-916c-417f-be4e-38e0659d0e2f"
-tides = ["topdeck_setup", "big_energy", "materialized_staples", "foresee_selection", "spirit_growth"]
+tides = ["topdeck_setup", "big_energy", "foresee_selection"]
 rendered-text = "▸ Materialized: Foresee 4. Gain 1 maximum ●."
 energy-cost = 2
 card-type = "Character"
@@ -5275,7 +5275,7 @@ card-number = 360
 [[cards]]
 name = "Carrion Lord"
 id = "cb30a53c-fce2-4048-b808-6ef106c9e054"
-tides = ["abandon_furnace", "figment_swarm", "leave_play_enablers"]
+tides = ["abandon_ladder", "figment_swarm", "leave_play_enablers"]
 rendered-text = "▸ Materialized: Abandon an ally. Materialize a Shadow figment."
 energy-cost = 2
 card-type = "Character"
@@ -5290,7 +5290,7 @@ card-number = 361
 [[cards]]
 name = "Dreamcatcher's Call"
 id = "a3f91057-ef7a-44e7-8183-d3a06d5e2884"
-tides = ["spirit_growth"]
+tides = ["spirit_growth", "discover_toolbox", "character_tutors"]
 rendered-text = "Pay X●: Discover a Spirit Animal with cost X● or less and materialize it."
 energy-cost = "*"
 card-type = "Event"
@@ -5320,7 +5320,7 @@ card-number = 363
 [[cards]]
 name = "Curio Dealer"
 id = "0ec9bbca-a3de-43b0-b64a-4b94c4b14e2c"
-tides = ["character_tutors", "hand_cycling", "discard_velocity", "character_velocity"]
+tides = ["hand_cycling", "discard_velocity", "card_flow"]
 rendered-text = "▸ Judgment: You may discard a character to draw a character with cost 1● higher."
 energy-cost = 3
 card-type = "Character"
@@ -5335,7 +5335,7 @@ card-number = 364
 [[cards]]
 name = "Heavenward Penitent"
 id = "44cb7de5-4d8a-479e-af0e-b88e47f60cee"
-tides = ["spark_tall"]
+tides = ["spark_tall", "cheap_curve"]
 rendered-text = "To play this character, lose 1 maximum ●."
 energy-cost = 1
 card-type = "Character"
@@ -5350,7 +5350,7 @@ card-number = 365
 [[cards]]
 name = "Skyborne Jellyfish"
 id = "41b097e9-44b5-4c61-8977-6a05a8e61dee"
-tides = ["spirit_growth", "big_energy", "abandon_furnace", "judgment_engines"]
+tides = ["spirit_growth", "big_energy", "abandon_value", "judgment_engines"]
 rendered-text = "▸ Judgment: You may abandon this character to gain 5●."
 energy-cost = 2
 card-type = "Character"
@@ -5365,7 +5365,7 @@ card-number = 366
 [[cards]]
 name = "Forgotten Factory Titan"
 id = "9e88669a-c0a7-4d5c-b871-d7dd1aac072f"
-tides = ["warrior_pressure", "warrior_bastion", "spirit_growth", "survivor_dissolve"]
+tides = ["warrior_pressure", "warrior_bastion", "spirit_growth", "survivor_dissolve", "spark_growth"]
 rendered-text = "▸ Materialized: Choose a character type. Allied characters of that type gain +1 spark."
 energy-cost = 2
 card-type = "Character"
@@ -5380,7 +5380,7 @@ card-number = 367
 [[cards]]
 name = "Last Light Herald"
 id = "8c2de60e-1e06-4563-acf9-beb76a2620c2"
-tides = ["ally_formation", "figment_swarm", "judgment_engines", "finishers"]
+tides = ["ally_wide", "figment_swarm", "judgment_engines", "finishers"]
 rendered-text = "▸ Judgment: Each ally gains +1 spark."
 energy-cost = 5
 card-type = "Character"
@@ -5410,7 +5410,7 @@ card-number = 370
 [[cards]]
 name = "Ordained Collapse"
 id = "c5785c16-b3bf-4b85-af06-5b719c6d9891"
-tides = ["sweepers", "premium_removal"]
+tides = ["premium_removal", "finishers"]
 rendered-text = "Choose a number: Dissolve all enemies with cost equal to that number."
 energy-cost = 3
 card-type = "Event"
@@ -5425,7 +5425,7 @@ card-number = 372
 [[cards]]
 name = "Autumn's Bounty"
 id = "57e41821-b153-4a0a-9b25-3c77e773fede"
-tides = ["resource_burst", "big_energy", "event_setup", "event_chain"]
+tides = ["resource_burst", "event_setup"]
 rendered-text = "Gain 1●."
 energy-cost = 0
 card-type = "Event"
@@ -5440,7 +5440,7 @@ card-number = 373
 [[cards]]
 name = "Lone Castaway"
 id = "fe663f4c-593d-42a2-9fa2-a2bf3560eb46"
-tides = ["big_energy", "judgment_bodies", "materialized_staples", "resource_burst"]
+tides = ["big_energy", "judgment_bodies"]
 rendered-text = "▸ Materialized, Judgment: Gain 2●. Lose 1✪."
 energy-cost = 2
 card-type = "Character"
@@ -5455,7 +5455,7 @@ card-number = 374
 [[cards]]
 name = "Ruptured Dynamo"
 id = "e71ac2d1-8d45-479d-81db-3127860ba498"
-tides = ["big_energy", "materialized_staples", "resource_burst", "bounce_blink_tools", "materialize_value"]
+tides = ["big_energy", "resource_burst", "materialize_value"]
 rendered-text = "▸ Materialized: Gain 4●. Lose 1 maximum ●."
 energy-cost = 1
 card-type = "Character"
@@ -5470,7 +5470,7 @@ card-number = 376
 [[cards]]
 name = "Arc Disciple"
 id = "daa30155-1b40-42ff-b5b6-0745ad9d4277"
-tides = ["abandon_furnace", "abandon_fodder", "judgment_engines"]
+tides = ["abandon_value", "abandon_fodder", "judgment_engines"]
 rendered-text = "▸ Judgment: You may abandon an ally to gain 2●."
 energy-cost = 1
 card-type = "Character"
@@ -5485,7 +5485,7 @@ card-number = 377
 [[cards]]
 name = "Pit Descender"
 id = "0bf69801-fab9-4459-9eef-4c57eae90b02"
-tides = ["abandon_furnace", "void_setup", "void_recursion"]
+tides = ["abandon_value", "void_setup"]
 rendered-text = "▸ Judgment: You may abandon an ally to put cards from your deck into your void equal to that ally's spark."
 energy-cost = 2
 card-type = "Character"
@@ -5532,7 +5532,7 @@ card-number = 381
 [[cards]]
 name = "Vortex Claimant"
 id = "5aad0a6c-81d2-417a-8442-9490191b526e"
-tides = ["materialize_value", "prevent_control", "materialize_tempo"]
+tides = ["materialize_value", "copy_effects"]
 rendered-text = "▸ Materialized: Disable an enemy's triggered abilities. This character gains those abilities."
 energy-cost = 5
 card-type = "Character"
@@ -5547,7 +5547,7 @@ card-number = 382
 [[cards]]
 name = "Duskmount"
 id = "98a49295-1ad6-4c6a-bb78-659bfedeec21"
-tides = ["materialize_tempo", "materialize_value", "spirit_growth"]
+tides = ["materialize_tempo", "spirit_growth", "bounce_blink_tools"]
 rendered-text = """
 When an ally is banished, this character gains +1 spark.
 
@@ -5565,7 +5565,7 @@ card-number = 383
 [[cards]]
 name = "Iron Executor"
 id = "9065b009-6ae3-4138-b5a0-1204a69abc00"
-tides = ["discard_velocity", "materialized_staples", "materialize_value"]
+tides = ["discard_velocity", "cheap_removal", "materialize_value"]
 rendered-text = "Costs 0● if you discarded a card this turn. ▸ Materialized: Dissolve an enemy with spark 3 or less."
 energy-cost = 4
 card-type = "Character"
@@ -5580,7 +5580,7 @@ card-number = 384
 [[cards]]
 name = "Cinderheart"
 id = "9c9892a6-b472-497c-83b8-fe3460349743"
-tides = ["abandon_furnace", "spark_tall"]
+tides = ["abandon_value", "spark_tall"]
 rendered-text = "When you abandon an ally, this character gains +1 spark. ▸ Dissolved: Kindle X where X is this character's spark."
 energy-cost = 2
 card-type = "Character"
@@ -5595,7 +5595,7 @@ card-number = 385
 [[cards]]
 name = "Fading Farewell"
 id = "e4196e79-c4f1-406c-8b9e-90a7323ae85e"
-tides = ["reclaim_characters", "prevent_control", "hand_disruption", "void_recursion"]
+tides = ["reclaim_characters", "hand_disruption", "void_recursion"]
 rendered-text = "Return a character from your void to your hand. The opponent discards a card."
 energy-cost = 3
 card-type = "Event"
@@ -5610,7 +5610,7 @@ card-number = 386
 [[cards]]
 name = "Radiant Convergence"
 id = "a374adac-d42d-4635-b68b-d2e55e65df3c"
-tides = ["materialize_tempo", "materialize_value"]
+tides = ["materialize_value", "spark_growth", "reclaim_events"]
 rendered-text = """
 Until end of turn, when you materialize a character, that character gains +3 spark.
 
@@ -5628,7 +5628,7 @@ card-number = 388
 [[cards]]
 name = "Warfield Stalwart"
 id = "d09f9ec0-02e0-4ce3-9281-b6d833e208c5"
-tides = ["figment_swarm", "abandon_furnace", "warrior_pressure"]
+tides = ["figment_swarm", "warrior_pressure", "leave_play_enablers"]
 rendered-text = "At the end of your turn, if an ally left play this turn, materialize a Warrior figment."
 energy-cost = 2
 card-type = "Character"
@@ -5643,7 +5643,7 @@ card-number = 389
 [[cards]]
 name = "Fell Swoop"
 id = "9e29bb8c-2faf-4964-be86-006883c8d539"
-tides = ["cheap_removal", "fast_interaction"]
+tides = ["cheap_removal", "fast_interaction", "reclaim_events"]
 rendered-text = """
 Dissolve an enemy with cost 3● or less.
 
@@ -5661,7 +5661,7 @@ card-number = 390
 [[cards]]
 name = "Ferryman of the Falls"
 id = "c9ec2950-f87e-4041-a50d-cd0fb85217f0"
-tides = ["judgment_engines", "void_recursion", "void_setup", "card_flow"]
+tides = ["judgment_engines", "recursion_fuel", "void_setup", "card_flow"]
 rendered-text = "▸ Judgment: Draw a card, then put the top 2 cards of your deck into your void."
 energy-cost = 5
 card-type = "Character"
@@ -5676,7 +5676,7 @@ card-number = 391
 [[cards]]
 name = "Mountainwatch Alpha"
 id = "05b21b36-09ff-461f-94a8-009b5140ee80"
-tides = ["spirit_growth", "materialized_staples", "materialize_value", "fast_tempo"]
+tides = ["spirit_growth", "materialize_value", "fast_tempo"]
 rendered-text = "▸ Materialized: Draw a card. With 3 allied Spirit Animals, dissolve an enemy with spark 2 or less."
 energy-cost = 2
 card-type = "Character"
@@ -5691,7 +5691,7 @@ card-number = 392
 [[cards]]
 name = "Doorlight Foundling"
 id = "e2a9fa5d-20c8-4aee-992c-d956e18c1e41"
-tides = ["materialize_value", "character_velocity"]
+tides = ["materialize_value", "character_chain"]
 rendered-text = "▸ Materialized: Draw a card with cost 2● or less and play it for 0●."
 energy-cost = 3
 card-type = "Character"
@@ -5706,7 +5706,7 @@ card-number = 393
 [[cards]]
 name = "Shadowcaller"
 id = "4c1b4afa-6ae8-4966-b9c2-66f483485245"
-tides = ["abandon_furnace", "figment_swarm"]
+tides = ["figment_swarm", "abandon_ladder"]
 rendered-text = "When a non-figment ally is abandoned, materialize a Shadow figment."
 energy-cost = 5
 card-type = "Character"
@@ -5721,7 +5721,7 @@ card-number = 399
 [[cards]]
 name = "Pyrewatcher"
 id = "16771c40-46a9-4122-b5e1-a80f3912d99e"
-tides = ["abandon_fodder", "abandon_furnace", "void_recursion", "survivor_dissolve"]
+tides = ["abandon_fodder", "abandon_value", "void_recursion", "survivor_dissolve"]
 rendered-text = """
 Abandon an ally: Foresee 1.
 
@@ -5739,7 +5739,7 @@ card-number = 401
 [[cards]]
 name = "Ironclad Marksman"
 id = "ac839892-f6bc-44c3-8306-a7f02db08679"
-tides = ["warrior_bastion", "materialized_staples", "materialize_value"]
+tides = ["warrior_bastion", "materialize_value", "premium_removal"]
 rendered-text = "▸ Materialized: Dissolve an enemy."
 energy-cost = 4
 card-type = "Character"
@@ -5754,7 +5754,7 @@ card-number = 402
 [[cards]]
 name = "Shadowbinder"
 id = "45eaba8d-8f3e-4f65-9c31-30565988e804"
-tides = ["figment_swarm", "judgment_engines", "abandon_furnace"]
+tides = ["figment_swarm", "judgment_engines", "abandon_value"]
 rendered-text = """
 ▸ Judgment: Materialize two Shadow Figments.
 
@@ -5772,7 +5772,7 @@ card-number = 403
 [[cards]]
 name = "Rootspring Summons"
 id = "12bdc762-59ec-481a-9936-8c5327ae7c09"
-tides = ["ally_formation", "materialize_value"]
+tides = ["ally_wide", "materialize_value"]
 rendered-text = "Materialize 3 random characters from your deck with total cost 6● or less."
 energy-cost = 7
 card-type = "Event"
@@ -5787,7 +5787,7 @@ card-number = 406
 [[cards]]
 name = "Sandglider"
 id = "c996cacb-1d18-4281-b695-42cee67278a8"
-tides = ["fast_tempo", "fast_setup", "prevent_control", "event_chain"]
+tides = ["fast_tempo", "fast_setup", "event_chain"]
 rendered-text = "Your cards have ↯fast."
 energy-cost = 5
 card-type = "Character"
@@ -5802,7 +5802,7 @@ card-number = 408
 [[cards]]
 name = "Blazeguard"
 id = "2555ec68-c322-42f6-9fba-27a09e59c7c9"
-tides = ["survivor_dissolve", "abandon_furnace", "reclaim_characters", "leave_play_enablers"]
+tides = ["survivor_dissolve", "abandon_value", "reclaim_characters", "leave_play_enablers"]
 rendered-text = "Abandon this character: Return an ally dissolved this turn from your void to play."
 energy-cost = 3
 card-type = "Character"
@@ -5817,7 +5817,7 @@ card-number = 409
 [[cards]]
 name = "Rubble Diviner"
 id = "86abaf83-6880-4d33-bb2f-e3a9867cf9de"
-tides = ["judgment_bodies", "materialized_staples", "hand_cycling", "card_flow", "judgment_engines"]
+tides = ["judgment_bodies", "hand_cycling", "card_flow", "judgment_engines", "discard_outlets"]
 rendered-text = "▸ Materialized, Judgment: You may pay 2●. If you do, draw 2 cards, then discard a card."
 energy-cost = 2
 card-type = "Character"
@@ -5832,7 +5832,7 @@ card-number = 410
 [[cards]]
 name = "Spent Courier"
 id = "b964cd06-967a-4f65-95ea-46fd698713f4"
-tides = ["materialized_staples", "abandon_furnace", "survivor_dissolve", "resource_burst"]
+tides = ["abandon_value", "survivor_dissolve", "resource_burst"]
 rendered-text = "▸ Materialized, Dissolved: Gain 2●."
 energy-cost = 2
 card-type = "Character"
@@ -5862,7 +5862,7 @@ card-number = 412
 [[cards]]
 name = "Simulacra"
 id = "fa780152-23dd-4138-8ff7-3083e46fc2bb"
-tides = ["copy_effects", "discover_toolbox"]
+tides = ["copy_effects"]
 rendered-text = "3●: Until end of turn, this character becomes a copy of an ally or enemy."
 energy-cost = 4
 card-type = "Character"
@@ -5877,7 +5877,7 @@ card-number = 413
 [[cards]]
 name = "Driftrider"
 id = "c0f7a075-a5a5-4383-8487-07f9788a623c"
-tides = ["materialize_tempo", "materialize_value", "card_flow"]
+tides = ["materialize_tempo", "card_flow", "bounce_blink_tools"]
 rendered-text = "When you return an ally to hand, draw a card."
 energy-cost = 4
 card-type = "Character"
@@ -5922,7 +5922,7 @@ card-number = 416
 [[cards]]
 name = "Harrowing Officiant"
 id = "19aac5e2-357c-4a50-8ef1-f40aa880a4c4"
-tides = ["judgment_engines", "void_denial", "prevent_control"]
+tides = ["judgment_engines", "void_denial"]
 rendered-text = "▸ Judgment: You may pay 1● to materialize a character from the opponent's void."
 energy-cost = 5
 card-type = "Character"
@@ -5952,7 +5952,7 @@ card-number = 418
 [[cards]]
 name = "Fractured Vessel"
 id = "801864d7-de84-44ee-b225-ded9ac7c6233"
-tides = ["figment_swarm", "abandon_furnace", "spark_tall"]
+tides = ["figment_swarm", "spark_growth", "abandon_ladder"]
 rendered-text = """
 ▸ Dissolved: Materialize a Shadow figment.
 
@@ -5970,7 +5970,7 @@ card-number = 419
 [[cards]]
 name = "Saltless Mariner"
 id = "a1df8763-d714-4cfe-8290-a63dbe2c6871"
-tides = ["figment_swarm", "abandon_furnace"]
+tides = ["figment_swarm", "abandon_value", "point_pressure"]
 rendered-text = "When you abandon a figment, gain 1✪."
 energy-cost = 4
 card-type = "Character"
@@ -5985,7 +5985,7 @@ card-number = 420
 [[cards]]
 name = "Overload Vagrant"
 id = "72b9b786-c098-4e96-95f2-e9eabfd010a0"
-tides = ["discard_velocity", "resource_burst", "void_setup"]
+tides = ["discard_velocity", "discard_outlets", "void_setup"]
 rendered-text = "Discard a card: Gain 2●."
 energy-cost = 4
 card-type = "Character"
@@ -6000,7 +6000,7 @@ card-number = 421
 [[cards]]
 name = "Crucible Warlord"
 id = "f6ccb2d8-663e-4c9b-830b-79b2ddc89f79"
-tides = ["warrior_pressure", "warrior_bastion", "character_velocity", "judgment_engines"]
+tides = ["warrior_pressure", "warrior_bastion", "judgment_engines", "character_tutors"]
 rendered-text = "▸ Judgment: With a non-Warrior ally, draw a Warrior and materialize it."
 energy-cost = 5
 card-type = "Character"
@@ -6030,7 +6030,7 @@ card-number = 423
 [[cards]]
 name = "Primordial Tyrant"
 id = "aba94351-4486-4710-ac3d-ae9e29279ac0"
-tides = ["abandon_furnace"]
+tides = ["abandon_ladder", "finishers"]
 rendered-text = "To play this card, abandon all allies."
 energy-cost = 4
 card-type = "Character"
@@ -6120,7 +6120,7 @@ card-number = 431
 [[cards]]
 name = "Harborwarden"
 id = "77bae5b0-ad0a-4b51-b211-141e95b3862a"
-tides = ["warrior_pressure", "materialized_staples", "figment_swarm", "spark_tall"]
+tides = ["warrior_pressure", "figment_swarm", "spark_tall"]
 rendered-text = """
 ▸ Materialized: Choose one:
 • Kindle 2.
@@ -6154,7 +6154,7 @@ card-number = 433
 [[cards]]
 name = "Green Abyss"
 id = "ecd53ca5-f250-4402-a686-c51148e1e3b8"
-tides = ["tempo_resets", "fast_interaction", "prevent_control", "fast_tempo"]
+tides = ["tempo_resets", "fast_interaction", "fast_tempo"]
 rendered-text = "Return an enemy character to the top of the opponenet's deck."
 energy-cost = 3
 card-type = "Event"
@@ -6169,7 +6169,7 @@ card-number = 434
 [[cards]]
 name = "World Ablaze"
 id = "aa399f47-2025-4539-ac69-a6bca90e2786"
-tides = ["sweepers", "abandon_furnace", "survivor_dissolve"]
+tides = ["finishers", "abandon_value", "survivor_dissolve"]
 rendered-text = "Each player abandons characters until they have as many as the player with fewest."
 energy-cost = 4
 card-type = "Event"
@@ -6184,7 +6184,7 @@ card-number = 435
 [[cards]]
 name = "Crashdown"
 id = "063190f6-7723-44f3-bdb4-59f4037faea3"
-tides = ["sweepers", "survivor_dissolve", "resource_burst"]
+tides = ["finishers", "survivor_dissolve"]
 rendered-text = "Dissolve all characters. Gain 1● for each of your characters dissolved this way."
 energy-cost = 6
 card-type = "Event"
@@ -6199,7 +6199,7 @@ card-number = 437
 [[cards]]
 name = "Stargazer"
 id = "4c45be08-290c-4129-9238-897cd73b7279"
-tides = ["materialized_staples", "materialize_value", "foresee_selection", "topdeck_setup"]
+tides = ["materialize_value", "foresee_selection", "topdeck_setup"]
 rendered-text = "▸ Materialized: Foresee 3, then draw a card."
 energy-cost = 4
 card-type = "Character"
@@ -6214,7 +6214,7 @@ card-number = 438
 [[cards]]
 name = "Sigil Analyst"
 id = "a81e4891-9545-4263-a5cf-29d44cb08dd3"
-tides = ["materialized_staples", "materialize_value", "card_flow", "spark_tall"]
+tides = ["materialize_value", "card_flow", "spark_tall"]
 rendered-text = "▸ Materialized: Draw 2 cards. This character gains +1 spark for each card drawn this turn."
 energy-cost = 5
 card-type = "Character"
@@ -6244,7 +6244,7 @@ card-number = 440
 [[cards]]
 name = "Crowflight Silencer"
 id = "90e97e94-2d89-4c25-b4ab-23d469b9a723"
-tides = ["prevent_control", "materialize_tempo", "fast_interaction"]
+tides = ["prevent_control", "fast_interaction"]
 rendered-text = "▸ Materialized: Disable an enemy's activated and triggered abilities while this character is in play."
 energy-cost = 3
 card-type = "Character"
@@ -6259,7 +6259,7 @@ card-number = 441
 [[cards]]
 name = "Gateweaver"
 id = "36eb38d7-c57f-4c60-8b7a-21d4e955728e"
-tides = ["materialize_value", "materialize_tempo", "event_chain"]
+tides = ["materialize_tempo", "event_chain"]
 rendered-text = "When you play an event, you may banish an ally, then materialize it."
 energy-cost = 4
 card-type = "Character"
@@ -6274,7 +6274,7 @@ card-number = 442
 [[cards]]
 name = "Luminous Ascent"
 id = "e0889e66-ab8c-4851-a909-b2bf9fc8ae55"
-tides = ["foresee_selection", "card_flow", "big_energy"]
+tides = ["foresee_selection", "card_flow"]
 rendered-text = "Foresee X, where X is your current energy. Draw a card."
 energy-cost = 2
 card-type = "Event"
@@ -6289,7 +6289,7 @@ card-number = 444
 [[cards]]
 name = "Wondrous Clearing"
 id = "1cf26e51-dd11-4ad0-85d9-42c324a65e2e"
-tides = ["cost_reduction", "character_velocity", "go_wide_enablers"]
+tides = ["cost_reduction", "character_chain", "go_wide_enablers"]
 rendered-text = "Each player may materialize a character from their hand for 0●."
 energy-cost = 2
 card-type = "Event"
@@ -6319,7 +6319,7 @@ card-number = 446
 [[cards]]
 name = "Cosmic Undertow"
 id = "17c95d25-fdc4-477c-ac98-92b2b2c1829b"
-tides = ["tempo_resets", "materialize_tempo", "prevent_control"]
+tides = ["tempo_resets", "materialize_tempo"]
 rendered-text = "Return all characters to their owners' hands."
 energy-cost = 6
 card-type = "Event"
@@ -6349,7 +6349,7 @@ card-number = 448
 [[cards]]
 name = "Frostbound Defiant"
 id = "f4205a7a-16db-4886-a094-06f974a01111"
-tides = ["warrior_bastion", "warrior_pressure", "judgment_bodies", "cheap_curve"]
+tides = ["warrior_bastion", "warrior_pressure", "judgment_bodies"]
 rendered-text = "▸ Judgment: If you have fewer ✪ than the opponent, this character gains +2 spark."
 energy-cost = 2
 card-type = "Character"
@@ -6379,7 +6379,7 @@ card-number = 450
 [[cards]]
 name = "Dune Reaper"
 id = "05b4c64a-8eb3-4a09-a37f-5c205d734850"
-tides = ["warrior_bastion", "spark_disruption", "materialize_value"]
+tides = ["warrior_bastion", "materialize_value"]
 rendered-text = "▸ Materialized: Each enemy loses 2 spark."
 energy-cost = 5
 card-type = "Character"
@@ -6394,7 +6394,7 @@ card-number = 451
 [[cards]]
 name = "Blightmaw"
 id = "801e53f1-fa99-4ed9-abc9-2c02e07acb1e"
-tides = ["prevent_control", "judgment_engines", "premium_removal", "finishers", "materialize_value"]
+tides = ["judgment_engines", "premium_removal", "finishers", "materialize_value"]
 rendered-text = "▸ Materialized, Judgment: The opponent abandons a character. Draw a card."
 energy-cost = 8
 card-type = "Character"
@@ -6439,7 +6439,7 @@ card-number = 455
 [[cards]]
 name = "Key Sifter"
 id = "e4c24242-619c-4dd1-862f-edf988e1d6cc"
-tides = ["discard_velocity", "void_setup"]
+tides = ["discard_velocity", "void_setup", "discard_outlets"]
 rendered-text = "▸ Judgment: You may discard up to 2 cards, then draw that many cards. This character gains +1 spark per card discarded."
 energy-cost = 1
 card-type = "Character"
@@ -6454,7 +6454,7 @@ card-number = 456
 [[cards]]
 name = "Skyline Prowler"
 id = "3002b466-fe0e-4237-b686-bd1c98235fad"
-tides = ["fast_tempo", "judgment_engines", "prevent_control"]
+tides = ["fast_tempo", "judgment_engines"]
 rendered-text = "▸ Judgment: Banish a card from the top of the opponent's deck. You may play it this turn."
 energy-cost = 4
 card-type = "Character"
@@ -6469,7 +6469,7 @@ card-number = 457
 [[cards]]
 name = "Sorrow Watcher"
 id = "29229288-b647-4ca8-b866-f42c983269cc"
-tides = ["prevent_control", "materialize_value", "hand_disruption", "survivor_dissolve"]
+tides = ["materialize_value", "hand_disruption", "survivor_dissolve"]
 rendered-text = "▸ Materialized: The opponent discards a card. Draw a card."
 energy-cost = 5
 card-type = "Character"
@@ -6484,7 +6484,7 @@ card-number = 458
 [[cards]]
 name = "Rooftop Prophet"
 id = "c84bf4e3-7cb5-4825-927a-3b87fcc5e92a"
-tides = ["judgment_engines", "void_recursion", "survivor_dissolve"]
+tides = ["judgment_engines", "void_threshold", "survivor_dissolve", "judgment_repeaters"]
 rendered-text = "▸ Judgment: With 4+ cards in your void, trigger an additional Judgment phase."
 energy-cost = 3
 card-type = "Character"
@@ -6499,7 +6499,7 @@ card-number = 459
 [[cards]]
 name = "Lanternwood Scout"
 id = "a1a7dbe9-a5b7-42cc-ab4f-615fa4edcbff"
-tides = ["judgment_bodies", "big_energy", "cheap_curve", "resource_burst"]
+tides = ["judgment_bodies", "big_energy", "resource_burst"]
 rendered-text = "▸ Judgment: Gain 2●. The opponent gains 1●."
 energy-cost = 2
 card-type = "Character"
@@ -6531,7 +6531,7 @@ card-number = 461
 [[cards]]
 name = "Pathfinder Adrift"
 id = "945a1ebb-4e22-462c-8db4-a3fe445dcc8d"
-tides = ["discard_velocity", "topdeck_setup", "event_chain"]
+tides = ["discard_velocity", "topdeck_setup", "event_chain", "discard_outlets"]
 rendered-text = "▸ Judgment: You may discard a card to banish the top 2 cards of your deck. You may play those cards this turn."
 energy-cost = 2
 card-type = "Character"
@@ -6546,7 +6546,7 @@ card-number = 462
 [[cards]]
 name = "Still Dreamer"
 id = "ac83cf04-f3c8-4c0d-aa05-98c142d2c322"
-tides = ["fast_setup", "fast_tempo", "cheap_curve", "card_flow"]
+tides = ["fast_setup", "fast_tempo", "card_flow"]
 rendered-text = "▸ Judgment: If the opponent has more cards in hand, draw a card."
 energy-cost = 2
 card-type = "Character"
@@ -6576,7 +6576,7 @@ card-number = 466
 [[cards]]
 name = "Dusk Duelist"
 id = "6a23256e-8dff-4b37-a8bd-6e6b744c74a9"
-tides = ["cheap_removal", "warrior_pressure", "warrior_bastion", "materialized_staples", "cheap_curve"]
+tides = ["warrior_pressure", "warrior_bastion", "cheap_removal"]
 rendered-text = "▸ Materialized: Dissolve an enemy with spark 2 or less."
 energy-cost = 1
 card-type = "Character"
@@ -6591,7 +6591,7 @@ card-number = 467
 [[cards]]
 name = "Seedling Sage"
 id = "d8d6cd28-141d-4bab-b0cb-bac4d7423e4a"
-tides = ["cost_reduction", "big_energy", "cheap_curve", "finishers"]
+tides = ["cost_reduction", "big_energy", "finishers"]
 rendered-text = "Characters with cost 5● or more cost you 2● less."
 energy-cost = 1
 card-type = "Character"
@@ -6636,7 +6636,7 @@ card-number = 470
 [[cards]]
 name = "Starbound Striker"
 id = "d0396d8f-e880-4176-be09-c3c7434f3c02"
-tides = ["warrior_pressure", "spark_tall", "spark_growth", "cheap_curve"]
+tides = ["warrior_pressure", "spark_tall", "spark_growth"]
 rendered-text = "▸ Judgment: This character gains +2 spark."
 energy-cost = 2
 card-type = "Character"
@@ -6666,7 +6666,7 @@ card-number = 473
 [[cards]]
 name = "Aureate Vision"
 id = "c7840f3b-3297-4409-b124-4309ed93e542"
-tides = ["ally_formation", "spark_tall", "figment_swarm"]
+tides = ["ally_wide", "spark_tall", "figment_swarm"]
 rendered-text = "▸ Judgment: Each ally gains spark equal to this character's spark."
 energy-cost = 5
 card-type = "Character"
@@ -6681,7 +6681,7 @@ card-number = 474
 [[cards]]
 name = "Wreckborn"
 id = "9c02bbbb-8c55-486a-9742-4d3a14f90545"
-tides = ["survivor_dissolve", "figment_swarm", "abandon_furnace"]
+tides = ["survivor_dissolve", "figment_swarm"]
 rendered-text = "When a non-Figment ally is dissolved, materialize a Warrior figment."
 energy-cost = 5
 card-type = "Character"
@@ -6696,7 +6696,7 @@ card-number = 475
 [[cards]]
 name = "Crumbling Behemoth"
 id = "11f31879-cc52-44ee-bbdf-74fb2d830dab"
-tides = ["survivor_dissolve", "abandon_furnace", "figment_swarm"]
+tides = ["survivor_dissolve", "figment_swarm", "finishers"]
 rendered-text = "▸ Dissolved: Materialize three Warrior figments."
 energy-cost = 10
 card-type = "Character"
@@ -6711,7 +6711,7 @@ card-number = 477
 [[cards]]
 name = "Arboreal Requiem"
 id = "53b9b423-156b-4e70-888b-107fe7ecce5b"
-tides = ["void_recursion", "big_energy", "finishers"]
+tides = ["void_threshold", "big_energy", "finishers"]
 rendered-text = "Gain N maximum ●, where N is the number of characters in your void."
 energy-cost = 4
 card-type = "Event"
@@ -6726,7 +6726,7 @@ card-number = 478
 [[cards]]
 name = "Forsaken Pact"
 id = "0382ee13-69bc-4e2a-b9da-e85d2f124779"
-tides = ["abandon_furnace", "judgment_engines"]
+tides = ["abandon_ladder", "judgment_engines"]
 rendered-text = "▸ Judgment: You may abandon a character to materialize a random character from your deck."
 energy-cost = 4
 card-type = "Event"
@@ -6741,7 +6741,7 @@ card-number = 479
 [[cards]]
 name = "Stoneborn Eternal"
 id = "5f0cd400-31d7-4321-aae2-dd970758c99a"
-tides = ["finishers", "big_energy", "cost_reduction"]
+tides = ["finishers", "big_energy"]
 rendered-text = "When you play this character from hand, take an extra turn after this one."
 energy-cost = 13
 card-type = "Character"
@@ -6771,7 +6771,7 @@ card-number = 482
 [[cards]]
 name = "Veinwalker"
 id = "cf62737a-9bee-44f4-8e26-8c7d0387f39b"
-tides = ["judgment_bodies", "big_energy", "resource_burst", "midcurve_glue"]
+tides = ["judgment_bodies", "big_energy", "resource_burst"]
 rendered-text = "▸ Judgment: Choose — gain 1● or gain 1 maximum ●."
 energy-cost = 3
 card-type = "Character"
@@ -6801,7 +6801,7 @@ card-number = 485
 [[cards]]
 name = "Lord of Hidden Paths"
 id = "70306c8a-a77c-4d07-a4f8-abb51704be8c"
-tides = ["event_chain", "character_velocity"]
+tides = ["event_chain", "character_chain"]
 rendered-text = "When you play a card, draw a card."
 energy-cost = 6
 card-type = "Character"
@@ -6816,7 +6816,7 @@ card-number = 487
 [[cards]]
 name = "Avatar of Oblivion"
 id = "18b1d155-a89a-4f37-87c4-644ff83c16ef"
-tides = ["prevent_control", "premium_removal", "finishers", "materialize_value"]
+tides = ["finishers", "materialize_value"]
 rendered-text = "▸ Materialized: The opponent abandons 3 characters"
 energy-cost = 9
 card-type = "Character"
@@ -6831,7 +6831,7 @@ card-number = 488
 [[cards]]
 name = "Vault Infiltrator"
 id = "29a1b50f-2dce-480b-841f-528a6817b462"
-tides = ["prevent_control", "defensive_curve", "midcurve_glue"]
+tides = ["prevent_control", "defensive_curve"]
 rendered-text = "The opponent cannot play fast cards on your turn."
 energy-cost = 3
 card-type = "Character"
@@ -6846,7 +6846,7 @@ card-number = 489
 [[cards]]
 name = "Stolen Genesis"
 id = "3d9919e3-de73-43a9-9168-573be50a7479"
-tides = ["premium_removal", "materialize_value", "prevent_control", "finishers"]
+tides = ["premium_removal", "materialize_value", "finishers"]
 rendered-text = "Banish an enemy. Materialize a copy of it."
 energy-cost = 6
 card-type = "Event"
@@ -6906,7 +6906,7 @@ card-number = 493
 [[cards]]
 name = "Glimmering Voyager"
 id = "bb4990d2-7fc4-492a-88b3-12022292e0df"
-tides = ["character_tutors", "materialize_value", "topdeck_setup"]
+tides = ["materialize_value", "card_flow", "topdeck_setup"]
 rendered-text = "▸ Materialized: Draw the top character of your deck."
 energy-cost = 4
 card-type = "Character"
@@ -6921,7 +6921,7 @@ card-number = 494
 [[cards]]
 name = "Pyrrhic Strike"
 id = "a6e4bc2e-8f67-411f-9c21-94b625156af1"
-tides = ["cheap_removal", "big_energy"]
+tides = ["cheap_removal"]
 rendered-text = "Lose 2 maximum ●: Dissolve an enemy."
 energy-cost = 1
 card-type = "Event"
@@ -6936,7 +6936,7 @@ card-number = 495
 [[cards]]
 name = "Carrion Shepherd"
 id = "6a96b4ba-892c-4ee7-86d3-83bccb8dd66d"
-tides = ["figment_swarm", "void_setup", "void_recursion", "go_wide_enablers", "judgment_engines"]
+tides = ["figment_swarm", "void_setup", "judgment_engines", "go_wide_enablers", "recursion_fuel"]
 rendered-text = """
 ▸ Judgment: Materialize a Shadow Figment, then put the top card of your deck into your void.
 """
@@ -6953,7 +6953,7 @@ card-number = 496
 [[cards]]
 name = "Starshot Gunner"
 id = "67cc1fd0-e41d-44d8-9d62-1150ba0e6148"
-tides = ["warrior_pressure", "cheap_curve", "point_pressure", "spark_growth"]
+tides = ["warrior_pressure", "point_pressure", "spark_growth"]
 rendered-text = "2●: This character gains +1 spark."
 energy-cost = 1
 card-type = "Character"
@@ -6968,7 +6968,7 @@ card-number = 497
 [[cards]]
 name = "Old Growth Sovereign"
 id = "97eaacbe-bd52-4ef1-b7d2-b553a06db48b"
-tides = ["materialize_tempo", "fast_tempo", "finishers", "card_flow", "cheap_removal"]
+tides = ["materialize_value", "fast_tempo", "finishers", "card_flow", "cheap_removal"]
 rendered-text = "▸ Materialized: Gain 3●. Draw 3 cards. Dissolve an enemy with spark 2 or less."
 energy-cost = 7
 card-type = "Character"
@@ -6983,7 +6983,7 @@ card-number = 498
 [[cards]]
 name = "Dreamvale Monarch"
 id = "c18a231f-7e84-4569-a492-11b6a58ebf25"
-tides = ["spirit_growth", "big_energy", "judgment_engines", "materialize_value", "finishers"]
+tides = ["big_energy", "judgment_engines", "materialize_value", "finishers"]
 rendered-text = "▸ Materialized: Draw a card. ▸ Judgment: Gain 4●."
 energy-cost = 8
 card-type = "Character"
@@ -6998,7 +6998,7 @@ card-number = 499
 [[cards]]
 name = "Leviathan Foundry"
 id = "0fc24a42-0ab3-4da0-a6bf-ff0a18203f35"
-tides = ["materialize_value", "event_chain", "character_tutors", "finishers"]
+tides = ["materialize_value", "character_tutors", "finishers"]
 rendered-text = "▸ Materialized: Draw a character and an event from your deck."
 energy-cost = 7
 card-type = "Character"
@@ -7058,7 +7058,7 @@ card-number = 503
 [[cards]]
 name = "Momentum's Edge"
 id = "d792412c-7d06-4ef3-b587-3b171792d45d"
-tides = ["event_chain", "character_velocity"]
+tides = ["event_chain"]
 rendered-text = "▸ Materialized: This character gains +2 spark for each card you played this turn."
 energy-cost = 2
 card-type = "Character"
@@ -7088,7 +7088,7 @@ card-number = 506
 [[cards]]
 name = "Galescarred"
 id = "51c13279-34a3-4dce-8396-8c639d4b0aad"
-tides = ["discard_velocity"]
+tides = ["discard_velocity", "tax_pressure"]
 rendered-text = "When you discard a card, this character gains +1 spark. With 4 or more spark, the opponent's characters cost 2● more."
 energy-cost = 1
 card-type = "Character"
@@ -7103,7 +7103,7 @@ card-number = 508
 [[cards]]
 name = "Veilpiercer"
 id = "afbee39f-4e9a-4a7d-908c-084e8752261d"
-tides = ["discover_toolbox", "prevent_control", "fast_tempo", "materialize_tempo"]
+tides = ["discover_toolbox", "materialize_value", "fast_tempo", "hand_disruption"]
 rendered-text = "▸ Materialized: Look at the opponent's hand. Gain a copy of a card there."
 energy-cost = 3
 card-type = "Character"
@@ -7118,7 +7118,7 @@ card-number = 509
 [[cards]]
 name = "Signal Resonant"
 id = "59859899-a531-4057-958f-9133cc52cdd4"
-tides = ["materialize_value", "materialize_tempo"]
+tides = ["materialize_value", "trigger_reuse"]
 rendered-text = "The ▸ Materialized: ability of allies triggers an additional time."
 energy-cost = 4
 card-type = "Character"
@@ -7148,7 +7148,7 @@ card-number = 514
 [[cards]]
 name = "Pinnacle Ascendant"
 id = "cf12f551-e084-43ed-97e7-d7d54b21bc2d"
-tides = ["discard_velocity", "character_velocity", "materialize_value"]
+tides = ["discard_velocity", "character_chain", "materialize_value"]
 rendered-text = "When you discard a character, materialize it."
 energy-cost = 5
 card-type = "Character"
@@ -7163,7 +7163,7 @@ card-number = 515
 [[cards]]
 name = "Manufactured Abomination"
 id = "60da36da-c426-43e0-9f2f-d891b442e199"
-tides = ["discard_velocity", "finishers", "prevent_control", "materialize_value"]
+tides = ["discard_velocity", "finishers", "hand_disruption", "materialize_value"]
 rendered-text = "Costs 1● less for each card you discarded this turn. ▸ Materialized: The opponent discards a card and you draw a card."
 energy-cost = 8
 card-type = "Character"
@@ -7178,7 +7178,7 @@ card-number = 518
 [[cards]]
 name = "Grovecaller"
 id = "93b22bea-429b-4008-afc1-921a88a07630"
-tides = ["spark_growth", "character_velocity"]
+tides = ["spark_growth"]
 rendered-text = "▸ Materialized: Each character in your hand gains +2 spark."
 energy-cost = 4
 card-type = "Character"
@@ -7223,7 +7223,7 @@ card-number = 521
 [[cards]]
 name = "Thronebound Arbiter"
 id = "0dba538b-f05a-4c30-8342-e61725cfb6cb"
-tides = ["prevent_control", "hand_disruption", "point_pressure", "judgment_engines"]
+tides = ["hand_disruption", "point_pressure", "judgment_engines"]
 rendered-text = "▸ Judgment: The opponent discards a card. If they can't, gain 2✪."
 energy-cost = 4
 card-type = "Character"
@@ -7298,7 +7298,7 @@ card-number = 527
 [[cards]]
 name = "Marionette Frame"
 id = "ec81ffdc-2f4c-4e45-8d5c-0fb7fc50b4b2"
-tides = ["materialize_tempo", "materialize_value", "premium_removal"]
+tides = ["premium_removal"]
 rendered-text = "▸ Materialized: This character becomes a copy of an enemy. Disable that enemy's abilities while in play."
 energy-cost = 4
 card-type = "Character"
@@ -7313,7 +7313,7 @@ card-number = 529
 [[cards]]
 name = "Iron Drake"
 id = "bd202039-a261-46a6-81ad-5563b7e27de0"
-tides = ["spark_disruption", "sweepers"]
+tides = ["finishers"]
 rendered-text = "▸ Materialized: The spark of each enemy becomes 1."
 energy-cost = 6
 card-type = "Character"
@@ -7328,7 +7328,7 @@ card-number = 530
 [[cards]]
 name = "Cloudmantle Ray"
 id = "3a15b27d-6274-4228-81f1-9e0e8ba295f3"
-tides = ["spirit_growth"]
+tides = ["spirit_growth", "materialize_value"]
 rendered-text = "▸ Materialized: Materialize each Spirit Animal in your hand."
 energy-cost = 7
 card-type = "Character"
@@ -7373,7 +7373,7 @@ card-number = 541
 [[cards]]
 name = "Wraithfire"
 id = "e394838a-5473-46d5-a45c-62aa6b502bc9"
-tides = ["survivor_dissolve", "abandon_furnace", "spark_tall"]
+tides = ["survivor_dissolve", "spark_tall"]
 rendered-text = "▸ Dissolved: Dissolve each enemy with spark less than this character's spark."
 energy-cost = 5
 card-type = "Character"
@@ -7388,7 +7388,7 @@ card-number = 544
 [[cards]]
 name = "Pilgrim of Old Stones"
 id = "0c197dae-d3e1-4303-bc3e-907d141224cc"
-tides = ["survivor_dissolve", "character_tutors", "finishers"]
+tides = ["survivor_dissolve", "finishers", "card_flow"]
 rendered-text = "▸ Materialized: Draw a character with cost 5● or more. ▸ Dissolved: Materialize it from your hand."
 energy-cost = 4
 card-type = "Character"
@@ -7403,7 +7403,7 @@ card-number = 545
 [[cards]]
 name = "Terminus"
 id = "af6f9e09-7b56-4d81-9b2c-6777497720e3"
-tides = ["void_recursion", "void_setup"]
+tides = ["recursion_fuel", "void_threshold"]
 rendered-text = "Put your deck into your void."
 energy-cost = 6
 card-type = "Event"
@@ -7433,7 +7433,7 @@ card-number = 547
 [[cards]]
 name = "Smoldering Ancient"
 id = "d5a6959b-6829-4fc1-a1b0-547bb92733b2"
-tides = ["survivor_dissolve", "abandon_furnace", "spark_tall"]
+tides = ["survivor_dissolve", "spark_tall"]
 rendered-text = "While in hand, when an ally is dissolved, this character gains +2 spark."
 energy-cost = 4
 card-type = "Character"
@@ -7463,7 +7463,7 @@ card-number = 550
 [[cards]]
 name = "Ferryman's Tithe"
 id = "eb5018b0-a374-4d2d-a5fa-69d0c34c89a3"
-tides = ["materialize_value", "survivor_dissolve", "materialize_tempo"]
+tides = ["materialize_tempo", "survivor_dissolve"]
 rendered-text = "Dissolve all characters, then materialize them with 1 spark."
 energy-cost = 4
 card-type = "Event"
@@ -7478,7 +7478,7 @@ card-number = 554
 [[cards]]
 name = "Worldbreacher"
 id = "3c3871cb-190d-435f-b35f-fcd5d88228e7"
-tides = ["spark_disruption", "materialize_tempo", "warrior_pressure"]
+tides = ["warrior_pressure", "fast_interaction"]
 rendered-text = "▸ Materialized: Swap this character's spark with an enemy's spark."
 energy-cost = 6
 card-type = "Character"
@@ -7538,7 +7538,7 @@ card-number = 559
 [[cards]]
 name = "Echo Technician"
 id = "7f86ffd5-f527-40ac-b8d2-f8559aa6082c"
-tides = ["event_chain"]
+tides = ["event_chain", "void_recursion"]
 rendered-text = "When you play an event from your void, copy it."
 energy-cost = 3
 card-type = "Character"
@@ -7553,7 +7553,7 @@ card-number = 560
 [[cards]]
 name = "Vessel of Echoes"
 id = "bb439fb1-1335-4f33-b6e3-9a95e2f2e596"
-tides = ["judgment_engines", "void_recursion"]
+tides = ["judgment_engines", "void_recursion", "survivor_dissolve"]
 rendered-text = "▸ Judgment: Become a copy of a random character in your void."
 energy-cost = 3
 card-type = "Character"
@@ -7568,7 +7568,7 @@ card-number = 562
 [[cards]]
 name = "Duskreaper"
 id = "ed201264-ec95-4ca2-a8b8-2c69282fa29d"
-tides = ["survivor_dissolve", "abandon_furnace", "trigger_reuse"]
+tides = ["survivor_dissolve", "trigger_reuse"]
 rendered-text = "Allied ▸ Dissolved: abilities trigger an additional time."
 energy-cost = 4
 card-type = "Character"
@@ -7613,7 +7613,7 @@ card-number = 567
 [[cards]]
 name = "Roots of Rebirth"
 id = "ae1ff27e-c14f-4938-a9e5-2201343f555b"
-tides = ["abandon_furnace", "survivor_dissolve", "ally_formation"]
+tides = ["abandon_ladder", "survivor_dissolve", "ally_wide"]
 rendered-text = "Each ally gains '▸ Dissolved: Materialize a character with equal cost from your deck.'"
 energy-cost = 4
 card-type = "Event"
@@ -7628,7 +7628,7 @@ card-number = 569
 [[cards]]
 name = "Kindlehorn"
 id = "c7511a4c-503d-48bd-b196-c78998c0ffa6"
-tides = ["spirit_growth", "big_energy", "judgment_engines"]
+tides = ["spirit_growth", "big_energy", "judgment_engines", "abandon_value"]
 rendered-text = "▸ Judgment: Gain +1 spark. You may abandon this character to gain maximum ● equal to its spark."
 energy-cost = 3
 card-type = "Character"
@@ -7643,7 +7643,7 @@ card-number = 571
 [[cards]]
 name = "Ambush Operative"
 id = "6370c96d-741c-4642-904d-0e5c8ab1421d"
-tides = ["materialize_tempo", "premium_removal"]
+tides = ["materialize_value", "premium_removal"]
 rendered-text = "▸ Materialized: If you drew this character this turn, banish an enemy."
 energy-cost = 5
 card-type = "Character"
@@ -7658,7 +7658,7 @@ card-number = 572
 [[cards]]
 name = "Tidecaller"
 id = "a4f02e6c-1a14-4529-94a5-b2e1299f979d"
-tides = ["prevent_control", "hand_disruption"]
+tides = ["hand_disruption", "tax_pressure"]
 rendered-text = "▸ Materialized: The opponent discards a card. They can't play cards with that cost until your next turn."
 energy-cost = 3
 card-type = "Character"
@@ -7673,7 +7673,7 @@ card-number = 573
 [[cards]]
 name = "Clockwork Conductor"
 id = "acaa0368-51d9-4ccf-a133-73e074c0b399"
-tides = ["event_chain"]
+tides = ["event_chain", "void_recursion"]
 rendered-text = "At end of turn, play a random event with cost 2● or less from your void for 0●."
 energy-cost = 4
 card-type = "Character"
@@ -7703,7 +7703,7 @@ card-number = 578
 [[cards]]
 name = "Phantasmal Recruiter"
 id = "58719d39-a9da-498f-a756-cfe82576d834"
-tides = ["figment_swarm", "character_velocity", "warrior_pressure"]
+tides = ["figment_swarm", "warrior_pressure"]
 rendered-text = "When you draw a character, materialize a Warrior figment."
 energy-cost = 3
 card-type = "Character"
@@ -7718,7 +7718,7 @@ card-number = 579
 [[cards]]
 name = "Liminal Striker"
 id = "f21c6100-c8de-452f-bd98-0f22b62aea71"
-tides = ["warrior_pressure", "warrior_bastion", "character_velocity"]
+tides = ["warrior_pressure", "warrior_bastion"]
 rendered-text = "When you draw a Warrior, materialize a copy of it with 1 spark."
 energy-cost = 5
 card-type = "Character"
@@ -7733,7 +7733,7 @@ card-number = 580
 [[cards]]
 name = "Charnel Seraph"
 id = "18c03e07-50e2-4305-9cb8-6cab55481ca6"
-tides = ["ally_formation", "abandon_furnace"]
+tides = ["ally_formation", "abandon_value"]
 rendered-text = "▸ Materialized: Abandon an ally. Each other ally gains that ally's spark."
 energy-cost = 5
 card-type = "Character"
@@ -7763,7 +7763,7 @@ card-number = 582
 [[cards]]
 name = "Vesper Outsider"
 id = "f5f60506-b4a2-4743-92f5-b460518e127a"
-tides = ["discard_velocity", "character_velocity", "spark_tall"]
+tides = ["discard_velocity", "spark_tall"]
 rendered-text = "Discard a character: Play this character for 0● and it gains that character's spark."
 energy-cost = 3
 card-type = "Character"
@@ -7778,7 +7778,7 @@ card-number = 585
 [[cards]]
 name = "Spellweaver"
 id = "7a696093-1347-49bf-81f6-4240a59198b7"
-tides = ["event_chain", "character_velocity", "materialize_value"]
+tides = ["event_chain", "materialize_value", "character_tutors"]
 rendered-text = "When you play an event, materialize a random character with equal cost from your deck."
 energy-cost = 5
 card-type = "Character"
@@ -7793,7 +7793,7 @@ card-number = 587
 [[cards]]
 name = "Eruption"
 id = "daa1eaa3-6504-4669-b4f2-50f1e2494dcc"
-tides = ["character_velocity", "cost_reduction", "go_wide_enablers"]
+tides = ["cost_reduction", "go_wide_enablers", "ally_wide"]
 rendered-text = "Until end of turn, characters in hand cost 1● and have 1 spark."
 energy-cost = 3
 card-type = "Event"
@@ -7823,7 +7823,7 @@ card-number = 592
 [[cards]]
 name = "Demonbane"
 id = "e265cb41-f7ab-436c-81e8-a4ba2f40fa86"
-tides = ["figment_swarm", "warrior_pressure"]
+tides = ["warrior_pressure"]
 rendered-text = "▸ Materialized: Each enemy gains '▸ Dissolved: The opponent materializes a Warrior figment.'"
 energy-cost = 4
 card-type = "Character"
@@ -7838,7 +7838,7 @@ card-number = 593
 [[cards]]
 name = "Forge-Twin"
 id = "194e61db-a950-42e4-b94d-67b83756103c"
-tides = ["materialize_value", "trigger_reuse", "materialize_tempo"]
+tides = ["materialize_tempo", "trigger_reuse", "copy_effects"]
 rendered-text = "▸ Materialized: Banish an ally. At end of turn, materialize it and a copy of it."
 energy-cost = 5
 card-type = "Character"
@@ -7853,7 +7853,7 @@ card-number = 594
 [[cards]]
 name = "Soulrender"
 id = "74e46c28-ea43-4b2a-9672-5e718d09f772"
-tides = ["abandon_furnace", "spark_tall"]
+tides = ["abandon_value", "spark_tall"]
 rendered-text = "Abandon an ally: This character gains spark equal to that ally's cost."
 energy-cost = 4
 card-type = "Character"
@@ -7868,7 +7868,7 @@ card-number = 597
 [[cards]]
 name = "Fathomscourge"
 id = "ba78c3e2-eb94-49db-8c54-ae1fcfae26aa"
-tides = ["sweepers", "discard_velocity", "survivor_dissolve", "finishers"]
+tides = ["discard_velocity", "survivor_dissolve", "finishers"]
 rendered-text = "▸ Materialized: Dissolve all other characters. Discard a card for each ally dissolved."
 energy-cost = 7
 card-type = "Character"
@@ -7883,7 +7883,7 @@ card-number = 599
 [[cards]]
 name = "Duskwall Delver"
 id = "2cb1defb-38d9-40fd-b7f0-43fcac173ccc"
-tides = ["judgment_engines", "void_setup", "void_recursion"]
+tides = ["judgment_engines", "void_setup", "recursion_fuel"]
 rendered-text = "▸ Judgment: Put the top cards 2 of your deck into your void. Materialize a copy of a random character from among them with 1 spark."
 energy-cost = 4
 card-type = "Character"
@@ -7898,7 +7898,7 @@ card-number = 600
 [[cards]]
 name = "Veil Crosser"
 id = "e1578a76-1238-4e52-b51c-7e378cc31f1b"
-tides = ["void_recursion", "character_velocity"]
+tides = ["void_recursion", "cost_reduction"]
 rendered-text = "▸ Materialized: Put 3 characters from your void into your deck. They cost 0●."
 energy-cost = 5
 card-type = "Character"
@@ -7913,7 +7913,7 @@ card-number = 601
 [[cards]]
 name = "Burning Revenant"
 id = "8b88a03f-ac7c-40ab-b692-1420402f586b"
-tides = ["warrior_pressure", "warrior_bastion", "character_velocity"]
+tides = ["warrior_pressure", "warrior_bastion"]
 rendered-text = "▸ Dissolved: Materialize a Warrior from hand. It gains +3 spark."
 energy-cost = 3
 card-type = "Character"
@@ -7988,7 +7988,7 @@ card-number = 609
 [[cards]]
 name = "Dreadmount Sovereign"
 id = "0381499a-bae2-48ff-9fca-b16d188ded6f"
-tides = ["judgment_engines", "spark_disruption", "warrior_bastion"]
+tides = ["judgment_engines", "warrior_bastion"]
 rendered-text = "▸ Judgment: Each enemy loses 1 spark."
 energy-cost = 5
 card-type = "Character"
@@ -8018,7 +8018,7 @@ card-number = 615
 [[cards]]
 name = "Marrow Drinker"
 id = "30363d50-516a-4784-aa55-1eeb5e7be508"
-tides = ["spark_disruption", "spark_tall"]
+tides = ["spark_tall", "premium_removal"]
 rendered-text = "▸ Materialized: Choose an enemy. This character gains spark equal to its spark. Its spark becomes 0."
 energy-cost = 4
 card-type = "Character"
@@ -8033,7 +8033,7 @@ card-number = 616
 [[cards]]
 name = "Stonewaker"
 id = "13be5284-0a7c-4894-ba59-5559841ec9ae"
-tides = ["spark_tall", "character_velocity"]
+tides = ["spark_tall"]
 rendered-text = "▸ Materialized: Each character in your deck gains +2 spark."
 energy-cost = 6
 card-type = "Character"
@@ -8063,7 +8063,7 @@ card-number = 626
 [[cards]]
 name = "Marrow Mimic"
 id = "16bb647c-ccad-443f-9947-5bf736f42f87"
-tides = ["materialize_value", "survivor_dissolve", "copy_effects"]
+tides = ["survivor_dissolve", "copy_effects"]
 rendered-text = "▸ Materialized: Choose an enemy. ▸ Dissolved: Materialize a copy of it."
 energy-cost = 3
 card-type = "Character"
@@ -8078,7 +8078,7 @@ card-number = 629
 [[cards]]
 name = "Distant Promise"
 id = "77934da6-b3d1-42aa-9c8f-3fade22da8ea"
-tides = ["point_pressure", "card_flow", "midcurve_glue"]
+tides = ["point_pressure", "card_flow"]
 rendered-text = "Secretly choose 1, 2, or 3. After that many turns, gain that many ✪ and draw that many cards."
 energy-cost = 3
 card-type = "Event"
@@ -8093,7 +8093,7 @@ card-number = 630
 [[cards]]
 name = "Rift Pilgrim"
 id = "f709eab8-c2e5-4e0e-b45f-f311a17f32bc"
-tides = ["topdeck_setup", "materialize_value", "resource_burst"]
+tides = ["topdeck_setup", "materialize_value"]
 rendered-text = "▸ Materialized: Banish the top card of your deck. ▸ Banished: Play the card you banished for 0●."
 energy-cost = 3
 card-type = "Character"
@@ -8123,7 +8123,7 @@ card-number = 632
 [[cards]]
 name = "Dread Arbiter"
 id = "dcfd366c-169d-46d4-9714-85383bbd86dd"
-tides = ["materialize_value", "materialized_staples", "materialize_tempo"]
+tides = ["materialize_value", "attrition_trade"]
 rendered-text = "▸ Materialized: The opponent chooses — you draw 2 cards, or they abandon a character."
 energy-cost = 4
 card-type = "Character"
@@ -8138,7 +8138,7 @@ card-number = 635
 [[cards]]
 name = "Ashen Harbinger"
 id = "56d74dc7-c88c-4039-bedf-9f38bcee0538"
-tides = ["judgment_engines", "sweepers"]
+tides = ["judgment_engines", "finishers"]
 rendered-text = "▸ Judgment: Lose 1 spark. If this has 0 spark, dissolve all enemies."
 energy-cost = 4
 card-type = "Character"
@@ -8168,7 +8168,7 @@ card-number = 637
 [[cards]]
 name = "Emergent Horror"
 id = "3169d027-ff3d-4549-9024-dbc589f21497"
-tides = ["materialize_value", "spark_disruption", "materialized_staples"]
+tides = ["materialize_value"]
 rendered-text = "▸ Materialized: Each enemy loses 1 spark."
 energy-cost = 6
 card-type = "Character"
@@ -8198,7 +8198,7 @@ card-number = 643
 [[cards]]
 name = "Patient Ascendant"
 id = "bb1fbd5e-511f-4e58-9ad6-967a3ea1a2e7"
-tides = ["big_energy", "spark_tall", "resource_burst"]
+tides = ["big_energy", "spark_tall"]
 rendered-text = "At the end of your turn, this character gains +1 spark for each unspent ● you have."
 energy-cost = 4
 card-type = "Character"
@@ -8228,7 +8228,7 @@ card-number = 647
 [[cards]]
 name = "Blazepath Traveler"
 id = "7eef114a-af13-43bf-b562-0b6ee3326027"
-tides = ["abandon_furnace", "character_velocity", "ally_formation"]
+tides = ["abandon_ladder", "character_chain", "ally_formation"]
 rendered-text = "▸ Materialized: Banish each ally. For each, materialize a character with cost 1● higher from your deck."
 energy-cost = 5
 card-type = "Character"
@@ -8243,7 +8243,7 @@ card-number = 650
 [[cards]]
 name = "Skybound Drifter"
 id = "ec01408b-bf2e-4c0d-afed-070032e3fff9"
-tides = ["spirit_growth", "topdeck_setup", "character_velocity", "finishers"]
+tides = ["topdeck_setup", "finishers", "spark_tall"]
 rendered-text = "▸ Materialized: Reveal the top card of your deck. You may play it. If you do, this character gains +2 spark and you repeat this process."
 energy-cost = 5
 card-type = "Character"
@@ -8288,7 +8288,7 @@ card-number = 661
 [[cards]]
 name = "Quiet Expeditionary"
 id = "b2689ff9-eab8-4df1-a449-a396c1f76c61"
-tides = ["spark_disruption", "prevent_control", "materialize_value"]
+tides = ["prevent_control", "materialize_value"]
 rendered-text = "▸ Materialized: Choose an enemy. It cannot gain spark while this character is in play."
 energy-cost = 4
 card-type = "Character"
@@ -8303,7 +8303,7 @@ card-number = 663
 [[cards]]
 name = "Blight Weaver"
 id = "293416b2-9b92-4c21-bdbf-ec186739ff35"
-tides = ["judgment_engines", "warrior_bastion", "spark_disruption", "premium_removal"]
+tides = ["judgment_engines", "warrior_bastion", "premium_removal"]
 rendered-text = "▸ Materialized: Choose an enemy. ▸ Judgment: It loses 2 spark. At 0, dissolve it and draw 2."
 energy-cost = 3
 card-type = "Character"
@@ -8318,7 +8318,7 @@ card-number = 665
 [[cards]]
 name = "The Starsand Titan"
 id = "3dde9a28-fd02-48fd-82d6-24467f698bbb"
-tides = ["judgment_engines"]
+tides = ["judgment_engines", "finishers"]
 rendered-text = "▸ Materialized: For the rest of the game, ▸ Judgment: abilities trigger twice."
 energy-cost = 7
 card-type = "Character"
@@ -8333,7 +8333,7 @@ card-number = 667
 [[cards]]
 name = "The Festering Mass"
 id = "789c2aa7-5d72-421d-b136-286701fb6074"
-tides = ["judgment_engines", "spark_tall", "spark_disruption", "finishers"]
+tides = ["judgment_engines", "spark_tall", "finishers", "fast_interaction"]
 rendered-text = "▸ Judgment: Each enemy loses 1 spark. This character gains +1 spark for each."
 energy-cost = 7
 card-type = "Character"
@@ -8363,7 +8363,7 @@ card-number = 669
 [[cards]]
 name = "Emberwolf Triad"
 id = "3581a5f9-aa26-4e52-9f60-7d9f11e38f03"
-tides = ["judgment_engines", "materialize_value", "ally_formation"]
+tides = ["judgment_engines", "materialize_value", "copy_effects"]
 rendered-text = "▸ Materialized: Choose an ally. ▸ Judgment: Materialize a copy of it with 1 spark."
 energy-cost = 4
 card-type = "Character"
@@ -8378,7 +8378,7 @@ card-number = 670
 [[cards]]
 name = "Trenchborn Manta"
 id = "e4b1aa60-eb33-4926-8c3b-97b8cb302388"
-tides = ["void_recursion", "judgment_engines", "survivor_dissolve"]
+tides = ["void_threshold", "judgment_engines", "survivor_dissolve"]
 rendered-text = "▸ Materialized, Judgment: Each character in your void gains +2 spark."
 energy-cost = 5
 card-type = "Character"
@@ -8393,7 +8393,7 @@ card-number = 671
 [[cards]]
 name = "Shatterpoint Agent"
 id = "ca261bd3-fca9-4b96-9050-1af5546a55b3"
-tides = ["materialize_tempo", "spark_disruption", "discard_velocity"]
+tides = ["materialize_value", "discard_velocity", "fast_interaction"]
 rendered-text = "▸ Materialized: An enemy's spark becomes 0 until your next turn. Discard a card."
 energy-cost = 3
 card-type = "Character"
@@ -8408,7 +8408,7 @@ card-number = 672
 [[cards]]
 name = "Rootbound Witness"
 id = "581e3324-8692-4edb-9f4e-411496928c09"
-tides = ["abandon_furnace", "judgment_engines", "ally_formation", "figment_swarm"]
+tides = ["abandon_value", "judgment_engines"]
 rendered-text = "▸ Judgment: You may abandon an ally to play the top card of the opponent's deck for 0●."
 energy-cost = 4
 card-type = "Character"
@@ -8438,7 +8438,7 @@ card-number = 674
 [[cards]]
 name = "Grimwood Ritualist"
 id = "148b0926-705b-44a4-8ea9-2867458ac88c"
-tides = ["abandon_furnace", "ally_formation"]
+tides = ["abandon_value", "copy_effects"]
 rendered-text = "When you abandon an ally, this character becomes a copy of that ally. It keeps this ability."
 energy-cost = 4
 card-type = "Character"
@@ -8483,7 +8483,7 @@ card-number = 677
 [[cards]]
 name = "Tethered Hollow"
 id = "0da0f7c9-7175-4944-ac27-8d3ba5653c79"
-tides = ["character_velocity", "cost_reduction", "warrior_bastion"]
+tides = ["character_chain", "cost_reduction", "warrior_bastion"]
 rendered-text = "▸ Dissolved: For the rest of the game, your first character each turn costs 2● less."
 energy-cost = 4
 card-type = "Character"
@@ -8498,7 +8498,7 @@ card-number = 678
 [[cards]]
 name = "Scrapyard Custodian"
 id = "350285d8-d986-49f9-9f33-db4bb661d4ce"
-tides = ["abandon_furnace"]
+tides = ["abandon_ladder", "void_recursion"]
 rendered-text = "▸ Dissolved: Materialize each character abandoned this turn from your void with +3 spark."
 energy-cost = 7
 card-type = "Character"
@@ -8513,7 +8513,7 @@ card-number = 679
 [[cards]]
 name = "Pyre Challenger"
 id = "d37b5344-545f-4c1c-8078-d167b1d5e90a"
-tides = ["warrior_pressure", "spark_tall", "spark_disruption"]
+tides = ["warrior_pressure", "spark_tall", "fast_interaction"]
 rendered-text = "▸ Materialized: An enemy loses all spark. This character gains that much spark."
 energy-cost = 4
 card-type = "Character"
@@ -8558,7 +8558,7 @@ card-number = 682
 [[cards]]
 name = "Desolation's Edge"
 id = "9ea29478-57f1-46a7-beb1-f5fae483eb98"
-tides = ["abandon_furnace", "premium_removal", "warrior_bastion"]
+tides = ["abandon_value", "premium_removal", "warrior_bastion"]
 rendered-text = "Abandon this character: Dissolve an enemy."
 energy-cost = 4
 card-type = "Character"
@@ -8573,7 +8573,7 @@ card-number = 683
 [[cards]]
 name = "Crossfire Specialist"
 id = "c52b81bb-a07f-4936-b044-4ac1aa5cc67d"
-tides = ["event_chain", "spark_disruption", "prevent_control"]
+tides = ["event_chain", "fast_interaction"]
 rendered-text = "When you play an event, the enemy with the most spark loses 1 spark."
 energy-cost = 4
 card-type = "Character"
@@ -8603,7 +8603,7 @@ card-number = 685
 [[cards]]
 name = "Entropy Spike"
 id = "c8f4f3d4-78e0-4ce3-af63-783f6aeb652f"
-tides = ["event_chain"]
+tides = ["event_chain", "cost_reduction"]
 rendered-text = "▸ Materialized: Events cost you 2● less this turn. For the rest of the game after that, events cost you 1● more."
 energy-cost = 3
 card-type = "Character"
@@ -8618,7 +8618,7 @@ card-number = 686
 [[cards]]
 name = "The Deathsworn"
 id = "1894cb9f-e46b-4f1a-9c2e-9486f9abd084"
-tides = ["warrior_bastion", "abandon_furnace"]
+tides = ["warrior_bastion", "void_recursion"]
 rendered-text = "When an allied Warrior is dissolved, reclaim it with 1 spark."
 energy-cost = 4
 card-type = "Character"
@@ -8633,7 +8633,7 @@ card-number = 687
 [[cards]]
 name = "Headtaker Wurm"
 id = "ef50eb65-e0c1-4dc9-8654-03827ff4fdb0"
-tides = ["premium_removal", "materialize_value", "materialized_staples", "discover_toolbox"]
+tides = ["premium_removal", "materialize_value", "discover_toolbox"]
 rendered-text = "▸ Materialized: Banish an enemy. Add a copy of it to your hand."
 energy-cost = 6
 card-type = "Character"
@@ -8663,7 +8663,7 @@ card-number = 689
 [[cards]]
 name = "Nullstone Contemplant"
 id = "4ed375e4-0bab-48da-83bc-c3bf7617ff25"
-tides = ["topdeck_setup", "foresee_selection", "spirit_growth"]
+tides = ["topdeck_setup", "foresee_selection"]
 rendered-text = "▸ Materialized: Reorder your deck from highest cost to lowest cost."
 energy-cost = 3
 card-type = "Character"
@@ -8693,7 +8693,7 @@ card-number = 691
 [[cards]]
 name = "Rusted Monolith"
 id = "dcc4834d-292e-4239-b77b-1425402800c6"
-tides = ["event_chain", "void_recursion"]
+tides = ["event_chain", "void_recursion", "reclaim_events"]
 rendered-text = "Events you reclaim cost 0●."
 energy-cost = 4
 card-type = "Character"
@@ -8723,7 +8723,7 @@ card-number = 693
 [[cards]]
 name = "The Thinning"
 id = "3b3d3beb-5678-4649-9fc2-066a5c7a9d62"
-tides = ["character_velocity", "event_chain"]
+tides = ["cost_reduction", "hand_cycling"]
 rendered-text = "Banish your hand. For the rest of the game, cards you draw cost 1● less."
 energy-cost = 4
 card-type = "Event"
@@ -8738,7 +8738,7 @@ card-number = 694
 [[cards]]
 name = "Petition the Megalith"
 id = "dbac7638-7216-4e61-8f4f-2d232b46f71b"
-tides = ["materialize_tempo", "bounce_blink_tools", "character_velocity", "cost_reduction"]
+tides = ["materialize_tempo", "bounce_blink_tools", "cost_reduction"]
 rendered-text = "Return each ally to hand. They cost 2● less this turn."
 energy-cost = 3
 card-type = "Event"
@@ -8768,7 +8768,7 @@ card-number = 696
 [[cards]]
 name = "Colossal Convergence"
 id = "e8dcb92a-4ee6-4dc7-86c2-a9092a9bf7c7"
-tides = ["spark_tall", "ally_formation", "abandon_furnace"]
+tides = ["spark_tall", "ally_formation", "abandon_value"]
 rendered-text = "An ally gains the total spark of your other allies. Abandon them."
 energy-cost = 4
 card-type = "Event"
@@ -8798,7 +8798,7 @@ card-number = 698
 [[cards]]
 name = "Conjured Zenith"
 id = "53a957e9-d35b-45ac-bb61-4394e9bb403c"
-tides = ["character_velocity", "materialize_value"]
+tides = ["materialize_value"]
 rendered-text = "Materialize a random character from your deck with cost equal to the number of cards in your hand."
 energy-cost = 2
 card-type = "Event"
@@ -8813,7 +8813,7 @@ card-number = 699
 [[cards]]
 name = "The Grand Heist"
 id = "9d3a63f7-68b0-490d-a521-321dfeb8a05e"
-tides = ["discover_toolbox", "prevent_control", "event_chain"]
+tides = ["discover_toolbox", "hand_disruption"]
 rendered-text = "Look at the top 5 cards of the opponent's deck. Play one for 0●. Put the rest on the bottom."
 energy-cost = 4
 card-type = "Event"
@@ -8828,7 +8828,7 @@ card-number = 700
 [[cards]]
 name = "Tidal Prism"
 id = "dc1ffde8-189c-4906-8251-0a9838f6e708"
-tides = ["materialize_value", "character_velocity"]
+tides = ["materialize_value", "materialize_tempo", "trigger_reuse"]
 rendered-text = "Until end of turn, when you materialize a character, materialize a copy of it."
 energy-cost = 5
 card-type = "Event"
@@ -8843,7 +8843,7 @@ card-number = 701
 [[cards]]
 name = "Collateral Damage"
 id = "28868166-7f79-4019-9960-b478397689a0"
-tides = ["premium_removal", "sweepers", "spark_disruption"]
+tides = ["premium_removal", "finishers"]
 rendered-text = "Dissolve an enemy. Each other enemy loses spark equal to the dissolved character's cost."
 energy-cost = 5
 card-type = "Event"
@@ -8873,7 +8873,7 @@ card-number = 703
 [[cards]]
 name = "Fenlight Expedition"
 id = "6b756f16-aa6d-4ec7-9588-65526e286acd"
-tides = ["reclaim_events", "void_setup", "event_chain"]
+tides = ["reclaim_events", "void_setup", "event_chain", "recursion_fuel"]
 rendered-text = "Put 5 random events from your deck into your void."
 energy-cost = 2
 card-type = "Event"
@@ -8888,7 +8888,7 @@ card-number = 704
 [[cards]]
 name = "Scuttled Fortune"
 id = "ff8a3548-f00b-4724-928a-fdbe886bbbf5"
-tides = ["abandon_furnace", "ally_formation", "figment_swarm"]
+tides = ["abandon_value", "ally_formation"]
 rendered-text = "Abandon all allies. Gain 2● and draw a card for each ally dissolved."
 energy-cost = 4
 card-type = "Event"
@@ -8903,7 +8903,7 @@ card-number = 705
 [[cards]]
 name = "Aftermath Bloom"
 id = "62e920a2-4b5d-4236-837d-ec02bc2e14bd"
-tides = ["abandon_furnace", "ally_formation", "character_velocity"]
+tides = ["abandon_ladder", "materialize_value", "ally_formation"]
 rendered-text = "Abandon any number of allies. Materialize a random character from your deck for each ally abandoned."
 energy-cost = 5
 card-type = "Event"
@@ -8918,7 +8918,7 @@ card-number = 706
 [[cards]]
 name = "Cradle of Storms"
 id = "02e4db99-f7f6-42f3-b317-345938e43a10"
-tides = ["discard_velocity", "character_velocity"]
+tides = ["discard_velocity", "character_chain"]
 rendered-text = "Until end of turn, when you discard a character, materialize it."
 energy-cost = 3
 card-type = "Event"
@@ -8933,7 +8933,7 @@ card-number = 707
 [[cards]]
 name = "Peak Plunder"
 id = "42fceb59-96a6-4053-bbfb-dcd841b0e196"
-tides = ["character_velocity", "cost_reduction", "resource_burst"]
+tides = ["cost_reduction", "resource_burst"]
 rendered-text = "The cost of a random character in your hand becomes 0●."
 energy-cost = 2
 card-type = "Event"
@@ -8948,7 +8948,7 @@ card-number = 708
 [[cards]]
 name = "Vertiginous Leap"
 id = "b93e0cef-e543-4229-a7b4-243e652dd31e"
-tides = ["discover_toolbox", "prevent_control", "hand_disruption"]
+tides = ["discover_toolbox", "hand_disruption"]
 rendered-text = "Look at the opponent's hand. You may play an event from it for 0●."
 energy-cost = 4
 card-type = "Event"
