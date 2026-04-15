@@ -10,38 +10,12 @@ import {
   type SiteGenerationContext,
 } from "./atlas-generator";
 import type { DreamscapeNode, SiteState } from "../types/quest";
-import type { CardData } from "../types/cards";
 
 function defaultContext(
   overrides?: Partial<SiteGenerationContext>,
 ): SiteGenerationContext {
-  const db = new Map<number, CardData>();
-  db.set(1, {
-    name: "Test Card",
-    id: "test-card",
-    cardNumber: 1,
-    cardType: "Character",
-    subtype: "",
-    rarity: "Common",
-    energyCost: 2,
-    spark: 1,
-    isFast: false,
-    tides: ["Bloom"],
-    renderedText: "Test rules text.",
-    imageNumber: 1,
-    artOwned: false,
-  });
   return {
-    cardDatabase: db,
-    dreamsignPool: [
-      {
-        name: "Test Dreamsign",
-        tide: "Bloom",
-        effectDescription: "Test effect.",
-      },
-    ],
     playerHasBanes: false,
-    selectedPackageTides: [],
     ...overrides,
   };
 }
@@ -134,7 +108,7 @@ describe("generateSiteComposition", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("populates reward data on Reward sites", () => {
+  it("leaves Reward sites unresolved until the player enters them", () => {
     let foundReward = false;
     for (let i = 0; i < 100; i++) {
       resetAtlasGenerator();
@@ -142,8 +116,7 @@ describe("generateSiteComposition", () => {
       const reward = sites.find((s) => s.type === "Reward");
       if (reward) {
         foundReward = true;
-        expect(reward.data).toBeDefined();
-        expect(reward.data!["rewardType"]).toBeDefined();
+        expect(reward.data).toBeUndefined();
         break;
       }
     }
@@ -348,47 +321,19 @@ describe("previewSiteTypes", () => {
 });
 
 describe("rewardPreviewLabel", () => {
-  it("returns card reward label for card reward sites", () => {
+  it("returns a generic label for reward sites", () => {
     const site: SiteState = {
       id: "s1",
       type: "Reward",
       isEnhanced: false,
       isVisited: false,
-      data: { rewardType: "card", cardNumber: 1, cardName: "Fire Bolt" },
     };
-    expect(rewardPreviewLabel(site)).toBe("Reward: Fire Bolt");
-  });
-
-  it("returns dreamsign reward label for dreamsign reward sites", () => {
-    const site: SiteState = {
-      id: "s2",
-      type: "Reward",
-      isEnhanced: false,
-      isVisited: false,
-      data: {
-        rewardType: "dreamsign",
-        dreamsignName: "Ember's Whisper",
-        dreamsignTide: "Ignite",
-        dreamsignEffect: "Fire effect.",
-      },
-    };
-    expect(rewardPreviewLabel(site)).toBe("Reward: Ember's Whisper");
-  });
-
-  it("returns essence reward label for essence reward sites", () => {
-    const site: SiteState = {
-      id: "s3",
-      type: "Reward",
-      isEnhanced: false,
-      isVisited: false,
-      data: { rewardType: "essence", essenceAmount: 250 },
-    };
-    expect(rewardPreviewLabel(site)).toBe("Reward: 250 Essence");
+    expect(rewardPreviewLabel(site)).toBe("Reward");
   });
 
   it("returns null for non-reward sites", () => {
     const site: SiteState = {
-      id: "s4",
+      id: "s2",
       type: "Shop",
       isEnhanced: false,
       isVisited: false,

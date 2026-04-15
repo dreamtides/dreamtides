@@ -5,12 +5,10 @@ import type { SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { dreamcallerAccentTide } from "../data/quest-content";
-import { countDeckTides, selectRareRewards } from "../data/tide-weights";
+import { selectRareRewards } from "../data/tide-weights";
 import { CardDisplay } from "../components/CardDisplay";
 import { logEvent } from "../logging";
 import { generateNewNodes } from "../atlas/atlas-generator";
-import { createDreamsign } from "../data/dreamsigns";
-import { resolveDreamsignTemplates } from "../dreamsign/dreamsign-pool";
 import type { DreamcallerContent } from "../types/content";
 
 type BattlePhase = "preBattle" | "animation" | "victory";
@@ -420,7 +418,7 @@ export function BattleScreen({
   cardDatabase: Map<number, CardData>;
 }) {
   const { state, mutations, questContent } = useQuest();
-  const { completionLevel, atlas, currentDreamscape, deck } = state;
+  const { completionLevel, atlas, currentDreamscape, resolvedPackage } = state;
 
   const [phase, setPhase] = useState<BattlePhase>("preBattle");
   const [selectedRewardIndex, setSelectedRewardIndex] = useState<number | null>(null);
@@ -438,8 +436,6 @@ export function BattleScreen({
   const isMiniboss = completionLevel === 3;
   const isFinalBoss = completionLevel === 6;
   const essenceReward = 100 + completionLevel * 50;
-  const selectedPackageTides = state.resolvedPackage?.selectedTides ?? [];
-
   // Generate enemy and rare card rewards once on mount and keep stable.
   const enemyRef = useRef<EnemyData | null>(null);
   if (enemyRef.current === null) {
@@ -449,11 +445,9 @@ export function BattleScreen({
 
   const rareCardsRef = useRef<CardData[] | null>(null);
   if (rareCardsRef.current === null) {
-    const tideCounts = countDeckTides(deck, cardDatabase);
     rareCardsRef.current = selectRareRewards(
       cardDatabase,
-      tideCounts,
-      selectedPackageTides,
+      resolvedPackage?.selectedTides ?? [],
     );
   }
   const rareCards = rareCardsRef.current;
@@ -535,13 +529,7 @@ export function BattleScreen({
               dreamscapeId,
               completionLevel,
               {
-                cardDatabase,
-                dreamsignPool: resolveDreamsignTemplates(
-                  state.remainingDreamsignPool,
-                  questContent.dreamsignTemplates,
-                ).map((template) => createDreamsign(template)),
                 playerHasBanes,
-                selectedPackageTides,
               },
             );
             mutations.updateAtlas(updatedAtlas);
@@ -569,11 +557,6 @@ export function BattleScreen({
       isMiniboss,
       state.deck,
       state.dreamsigns,
-      state.remainingDreamsignPool,
-      cardDatabase,
-      questContent.dreamcallers,
-      questContent.dreamsignTemplates,
-      selectedPackageTides,
     ],
   );
 

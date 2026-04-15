@@ -1,7 +1,5 @@
 import { generateInitialAtlas } from "../atlas/atlas-generator";
-import { createDreamsign } from "../data/dreamsigns";
 import { initializeDraftState } from "../draft/draft-engine";
-import { resolveDreamsignTemplates } from "../dreamsign/dreamsign-pool";
 import { logEvent } from "../logging";
 import type { QuestContent } from "../data/quest-content";
 import type { CardData } from "../types/cards";
@@ -26,7 +24,7 @@ export interface QuestStartBootstrapArgs {
   cardDatabase: Map<number, CardData>;
   questContent: Pick<
     QuestContent,
-    "dreamsignTemplates" | "resolvedPackagesByDreamcallerId"
+    "resolvedPackagesByDreamcallerId"
   >;
 }
 
@@ -51,13 +49,7 @@ export function bootstrapQuestStart({
     state.deck.some((entry) => entry.isBane) ||
     state.dreamsigns.some((dreamsign) => dreamsign.isBane);
   const atlas = generateInitialAtlas(state.completionLevel, {
-    cardDatabase,
-    dreamsignPool: resolveDreamsignTemplates(
-      resolvedPackage.dreamsignPoolIds,
-      questContent.dreamsignTemplates,
-    ).map((template) => createDreamsign(template)),
     playerHasBanes,
-    selectedPackageTides: resolvedPackage.selectedTides,
   });
   const draftState = initializeDraftState(cardDatabase, resolvedPackage);
 

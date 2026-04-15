@@ -24,6 +24,11 @@ export interface QuestContent {
   resolvedPackagesByDreamcallerId: Map<string, ResolvedDreamcallerPackage>;
 }
 
+export interface PackageAdjacentCandidate<T> {
+  item: T;
+  overlapCount: number;
+}
+
 /** Returns the overlap count between a candidate and the selected package tides. */
 export function countPackageOverlap(
   candidatePackageTides: readonly PackageTideId[],
@@ -66,14 +71,53 @@ export function selectPackageAdjacentOrFallback<T>(
   packageTides: (item: T) => readonly PackageTideId[],
   selectedPackageTides: readonly PackageTideId[],
 ): T[] {
+  return packageAdjacentCandidatesOrFallback(
+    items,
+    packageTides,
+    selectedPackageTides,
+  ).map((candidate) => candidate.item);
+}
+
+/** Returns package-adjacent items with overlap counts, or the full pool as a flat fallback. */
+export function packageAdjacentCandidatesOrFallback<T>(
+  items: readonly T[],
+  packageTides: (item: T) => readonly PackageTideId[],
+  selectedPackageTides: readonly PackageTideId[],
+): PackageAdjacentCandidate<T>[] {
+  const candidates = items.map((item) => ({
+    item,
+    overlapCount: countPackageOverlap(packageTides(item), selectedPackageTides),
+  }));
+
   if (selectedPackageTides.length === 0) {
-    return [...items];
+    return candidates.map((candidate) => ({
+      ...candidate,
+      overlapCount: 1,
+    }));
   }
 
-  const adjacent = items.filter((item) =>
-    isPackageAdjacent(packageTides(item), selectedPackageTides),
+  const adjacent = candidates.filter((candidate) => candidate.overlapCount > 0);
+  if (adjacent.length > 0) {
+    return adjacent;
+  }
+
+  return candidates.map((candidate) => ({
+    ...candidate,
+    overlapCount: 1,
+  }));
+}
+
+/** Selects package-adjacent items with overlap counts, or the full pool as a flat fallback. */
+export function selectPackageAdjacentWithOverlap<T>(
+  items: readonly T[],
+  packageTides: (item: T) => readonly PackageTideId[],
+  selectedPackageTides: readonly PackageTideId[],
+): PackageAdjacentCandidate<T>[] {
+  return packageAdjacentCandidatesOrFallback(
+    items,
+    packageTides,
+    selectedPackageTides,
   );
-  return adjacent.length > 0 ? adjacent : [...items];
 }
 
 /** Returns a stable accent tide for Dreamcaller display surfaces. */

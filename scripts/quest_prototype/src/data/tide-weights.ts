@@ -1,32 +1,7 @@
-import { cardAccentTide } from "./card-database";
-import type { CardData, Tide } from "../types/cards";
+import type { CardData } from "../types/cards";
 import type { PackageTideId } from "../types/content";
-import {
-  packageOverlapWeight,
-  selectPackageAdjacentOrFallback,
-} from "./quest-content";
+import { packageAdjacentCandidatesOrFallback } from "./quest-content";
 
-/** Counts tide occurrences in the player's deck. */
-export function countDeckTides(
-  deck: ReadonlyArray<{ cardNumber: number }>,
-  cardDatabase: ReadonlyMap<number, CardData>,
-): Map<Tide, number> {
-  const counts = new Map<Tide, number>();
-  for (const entry of deck) {
-    const card = cardDatabase.get(entry.cardNumber);
-    if (card) {
-      const accentTide = cardAccentTide(card);
-      counts.set(accentTide, (counts.get(accentTide) ?? 0) + 1);
-    }
-  }
-  return counts;
-}
-
-/**
- * Performs a weighted random selection of `count` items from `pool`.
- * Items with higher weights are more likely to be selected.
- * Selected items are not re-picked (sampling without replacement).
- */
 export function weightedSample<T>(
   pool: ReadonlyArray<T>,
   count: number,
@@ -34,21 +9,25 @@ export function weightedSample<T>(
 ): T[] {
   const weighted: Array<[T, number]> = pool.map((item) => [
     item,
-    weightFn(item),
+    Math.max(0, weightFn(item)),
   ]);
-
   const selected: T[] = [];
   const remaining = [...weighted];
 
-  for (let pick = 0; pick < count && remaining.length > 0; pick++) {
-    const total = remaining.reduce((sum, [, w]) => sum + w, 0);
+  for (let pick = 0; pick < count && remaining.length > 0; pick += 1) {
+    const total = remaining.reduce((sum, [, weight]) => sum + weight, 0);
+    if (total <= 0) {
+      selected.push(remaining.shift()![0]);
+      continue;
+    }
+
     let roll = Math.random() * total;
     let chosenIndex = remaining.length - 1;
 
-    for (let i = 0; i < remaining.length; i++) {
-      roll -= remaining[i][1];
+    for (let index = 0; index < remaining.length; index += 1) {
+      roll -= remaining[index][1];
       if (roll <= 0) {
-        chosenIndex = i;
+        chosenIndex = index;
         break;
       }
     }
@@ -60,39 +39,43 @@ export function weightedSample<T>(
   return selected;
 }
 
-/**
- * Computes a weight for a tide-bearing item based on how common that
- * tide is in the player's deck. Items matching the player's dominant
- * tides receive up to 4x the base weight.
- */
-export function tideWeight(
-  tide: Tide,
-  deckTideCounts: ReadonlyMap<Tide, number>,
-): number {
-  const maxCount = Math.max(...deckTideCounts.values(), 1);
-  const tideCount = deckTideCounts.get(tide) ?? 0;
-  return 1 + (tideCount / maxCount) * 3;
+export function pickPackageAdjacentItem<T>(
+  items: readonly T[],
+  packageTides: (item: T) => readonly PackageTideId[],
+  selectedPackageTides: readonly PackageTideId[],
+): T | null {
+  return (
+    samplePackageAdjacentItems(items, 1, packageTides, selectedPackageTides)[0] ??
+    null
+  );
 }
 
-/**
- * Selects rare cards weighted toward the player's deck tides.
- * Draws from an infinite pool (does not deplete the draft cube).
- */
-export function selectRareRewards(
-  cardDatabase: Map<number, CardData>,
-  deckTideCounts: Map<Tide, number>,
-  selectedPackageTides: readonly PackageTideId[] = [],
-): CardData[] {
-  const rareCards = selectPackageAdjacentOrFallback(
-    Array.from(cardDatabase.values()).filter((card) => card.rarity === "Rare"),
-    (card) => card.tides,
+export function samplePackageAdjacentItems<T>(
+  items: readonly T[],
+  count: number,
+  packageTides: (item: T) => readonly PackageTideId[],
+  selectedPackageTides: readonly PackageTideId[],
+): T[] {
+  const candidates = packageAdjacentCandidatesOrFallback(
+    items,
+    packageTides,
     selectedPackageTides,
   );
 
-  if (rareCards.length === 0) return [];
+  return weightedSample(candidates, count, (candidate) => candidate.overlapCount).map(
+    (candidate) => candidate.item,
+  );
+}
 
-  return weightedSample(rareCards, 4, (card) =>
-    tideWeight(cardAccentTide(card), deckTideCounts) *
-      Math.max(1, packageOverlapWeight(card.tides, selectedPackageTides)),
+/** Selects rare rewards from the package-adjacent pool without touching the draft multiset. */
+export function selectRareRewards(
+  cardDatabase: ReadonlyMap<number, CardData>,
+  selectedPackageTides: readonly PackageTideId[] = [],
+): CardData[] {
+  return samplePackageAdjacentItems(
+    Array.from(cardDatabase.values()).filter((card) => card.rarity === "Rare"),
+    4,
+    (card) => card.tides,
+    selectedPackageTides,
   );
 }

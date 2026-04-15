@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import type { SiteState, Dreamsign } from "../types/quest";
 import { useQuest } from "../state/quest-context";
@@ -6,6 +6,10 @@ import { logEvent } from "../logging";
 import { CardDisplay } from "../components/CardDisplay";
 import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import type { Tide } from "../types/cards";
+import {
+  generateRewardSiteData,
+  type RewardSiteData,
+} from "../rewards/reward-generator";
 
 /** Props for the RewardSiteScreen component. */
 interface RewardSiteScreenProps {
@@ -14,22 +18,46 @@ interface RewardSiteScreenProps {
 
 /** Displays the reward site: shows the pre-defined reward and accept/decline buttons. */
 export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
-  const { mutations } = useQuest();
+  const { state, mutations, cardDatabase, questContent } = useQuest();
+  const rewardRef = useRef<{
+    reward: RewardSiteData;
+    remainingDreamsignPoolIds: string[];
+    spentDreamsignPoolIds: string[];
+  } | null>(null);
 
-  const rewardData = useMemo(
-    () => site.data ?? {},
-    [site.data],
-  );
+  if (rewardRef.current === null) {
+    rewardRef.current = generateRewardSiteData({
+      cardDatabase,
+      dreamsignTemplates: questContent.dreamsignTemplates,
+      remainingDreamsignPoolIds: state.remainingDreamsignPool,
+      selectedPackageTides: state.resolvedPackage?.selectedTides ?? [],
+    });
+  }
 
-  const rewardType = rewardData["rewardType"] as string | undefined;
+  const rewardData = rewardRef.current.reward;
 
   useEffect(() => {
+    if (rewardRef.current === null) {
+      return;
+    }
+
+    if (rewardRef.current.spentDreamsignPoolIds.length > 0) {
+      mutations.setRemainingDreamsignPool(
+        rewardRef.current.remainingDreamsignPoolIds,
+        "reward_site_revealed",
+      );
+    }
+
     logEvent("site_entered", {
       siteType: "Reward",
       isEnhanced: site.isEnhanced,
-      rewardType: rewardType ?? "unknown",
+      rewardType: rewardData.rewardType,
     });
-  }, [site.isEnhanced, rewardType]);
+  }, [
+    mutations,
+    rewardData.rewardType,
+    site.isEnhanced,
+  ]);
 
   const completeSite = useCallback(() => {
     logEvent("site_completed", {
@@ -41,31 +69,29 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
   }, [site, mutations]);
 
   const handleAccept = useCallback(() => {
-    if (rewardType === "card") {
-      const cardNumber = rewardData["cardNumber"] as number;
-      mutations.addCard(cardNumber, "reward_site");
-    } else if (rewardType === "dreamsign") {
+    if (rewardData.rewardType === "card") {
+      mutations.addCard(rewardData.cardNumber, "reward_site");
+    } else if (rewardData.rewardType === "dreamsign") {
       const dreamsign: Dreamsign = {
-        name: rewardData["dreamsignName"] as string,
-        tide: rewardData["dreamsignTide"] as Tide,
-        effectDescription: rewardData["dreamsignEffect"] as string,
+        name: rewardData.dreamsignName,
+        tide: rewardData.dreamsignTide,
+        effectDescription: rewardData.dreamsignEffect,
         isBane: false,
       };
       mutations.addDreamsign(dreamsign, "Reward");
-    } else if (rewardType === "essence") {
-      const amount = rewardData["essenceAmount"] as number;
-      mutations.changeEssence(amount, "reward_site");
+    } else {
+      mutations.changeEssence(rewardData.essenceAmount, "reward_site");
     }
 
     completeSite();
-  }, [rewardType, rewardData, mutations, completeSite]);
+  }, [rewardData, mutations, completeSite]);
 
   const handleDecline = useCallback(() => {
     logEvent("reward_declined", {
-      rewardType: rewardType ?? "unknown",
+      rewardType: rewardData.rewardType,
     });
     completeSite();
-  }, [rewardType, completeSite]);
+  }, [rewardData.rewardType, completeSite]);
 
   return (
     <motion.div
@@ -95,23 +121,20 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        {rewardType === "card" && (
-          <CardRewardDisplay cardNumber={rewardData["cardNumber"] as number} />
+        {rewardData.rewardType === "card" && (
+          <CardRewardDisplay cardNumber={rewardData.cardNumber} />
         )}
-        {rewardType === "dreamsign" && (
+        {rewardData.rewardType === "dreamsign" && (
           <DreamsignRewardDisplay
-            name={rewardData["dreamsignName"] as string}
-            tide={rewardData["dreamsignTide"] as Tide}
-            effectDescription={rewardData["dreamsignEffect"] as string}
+            name={rewardData.dreamsignName}
+            tide={rewardData.dreamsignTide}
+            effectDescription={rewardData.dreamsignEffect}
           />
         )}
-        {rewardType === "essence" && (
+        {rewardData.rewardType === "essence" && (
           <EssenceRewardDisplay
-            amount={rewardData["essenceAmount"] as number}
+            amount={rewardData.essenceAmount}
           />
-        )}
-        {rewardType === undefined && (
-          <p className="text-lg opacity-50">No reward data available.</p>
         )}
       </motion.div>
 

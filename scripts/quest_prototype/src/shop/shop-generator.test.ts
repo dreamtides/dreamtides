@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import type { CardData } from "../types/cards";
 import type { DreamsignTemplate } from "../types/content";
 import type { DeckEntry } from "../types/quest";
@@ -274,20 +274,10 @@ describe("generateSpecialtyShopInventory", () => {
     }
   });
 
-  it("weights toward deck tides", () => {
+  it("fills all 4 slots even when the rare pool is smaller than 4", () => {
     const deckEntries = Array.from({ length: 20 }, () => makeDeckEntry(2));
-    // Run multiple trials: cards matching Arc tide (card 2) should appear more
-    const tideCounts: Record<string, number> = { Arc: 0, Ignite: 0, Rime: 0 };
-    for (let i = 0; i < 100; i++) {
-      const slots = generateSpecialtyShopInventory(db, deckEntries);
-      for (const slot of slots) {
-        if (slot.card) {
-          tideCounts[slot.card.tides[0]] = (tideCounts[slot.card.tides[0]] ?? 0) + 1;
-        }
-      }
-    }
-    // Arc should appear significantly more than average
-    expect(tideCounts.Arc).toBeGreaterThan(tideCounts.Ignite);
+    const slots = generateSpecialtyShopInventory(db, deckEntries);
+    expect(slots).toHaveLength(4);
   });
 
   it("returns empty slots when no rare cards exist", () => {
@@ -311,5 +301,14 @@ describe("generateSpecialtyShopInventory", () => {
     for (const slot of slots) {
       expect(slot.card?.tides).toContain("Arc");
     }
+  });
+
+  it("falls back to the broader rare pool when no package-adjacent rares exist", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const slots = generateSpecialtyShopInventory(db, [], ["Umbra"]);
+    expect(slots).toHaveLength(4);
+    expect(
+      slots.some((slot) => slot.card?.tides.includes("Arc") ?? false),
+    ).toBe(true);
   });
 });

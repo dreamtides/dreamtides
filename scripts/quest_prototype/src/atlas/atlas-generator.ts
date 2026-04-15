@@ -4,22 +4,12 @@ import type {
   SiteState,
   SiteType,
 } from "../types/quest";
-import type { CardData } from "../types/cards";
-import type { PackageTideId } from "../types/content";
-import type { Dreamsign } from "../types/quest";
 import { BIOMES, type Biome } from "../data/biomes";
-import {
-  packageOverlapWeight,
-  selectPackageAdjacentOrFallback,
-} from "../data/quest-content";
 import { logEvent } from "../logging";
 
 /** Parameters for site generation that require external data. */
 export interface SiteGenerationContext {
-  cardDatabase: Map<number, CardData>;
-  dreamsignPool: ReadonlyArray<Omit<Dreamsign, "isBane">>;
   playerHasBanes: boolean;
-  selectedPackageTides: readonly PackageTideId[];
 }
 
 const BASE_RADIUS = 200;
@@ -121,49 +111,6 @@ function buildAdditionalSitePool(
   return pool;
 }
 
-/** Generates reward data for a Reward site at dreamscape creation time. */
-function generateRewardData(
-  context: SiteGenerationContext,
-): Record<string, unknown> {
-  const { cardDatabase, dreamsignPool, selectedPackageTides } = context;
-  const cards = selectPackageAdjacentOrFallback(
-    Array.from(cardDatabase.values()),
-    (card) => card.tides,
-    selectedPackageTides,
-  );
-
-  // 70% chance card reward, 30% chance dreamsign reward
-  if (cards.length > 0 && Math.random() < 0.7) {
-    const weightedCards: Array<[CardData, number]> = cards.map((card) => [
-      card,
-      Math.max(1, packageOverlapWeight(card.tides, selectedPackageTides)),
-    ]);
-    const card = weightedPick(weightedCards);
-    return {
-      rewardType: "card",
-      cardNumber: card.cardNumber,
-      cardName: card.name,
-    };
-  }
-
-  if (dreamsignPool.length > 0) {
-    const template =
-      dreamsignPool[Math.floor(Math.random() * dreamsignPool.length)];
-    return {
-      rewardType: "dreamsign",
-      dreamsignName: template.name,
-      dreamsignTide: template.tide,
-      dreamsignEffect: template.effectDescription,
-    };
-  }
-
-  // Fallback to essence reward
-  return {
-    rewardType: "essence",
-    essenceAmount: randomInt(150, 350),
-  };
-}
-
 /** Generates the site composition for a dreamscape. Total: 3-6 sites. */
 export function generateSiteComposition(
   completionLevel: number,
@@ -199,14 +146,11 @@ export function generateSiteComposition(
   const additionalCount = randomInt(minAdditional, maxAdditional);
   for (let i = 0; i < additionalCount; i++) {
     const siteType = weightedPick(pool);
-    const data =
-      siteType === "Reward" ? generateRewardData(context) : undefined;
     sites.push({
       id: nextSiteId(),
       type: siteType,
       isEnhanced: false,
       isVisited: false,
-      data,
     });
   }
 
@@ -476,19 +420,5 @@ export function previewSiteTypes(node: DreamscapeNode): SiteType[] {
 
 /** Returns a reward preview label for atlas tooltip display, or null if not a reward site. */
 export function rewardPreviewLabel(site: SiteState): string | null {
-  if (site.type !== "Reward" || !site.data) return null;
-  const rewardType = site.data["rewardType"] as string | undefined;
-  if (rewardType === "card") {
-    const name = (site.data["cardName"] as string | undefined) ?? "Card";
-    return `Reward: ${name}`;
-  }
-  if (rewardType === "dreamsign") {
-    const name = (site.data["dreamsignName"] as string | undefined) ?? "Dreamsign";
-    return `Reward: ${name}`;
-  }
-  if (rewardType === "essence") {
-    const amount = (site.data["essenceAmount"] as number | undefined) ?? 0;
-    return `Reward: ${String(amount)} Essence`;
-  }
-  return null;
+  return site.type === "Reward" ? "Reward" : null;
 }
