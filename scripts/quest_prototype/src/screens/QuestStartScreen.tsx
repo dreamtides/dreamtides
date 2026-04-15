@@ -189,20 +189,17 @@ export function QuestStartScreen() {
                   >
                     Tides:
                   </span>
-                  <div className="grid w-full grid-cols-2 gap-2">
+                  <div className="flex w-full flex-col gap-2">
                     {structuralTides.map((tide) => (
                       <span
                         key={`${dreamcaller.id}-${tide.id}`}
                         className="group/structural relative"
                         data-structural-tide-chip={tide.id}
                         data-structural-tide-appearance={tide.appearance}
-                        title={tide.hoverBlurb}
                       >
                         <span
-                          className="inline-flex w-full items-center justify-start gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
+                          className="inline-flex min-h-8 w-full items-center justify-start gap-1.5 px-1 py-1 text-xs font-medium"
                           style={{
-                            background: "#000000",
-                            borderColor: "rgba(255, 255, 255, 0.16)",
                             color:
                               tide.appearance === "optional"
                                 ? "#94a3b8"

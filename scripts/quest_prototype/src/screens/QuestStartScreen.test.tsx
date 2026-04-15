@@ -284,7 +284,7 @@ describe("QuestStartScreen", () => {
       const chip = container.querySelector(
         `[data-structural-tide-chip="${tide.id}"]`,
       );
-      expect(chip?.getAttribute("title")).toBe(tide.hoverBlurb);
+      expect(chip?.getAttribute("title")).toBeNull();
       expect(chip?.getAttribute("data-structural-tide-appearance")).toBe(
         tide.appearance,
       );
