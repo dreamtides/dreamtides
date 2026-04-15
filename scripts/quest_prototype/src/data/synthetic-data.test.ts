@@ -21,14 +21,6 @@ const ALL_RARITIES: Rarity[] = ["Common", "Uncommon", "Rare", "Legendary"];
 const tideSet = new Set<string>(ALL_TIDES);
 const raritySet = new Set<string>(ALL_RARITIES);
 
-/** Returns the tide values referenced by a JourneyEffect, if any. */
-function journeyEffectTides(e: JourneyEffect): string[] {
-  switch (e.type) {
-    default:
-      return [];
-  }
-}
-
 /** Returns the rarity values referenced by a JourneyEffect, if any. */
 function journeyEffectRarities(e: JourneyEffect): string[] {
   switch (e.type) {
@@ -36,14 +28,6 @@ function journeyEffectRarities(e: JourneyEffect): string[] {
       return [e.rarity];
     case "removeCardsAndAddRandomCards":
       return [e.rarity];
-    default:
-      return [];
-  }
-}
-
-/** Returns the tide values referenced by an OfferEffect, if any. */
-function offerEffectTides(e: OfferEffect): string[] {
-  switch (e.type) {
     default:
       return [];
   }
@@ -96,12 +80,14 @@ describe("dream journeys", () => {
     }
   });
 
-  it("effect tides are valid Tide values", () => {
-    for (const dj of DREAM_JOURNEYS) {
-      for (const t of journeyEffectTides(dj.effect)) {
-        expect(tideSet.has(t)).toBe(true);
-      }
-    }
+  it("current journey content does not use tide-bearing legacy effects", () => {
+    const tideEffects = DREAM_JOURNEYS.filter(
+      (journey) =>
+        journey.effect.type === "addTideCrystal" ||
+        journey.effect.type === "removeCardsAndAddTideCrystal",
+    );
+
+    expect(tideEffects).toHaveLength(0);
   });
 
   it("effect rarities are valid Rarity values", () => {
@@ -154,15 +140,16 @@ describe("tempting offers", () => {
     }
   });
 
-  it("effect tides are valid Tide values", () => {
-    for (const to of TEMPTING_OFFERS) {
-      for (const t of [
-        ...offerEffectTides(to.benefit),
-        ...offerEffectTides(to.cost),
-      ]) {
-        expect(tideSet.has(t)).toBe(true);
-      }
-    }
+  it("current offer content does not use tide-bearing legacy effects", () => {
+    const tideEffects = TEMPTING_OFFERS.flatMap((offer) =>
+      [offer.benefit, offer.cost].filter(
+        (effect) =>
+          effect.type === "addTideCrystal" ||
+          effect.type === "addMultipleTideCrystals",
+      ),
+    );
+
+    expect(tideEffects).toHaveLength(0);
   });
 
   it("effect rarities are valid Rarity values", () => {

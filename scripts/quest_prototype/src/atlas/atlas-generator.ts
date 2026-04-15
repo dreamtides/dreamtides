@@ -111,6 +111,16 @@ function buildAdditionalSitePool(
   return pool;
 }
 
+/** Returns the additional site types that can appear for the given context. */
+export function additionalSiteTypesForLevel(
+  completionLevel: number,
+  context: SiteGenerationContext,
+): SiteType[] {
+  return buildAdditionalSitePool(completionLevel, context.playerHasBanes).map(
+    ([siteType]) => siteType,
+  );
+}
+
 /** Generates the site composition for a dreamscape. Total: 3-6 sites. */
 export function generateSiteComposition(
   completionLevel: number,
