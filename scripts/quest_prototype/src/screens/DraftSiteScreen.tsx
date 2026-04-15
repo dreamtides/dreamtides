@@ -9,12 +9,11 @@ import {
   getCurrentOffer,
   processPlayerPick,
   completeDraftSite,
-  sortCardsByTide,
   SITE_PICKS,
 } from "../draft/draft-engine";
 import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
-import { cardAccentTide, cardImageUrl, TIDE_COLORS } from "../data/card-database";
+import { cardImageUrl, RARITY_COLORS } from "../data/card-database";
 import { logEvent } from "../logging";
 
 
@@ -23,6 +22,25 @@ const NEXT_PACK_DELAY = 500;
 
 /** Animation phases during a pick. */
 type PickPhase = "idle" | "animating" | "waiting";
+
+const RARITY_ORDER = ["Common", "Uncommon", "Rare", "Legendary"] as const;
+
+function sortCardsForDisplay(cards: CardData[]): CardData[] {
+  return [...cards].sort((a, b) => {
+    const energyCostDelta = (a.energyCost ?? 0) - (b.energyCost ?? 0);
+    if (energyCostDelta !== 0) {
+      return energyCostDelta;
+    }
+
+    const rarityDelta =
+      RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity);
+    if (rarityDelta !== 0) {
+      return rarityDelta;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+}
 
 /** Shows the drafted cards as a row of mini-cards at the bottom. */
 function DraftedCardsRow({ cardNumbers, cardDatabase }: {
@@ -161,7 +179,7 @@ function DeckSidebar({
         const cost = card.energyCost ?? 0;
         const showDivider = cost !== lastCost;
         lastCost = cost;
-        const tideColor = TIDE_COLORS[cardAccentTide(card)];
+        const rarityColor = RARITY_COLORS[card.rarity];
 
         return (
           <div key={`deck-${String(card.cardNumber)}-${String(i)}`}>
@@ -186,8 +204,8 @@ function DeckSidebar({
             <div
               className="relative flex items-center gap-2 overflow-hidden rounded px-2 py-1"
               style={{
-                background: `linear-gradient(90deg, ${tideColor}15 0%, rgba(10, 6, 18, 0.7) 70%)`,
-                borderLeft: `2px solid ${tideColor}60`,
+                background: `linear-gradient(90deg, ${rarityColor}15 0%, rgba(10, 6, 18, 0.7) 70%)`,
+                borderLeft: `2px solid ${rarityColor}60`,
               }}
             >
               <img
@@ -272,7 +290,7 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     const offerCards = getCurrentOffer(state.draftState)
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
-    setCurrentOfferCards(sortCardsByTide(offerCards));
+    setCurrentOfferCards(sortCardsForDisplay(offerCards));
     setIsComplete(
       state.draftState.activeSiteId === siteId
       && state.draftState.currentOffer.length === 0
@@ -283,14 +301,14 @@ export function DraftSiteScreen({ siteId }: { siteId: string }) {
     );
   }, [siteId, state.draftState, cardDatabase, mutations]);
 
-  // Resolve the current offer from draft state, sorted by tide.
+  // Resolve the current offer from draft state using a neutral display order.
   const refreshOffer = useCallback(() => {
     const ds = draftStateRef.current;
     if (!ds) return;
     const cards = getCurrentOffer(ds)
       .map((num) => cardDatabase.get(num))
       .filter((c): c is CardData => c !== undefined);
-    setCurrentOfferCards(sortCardsByTide(cards));
+    setCurrentOfferCards(sortCardsForDisplay(cards));
     setOfferKey((prev) => prev + 1);
   }, [cardDatabase]);
 

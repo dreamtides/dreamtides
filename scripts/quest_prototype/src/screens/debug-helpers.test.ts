@@ -1,7 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { extractDraftDebugInfo } from "./debug-helpers";
+import {
+  extractDraftDebugInfo,
+  extractPackageDebugInfo,
+} from "./debug-helpers";
 import type { DraftState } from "../types/draft";
 import type { CardData } from "../types/cards";
+import type {
+  DreamsignTemplate,
+  ResolvedDreamcallerPackage,
+} from "../types/content";
 
 function makeCard(num: number, name: string): CardData {
   return {
@@ -34,6 +41,53 @@ function makeDraftState(
   };
 }
 
+function makeResolvedPackage(): ResolvedDreamcallerPackage {
+  return {
+    dreamcaller: {
+      id: "dreamcaller-1",
+      name: "Caller of Depths",
+      awakening: 6,
+      renderedText: "Test",
+      mandatoryTides: ["core"],
+      optionalTides: ["support-a", "support-b", "support-c", "support-d"],
+    },
+    mandatoryTides: ["core"],
+    optionalSubset: ["support-a", "support-b", "support-c"],
+    selectedTides: ["core", "support-a", "support-b", "support-c"],
+    draftPoolCopiesByCard: { "1": 2, "2": 1 },
+    dreamsignPoolIds: ["sign-1", "sign-2", "sign-3"],
+    mandatoryOnlyPoolSize: 120,
+    draftPoolSize: 198,
+    doubledCardCount: 41,
+    legalSubsetCount: 4,
+    preferredSubsetCount: 2,
+  };
+}
+
+const DREAMSIGN_TEMPLATES: readonly DreamsignTemplate[] = [
+  {
+    id: "sign-1",
+    name: "First Sign",
+    displayTide: "Bloom",
+    packageTides: ["core"],
+    effectDescription: "Test",
+  },
+  {
+    id: "sign-2",
+    name: "Second Sign",
+    displayTide: "Arc",
+    packageTides: ["support-a"],
+    effectDescription: "Test",
+  },
+  {
+    id: "sign-3",
+    name: "Third Sign",
+    displayTide: "Rime",
+    packageTides: ["support-b"],
+    effectDescription: "Test",
+  },
+] as const;
+
 describe("extractDraftDebugInfo", () => {
   it("returns null when draft state is null", () => {
     expect(extractDraftDebugInfo(null, new Map())).toBeNull();
@@ -52,6 +106,18 @@ describe("extractDraftDebugInfo", () => {
     expect(result?.sitePicksCompleted).toBe(0);
     expect(result?.remainingCards).toBe(3);
     expect(result?.remainingUniqueCards).toBe(2);
+    expect(result?.topRemainingCards).toEqual([
+      {
+        cardNumber: 1,
+        name: "Unknown Card #1",
+        copiesRemaining: 2,
+      },
+      {
+        cardNumber: 2,
+        name: "Unknown Card #2",
+        copiesRemaining: 1,
+      },
+    ]);
   });
 
   it("resolves current offer card data", () => {
@@ -71,6 +137,30 @@ describe("extractDraftDebugInfo", () => {
     expect(result?.currentOffer.map((card) => card.name)).toEqual([
       "Lightning Sprite",
       "Rose Golem",
+    ]);
+  });
+});
+
+describe("extractPackageDebugInfo", () => {
+  it("returns null when the resolved package is absent", () => {
+    expect(extractPackageDebugInfo(null, [], DREAMSIGN_TEMPLATES)).toBeNull();
+  });
+
+  it("summarizes remaining and spent Dreamsign pool entries", () => {
+    const result = extractPackageDebugInfo(
+      makeResolvedPackage(),
+      ["sign-2"],
+      DREAMSIGN_TEMPLATES,
+    );
+
+    expect(result?.dreamcallerName).toBe("Caller of Depths");
+    expect(result?.initialDreamsignPoolSize).toBe(3);
+    expect(result?.remainingDreamsigns).toEqual([
+      { id: "sign-2", name: "Second Sign" },
+    ]);
+    expect(result?.spentDreamsigns).toEqual([
+      { id: "sign-1", name: "First Sign" },
+      { id: "sign-3", name: "Third Sign" },
     ]);
   });
 });

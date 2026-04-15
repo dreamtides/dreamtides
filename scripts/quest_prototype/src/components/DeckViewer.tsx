@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { CardData, Tide } from "../types/cards";
+import type { CardData, Rarity } from "../types/cards";
 import type {
   DeckEntry,
   QuestState,
 } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import {
-  cardAccentTide,
-  NAMED_TIDES,
+  RARITY_COLORS,
   TIDE_COLORS,
   tideIconUrl,
 } from "../data/card-database";
@@ -16,17 +15,14 @@ import { CardDisplay } from "./CardDisplay";
 import { CardOverlay } from "./CardOverlay";
 import { logEvent } from "../logging";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
-import { computeTideDistribution } from "./tide-distribution";
-
-/** All tides including Neutral, used for filter toggles. */
-const ALL_TIDES: readonly Tide[] = [...NAMED_TIDES, "Neutral"] as const;
+import { ALL_RARITIES, computeDeckSummary } from "./deck-summary";
 
 /** Sort criteria options. */
 type SortCriteria =
   | "acquisitionOrder"
   | "energyCost"
   | "name"
-  | "tide"
+  | "rarity"
   | "cardType";
 
 /** Labels for sort criteria. */
@@ -34,23 +30,19 @@ const SORT_LABELS: Readonly<Record<SortCriteria, string>> = {
   acquisitionOrder: "Acquisition Order",
   energyCost: "Energy Cost",
   name: "Name",
-  tide: "Tide",
+  rarity: "Rarity",
   cardType: "Card Type",
 };
 
 /** Card type filter options. */
 type CardTypeFilter = "All" | "Characters" | "Events";
 
-/** Tide ordering for sort-by-tide. */
-const TIDE_ORDER: Readonly<Record<Tide, number>> = {
-  Bloom: 0,
-  Arc: 1,
-  Ignite: 2,
-  Pact: 3,
-  Umbra: 4,
-  Rime: 5,
-  Surge: 6,
-  Neutral: 7,
+/** Rarity ordering for sorting. */
+const RARITY_ORDER: Readonly<Record<Rarity, number>> = {
+  Common: 0,
+  Uncommon: 1,
+  Rare: 2,
+  Legendary: 3,
 };
 
 /** A deck entry paired with its resolved card data. */
@@ -78,13 +70,13 @@ export function DeckViewer({
 }: DeckViewerProps) {
   const { state } = useQuest();
 
-  const [tideFilters, setTideFilters] = useState<Record<Tide, boolean>>(
+  const [rarityFilters, setRarityFilters] = useState<Record<Rarity, boolean>>(
     () => {
-      const filters: Partial<Record<Tide, boolean>> = {};
-      for (const tide of ALL_TIDES) {
-        filters[tide] = true;
+      const filters: Partial<Record<Rarity, boolean>> = {};
+      for (const rarity of ALL_RARITIES) {
+        filters[rarity] = true;
       }
-      return filters as Record<Tide, boolean>;
+      return filters as Record<Rarity, boolean>;
     },
   );
   const [cardTypeFilter, setCardTypeFilter] =
@@ -102,16 +94,21 @@ export function DeckViewer({
       openTimestampRef.current = Date.now();
       logEvent("deck_viewer_opened", {
         cardCount: state.deck.length,
-        tideFilters: Object.fromEntries(
-          Object.entries(tideFilters).filter(([_, v]) => !v),
-        ),
+        disabledRarities: ALL_RARITIES.filter((rarity) => !rarityFilters[rarity]),
         sortCriteria,
         sortAscending,
         cardTypeFilter,
       });
     }
     prevOpenRef.current = isOpen;
-  }, [isOpen, state.deck.length, tideFilters, sortCriteria, sortAscending, cardTypeFilter]);
+  }, [
+    isOpen,
+    state.deck.length,
+    rarityFilters,
+    sortCriteria,
+    sortAscending,
+    cardTypeFilter,
+  ]);
 
   const handleClose = useCallback(() => {
     const duration = Date.now() - openTimestampRef.current;
@@ -145,20 +142,21 @@ export function DeckViewer({
       .filter((e): e is ResolvedEntry => e !== null);
   }, [state.deck, cardDatabase]);
 
-  const tideDistribution = useMemo(
-    () => computeTideDistribution(state.deck, cardDatabase),
+  const deckSummary = useMemo(
+    () => computeDeckSummary(state.deck, cardDatabase),
     [state.deck, cardDatabase],
   );
 
-  const activeFilterCount = useMemo(() => {
-    const tideActive = ALL_TIDES.some((t) => !tideFilters[t]);
-    const typeActive = cardTypeFilter !== "All";
-    return tideActive || typeActive;
-  }, [tideFilters, cardTypeFilter]);
+  const hasActiveFilters = useMemo(
+    () =>
+      ALL_RARITIES.some((rarity) => !rarityFilters[rarity])
+      || cardTypeFilter !== "All",
+    [rarityFilters, cardTypeFilter],
+  );
 
   const filteredEntries = useMemo<ResolvedEntry[]>(() => {
     return resolvedEntries.filter((resolved) => {
-      if (!tideFilters[cardAccentTide(resolved.card)]) return false;
+      if (!rarityFilters[resolved.card.rarity]) return false;
       if (
         cardTypeFilter === "Characters" &&
         resolved.card.cardType !== "Character"
@@ -171,7 +169,7 @@ export function DeckViewer({
         return false;
       return true;
     });
-  }, [resolvedEntries, tideFilters, cardTypeFilter]);
+  }, [resolvedEntries, rarityFilters, cardTypeFilter]);
 
   const sortedEntries = useMemo<ResolvedEntry[]>(() => {
     const sorted = [...filteredEntries];
@@ -187,10 +185,8 @@ export function DeckViewer({
         case "name":
           cmp = a.card.name.localeCompare(b.card.name);
           break;
-        case "tide":
-          cmp =
-            TIDE_ORDER[cardAccentTide(a.card)] -
-            TIDE_ORDER[cardAccentTide(b.card)];
+        case "rarity":
+          cmp = RARITY_ORDER[a.card.rarity] - RARITY_ORDER[b.card.rarity];
           break;
         case "cardType":
           cmp = a.card.cardType.localeCompare(b.card.cardType);
@@ -201,8 +197,8 @@ export function DeckViewer({
     return sorted;
   }, [filteredEntries, sortCriteria, sortAscending]);
 
-  const toggleTide = useCallback((tide: Tide) => {
-    setTideFilters((prev) => ({ ...prev, [tide]: !prev[tide] }));
+  const toggleRarity = useCallback((rarity: Rarity) => {
+    setRarityFilters((prev) => ({ ...prev, [rarity]: !prev[rarity] }));
   }, []);
 
   const handleCardClick = useCallback((card: CardData) => {
@@ -272,8 +268,8 @@ export function DeckViewer({
             </button>
           </div>
 
-          {/* Tide distribution bar */}
-          {tideDistribution.total > 0 && (
+          {/* Deck summary */}
+          {deckSummary.total > 0 && (
             <div
               className="px-4 py-2 md:px-6"
               style={{
@@ -281,74 +277,96 @@ export function DeckViewer({
                 background: "rgba(10, 6, 18, 0.5)",
               }}
             >
-              {/* Proportional bar */}
+              <div
+                className="mb-2 grid gap-2 md:grid-cols-3"
+                style={{ color: "#e2e8f0" }}
+              >
+                <SummaryBadge
+                  label="Characters"
+                  value={String(deckSummary.characterCount)}
+                />
+                <SummaryBadge
+                  label="Events"
+                  value={String(deckSummary.eventCount)}
+                />
+                <SummaryBadge
+                  label="Avg Cost"
+                  value={
+                    deckSummary.averageEnergyCost === null
+                      ? "--"
+                      : deckSummary.averageEnergyCost.toFixed(1)
+                  }
+                />
+              </div>
+
               <div
                 className="mb-2 flex h-2 overflow-hidden rounded-full"
                 style={{ background: "rgba(255, 255, 255, 0.05)" }}
               >
-                {tideDistribution.tides
-                  .filter((t) => t.count > 0)
-                  .map((t) => (
+                {deckSummary.rarities
+                  .filter((rarity) => rarity.count > 0)
+                  .map((rarity) => (
                     <div
-                      key={t.tide}
+                      key={rarity.rarity}
                       style={{
-                        width: `${String(t.percentage)}%`,
-                        background: TIDE_COLORS[t.tide],
-                        opacity: 0.8,
+                        width: `${String(rarity.percentage)}%`,
+                        background: RARITY_COLORS[rarity.rarity],
+                        opacity: 0.85,
                       }}
-                      title={`${t.tide}: ${String(t.count)} (${String(t.percentage)}%)`}
+                      title={`${rarity.rarity}: ${String(rarity.count)} (${String(rarity.percentage)}%)`}
                     />
                   ))}
               </div>
 
-              {/* Tide badges row */}
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                {tideDistribution.tides.map((t) => (
+                {deckSummary.rarities.map((rarity) => (
                   <div
-                    key={t.tide}
+                    key={rarity.rarity}
                     className="flex items-center gap-1"
                     style={{
-                      opacity: t.count > 0 ? 1 : 0.3,
+                      opacity: rarity.count > 0 ? 1 : 0.35,
                     }}
                   >
-                    <img
-                      src={tideIconUrl(t.tide)}
-                      alt={t.tide}
-                      className="h-4 w-4 rounded-full"
+                    <span
+                      className="h-3 w-3 rounded-full"
                       style={{
-                        border: t.isDominant
-                          ? `1.5px solid ${TIDE_COLORS[t.tide]}`
-                          : "1px solid rgba(255, 255, 255, 0.15)",
+                        background: RARITY_COLORS[rarity.rarity],
+                        boxShadow:
+                          rarity.count > 0
+                            ? `0 0 8px ${RARITY_COLORS[rarity.rarity]}55`
+                            : "none",
                       }}
                     />
                     <span
                       className="text-[11px] font-medium"
                       style={{
-                        color: t.count > 0 ? TIDE_COLORS[t.tide] : "#6b7280",
+                        color:
+                          rarity.count > 0
+                            ? RARITY_COLORS[rarity.rarity]
+                            : "#6b7280",
                       }}
                     >
-                      {t.tide}
+                      {rarity.rarity}
                     </span>
                     <span
                       className="text-[11px]"
                       style={{
-                        color: t.count > 0 ? "#e2e8f0" : "#4b5563",
-                        fontWeight: t.isDominant ? 700 : 400,
+                        color: rarity.count > 0 ? "#e2e8f0" : "#4b5563",
                       }}
                     >
-                      {String(t.count)}
+                      {String(rarity.count)}
                     </span>
-                    {t.count > 0 && (
+                    {rarity.count > 0 && (
                       <span
                         className="text-[10px]"
                         style={{ color: "#9ca3af" }}
                       >
-                        ({String(t.percentage)}%)
+                        ({String(rarity.percentage)}%)
                       </span>
                     )}
                   </div>
                 ))}
-                {activeFilterCount && (
+                {hasActiveFilters && (
                   <span
                     className="ml-auto text-[10px] italic"
                     style={{ color: "#6b7280" }}
@@ -368,36 +386,37 @@ export function DeckViewer({
               background: "rgba(10, 6, 18, 0.6)",
             }}
           >
-            {/* Tide filter toggles */}
+            {/* Rarity filter toggles */}
             <div className="flex flex-wrap items-center gap-1">
               <span className="mr-1 text-[10px] uppercase tracking-wider opacity-40">
-                Tides
+                Rarity
               </span>
-              {ALL_TIDES.map((tide) => (
+              {ALL_RARITIES.map((rarity) => (
                 <button
-                  key={tide}
+                  key={rarity}
                   className="flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
                   style={{
-                    background: tideFilters[tide]
-                      ? `${TIDE_COLORS[tide]}25`
+                    background: rarityFilters[rarity]
+                      ? `${RARITY_COLORS[rarity]}25`
                       : "rgba(255, 255, 255, 0.03)",
-                    border: `1px solid ${tideFilters[tide] ? `${TIDE_COLORS[tide]}60` : "rgba(255, 255, 255, 0.1)"}`,
-                    color: tideFilters[tide] ? TIDE_COLORS[tide] : "#6b7280",
-                    opacity: tideFilters[tide] ? 1 : 0.5,
+                    border: `1px solid ${rarityFilters[rarity] ? `${RARITY_COLORS[rarity]}60` : "rgba(255, 255, 255, 0.1)"}`,
+                    color: rarityFilters[rarity]
+                      ? RARITY_COLORS[rarity]
+                      : "#6b7280",
+                    opacity: rarityFilters[rarity] ? 1 : 0.5,
                   }}
                   onClick={() => {
-                    toggleTide(tide);
+                    toggleRarity(rarity);
                   }}
                 >
-                  <img
-                    src={tideIconUrl(tide)}
-                    alt={tide}
-                    className="h-3 w-3 rounded-full"
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
                     style={{
-                      opacity: tideFilters[tide] ? 1 : 0.4,
+                      background: RARITY_COLORS[rarity],
+                      opacity: rarityFilters[rarity] ? 1 : 0.4,
                     }}
                   />
-                  <span className="hidden sm:inline">{tide}</span>
+                  <span className="hidden sm:inline">{rarity}</span>
                 </button>
               ))}
             </div>
@@ -730,6 +749,25 @@ export function DeckViewer({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function SummaryBadge({ label, value }: { label: string; value: string }) {
+  return (
+    <div
+      className="rounded-lg px-3 py-2"
+      style={{
+        background: "rgba(255, 255, 255, 0.03)",
+        border: "1px solid rgba(255, 255, 255, 0.08)",
+      }}
+    >
+      <span className="text-[10px] uppercase tracking-wider opacity-45">
+        {label}
+      </span>
+      <div className="text-sm font-bold" style={{ color: "#e2e8f0" }}>
+        {value}
+      </div>
+    </div>
   );
 }
 

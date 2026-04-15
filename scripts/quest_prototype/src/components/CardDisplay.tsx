@@ -1,11 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { CardData } from "../types/cards";
-import {
-  cardAccentTide,
-  cardImageUrl,
-  tideIconUrl,
-  TIDE_COLORS,
-} from "../data/card-database";
+import { cardImageUrl, RARITY_COLORS } from "../data/card-database";
 import { tokenizeRulesText, formatTypeLine } from "./card-text";
 
 /** Color used for each symbol type when rendering rules text. */
@@ -24,8 +19,6 @@ interface CardDisplayProps {
   selectionColor?: string;
   /** When set, tints the card's stat values and rules text in this color. */
   tintColor?: string;
-  /** Whether to show tide cost symbols (default true). */
-  showTideSymbols?: boolean;
   /** Additional CSS class name for the root element. */
   className?: string;
   /** Use larger text sizes for rules text, name, type line, and stats. */
@@ -51,8 +44,7 @@ function renderRulesText(text: string): ReactNode[] {
 }
 
 /**
- * Renders a Dreamtides card with full details including art, name, cost,
- * spark, tide, rarity glow, type/subtype, rules text, and fast badge.
+ * Renders a Dreamtides card with neutral, rarity-driven chrome.
  */
 export function CardDisplay({
   card,
@@ -60,7 +52,6 @@ export function CardDisplay({
   selected = false,
   selectionColor = "#f97316",
   tintColor,
-  showTideSymbols = false,
   className,
   large = false,
 }: CardDisplayProps) {
@@ -70,8 +61,13 @@ export function CardDisplay({
     setImageError(false);
   }, [card.cardNumber]);
 
-  const accentTide = cardAccentTide(card);
-  const tideColor = showTideSymbols ? TIDE_COLORS[accentTide] : "#9ca3af";
+  const rarityColor = RARITY_COLORS[card.rarity];
+  const borderColor =
+    card.rarity === "Common"
+      ? "rgba(255, 255, 255, 0.18)"
+      : `${rarityColor}55`;
+  const nameColor =
+    card.rarity === "Common" ? "#f8fafc" : rarityColor;
 
   const borderStyle = selected
     ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }
@@ -85,7 +81,7 @@ export function CardDisplay({
       style={{
         aspectRatio: "2 / 3",
         background: "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-        border: "1px solid rgba(255, 255, 255, 0.15)",
+        border: `1px solid ${borderColor}`,
         ...borderStyle,
       }}
       onClick={onClick}
@@ -101,6 +97,14 @@ export function CardDisplay({
           }
         : {})}
     >
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-1"
+        style={{
+          background: `linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, ${rarityColor} 50%, rgba(255, 255, 255, 0.08) 100%)`,
+          opacity: card.rarity === "Common" ? 0.35 : 0.8,
+        }}
+      />
+
       {/* Energy cost badge */}
       <div className={`absolute ${large ? "top-2 left-2" : "top-1.5 left-1.5"} z-10 flex flex-col items-center gap-1`}>
         <div
@@ -115,17 +119,6 @@ export function CardDisplay({
             {card.energyCost !== null ? String(card.energyCost) : "X"}
           </span>
         </div>
-        {showTideSymbols && (
-          <img
-            src={tideIconUrl(accentTide)}
-            alt={accentTide}
-            className={`${large ? "h-10 w-10" : "h-7 w-7"} rounded-full object-contain shadow-md`}
-            style={{
-              border: `1px solid ${tideColor}`,
-              background: "rgba(0, 0, 0, 0.5)",
-            }}
-          />
-        )}
       </div>
 
       {/* Fast badge */}
@@ -158,12 +151,12 @@ export function CardDisplay({
           <div
             className="flex h-full w-full items-center justify-center p-2"
             style={{
-              background: `linear-gradient(135deg, ${tideColor}20, ${tideColor}08)`,
+              background: `linear-gradient(135deg, ${rarityColor}24, rgba(255, 255, 255, 0.05))`,
             }}
           >
             <span
               className="text-center text-sm font-medium opacity-60"
-              style={{ color: tideColor }}
+              style={{ color: nameColor }}
             >
               {card.name}
             </span>
@@ -183,18 +176,27 @@ export function CardDisplay({
         {/* Card name */}
         <h3
           className={`truncate ${large ? "text-xl" : "text-sm"} leading-tight font-bold`}
-          style={{ color: tideColor }}
+          style={{ color: nameColor }}
         >
           {card.name}
         </h3>
 
-        {/* Type line */}
-        <div className="mt-0.5 flex items-center gap-1">
+        <div className="mt-0.5 flex items-center gap-1.5">
           <span
             className={`truncate ${large ? "text-sm" : "text-[10px]"} opacity-50`}
             style={{ color: "#e2e8f0" }}
           >
             {formatTypeLine(card)}
+          </span>
+          <span
+            className={`shrink-0 rounded-full ${large ? "px-2 py-0.5 text-[10px]" : "px-1.5 py-0.5 text-[9px]"} font-bold uppercase tracking-wide`}
+            style={{
+              background: `${rarityColor}18`,
+              border: `1px solid ${borderColor}`,
+              color: nameColor,
+            }}
+          >
+            {card.rarity}
           </span>
         </div>
 
@@ -226,7 +228,7 @@ export function CardDisplay({
       {/* Bottom accent */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
-        style={{ background: "rgba(255, 255, 255, 0.15)" }}
+        style={{ background: borderColor }}
       />
     </div>
   );

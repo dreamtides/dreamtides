@@ -14,7 +14,7 @@ function QuestApp({
 }: {
   cardDatabase: Map<number, CardData>;
 }) {
-  const { state } = useQuest();
+  const { state, questContent } = useQuest();
   const showHud = state.screen.type !== "questStart";
   const [deckViewerOpen, setDeckViewerOpen] = useState(false);
   const [debugScreenOpen, setDebugScreenOpen] = useState(false);
@@ -59,6 +59,7 @@ function QuestApp({
         cardDatabase={cardDatabase}
         resolvedPackage={state.resolvedPackage}
         remainingDreamsignPool={state.remainingDreamsignPool}
+        dreamsignTemplates={questContent.dreamsignTemplates}
       />
     </div>
   );

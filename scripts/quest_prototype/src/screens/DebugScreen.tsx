@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useMemo, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { CardData } from "../types/cards";
-import type { ResolvedDreamcallerPackage } from "../types/content";
+import type {
+  DreamsignTemplate,
+  ResolvedDreamcallerPackage,
+} from "../types/content";
 import type { DraftState } from "../types/draft";
-import { extractDraftDebugInfo } from "./debug-helpers";
+import {
+  extractDraftDebugInfo,
+  extractPackageDebugInfo,
+} from "./debug-helpers";
 
 /** Props for the DebugScreen component. */
 interface DebugScreenProps {
@@ -13,6 +19,7 @@ interface DebugScreenProps {
   cardDatabase: Map<number, CardData>;
   resolvedPackage: ResolvedDreamcallerPackage | null;
   remainingDreamsignPool: string[];
+  dreamsignTemplates: readonly DreamsignTemplate[];
 }
 
 /** Full-screen overlay showing package and draft pool debug info. */
@@ -23,10 +30,20 @@ export function DebugScreen({
   cardDatabase,
   resolvedPackage,
   remainingDreamsignPool,
+  dreamsignTemplates,
 }: DebugScreenProps) {
   const debugInfo = useMemo(
     () => extractDraftDebugInfo(draftState, cardDatabase),
     [draftState, cardDatabase],
+  );
+  const packageDebugInfo = useMemo(
+    () =>
+      extractPackageDebugInfo(
+        resolvedPackage,
+        remainingDreamsignPool,
+        dreamsignTemplates,
+      ),
+    [resolvedPackage, remainingDreamsignPool, dreamsignTemplates],
   );
 
   const handleClose = useCallback(() => {
@@ -90,22 +107,26 @@ export function DebugScreen({
           </div>
 
           <div className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
-            {resolvedPackage === null ? (
+            {packageDebugInfo === null ? (
               <div className="flex h-full items-center justify-center">
                 <p className="text-sm opacity-40">
                   No package data available yet.
                 </p>
               </div>
             ) : (
-              <div className="mx-auto max-w-2xl space-y-4">
+              <div className="mx-auto max-w-4xl space-y-4">
                 <div className="flex flex-wrap gap-3">
                   <StatBadge
                     label="Draft Pool"
-                    value={String(resolvedPackage.draftPoolSize)}
+                    value={String(packageDebugInfo.draftPoolSize)}
                   />
                   <StatBadge
                     label="Signs Left"
-                    value={String(remainingDreamsignPool.length)}
+                    value={String(packageDebugInfo.remainingDreamsigns.length)}
+                  />
+                  <StatBadge
+                    label="Signs Spent"
+                    value={String(packageDebugInfo.spentDreamsigns.length)}
                   />
                   {debugInfo !== null && (
                     <>
@@ -127,45 +148,92 @@ export function DebugScreen({
 
                 <InfoCard title="Dreamcaller">
                   <p className="text-sm font-bold" style={{ color: "#e2e8f0" }}>
-                    {resolvedPackage.dreamcaller.name}
+                    {packageDebugInfo.dreamcallerName}
+                  </p>
+                  <p className="text-xs opacity-60">
+                    Awakening {String(packageDebugInfo.awakening)}
                   </p>
                 </InfoCard>
 
                 <InfoCard title="Optional Subset">
                   <p className="text-sm opacity-80">
-                    {resolvedPackage.optionalSubset.join(", ")}
+                    {packageDebugInfo.optionalSubset.length === 0
+                      ? "None"
+                      : packageDebugInfo.optionalSubset.join(", ")}
                   </p>
                 </InfoCard>
 
                 <InfoCard title="Selected Package Tides">
                   <p className="text-sm opacity-80">
-                    {resolvedPackage.selectedTides.join(", ")}
+                    {packageDebugInfo.selectedTides.join(", ")}
                   </p>
+                </InfoCard>
+
+                <InfoCard title="Package Validation">
+                  <div className="grid gap-2 text-sm opacity-80 md:grid-cols-2">
+                    <p>
+                      Mandatory-only pool:{" "}
+                      {String(packageDebugInfo.mandatoryOnlyPoolSize)}
+                    </p>
+                    <p>
+                      Doubled cards: {String(packageDebugInfo.doubledCardCount)}
+                    </p>
+                    <p>
+                      Legal subsets: {String(packageDebugInfo.legalSubsetCount)}
+                    </p>
+                    <p>
+                      Preferred subsets:{" "}
+                      {String(packageDebugInfo.preferredSubsetCount)}
+                    </p>
+                  </div>
+                </InfoCard>
+
+                <InfoCard title="Dreamsign Pool">
+                  <p className="mb-2 text-xs opacity-60">
+                    Remaining {String(packageDebugInfo.remainingDreamsigns.length)}
+                    {" / "}
+                    {String(packageDebugInfo.initialDreamsignPoolSize)}
+                  </p>
+                  <DebugChipList
+                    emptyLabel="Dreamsign pool exhausted."
+                    items={packageDebugInfo.remainingDreamsigns.map((dreamsign) => ({
+                      key: dreamsign.id,
+                      label: dreamsign.name,
+                    }))}
+                  />
+                </InfoCard>
+
+                <InfoCard title="Spent Dreamsigns">
+                  <DebugChipList
+                    emptyLabel="No Dreamsigns have been spent yet."
+                    items={packageDebugInfo.spentDreamsigns.map((dreamsign) => ({
+                      key: dreamsign.id,
+                      label: dreamsign.name,
+                    }))}
+                  />
                 </InfoCard>
 
                 {debugInfo !== null && (
                   <InfoCard title="Current Offer">
-                    {debugInfo.currentOfferSize === 0 ? (
-                      <p className="text-sm opacity-50">
-                        No offer is currently active.
-                      </p>
-                    ) : (
-                      <div className="flex flex-wrap gap-1">
-                        {debugInfo.currentOffer.map((card) => (
-                          <span
-                            key={card.cardNumber}
-                            className="rounded-full px-2 py-0.5 text-[10px] font-medium"
-                            style={{
-                              background: "rgba(168, 85, 247, 0.12)",
-                              border: "1px solid rgba(168, 85, 247, 0.24)",
-                              color: "#c084fc",
-                            }}
-                          >
-                            {card.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <DebugChipList
+                      emptyLabel="No offer is currently active."
+                      items={debugInfo.currentOffer.map((card) => ({
+                        key: String(card.cardNumber),
+                        label: card.name,
+                      }))}
+                    />
+                  </InfoCard>
+                )}
+
+                {debugInfo !== null && (
+                  <InfoCard title="Top Remaining Draft Cards">
+                    <DebugChipList
+                      emptyLabel="No cards remain in the draft pool."
+                      items={debugInfo.topRemainingCards.map((card) => ({
+                        key: String(card.cardNumber),
+                        label: `${card.name} x${String(card.copiesRemaining)}`,
+                      }))}
+                    />
                   </InfoCard>
                 )}
               </div>
@@ -174,6 +242,36 @@ export function DebugScreen({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function DebugChipList({
+  emptyLabel,
+  items,
+}: {
+  emptyLabel: string;
+  items: Array<{ key: string; label: string }>;
+}) {
+  if (items.length === 0) {
+    return <p className="text-sm opacity-50">{emptyLabel}</p>;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {items.map((item) => (
+        <span
+          key={item.key}
+          className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+          style={{
+            background: "rgba(168, 85, 247, 0.12)",
+            border: "1px solid rgba(168, 85, 247, 0.24)",
+            color: "#c084fc",
+          }}
+        >
+          {item.label}
+        </span>
+      ))}
+    </div>
   );
 }
 
