@@ -117,6 +117,14 @@ export function DebugScreen({
               <div className="mx-auto max-w-4xl space-y-4">
                 <div className="flex flex-wrap gap-3">
                   <StatBadge
+                    label="Required"
+                    value={String(packageDebugInfo.mandatoryTides.length)}
+                  />
+                  <StatBadge
+                    label="Optional"
+                    value={String(packageDebugInfo.optionalSubset.length)}
+                  />
+                  <StatBadge
                     label="Draft Pool"
                     value={String(packageDebugInfo.draftPoolSize)}
                   />
@@ -155,18 +163,43 @@ export function DebugScreen({
                   </p>
                 </InfoCard>
 
-                <InfoCard title="Optional Subset">
-                  <p className="text-sm opacity-80">
-                    {packageDebugInfo.optionalSubset.length === 0
-                      ? "None"
-                      : packageDebugInfo.optionalSubset.join(", ")}
+                <InfoCard title="Required Packages">
+                  <p className="mb-2 text-xs opacity-60">
+                    Fixed package IDs always used for this Dreamcaller.
                   </p>
+                  <DebugChipList
+                    emptyLabel="No required packages."
+                    items={packageDebugInfo.mandatoryTides.map((packageTideId) => ({
+                      key: packageTideId,
+                      label: packageTideId,
+                    }))}
+                  />
                 </InfoCard>
 
-                <InfoCard title="Selected Package Tides">
-                  <p className="text-sm opacity-80">
-                    {packageDebugInfo.selectedTides.join(", ")}
+                <InfoCard title="Selected Optional Packages">
+                  <p className="mb-2 text-xs opacity-60">
+                    Optional package IDs selected for this run's draft pool.
                   </p>
+                  <DebugChipList
+                    emptyLabel="No optional packages were selected."
+                    items={packageDebugInfo.optionalSubset.map((packageTideId) => ({
+                      key: packageTideId,
+                      label: packageTideId,
+                    }))}
+                  />
+                </InfoCard>
+
+                <InfoCard title="Full Draft Pool Packages">
+                  <p className="mb-2 text-xs opacity-60">
+                    Combined required and selected optional package IDs.
+                  </p>
+                  <DebugChipList
+                    emptyLabel="No package IDs are active."
+                    items={packageDebugInfo.selectedTides.map((packageTideId) => ({
+                      key: packageTideId,
+                      label: packageTideId,
+                    }))}
+                  />
                 </InfoCard>
 
                 <InfoCard title="Package Validation">

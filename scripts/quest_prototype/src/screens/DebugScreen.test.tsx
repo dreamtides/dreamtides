@@ -170,10 +170,14 @@ describe("DebugScreen", () => {
 
     expect(container.textContent).toContain("Debug: Package State");
     expect(container.textContent).toContain("Caller of Lanterns");
-    expect(container.textContent).toContain("Selected Package Tides");
-    expect(container.textContent).toContain(
-      "accent:Bloom, support-a, support-b, support-c",
-    );
+    expect(container.textContent).toContain("Required Packages");
+    expect(container.textContent).toContain("core");
+    expect(container.textContent).toContain("Selected Optional Packages");
+    expect(container.textContent).toContain("support-a");
+    expect(container.textContent).toContain("support-b");
+    expect(container.textContent).toContain("support-c");
+    expect(container.textContent).toContain("Full Draft Pool Packages");
+    expect(container.textContent).toContain("accent:Bloom");
     expect(container.textContent).toContain("First Sign");
     expect(container.textContent).toContain("Second Sign");
     expect(container.textContent).toContain("Lantern Sprite");
