@@ -77,6 +77,8 @@ way to win games.
 
 Narrative identity: Relentless martial momentum.
 
+Boxicon: `bullseye`.
+
 Mechanical identity: Low-curve Warriors, direct spark buffs, point racing, and
 aggressive battlefield snowball.
 
@@ -86,6 +88,8 @@ Warrior density into pressure.
 ### `warrior_bastion`
 
 Narrative identity: Disciplined defense and superior trading.
+
+Boxicon: `castle`.
 
 Mechanical identity: Sticky Warriors, favorable trades, attrition tools, and
 defensive board control.
@@ -97,6 +101,8 @@ grind through combat.
 
 Narrative identity: Living abundance that compounds over time.
 
+Boxicon: `tree-alt`.
+
 Mechanical identity: Spirit Animals, ramp, top-of-deck play, board snowball, and
 Judgment energy and spark chaining.
 
@@ -106,6 +112,8 @@ convert Judgment into more board.
 ### `materialize_value`
 
 Narrative identity: Repeated arrival as a source of advantage.
+
+Boxicon: `book`.
 
 Mechanical identity: ETB value, materialized triggers, copy effects tied to
 entry, and steady resource gain.
@@ -117,6 +125,8 @@ entries.
 
 Narrative identity: Reality in motion, never letting the board settle.
 
+Boxicon: `show`.
+
 Mechanical identity: Bounce, temporary banish, replay timing, fast pressure, and
 tempo swings.
 
@@ -126,6 +136,8 @@ or use replay to create pressure windows.
 ### `ally_formation`
 
 Narrative identity: Coordinated companies moving in deliberate formation.
+
+Boxicon: `diamond`.
 
 Mechanical identity: Multi-ally payoffs, pair scoring, formation spark scaling,
 and disciplined board geometry.
@@ -137,6 +149,8 @@ pair-based scaling.
 
 Narrative identity: Overwhelming presence through sheer board spread.
 
+Boxicon: `sun`.
+
 Mechanical identity: Generic go-wide battlefield shells, token-flood finishes,
 and non-scaling wide pressure.
 
@@ -146,6 +160,8 @@ win condition.
 ### `fast_tempo`
 
 Narrative identity: Winning through timing and initiative.
+
+Boxicon: `bolt`.
 
 Mechanical identity: Dense fast cards, hand-fast enablers, opponent-turn plays,
 and explicit fast-payoff bodies.
@@ -157,6 +173,8 @@ without giving up tempo.
 
 Narrative identity: Spell turns that build into a decisive burst.
 
+Boxicon: `meteor`.
+
 Mechanical identity: Event density, cost reduction, copies, burst sequencing,
 and cards-played-this-turn finishers.
 
@@ -166,6 +184,8 @@ chaining.
 ### `prevent_control`
 
 Narrative identity: Command of the game through refusal and interruption.
+
+Boxicon: `shield-x`.
 
 Mechanical identity: Hard prevents, counterspell pressure, reactive events, and
 denial-as-engine value.
@@ -177,6 +197,8 @@ into advantage.
 
 Narrative identity: Burning through the hand to gain speed.
 
+Boxicon: `flame`.
+
 Mechanical identity: Self-discard, hand churn, burst draw, and discard-fueled
 tempo.
 
@@ -186,6 +208,8 @@ speed.
 ### `void_recursion`
 
 Narrative identity: The void as a second hand and a place of return.
+
+Boxicon: `ghost`.
 
 Mechanical identity: Reclaim, replay from void, recursive threats, and
 void-as-hand patterns.
@@ -197,6 +221,8 @@ rebuy loops.
 
 Narrative identity: Power that grows as the void deepens.
 
+Boxicon: `moon`.
+
 Mechanical identity: Void count scaling, threshold bodies, and count-based
 finishers.
 
@@ -206,6 +232,8 @@ at specific void sizes.
 ### `abandon_value`
 
 Narrative identity: Sacrifice as fuel for resource conversion.
+
+Boxicon: `skull`.
 
 Mechanical identity: Abandon for energy, cards, attrition value, and sacrifice
 loops.
@@ -217,6 +245,8 @@ conversion.
 
 Narrative identity: Feeding lesser pieces upward into greater ones.
 
+Boxicon: `pyramid`.
+
 Mechanical identity: Abandon to upgrade, abandon into deck cheat,
 materialize-bigger chains, and deck-as-resource finishing.
 
@@ -226,6 +256,8 @@ board state.
 ### `figment_swarm`
 
 Narrative identity: A dream made real through multiplying fragments.
+
+Boxicon: `star-half`.
 
 Mechanical identity: Figment generation, figment multiplication, figment-tribal
 payoffs, and token-board finishes.
@@ -237,6 +269,8 @@ into lethal pressure.
 
 Narrative identity: Endurance through death, recovery, and attrition.
 
+Boxicon: `yin-yang`.
+
 Mechanical identity: Survivors, Dissolved triggers, death loops, void rebuys,
 and sticky attrition.
 
@@ -246,6 +280,8 @@ dissolved pieces.
 ### `judgment_engines`
 
 Narrative identity: Winning by bending the scoring phase itself.
+
+Boxicon: `hourglass`.
 
 Mechanical identity: Extra Judgment phases, repeated Judgment triggers,
 phase-scaling bodies, and Judgment payoff turns.
@@ -257,6 +293,8 @@ or happening bigger.
 
 Narrative identity: Momentum built from body after body entering play.
 
+Boxicon: `cloud-lightning`.
+
 Mechanical identity: Second-character payoffs, deploy rebates, replay-on-deploy
 chains, and character-play cost reduction.
 
@@ -266,6 +304,8 @@ character sequencing into tempo.
 ### `spark_tall`
 
 Narrative identity: Concentrating power into a single dominant threat.
+
+Boxicon: `crown`.
 
 Mechanical identity: Kindle, focused spark growth, board compression, and
 one-threat or two-threat pressure.
