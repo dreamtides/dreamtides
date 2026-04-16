@@ -201,6 +201,68 @@ class PlanningTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "must match dreamcaller count"):
                 dreamsign_batch.build_mode_specs(args)
 
+    def test_build_jobs_allows_mode3b_only_run(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            dreamcallers_path = temp_path / "dreamcallers.toml"
+            dreamcallers_path.write_text(
+                "\n".join(
+                    [
+                        "[[dreamcaller]]",
+                        'name = "A"',
+                        'title = "One"',
+                        'rendered-text = "Alpha"',
+                        'mandatory-tides = ["tide_a"]',
+                        'optional-tides = ["tide_b"]',
+                        "",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            commanders_path = temp_path / "commanders.txt"
+            commanders_path.write_text("Commander 1\nCommander 2\n", encoding="utf-8")
+            sts_fight_path = temp_path / "relics-fight.txt"
+            sts_fight_path.write_text("STS fight 1\n", encoding="utf-8")
+            mt_battle_path = temp_path / "artifacts-battle.txt"
+            mt_battle_path.write_text("MT battle 1\n", encoding="utf-8")
+            mt_map_path = temp_path / "artifacts-map.txt"
+            mt_map_path.write_text("MT map 1\nMT map 2\n", encoding="utf-8")
+            sts_other_path = temp_path / "relics-other.txt"
+            sts_other_path.write_text(
+                "STS other 1\nSTS other 2\nSTS other 3\n",
+                encoding="utf-8",
+            )
+
+            args = argparse.Namespace(
+                seed=5,
+                codex_model="gpt-5.4",
+                claude_model="opus",
+                mode1_count=0,
+                mode2_count=0,
+                mode3a_count=0,
+                mode3b_count=4,
+                mode2_min_per_job=1,
+                mode3a_sts_min_per_job=1,
+                mode3a_mt_min_per_job=1,
+                mode3b_sts_min_per_job=1,
+                mode3b_mt_min_per_job=1,
+                dreamcallers_path=dreamcallers_path,
+                commanders_path=commanders_path,
+                sts_fight_path=sts_fight_path,
+                mt_battle_path=mt_battle_path,
+                mt_map_path=mt_map_path,
+                sts_other_path=sts_other_path,
+                avoid_ability_texts_path=None,
+            )
+
+            jobs = dreamsign_batch.build_jobs(args)
+
+        self.assertEqual(len(jobs), 4)
+        self.assertTrue(all(job.mode == "mode3b" for job in jobs))
+        self.assertEqual(sum(1 for job in jobs if job.agent_name == "codex"), 2)
+        self.assertEqual(sum(1 for job in jobs if job.agent_name == "claude"), 2)
+
 
 class ValidationTests(unittest.TestCase):
     """Tests for output validation."""
@@ -224,6 +286,28 @@ class ValidationTests(unittest.TestCase):
 
 class CommandTests(unittest.TestCase):
     """Tests for command construction."""
+
+    def test_build_agent_prompt_includes_avoid_list(self) -> None:
+        prompt = dreamsign_batch.build_agent_prompt(
+            dreamsign_batch.AgentJob(
+                agent_name="codex",
+                model_name="gpt-5.4",
+                job_key="mode3b-001-codex-test",
+                mode="mode3b",
+                source_paths=("map.txt", "other.txt"),
+                source_items=("Map effect", "Other effect"),
+                avoid_ability_texts=("Existing line one.", "Existing line two."),
+            ),
+            "skill text",
+        )
+
+        self.assertIn(
+            "Mode: Mode 3B: Monster Train / Slay the Spire Inspired, Quest-Level",
+            prompt,
+        )
+        self.assertIn("Existing Dreamsign ability texts to avoid", prompt)
+        self.assertIn("Existing line one.", prompt)
+        self.assertIn("Existing line two.", prompt)
 
     def test_build_codex_command_includes_model_and_schema(self) -> None:
         command = dreamsign_batch.build_codex_command(

@@ -96,6 +96,7 @@ class AgentJob:
     mode: str
     source_paths: tuple[str, ...]
     source_items: tuple[str, ...]
+    avoid_ability_texts: tuple[str, ...] = ()
     attempt: int = 1
 
 
@@ -451,6 +452,14 @@ def parse_args() -> argparse.Namespace:
         help="Path to Slay the Spire quest relic inspirations for Mode 3B",
     )
     parser.add_argument(
+        "--avoid-ability-texts-path",
+        type=Path,
+        help=(
+            "Optional newline-delimited file of existing Dreamsign ability texts to "
+            "avoid repeating or closely paraphrasing."
+        ),
+    )
+    parser.add_argument(
         "--recover-from-logs",
         action="store_true",
         help="Seed or reconstruct results from ~/.claude and ~/.codex session logs",
@@ -512,6 +521,12 @@ def load_unique_lines(path: Path) -> list[str]:
     return unique_lines
 
 
+def load_optional_unique_lines(path: Path | None) -> tuple[str, ...]:
+    if path is None:
+        return ()
+    return tuple(load_unique_lines(path))
+
+
 def _arg_value(
     args: argparse.Namespace, new_name: str, legacy_name: str, default: int
 ) -> int:
@@ -565,100 +580,110 @@ def build_mode_specs(args: argparse.Namespace) -> dict[str, list[DreamsignPrompt
         mode: [] for mode in MODE_ORDER
     }
 
-    mode1_specs = load_dreamcaller_specs(args.dreamcallers_path)
-    if args.mode1_count != len(mode1_specs):
-        raise ValueError(
-            f"--mode1-count must match dreamcaller count in {args.dreamcallers_path}: "
-            f"expected {len(mode1_specs)}, got {args.mode1_count}"
-        )
-    specs_by_mode["mode1"] = mode1_specs
+    if args.mode1_count == 0:
+        specs_by_mode["mode1"] = []
+    else:
+        mode1_specs = load_dreamcaller_specs(args.dreamcallers_path)
+        if args.mode1_count != len(mode1_specs):
+            raise ValueError(
+                f"--mode1-count must match dreamcaller count in {args.dreamcallers_path}: "
+                f"expected {len(mode1_specs)}, got {args.mode1_count}"
+            )
+        specs_by_mode["mode1"] = mode1_specs
 
-    mode2_rng = random.Random(f"{args.seed}:mode2")
-    commander_chunks = _build_saturated_chunks(
-        load_unique_lines(args.commanders_path),
-        chunk_count=args.mode2_count,
-        min_per_chunk=_arg_value(
-            args,
-            "mode2_min_per_job",
-            "mode2_pool_size",
-            DEFAULT_MIN_ITEMS_PER_JOB,
-        ),
-        rng=mode2_rng,
-    )
-    specs_by_mode["mode2"] = [
-        DreamsignPromptSpec(
-            mode="mode2",
-            source_paths=(str(args.commanders_path),),
-            source_items=chunk,
+    if args.mode2_count > 0:
+        mode2_rng = random.Random(f"{args.seed}:mode2")
+        commander_chunks = _build_saturated_chunks(
+            load_unique_lines(args.commanders_path),
+            chunk_count=args.mode2_count,
+            min_per_chunk=_arg_value(
+                args,
+                "mode2_min_per_job",
+                "mode2_pool_size",
+                DEFAULT_MIN_ITEMS_PER_JOB,
+            ),
+            rng=mode2_rng,
         )
-        for chunk in commander_chunks
-    ]
+        specs_by_mode["mode2"] = [
+            DreamsignPromptSpec(
+                mode="mode2",
+                source_paths=(str(args.commanders_path),),
+                source_items=chunk,
+            )
+            for chunk in commander_chunks
+        ]
 
-    mode3a_sts_rng = random.Random(f"{args.seed}:mode3a:sts")
-    mode3a_mt_rng = random.Random(f"{args.seed}:mode3a:mt")
-    mode3a_sts_chunks = _build_saturated_chunks(
-        load_unique_lines(args.sts_fight_path),
-        chunk_count=args.mode3a_count,
-        min_per_chunk=_arg_value(
-            args,
-            "mode3a_sts_min_per_job",
-            "mode3a_sts_pool_size",
-            DEFAULT_MIN_ITEMS_PER_JOB,
-        ),
-        rng=mode3a_sts_rng,
-    )
-    mode3a_mt_chunks = _build_saturated_chunks(
-        load_unique_lines(args.mt_battle_path),
-        chunk_count=args.mode3a_count,
-        min_per_chunk=_arg_value(
-            args,
-            "mode3a_mt_min_per_job",
-            "mode3a_mt_pool_size",
-            DEFAULT_MIN_ITEMS_PER_JOB,
-        ),
-        rng=mode3a_mt_rng,
-    )
-    specs_by_mode["mode3a"] = [
-        DreamsignPromptSpec(
-            mode="mode3a",
-            source_paths=(str(args.sts_fight_path), str(args.mt_battle_path)),
-            source_items=sts_chunk + mt_chunk,
+    if args.mode3a_count > 0:
+        mode3a_sts_rng = random.Random(f"{args.seed}:mode3a:sts")
+        mode3a_mt_rng = random.Random(f"{args.seed}:mode3a:mt")
+        mode3a_sts_chunks = _build_saturated_chunks(
+            load_unique_lines(args.sts_fight_path),
+            chunk_count=args.mode3a_count,
+            min_per_chunk=_arg_value(
+                args,
+                "mode3a_sts_min_per_job",
+                "mode3a_sts_pool_size",
+                DEFAULT_MIN_ITEMS_PER_JOB,
+            ),
+            rng=mode3a_sts_rng,
         )
-        for sts_chunk, mt_chunk in zip(mode3a_sts_chunks, mode3a_mt_chunks, strict=True)
-    ]
+        mode3a_mt_chunks = _build_saturated_chunks(
+            load_unique_lines(args.mt_battle_path),
+            chunk_count=args.mode3a_count,
+            min_per_chunk=_arg_value(
+                args,
+                "mode3a_mt_min_per_job",
+                "mode3a_mt_pool_size",
+                DEFAULT_MIN_ITEMS_PER_JOB,
+            ),
+            rng=mode3a_mt_rng,
+        )
+        specs_by_mode["mode3a"] = [
+            DreamsignPromptSpec(
+                mode="mode3a",
+                source_paths=(str(args.sts_fight_path), str(args.mt_battle_path)),
+                source_items=sts_chunk + mt_chunk,
+            )
+            for sts_chunk, mt_chunk in zip(
+                mode3a_sts_chunks, mode3a_mt_chunks, strict=True
+            )
+        ]
 
-    mode3b_sts_rng = random.Random(f"{args.seed}:mode3b:sts")
-    mode3b_mt_rng = random.Random(f"{args.seed}:mode3b:mt")
-    mode3b_sts_chunks = _build_saturated_chunks(
-        load_unique_lines(args.sts_other_path),
-        chunk_count=args.mode3b_count,
-        min_per_chunk=_arg_value(
-            args,
-            "mode3b_sts_min_per_job",
-            "mode3b_sts_pool_size",
-            DEFAULT_MIN_ITEMS_PER_JOB,
-        ),
-        rng=mode3b_sts_rng,
-    )
-    mode3b_mt_chunks = _build_saturated_chunks(
-        load_unique_lines(args.mt_map_path),
-        chunk_count=args.mode3b_count,
-        min_per_chunk=_arg_value(
-            args,
-            "mode3b_mt_min_per_job",
-            "mode3b_mt_pool_size",
-            DEFAULT_MIN_ITEMS_PER_JOB,
-        ),
-        rng=mode3b_mt_rng,
-    )
-    specs_by_mode["mode3b"] = [
-        DreamsignPromptSpec(
-            mode="mode3b",
-            source_paths=(str(args.mt_map_path), str(args.sts_other_path)),
-            source_items=mt_chunk + sts_chunk,
+    if args.mode3b_count > 0:
+        mode3b_sts_rng = random.Random(f"{args.seed}:mode3b:sts")
+        mode3b_mt_rng = random.Random(f"{args.seed}:mode3b:mt")
+        mode3b_sts_chunks = _build_saturated_chunks(
+            load_unique_lines(args.sts_other_path),
+            chunk_count=args.mode3b_count,
+            min_per_chunk=_arg_value(
+                args,
+                "mode3b_sts_min_per_job",
+                "mode3b_sts_pool_size",
+                DEFAULT_MIN_ITEMS_PER_JOB,
+            ),
+            rng=mode3b_sts_rng,
         )
-        for mt_chunk, sts_chunk in zip(mode3b_mt_chunks, mode3b_sts_chunks, strict=True)
-    ]
+        mode3b_mt_chunks = _build_saturated_chunks(
+            load_unique_lines(args.mt_map_path),
+            chunk_count=args.mode3b_count,
+            min_per_chunk=_arg_value(
+                args,
+                "mode3b_mt_min_per_job",
+                "mode3b_mt_pool_size",
+                DEFAULT_MIN_ITEMS_PER_JOB,
+            ),
+            rng=mode3b_mt_rng,
+        )
+        specs_by_mode["mode3b"] = [
+            DreamsignPromptSpec(
+                mode="mode3b",
+                source_paths=(str(args.mt_map_path), str(args.sts_other_path)),
+                source_items=mt_chunk + sts_chunk,
+            )
+            for mt_chunk, sts_chunk in zip(
+                mode3b_mt_chunks, mode3b_sts_chunks, strict=True
+            )
+        ]
 
     return specs_by_mode
 
@@ -674,6 +699,9 @@ def provider_counts_for_mode(mode_count: int) -> dict[str, int]:
 def build_jobs(args: argparse.Namespace) -> list[AgentJob]:
     specs_by_mode = build_mode_specs(args)
     model_by_agent = {"codex": args.codex_model, "claude": args.claude_model}
+    avoid_ability_texts = load_optional_unique_lines(
+        getattr(args, "avoid_ability_texts_path", None)
+    )
     jobs: list[AgentJob] = []
 
     for mode in MODE_ORDER:
@@ -697,6 +725,7 @@ def build_jobs(args: argparse.Namespace) -> list[AgentJob]:
                     mode=mode,
                     source_paths=spec.source_paths,
                     source_items=spec.source_items,
+                    avoid_ability_texts=avoid_ability_texts,
                 )
             )
 
@@ -821,6 +850,14 @@ def build_agent_prompt(job: AgentJob, skill_text: str) -> str:
     inspirations_block = "\n".join(
         f"{index}. {item}" for index, item in enumerate(job.source_items, start=1)
     )
+    avoid_block = ""
+    if job.avoid_ability_texts:
+        avoid_lines = "\n".join(f"- {text}" for text in job.avoid_ability_texts)
+        avoid_block = (
+            "Existing Dreamsign ability texts to avoid repeating or closely paraphrasing:\n"
+            f"{avoid_lines}\n\n"
+            "Do not reuse the same core hook, cadence, or obvious near-variant of any listed text.\n\n"
+        )
     return (
         "You are generating structured JSON for one Dreamtides Dreamsign design.\n"
         "Follow the dreamsign-design skill specification below exactly.\n"
@@ -840,6 +877,7 @@ def build_agent_prompt(job: AgentJob, skill_text: str) -> str:
         f"{sources_block}\n\n"
         "Inspiration input:\n"
         f"{inspirations_block}\n\n"
+        f"{avoid_block}"
         "Skill specification:\n"
         f"{skill_text}"
     )
@@ -999,6 +1037,7 @@ async def run_batch(
                         mode=job.mode,
                         source_paths=job.source_paths,
                         source_items=job.source_items,
+                        avoid_ability_texts=job.avoid_ability_texts,
                         attempt=2,
                     )
                     pending_jobs[retry_job.agent_name].append(retry_job)
@@ -1452,10 +1491,15 @@ def main() -> int:
     args = parse_args()
     if args.max_concurrency < 1:
         raise ValueError("--max-concurrency must be at least 1")
+    for mode_name in ("mode1_count", "mode2_count", "mode3a_count", "mode3b_count"):
+        if getattr(args, mode_name) < 0:
+            raise ValueError(f"--{mode_name.replace('_', '-')} must be at least 0")
     if args.recover_only and not args.recover_from_logs:
         raise ValueError("--recover-only requires --recover-from-logs")
 
     jobs = build_jobs(args)
+    if not jobs:
+        raise ValueError("At least one job must be requested")
     reporter = BatchReporter(
         jobs=jobs,
         output_path=args.output,
