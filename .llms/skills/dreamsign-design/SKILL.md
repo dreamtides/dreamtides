@@ -42,14 +42,15 @@ both.
 - **Quest-facing Dreamsigns do not need tide linkage.** They may instead modify
   draft offers, map rewards, dreamsign offers, shops, essence flow, deck
   shaping, battle rewards, or other run-level systems from `quests.md`.
-- Never design a battle Dreamsign with an activated ability.
-- Use battle triggered abilities only rarely. Prefer static text.
+- Never design a Dreamsign with an activated ability.
+- Use battle triggered abilities rarely. Prefer static text.
 - Triggered abilities outside battle are fine.
 - Avoid narrative writing. Output ability text and mechanical justification only.
 
 ## What Good Dreamsigns Do
 
 - Make an existing deck or run pattern feel sharper, cleaner, or more distinct.
+- Change the quest metagame in interesting ways
 - Change incentives without monopolizing the whole run.
 - Create interesting deckbuilding or map-routing texture.
 - Stay understandable at a glance despite being always-on.
@@ -90,7 +91,7 @@ Guidelines:
 
 ### Mode 2: Magic the Gathering Inspired
 
-Input: a pool of roughly 25 MTG cards.
+Input: a pool of MTG cards.
 
 Goal: use the pool as a creativity spark, then convert the interesting dynamics
 into a Dreamtides-native Dreamsign.
@@ -101,6 +102,7 @@ Guidelines:
 - Translate inspiration into Dreamtides concepts: battlefield geometry, energy
   pacing, Judgment timing, materialize/reclaim/void play, quest reward shaping,
   and the tide package system.
+- Think about how concepts like attacking/blocking/damage map to the judgment system
 - For battle Dreamsigns, ask which tides would actually want this and why.
 - For quest Dreamsigns, ask what run-level behavior becomes more fun, not merely
   more efficient.
@@ -108,7 +110,7 @@ Guidelines:
 
 ### Mode 3: Monster Train / Slay the Spire Inspired
 
-Input: a pool of roughly 10 relics or artifacts from those games.
+Input: a pool of relics or artifacts from those games.
 
 Goal: capture the appealing run-shaping pattern of the relics while designing a
 Dreamsign that fits Dreamtides battles and quests.
@@ -245,7 +247,7 @@ Explain:
 ### Rejected Alternatives
 
 List 2 or 3 short bullets describing the best discarded concepts and why the
-final design beat them.
+final design beat them, unless more specific output instructions are given.
 
 ## Final Checks
 
