@@ -30,24 +30,25 @@ when possible.
 
 ## Overview
 
-Quests revolve primarily around drafting a deck to bring into future battles.
-Quests use a currency called "essence" which can be spent on shops and in
-various other ways. Players start each quest with 250 essence and no cards in
-their deck.
+Quests revolve primarily around drafting and refining a deck to bring into
+future battles. Quests use a currency called "essence" which can be spent on
+shops and in various other ways. Players start each quest with 250 essence and a
+fixed starter deck, then choose a Dreamcaller to define the run.
 
-In addition to deck cards, users during a quest will select a "dreamcaller" to
-lead their deck and may have some number of "dreamsigns":
+In addition to deck cards, users during a quest will select a Dreamcaller to
+lead their deck and may have some number of Dreamsigns:
 
 - **Dreamcaller:** An animated 3D character who starts each battle already in
-  play for both participants in a battle. Each dreamcaller has powerful ongoing
-  static, triggered, or activated abilities. Each dreamcaller is associated with
-  a tide and typically grants 1 permanent tide crystal (see
-  [Tide Crystals](#tide-crystals)).
-- **Dreamsigns:** Cards with 2D illustrations of objects, which provide more
+  play for both participants in a battle. Each Dreamcaller has powerful ongoing,
+  triggered, or activated abilities and defines a fixed run package: mandatory
+  package tides plus a selected subset of optional package tides. That package
+  seeds the run's draft multiset, Dreamsign pool, and default reward bias.
+- **Dreamsigns:** Cards with 2D illustrations of objects which provide more
   minor ongoing effects. Dreamsign effects can apply during battles, on the
-  quest map, or both. Generally we try to assign the splashy "build around"
-  effects to dreamcallers and secondary effects to dreamsigns. Dreamsigns are
-  associated with tides.
+  quest map, or both. Dreamsigns have a display tide for UI chrome, plus hidden
+  package-tide memberships used for quest content generation. Dreamsigns are
+  pulled from a shared run pool and are spent as soon as they are shown to the
+  player.
 
 Quests display a top-level 3D screen called the [Dream Atlas](#dream-atlas) with
 a series of "dreamscapes" the user can navigate to. Each dreamscape is
@@ -65,112 +66,127 @@ process repeats.
 
 ## Current Quest Prototype
 
-A prototype of client UI patterns for the quest system is available in
-client/Assets/Dreamtides/Prototype. This should serve as a starting point for
-the implementation, but is by no means definitive and many aspects of its design
-are already outdated. This document supersedes all quest prototype decisions.
+The current reference prototype for quest flow lives in
+`scripts/quest_prototype/` as a standalone web app. It reflects the current
+package-based run setup:
 
-The prototype demonstrates the basics of the `UpdateQuestCommand` command and
-the `QuestView` type. Quests use the same general mechanisms as battles and run
-in the same Unity scene. The
-[DreamscapeLayout](client/Assets/Dreamtides/Layout/DreamscapeLayout.cs) class is
-the entrypoint to many quest-specific Unity components, while
-[DreamscapeService](client/Assets/Dreamtides/Services/DreamscapeService.cs) owns
-top-level quest functionality for a single dreamscape. Both of these classes
-should still be treated as prototype quality despite existing outside of the
-`Prototype/` directory.
+1. The player is offered 3 Dreamcallers.
+2. Choosing a Dreamcaller resolves a fixed package once for the run.
+3. The starter deck, draft multiset, Dreamsign pool, and atlas are initialized.
+4. The run enters the first dreamscape directly with no intermediate Dreamcaller
+   Draft or tide-pick screen.
 
-The [current_prototype.md](current_prototype.md) document is a technical
-reference for the current quest prototype implementation, covering Rust types,
-client layout and site system, prototype interaction flows, and implementation
-gaps. Read when implementing quest features or migrating prototype logic to the
-rules engine.
+The older Unity quest prototype remains useful for some layout exploration, but
+it is no longer the source of truth for quest flow, tide logic, or draft pool
+construction. The documents [current_prototype.md](current_prototype.md) and
+[`docs/quest_prototype/quest_prototype.md`](../../quest_prototype/quest_prototype.md)
+are the technical references for the live prototype behavior that this design
+document should track.
 
 ## Tides
 
-Every card, dreamsign, and dreamcaller in Dreamtides is associated with a
-**tide**, which represents a deck archetype and philosophical identity. See
-[Tides](../../tides/tides.md) for the full tide design including archetype
-descriptions and alliances.
+Quest content now uses the layered tide system described in
+[Tides](../../tides/tides.md). Tides are gameplay packages, not a battle
+resource system:
 
-The seven core tides are: **Bloom**, **Arc**, **Ignite**, **Pact**, **Umbra**,
-**Rime**, and **Surge**. **Wild** is a neutral tide that sits at the center,
-compatible with all strategies.
+- **Structural tides** are full shells. They define the deck's main engines,
+  payoffs, and finishers.
+- **Support tides** are splashable reinforcement packages. They provide setup,
+  smoothing, bridges, and enablers for structural shells.
+- **Utility tides** are broad role packages. They provide generic curve,
+  interaction, selection, refuel, and closing tools.
 
-Tides have direct mechanical impact on gameplay through **tide crystals** — a
-resource required to play cards during battles. See
-[Tide Crystals](#tide-crystals) for details.
+Cards are assigned tides by battlefield function, not by flavor or surface
+terminology. A single card may belong to multiple package tides if it genuinely
+supports multiple gameplay patterns.
 
-## Cube Draft
+For quests, the important consequences are:
 
-The cube draft is the primary mechanism by which players build their deck during
-a quest. It is modeled after cube drafts in Magic: the Gathering.
+- Dreamcallers define **mandatory package tides** and **optional package
+  tides**.
+- A run resolves one fixed **selected tide package** at quest start: mandatory
+  tides plus a chosen optional subset.
+- Draft pools, Dreamsign pools, shops, and reward generators all key off these
+  package tides.
+- Battles themselves use the core
+  [battle rules](../../battle_rules/battle_rules.md) resource model: cards are
+  paid for with **energy**, and energy production comes from the shared
+  **Dreamwell** rather than from tide-specific resources.
 
-### Draft Pool
+Cards and Dreamsigns may still expose one of the seven display tides
+(Bloom/Arc/Ignite/Pact/Umbra/Rime/Surge, plus Neutral) for iconography and card
+chrome, but quest generation should treat those as presentation. The underlying
+package tides are what drive run identity.
 
-At the start of each quest, a **draft pool** is created containing every card in
-the game (approximately 480 cards). Each card appears exactly once in the pool —
-there is **no rarity weighting** in the draft pool. The draft operates as a
-10-person cube draft table with the player and **9 AI bot drafters**.
+## Draft Pool Construction
 
-### Draft Mechanics
+The draft is now a fixed multiset built from the selected Dreamcaller package.
+It is not a pod draft, does not use AI bot drafters, and does not deal or pass
+packs.
 
-The cube draft works as follows:
+### Package Resolution Algorithm
 
-1. **Pack dealing:** 10 packs of 15 cards each are dealt simultaneously from the
-   draft pool, one for each drafter at the table.
-2. **Picking and passing:** Each drafter takes 1 card from their pack, then
-   passes the remaining cards to the next drafter. Packs circulate in a single
-   fixed direction — always the same 9 AIs passing to the player.
-3. **Player's view:** The player opens their own pack and sees all 15 cards on
-   their first pick. On their second pick, they receive a pack passed from the
-   adjacent AI (14 cards remaining). On their third pick, the pack has been
-   through 2 AIs (13 cards), and so on. By the 10th pick, the pack has passed
-   through all 9 AIs and the player sees 6 remaining cards.
-4. **Leftovers:** After all 10 drafters have picked from a pack, 5 cards remain.
-   These leftover cards are discarded and do not return to the pool.
-5. **No wheeling:** Packs do not wheel back to the player. Each pack passes
-   through the player exactly once, and the draft direction never alternates.
+At quest start, choosing a Dreamcaller resolves the run's draft pool as follows:
 
-### Draft Sites on the Map
+1. Start from the full non-starter card pool.
+2. Build a **mandatory-only** draft multiset using the Dreamcaller's mandatory
+   package tides. A card receives copies equal to its overlap count with the
+   selected tides, capped at 2 copies.
+3. The mandatory-only pool must land in the `110-150` card range. Dreamcallers
+   that fail this validation are not legal quest-start offers.
+4. Enumerate all optional-tide subsets of size 3 and 4 from the Dreamcaller's
+   optional package tides.
+5. For each subset, form `selectedTides = mandatoryTides + optionalSubset`, then
+   rebuild the draft multiset using the same overlap-count rule: one copy for
+   one matching tide, two copies for two or more matching tides.
+6. Legal draft pools are `175-225` cards. Preferred draft pools are `190-210`
+   cards.
+7. Choose the best candidate from the preferred range if one exists; otherwise
+   choose the best legal candidate. "Best" currently means the largest pool
+   size, with deterministic tie-breaking by the sorted optional-subset key.
+
+This makes the run package concrete and replayable: Dreamcaller choice decides
+which structural/support/utility packages are active, and cards that bridge
+multiple selected tides naturally show up more often because they receive two
+copies instead of one.
+
+The same resolution step also builds the run's initial Dreamsign pool by taking
+every Dreamsign template with any package-tide overlap against the selected
+tides.
+
+### Offer Generation
+
+The draft state stores `remainingCopiesByCard` for the resolved multiset and
+generates offers directly from that data:
+
+- Each pick shows **4 unique cards** when at least 4 unique cards remain.
+- Cards are sampled **without replacement**, weighted by their remaining copy
+  counts.
+- The shown offer is **spent immediately** from the pool. Unpicked cards are
+  burned; they do not return to the pool later.
+- The player pick adds the chosen card to the deck but does not otherwise alter
+  the already-spent offer.
+- The draft multiset persists across dreamscapes for the entire run.
+- There are no rounds, no refresh after 10 picks, and no hidden bot picks.
+
+This system makes the run feel like drafting through a finite, Dreamcaller-tuned
+inventory rather than fighting over shared packs at a table.
+
+### Draft Sites On The Map
 
 Each [Draft site](#draft) on the dreamscape map provides **5 picks** from the
-ongoing cube draft. With 2 draft sites per dreamscape at early completion
-levels, the player makes 10 picks per dreamscape — completing one full pass
-through the 10 circulating packs.
+ongoing multiset. Early dreamscapes still provide more opportunities to draft
+than late dreamscapes:
 
-- The **first "draft 5" site** in a dreamscape covers picks from packs with 15,
-  14, 13, 12, and 11 cards (the player's own pack and packs that have passed
-  through 1-4 AIs).
-- The **second "draft 5" site** covers picks from packs with 10, 9, 8, 7, and 6
-  cards (packs that have passed through 5-9 AIs).
+| Completion Level | Draft Sites |
+| ---------------- | ----------- |
+| 0, 1             | 2           |
+| 2, 3             | 1           |
+| 4+               | 0           |
 
-### Rounds and Pool Refresh
-
-After the player completes 10 picks (one full set of circulating packs), a new
-**round** begins: 10 new packs of 15 cards are dealt from the remaining pool.
-After **3 rounds** (30 total player picks), the draft pool is discarded and a
-completely fresh pool is created from all cards in the game. This is the only
-point at which duplicate cards may appear in draft picks. The draft state (pool,
-AI bot state, round counter) persists across dreamscapes throughout the entire
-quest.
-
-### AI Bot Drafters
-
-The 9 AI bot drafters are persistent throughout the quest, maintaining the same
-archetype preferences even across pool refreshes. Each AI bot scores cards using
-a weighted blend of:
-
-- **Raw power (20%):** How strong the card is in isolation.
-- **Archetype alignment (60%):** How well the card fits the bot's learned
-  archetype preferences (based on its tide commitment).
-- **Openness signals (20%):** Estimated archetype availability based on what
-  cards are being passed to the bot.
-
-Bots **commit to a tide after 5 picks** and pick **randomly 20% of the time**
-for variety. The AI bots' drafted cards are not used elsewhere — they serve
-purely to simulate realistic pack dynamics where desirable cards are taken
-before they reach the player.
+Because the draft pool is persistent and finite, each draft site is spending
+real run inventory. Offer quality will naturally shift over time as adjacent
+cards and doubled bridge cards are consumed.
 
 ## Dreamscape Sites
 
@@ -199,7 +215,11 @@ dreamcaller with their own deck. Opponent decks are (for now) defined statically
 in TOML. Before the battle begins, the opposing dreamcaller is displayed so the
 user can understand any special abilities they have. Opposing dreamsigns are
 also shown. When the battle completes, the [Victory or Defeat](#victory--defeat)
-screen is shown along with any associated battle rewards.
+screen is shown along with any associated battle rewards. Battles use the normal
+Dreamwell-and-energy rules from
+[`docs/battle_rules/battle_rules.md`](../../battle_rules/battle_rules.md): the
+Dreamwell phase increases energy production, current energy resets to production
+each turn, and playing cards only checks energy cost, not tide membership.
 
 **UI:** The camera pans in to the battle scene. The "full body" card
 representation of the enemy dreamcaller animates in from a small size at the
@@ -217,70 +237,65 @@ Icon: "Sword"
 ### Draft
 
 The Draft site allows users to add cards to their deck via the
-[Cube Draft](#cube-draft) system. Each draft site provides 5 picks from the
-ongoing cube draft. There is no way to "skip" or "reroll" draft picks by
-default, but of course all rules can be broken by specific dreamsigns.
+[Draft Pool Construction](#draft-pool-construction) system. Each draft site
+provides 5 picks from the ongoing run multiset. Each pick shows 4 unique cards
+sampled from the remaining pool, weighted by remaining copies. Revealed cards
+are spent immediately whether or not they are chosen, so a Draft site always
+burns real run inventory. There is no default skip or reroll for draft picks,
+though dreamsigns and journeys may still override this.
 
 **UI:** The cards available for the current pick are shown in multiple rows. The
-pack of cards to draft from is shown in a pile in the 3D scene, then the
 available cards animate in to be selected. Clicking a card animates it to the
-quest deck, and the remaining cards animate away as the next pack arrives. After
-all picks at a draft site are completed, the camera automatically pulls back to
-the map view. Cards are shown with an orange outline.
+quest deck, and the remaining cards animate away as the next offer arrives.
+After all picks at a draft site are completed, the camera automatically pulls
+back to the map view. Cards are shown with an orange outline.
 
 Icon: "Rectangle Vertical"
 
-### Dreamcaller Draft
+### Dreamcaller Selection
 
-The user activates the Dreamcaller Draft site to select their chosen
-dreamcaller. This displays a selection of around 3 dreamcallers. Dreamcallers
-are animated 3D characters, and we'll typically play character animations on
-this screen. The user can read the special abilities of the offered dreamcallers
-and pick one to lead their deck.
+Dreamcaller selection is no longer a dreamscape site. It is the quest-start
+screen shown before the player enters the Dream Atlas. The player is presented
+with 3 Dreamcallers and chooses one to define the run.
 
-Each dreamcaller is associated with a **tide** and grants **1 permanent tide
-crystal** of that tide, which the player starts each battle with. This is a key
-enabler for the player's tide commitment.
+Selecting a Dreamcaller performs all run bootstrap work immediately:
 
-If the Dreamcaller Draft is visited **before** any card drafting, the displayed
-dreamcallers are a random selection. If visited **after** drafting cards, the
-displayed dreamcallers are **weighted based on the tides in the player's deck**
-— for example, the player will always see a dreamcaller matching their 3
-most-drafted tides if possible.
+- Add the fixed starter deck.
+- Resolve the Dreamcaller's mandatory and optional package tides into one legal
+  selected tide package.
+- Initialize the draft multiset and Dreamsign pool from that package.
+- Generate the initial atlas and enter the first available dreamscape.
 
-Each dreamcaller comes with a different **essence bonus** gained for selecting
-that option, which serves as a lever for balancing more powerful dreamcallers.
-Bonus amounts are configured in TOML.
-
-Since all non-battle sites must be visited before entering battle, the
-dreamcaller is always selected before the battle begins. There is a certain
-element of strategy to *when* the user visits this site relative to other sites
-like shops and drafts, and it's intended to not be obvious whether it's better
-to visit other sites before selecting a dreamcaller.
+Dreamcallers should communicate their intended play pattern by surfacing a small
+set of structural/support tides and their rules text, but there is no longer a
+mid-run "wait to pick your archetype" decision or Dreamcaller-granted resource
+fixing.
 
 **UI:** Dreamcallers are shown in their full-body "card" representation, with
-ability text displayed alongside their 3D models and essence bonuses. The
-dreamcaller cards animate in from a small size in the center of the screen. Each
-dreamcaller does a different humanoid animation within its card frame. A primary
-action button appears below each dreamcaller allowing them to be selected. The
-selected dreamcaller animates to the bottom left of the screen to appear in a
-"square" frame (head only). The other cards animate back to a small size.
+ability text displayed alongside their 3D models and highlighted structural and
+support tides. The Dreamcaller cards animate in from a small size in the center
+of the screen. Each Dreamcaller does a different humanoid animation within its
+card frame. A primary action button appears below each Dreamcaller allowing it
+to be selected. The selected Dreamcaller animates to the bottom left of the
+screen to appear in a square frame (head only). The other cards animate back to
+a small size.
 
 Icon: "Crown"
 
 ### Specialty Shop
 
 A specialty shop operates in a similar manner to
-[Boss Rewards](#battle-rewards), showing a selection of powerful rare cards
-weighted to match the player's tides.
+[Battle Rewards](#battle-rewards), showing a curated selection of powerful cards
+that prefer the run's selected package tides and then tighten further around the
+player's actual deck composition.
 
 Future iterations may experiment with more novel offerings, such as:
 
-- A curated selection of cards from *other* tides that synergize well with the
-  player's deck.
+- A curated selection of cards from *other* packages that synergize well with
+  the player's deck.
 - A curated offering of removal effects, card advantage effects, or other
   mechanical categories.
-- Tide-weighted rare card selection (the default behavior).
+- Strong package-adjacent card selection (the default behavior).
 
 **UI:** Identical UI to the regular shop site except that it features a
 different NPC.
@@ -290,22 +305,16 @@ Icon: "Store Alt 2"
 ### Shop
 
 The shop is the primary site in which the user can spend their essence. Shops
-offer individual cards, dreamsigns, and **tide crystals** for purchase, and may
-rarely offer other site options such as purchasing journeys, purging cards,
+offer individual cards, dreamsigns, and rerolls for purchase, and may rarely
+offer other site options such as purchasing journeys, purging cards,
 transfiguring cards, duplicating cards, etc. Shops do offer the ability to spend
-essence to "reroll" (generate a new set of shop items to buy).
+essence to reroll and generate a new set of shop items.
 
-The cards and dreamsigns shown in a shop are **weighted to match the player's
-tides** in their deck. A player who has heavily committed to Surge will see
-predominantly Surge cards and dreamsigns. The weighting should be aggressive
-enough that committed players see mostly their main tide, while still
-occasionally showing complementary options from allied tides. Card rarity is
-still exposed in the shop through **pricing** — rare cards cost more essence
-than common ones.
-
-**Tide crystal purchases** allow the player to gain a permanent tide crystal in
-exchange for essence. The purchased crystal is in play at the start of each
-subsequent battle. This is a key mechanism for enabling multi-tide splashes.
+Shop cards should prefer content that overlaps the run's selected package tides,
+then weight further toward the packages the player's current deck has actually
+started to accumulate. If no package-adjacent content is available, the shop may
+fall back to the broader card pool. Dreamsign offers are drawn from the shared
+remaining Dreamsign pool for the run.
 
 Shop base prices and the overall essence economy are defined in TOML. The shop
 implements a random "discount" system where one or more items can be displayed
@@ -330,11 +339,10 @@ Icon: "Store"
 ### Dreamsign Offering
 
 At a dreamsign offering site, the user is presented with a single dreamsign to
-gain. The offering may be rejected, but there is no reward for doing so.
-Dreamsigns are associated with tides. The offered dreamsign is **weighted to
-match the player's tides** — dreamsigns matching the player's dominant deck
-tides are more likely to appear, using the same tide-weighting system as shops
-and dreamcaller drafts.
+gain. The offering may be rejected, but there is no reward for doing so. The
+offered Dreamsign is drawn from the run's shared Dreamsign pool, which was
+seeded from the selected Dreamcaller package. Revealed Dreamsigns are spent from
+that pool immediately, so rejecting an offer does not return it to the run.
 
 **UI:** The dreamsign animates to be displayed from screen center at a small
 scale. A purple accept button and a gray reject button are displayed. The
@@ -347,9 +355,9 @@ Icon: "Sparkles"
 
 At a dreamsign draft site, the user is presented with around three dreamsigns
 and is able to select one to gain. It is again possible to select no dreamsign.
-The presented dreamsigns are **weighted to match the player's tides** —
-dreamsigns matching the player's dominant deck tides are more likely to appear,
-using the same tide-weighting system as shops and dreamcaller drafts.
+As with Dreamsign Offering, the shown Dreamsigns are drawn from the run's shared
+Dreamsign pool and are spent as soon as they are shown. Skipping the site means
+the revealed Dreamsigns are lost for the rest of the run.
 
 **UI:** The three dreamsigns animate in at full size from the bottom of the
 screen in a staggered animation, positioning themselves in a single row. Purple
@@ -559,12 +567,12 @@ custom cards in their decks. See [Boss Dreamcallers](bosses.md) for details.
 ### Battle Rewards
 
 Completing a battle always grants an essence reward, which increases as the user
-completes more dreamscapes. The user also gets a **rare card draft** pick: a
-choice from among 4 cards that are weighted to match the player's tides and
-always drawn from **rare cards**. Since the main cube draft ignores rarity, boss
-rewards are one of the few places where rarity serves as a visible power-level
-distinction. These cards should feel very strong in the player's deck. This
-draft pick cannot be skipped.
+completes more dreamscapes. The user also gets a 4-card reward pick drawn from a
+package-adjacent reward pool. This reward generator should prefer cards
+overlapping the run's selected package tides, with a fallback to the broader
+pool if necessary. Battle rewards do not consume the main draft multiset, so
+they are a separate way to inject high-synergy cards into the deck. This draft
+pick cannot be skipped.
 
 ## Limits
 
@@ -594,11 +602,11 @@ normal. Bane cards and bane dreamsigns can be removed via the
 
 ## Dream Atlas
 
-The Dream Atlas is the screen players see at the start of a quest. It shows a 3D
-map of dreamscapes represented as circular miniature "worlds," connected by
-dotted lines. The player can hover over or long-press a dreamscape to preview
-its biome and available sites, then click it again to zoom the camera in to that
-dreamscape.
+The Dream Atlas is the world map players navigate after Dreamcaller selection
+and quest bootstrap. It shows a 3D map of dreamscapes represented as circular
+miniature "worlds," connected by dotted lines. The player can hover over or
+long-press a dreamscape to preview its biome and available sites, then click it
+again to zoom the camera in to that dreamscape.
 
 Each dreamscape can be in one of three states:
 
@@ -665,9 +673,6 @@ dreamcaller, dreamsigns, and deck for the battle is selected from a pool of
 opponents defined in TOML for a given completion level. Difficulty scaling is
 configured in TOML.
 
-The Dreamcaller Draft site is distinct and always appears in the first
-dreamscape visited, and only in that dreamscape.
-
 ### Enhanced Sites
 
 Each dreamscape is associated with a specific "biome" which dictates the 3D
@@ -689,53 +694,6 @@ visited. The available enhanced sites are:
 - **Duplication**: The player may select which card in their deck is duplicated
 - **Specialty Shop**: The player may select any number of the offered cards to
   add to their deck.
-
-## Tide Crystals
-
-Tide crystals are the resource system that governs which cards a player can play
-during a battle. Each card has a **tide cost** indicating how many crystals of
-its tide are required to play it:
-
-- Most cards cost **1** tide crystal of their tide.
-- Cards that heavily commit to a specific archetype may cost **2 or 3** crystals
-  of their tide.
-- **Wild** cards cost **0** tide crystals and can always be played regardless of
-  crystal state.
-- No cards currently require crystals from multiple different tides.
-
-### Crystal Pool Generation
-
-Before each battle begins, a **crystal pool** is assembled based on the
-composition of the player's deck. The algorithm functions like a skilled Magic:
-the Gathering deck builder designing a mana base — it asks "what distribution of
-tide crystals would be most likely to let this player play their cards on
-curve?" The crystal pool is a fixed list of approximately 30 crystals.
-
-The design goal is that **mono-tide decks can be played without any thought
-about crystals**, while **splashing additional tides carries added cost** and
-requires deliberate investment. Players who want to play cards from multiple
-tides must plan accordingly.
-
-### Crystal Accumulation During Battle
-
-During each **Dreamwell phase** of a battle, the player receives 1 random
-crystal drawn from their crystal pool. Crystals accumulate over the course of
-the battle, with a **cap of 3 crystals per tide**. If the crystal pool is
-somehow exhausted, a randomized second copy is generated.
-
-### Acquiring Additional Crystals
-
-Players have several ways to improve their tide crystal situation beyond the
-automatic Dreamwell phase allocation:
-
-- **Dreamcallers** grant 1 permanent tide crystal of their associated tide. The
-  player starts each battle already having this crystal in play.
-- **Shops** sell the ability to gain a tide crystal in exchange for essence,
-  allowing the player to start battles with a pre-purchased crystal in play.
-  This is a key tool for enabling multi-tide decks.
-- **Cards** — certain cards will be designed that generate tide crystals as part
-  of their effects, allowing players to fix their tide pool and play cards from
-  multiple tides.
 
 ## Implementation Strategy and QA
 
