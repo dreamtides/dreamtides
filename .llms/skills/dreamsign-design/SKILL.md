@@ -33,6 +33,13 @@ both.
   removed**.
 - A Dreamsign is **not** a Dreamcaller. It should usually be narrower, smaller,
   and less build-defining.
+- Simplicity is a primary quality bar for all Dreamsigns.
+- A good Dreamsign should usually read as **one idea**.
+- Prefer a single persistent rule.
+- A second clause is allowed only when it is structurally necessary and clearly
+  serves the same idea.
+- If the design reads like a bundle of bonuses, restart from the strongest
+  single hook.
 - Dreamsigns may be:
   - **Battle-facing**
   - **Quest-facing**
@@ -45,7 +52,38 @@ both.
 - Never design a Dreamsign with an activated ability.
 - Use battle triggered abilities rarely. Prefer static text.
 - Triggered abilities outside battle are fine.
+- Do not use `At quest start` unless the design is explicitly for a Dreamsign
+  granted during run bootstrap. Dreamsigns are usually gained mid-run, so
+  prefer static text or timings like `When you gain this`.
 - Avoid narrative writing. Output ability text and mechanical justification only.
+
+## Simplicity Rule
+
+All Dreamsigns, whether Battle, Quest, or Hybrid, must clear a high simplicity
+bar.
+
+Ask these questions before finalizing:
+
+- Can the design be explained as one sentence of player-facing strategy?
+- Does every clause point at the same deck pattern or run decision?
+- Would removing one clause make the design cleaner without losing its identity?
+- Is this expressing one strong hook rather than several medium hooks?
+
+Default target:
+
+- 1 sentence of rules text
+
+Soft maximum:
+
+- 2 sentences, only if both are tightly linked
+
+Failure cases:
+
+- multiple unrelated rewards
+- separate setup and payoff packages that do not reinforce the same behavior
+- sampler-platter designs trying to represent every source card
+- hybrid designs whose quest and battle text could be split into two different
+  Dreamsigns
 
 ## What Good Dreamsigns Do
 
@@ -99,6 +137,8 @@ into a Dreamtides-native Dreamsign.
 Guidelines:
 
 - Do not search for literal copies. Extract the useful gameplay dynamics.
+- If multiple source cards are provided, do not treat them as a checklist of
+  mechanics to cover. Extract the strongest shared pattern and discard the rest.
 - Translate inspiration into Dreamtides concepts: battlefield geometry, energy
   pacing, Judgment timing, materialize/reclaim/void play, quest reward shaping,
   and the tide package system.
@@ -120,6 +160,8 @@ Guidelines:
 - Treat relics and artifacts as examples of combat pacing, board incentives,
   and tactical texture.
 - Do not port numbers, cadence, or wording directly.
+- If multiple relics or artifacts are provided, do not try to cover all of
+  them. Capture the single strongest shared combat texture.
 - Start by asking what makes the source relic feel strong in combat:
   smoothing, tempo, survivability, payoff concentration, or a specific combat
   stance.
@@ -144,6 +186,9 @@ Guidelines:
 - Treat relics and artifacts as examples of pacing, incentives, and run
   texture.
 - Do not port numbers or wording directly.
+- If multiple relics or artifacts are provided, do not try to represent each
+  one with a separate clause. Identify the strongest shared run-level behavior
+  and build only around that.
 - Start by asking what strategic behavior the source relic rewards across a
   run: greed, risk-taking, drafting narrow cards, conserving health, hitting
   shops, routing toward elites, and so on.
@@ -195,6 +240,14 @@ Then identify the design's job:
 - reward shaper
 - risk/reward modifier
 
+Then state the single player behavior this Dreamsign is meant to change.
+
+- Examples: hoard essence longer, route harder toward Dreamsign sites, spend
+  aggressively at shops, draft narrower cards, hold reserve characters for a
+  later payoff.
+- If you cannot describe one dominant behavior in one sentence, the concept is
+  too diffuse.
+
 If the design starts looking like a full archetype engine, shrink it.
 
 For relic/artifact inspiration specifically:
@@ -215,6 +268,7 @@ For each concept, sanity check:
 - Is this smaller than a Dreamcaller?
 - If battle-facing, what tides or tide bridges want it?
 - If quest-facing, what quest decision does it change?
+- Does the concept still read as one idea rather than a package of rewards?
 - Is the text mainly static?
 - Is it too generic?
 - Is it too much bookkeeping for too little payoff?
@@ -233,6 +287,13 @@ Choose the single best concept using this priority order:
 6. Novel enough to be worth existing
 
 Refine until the Dreamsign text is concise and stable.
+
+Apply a clause budget:
+
+- Default target: 1 sentence of rules text
+- Maximum: 2 sentences only if both clauses express one unified idea
+- If the design needs three or more separate payouts, triggers, or rewards,
+  compress or discard it
 
 ## Design Heuristics
 
@@ -327,8 +388,16 @@ Before answering, verify:
 - battle triggers used only if clearly worth it
 - battle-facing design is tide-connected
 - quest-facing design uses real quest systems
+- the Dreamsign is simple enough to understand at a glance
+- the text expresses one idea, not a package of bonuses
+- each clause reinforces the same behavior or board pattern
+- removing any clause would meaningfully damage the design's identity
 - the effect is persistent and appropriate from turn 1
 - the design augments more than it defines
+- no `At quest start` wording unless the Dreamsign is explicitly granted during
+  run bootstrap
+- if multiple inspirations were provided, the final design captures their
+  shared feeling rather than attempting one-to-one feature coverage
 - no clause redundantly re-states an existing keyword's built-in functionality
 - the final output contains only one Dreamsign design unless the user asks for
   more
