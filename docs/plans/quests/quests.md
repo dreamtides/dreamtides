@@ -108,10 +108,10 @@ For quests, the important consequences are:
   tides plus a chosen optional subset.
 - Draft pools, Dreamsign pools, shops, and reward generators all key off these
   package tides.
-- Battles themselves use the core
-  [battle rules](../../battle_rules/battle_rules.md) resource model: cards are
-  paid for with **energy**, and energy production comes from the shared
-  **Dreamwell** rather than from tide-specific resources.
+- Battles themselves use the core [battle
+  rules](../../battle_rules/battle_rules.md) resource model: cards are paid for
+  with **energy**, and energy production comes from the shared **Dreamwell**
+  rather than from tide-specific resources.
 
 Cards and Dreamsigns may still expose one of the seven display tides
 (Bloom/Arc/Ignite/Pact/Umbra/Rime/Surge, plus Neutral) for iconography and card
@@ -236,13 +236,13 @@ Icon: "Sword"
 
 ### Draft
 
-The Draft site allows users to add cards to their deck via the
-[Draft Pool Construction](#draft-pool-construction) system. Each draft site
-provides 5 picks from the ongoing run multiset. Each pick shows 4 unique cards
-sampled from the remaining pool, weighted by remaining copies. Revealed cards
-are spent immediately whether or not they are chosen, so a Draft site always
-burns real run inventory. There is no default skip or reroll for draft picks,
-though dreamsigns and journeys may still override this.
+The Draft site allows users to add cards to their deck via the [Draft Pool
+Construction](#draft-pool-construction) system. Each draft site provides 5 picks
+from the ongoing run multiset. Each pick shows 4 unique cards sampled from the
+remaining pool, weighted by remaining copies. Revealed cards are spent
+immediately whether or not they are chosen, so a Draft site always burns real
+run inventory. There is no default skip or reroll for draft picks, though
+dreamsigns and journeys may still override this.
 
 **UI:** The cards available for the current pick are shown in multiple rows. The
 available cards animate in to be selected. Clicking a card animates it to the
@@ -284,9 +284,9 @@ Icon: "Crown"
 
 ### Specialty Shop
 
-A specialty shop operates in a similar manner to
-[Battle Rewards](#battle-rewards), showing a curated selection of powerful cards
-that prefer the run's selected package tides and then tighten further around the
+A specialty shop operates in a similar manner to [Battle
+Rewards](#battle-rewards), showing a curated selection of powerful cards that
+prefer the run's selected package tides and then tighten further around the
 player's actual deck composition.
 
 Future iterations may experiment with more novel offerings, such as:
@@ -379,6 +379,18 @@ put the biggest random effects which can structurally change a quest or modify
 the user's entire deck. A close button is displayed in a similar manner to the
 shop screen allowing the user to reject the dream journey options.
 
+Some dream journeys are drawn with a distinct "cost" card frame, indicating that
+the journey has both a benefit and an associated cost the user must pay to
+accept it. Cost-framed journeys are drawn from the same pool and appear at
+ordinary Dream Journey sites alongside benefit-only journeys; the frame is
+purely a visual cue that a price is attached. When a cost-framed journey is
+accepted, the cost card resolves alongside the benefit, typically with its own
+effect animation, sound effect, and particle effect.
+
+All dream journeys are equally likely to appear: there is no rarity tier and no
+weighting between journey templates. Which journeys show up at a given site is
+determined purely by uniform random sampling from the journey pool.
+
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. The journey cards animate
 from the center of the NPC's chest at a small size and are shown side-by-side in
@@ -391,34 +403,11 @@ via a custom animation (e.g. cards might fade in and then be animated to the
 user's quest deck if the journey effect is "add 3 cards to your deck"). Once the
 effect animation completes, the camera pulls back to the map screen. A dream
 journey is a circular card image which displays its rules text on hover/long
-press.
+press. For cost-framed journeys, after the benefit animation completes the cost
+card animates to screen center and plays its own custom animation before the
+camera pulls back.
 
 Icon: "Moon + Star"
-
-### Tempting Offer
-
-A tempting offer is a site where the user is faced with a pair of dream journey
-options with positive effects, in a similar manner to the dream journey site.
-This time, however, each dream journey is also associated with a 'cost' card
-with its own card and description, showing some price to be paid to unlock the
-journey effect. The user may select an option to pay its cost and receive the
-benefit. A close button is displayed in a similar manner to the shop screen
-allowing the user to reject the dream journey options.
-
-**UI:** An NPC is shown who performs an animation and displays a speech bubble
-with some dialog when the camera arrives at this site. The journey/cost card
-pairs animate out from the center of the NPC's chest at a small scale in a
-staggered animation (identical to a Dream Journey). The cards are displayed in
-two rows, with the journey card on the left side of the row and the cost card on
-the right side of the row, and with a purple button displayed under each pair to
-select that option. Picking an option performs the same resolution animation as
-above, with the journey card first animating to a large size in the center of
-the screen, dissolving, and playing a custom effect animation, then the cost
-card animating to screen center and playing its custom animation. Journey and
-Cost cards will often have associated sound effects and particle effects for
-their abilities.
-
-Icon: "Law"
 
 ### Purge
 
@@ -593,12 +582,11 @@ Users may have only 1 dreamcaller.
 
 ## Banes
 
-Certain cards and dreamsigns, called "banes", can be given to the user during a
-quest, typically as a result of a [Tempting Offer](#tempting-offer) choice. Bane
-cards generally have negative effects when drawn, while bane dreamsigns provide
-ongoing negative effects on the quest. Bane cards can be [purged](#purge) as
-normal. Bane cards and bane dreamsigns can be removed via the
-[cleanse](#cleanse) site.
+Certain cards, called "banes", can be given to the user during a quest,
+typically as a result of the cost side of a [Dream Journey](#dream-journey).
+Bane cards generally have negative effects when drawn. Bane cards can be
+[purged](#purge) as normal. Bane cards can also be removed via the
+[cleanse](#cleanse) site. See [Banes](banes.md) for more information.
 
 ## Dream Atlas
 
@@ -686,7 +674,6 @@ visited. The available enhanced sites are:
 - **Dreamsign Offering/Dreamsign Draft**: A dreamsign draft is offered instead,
   or a draft is offered with an additional option
 - **Dream Journey**: A 3rd dream journey option is provided
-- **Tempting Offer**: 3 tempting offer options are displayed
 - **Purge**: Up to 6 cards can be removed from the deck
 - **Essence**: The essence amount given is doubled
 - **Transfiguration**: The player may select which card in their deck receives
