@@ -1,6 +1,6 @@
 ---
 name: dreamsign-design
-description: Design one Dreamtides Dreamsign from a Dreamcaller prompt or a pool of MTG cards, Slay the Spire relics, or Monster Train artifacts. Use when creating a new dreamsign, designing a quest relic, or turning outside inspiration into a battle, quest, or hybrid dreamsign.
+description: Design one Dreamtides Dreamsign from a Dreamcaller prompt, a pool of MTG cards, or Slay the Spire / Monster Train relic or artifact inspiration. Use when creating a new dreamsign, designing a quest relic, or translating outside inspiration into a battle, quest, or hybrid dreamsign.
 ---
 
 # Dreamsign Design Skill
@@ -108,23 +108,72 @@ Guidelines:
   more efficient.
 - Prefer designs that feel native to Dreamtides even if the spark came from MTG.
 
-### Mode 3: Monster Train / Slay the Spire Inspired
+### Mode 3A: Monster Train / Slay the Spire Inspired, Battle-Level
 
-Input: a pool of relics or artifacts from those games.
+Input: a pool of relics or artifacts whose appeal is mainly in-battle.
 
-Goal: capture the appealing run-shaping pattern of the relics while designing a
-Dreamsign that fits Dreamtides battles and quests.
+Goal: capture the appealing combat texture of the relics while designing a
+battle-facing Dreamsign that fits Dreamtides combat and tide structure.
 
 Guidelines:
 
-- Treat relics and artifacts as examples of pacing, incentives, and run texture.
+- Treat relics and artifacts as examples of combat pacing, board incentives,
+  and tactical texture.
+- Do not port numbers, cadence, or wording directly.
+- Start by asking what makes the source relic feel strong in combat:
+  smoothing, tempo, survivability, payoff concentration, or a specific combat
+  stance.
+- Then ask which Dreamtides tide package, board pattern, or judgment pattern
+  wants that feeling.
+- A strong battle Dreamsign in this mode should make a real tide shell feel
+  cleaner, sharper, or more threatening from turn 1 without becoming a generic
+  auto-pick.
+- Prefer effects that improve a deck's preferred board states over effects that
+  simply spray value every turn.
+- If the idea would fit equally well in nearly every battle deck, narrow it.
+
+### Mode 3B: Monster Train / Slay the Spire Inspired, Quest-Level
+
+Input: a pool of relics or artifacts whose appeal is mainly run-level.
+
+Goal: capture the appealing run-shaping pattern of the relics while designing a
+quest-facing Dreamsign that fits Dreamtides run structure.
+
+Guidelines:
+
+- Treat relics and artifacts as examples of pacing, incentives, and run
+  texture.
 - Do not port numbers or wording directly.
-- Lean toward compact, elegant augmentation effects.
-- Quest-facing or hybrid designs are especially natural in this mode, but
-  battle-facing designs are valid if they still obey Dreamtides battle
-  constraints.
+- Start by asking what strategic behavior the source relic rewards across a
+  run: greed, risk-taking, drafting narrow cards, conserving health, hitting
+  shops, routing toward elites, and so on.
+- Then map that behavior onto real Dreamtides quest systems such as draft
+  shaping, essence flow, map routing, reward modification, shops, or dreamsign
+  offers.
+- A strong quest Dreamsign in this mode should create better decisions, not
+  just more resources. It should make the player want to route, draft, or spend
+  differently.
+- Favor hooks that create a run identity with modest numbers over passive value
+  text that always pays out.
+- Only make this hybrid if the quest behavior and battle payoff clearly express
+  one unified idea.
 
 ## Design Workflow
+
+### Phase 0: Rules fidelity
+
+Before designing, write a short internal rules brief for every keyword, timing
+window, or zone interaction the Dreamsign touches.
+
+- Restate the exact gameplay meaning in your own words from the docs; do not
+  design from surface memory.
+- If the design uses or implies `Foresee`, `Reclaim`, `Materialize`,
+  `Dissolve`, `Banish`, `Judgment`, `Ending`, or reserve/deployed positioning,
+  verify that term before drafting text.
+- Do not add reminder text for functionality already contained in a keyword
+  unless the Dreamsign is intentionally modifying that functionality.
+- If any wording depends on a rules assumption, reopen the relevant doc and
+  resolve it before selecting a final concept.
 
 ### Phase 1: Understand the hook
 
@@ -147,6 +196,15 @@ Then identify the design's job:
 - risk/reward modifier
 
 If the design starts looking like a full archetype engine, shrink it.
+
+For relic/artifact inspiration specifically:
+
+- If the source's appeal is mostly about turn-to-turn combat states, use
+  **Mode 3A**.
+- If the source's appeal is mostly about run pacing, drafting, rewards, or map
+  choices, use **Mode 3B**.
+- If both are present, choose the stronger half first and only keep the other
+  half if the final design still reads as one compact idea.
 
 ### Phase 2: Internal brainstorm
 
@@ -195,6 +253,12 @@ Refine until the Dreamsign text is concise and stable.
 - The best battle Dreamsigns often make a tide package play a little cleaner,
   safer, or more explosive in its preferred board states.
 - If a battle design would be equally perfect in every deck, it has failed.
+- For STS / Monster Train combat inspiration, preserve the source relic's
+  feeling of strength by identifying the exact battle problem it solves, then
+  solving that problem in a tide-linked Dreamtides way.
+- Strong battle Dreamsigns from relic inspiration usually do one of three
+  things well: stabilize an archetype's weak draws, intensify its payoff turns,
+  or reward a board pattern that already matters.
 
 ### Quest-facing heuristics
 
@@ -210,6 +274,12 @@ Refine until the Dreamsign text is concise and stable.
   - bane handling
 - Favor effects that influence meaningful run choices instead of passively
   granting raw value every time something happens.
+- For STS / Monster Train run-level inspiration, preserve the source relic's
+  feeling of strength by turning it into a sharper decision economy rather than
+  a permanent fountain of free resources.
+- Strong quest Dreamsigns from relic inspiration usually make the player
+  meaningfully better at one style of run navigation: greedier, narrower,
+  more adaptive, or more committed.
 
 ### Hybrid heuristics
 
@@ -259,5 +329,6 @@ Before answering, verify:
 - quest-facing design uses real quest systems
 - the effect is persistent and appropriate from turn 1
 - the design augments more than it defines
+- no clause redundantly re-states an existing keyword's built-in functionality
 - the final output contains only one Dreamsign design unless the user asks for
   more
