@@ -66,7 +66,7 @@
     {
       "dreamsign_id": "dreamsign_010",
       "effect_text": "When you return an ally to hand, it costs 1\u25cf less this turn.",
-      "name": "Bead Trinket",
+      "name": "Bead Charm",
       "image_file": "amulet_6.png",
       "justification": "This little talisman already looks like a tool for handling things in hand, so reducing the cost to return an ally is a clean fit."
     },
@@ -920,7 +920,7 @@
     {
       "dreamsign_id": "dreamsign_132",
       "effect_text": "When you enter a new Dreamscape, gain essence equal to 20% of your current essence.",
-      "name": "Brown Worm",
+      "name": "Banded Worm",
       "image_file": "worm.png",
       "justification": "The worm curls back on itself, which matches carrying a percentage of your current essence into the next Dreamscape."
     },
@@ -1039,7 +1039,7 @@
     {
       "dreamsign_id": "dreamsign_149",
       "effect_text": "Your dream journey effects apply twice, if able",
-      "name": "Hook Worm",
+      "name": "Curled Tail",
       "image_file": "tall.png",
       "justification": "The long curled shape gives the sense of an effect stretching out and looping back on itself, which is the heart of double application."
     },
