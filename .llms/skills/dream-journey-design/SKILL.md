@@ -25,9 +25,11 @@ Make reasonable assumptions and proceed.
 
 Two different texts exist on every journey and serve different audiences:
 
-- **Ability text** — the short user-facing text shown on the journey card.
-  Soft cap of 100 characters. This is what the player actually reads
-  before deciding to embark.
+- **Ability text** — the user-facing text shown on the journey card,
+  written as natural prose. Short enough to read at a glance, but
+  coherent-sentence readability always wins over brevity. No hard length
+  target. This is what the player actually reads before deciding to
+  embark.
 - **Ability description** — the resolved mechanical specification for
   engineers implementing the journey. Unbounded length; not player-facing.
 
@@ -156,13 +158,24 @@ describe the actual mechanical effect in concrete game terms — what gets
 added, removed, changed, or triggered. Prose, metaphor, poetic framing,
 and implication are **not allowed**.
 
-The ability text is **also the player's reading experience**. It must be
-readable English that a player can parse at a glance. Being literal and
-mechanical is not license to write patch-note shorthand. Soft cap of
-**100 characters** — going slightly over is fine when it buys
-readability, but if you're drifting much further, use partial info-reveal
-(see below) and let the sub-choice UI carry the detail rather than
-compressing everything into slash-delimited keyword lists.
+The ability text is **also the player's reading experience**. Write it
+as natural prose — one or two coherent English sentences that parse on
+first read. Being literal and mechanical is not license to write
+patch-note shorthand or compressed keyword lists.
+
+**Do not compress language to hit a length target.** There is no hard
+character cap. Keep the text as short as it can be *while remaining a
+natural sentence*, and no shorter. A clear 160-character sentence beats
+a cryptic 90-character one every time. If shortening damages the flow —
+forces slashes, colons stacked mid-sentence, run-on keyword lists,
+telegraphic syntax, or awkward phrasing — lengthen it. If the mechanics
+are genuinely complex enough to resist prose, use partial info-reveal
+(see below) and let the sub-choice UI carry the detail, rather than
+squeezing everything into one compressed line.
+
+As a rough calibration: most journeys land in the 60-180 character
+range. That is a consequence of writing good prose for the mechanics at
+hand, not a target to aim at.
 
 - GOOD: "Add 3 Lunar Voyage cards to your deck."
 - GOOD: "Purge 3 random cards from your deck."
@@ -181,6 +194,15 @@ compressing everything into slash-delimited keyword lists.
   +1 draw / +1 Dreamwell energy. Or gain {dreamsign}." (patch-notes
   shorthand — fails the comprehensibility bar even though every piece is
   technically mechanical)
+- BAD: "Reach up to 4 times, ending on success. Each adds 1 Nightmare;
+  Dreamsign chance: 25/50/75/100%." (compressed — the slash-delimited
+  probability list and mid-sentence colon trade sentence flow for a few
+  saved characters)
+- GOOD: "Reach up to four times, stopping whenever you like. Each reach
+  adds a Nightmare bane to your deck, then offers a random Dreamsign
+  with a 25%, 50%, 75%, or 100% chance on the first through fourth
+  reach respectively; success ends the event." (prose — same mechanics,
+  reads as English sentences, and the length is earned by clarity)
 
 Use "add" (not "shuffle in") for deck insertions — shuffling is battle
 vocabulary, and the quest layer presents deck changes as additions.
@@ -327,6 +349,10 @@ sweeping Reshapes, Crossroads, and Horizons are equally valid. Pick the
 category that frames the design best and bias toward sweeping change
 within it.
 
+Mode 1 accepts an **optional preset category**. If the caller specifies
+one (recognized labels match Mode 2A), use that category instead of
+picking — and still bias toward sweeping change within it.
+
 ### Mode 2A: Category-based
 
 The user passes a category label (or omits it). Recognized labels:
@@ -351,8 +377,9 @@ costed Decree is also valid.
 
 ### Mode 3: Third-party inspired
 
-The user provides a pool of event descriptions from another game (Slay
-the Spire, Monster Train, or similar) as inspiration.
+The user provides one or more event descriptions from another game (Slay
+the Spire, Monster Train, or similar) as inspiration. A single event is
+a valid input — treat it the same as a pool of size one.
 
 - Do not search for literal copies. Extract the useful gameplay dynamics.
 - If multiple events are provided, do not treat them as a checklist of
@@ -390,9 +417,9 @@ For each concept, sanity check:
 
 - Does this match the category's central design question?
 - Is the cost (if any) proportional to the benefit?
-- Is the ability text under the 100-character soft cap (or close to it),
-  conveying the right information, and reading as a natural English
-  sentence?
+- Does the ability text read as a coherent, natural English sentence
+  (one or two sentences) that conveys the right information without
+  slashes, colons stacked mid-sentence, or keyword-list compression?
 - Is the player choice meaningful — would different runs make different
   calls?
 - Is this a 1:1 import from another game, or a Dreamtides-native design?
@@ -412,9 +439,10 @@ Choose the single best concept using this priority order:
 5. Cost (if any) is proportional and well-targeted
 6. Novel — not a near-copy of an existing journey or event
 
-Refine until the ability text reads cleanly under (or close to) the
-100-character soft cap and the ability description fully specifies the
-effect.
+Refine until the ability text reads as natural prose — a coherent
+English sentence (or at most two) with no patch-note shorthand — and
+the ability description fully specifies the effect. Do not trim for
+length at the cost of readability.
 
 ## Output Format
 
@@ -433,11 +461,12 @@ One line — `Mode N` plus a short label.
 One line — one of the 7 category names.
 
 ### Ability Text
-**Soft cap of 100 characters.** This is what the player sees on the
-journey card before opting in. Going slightly over is acceptable when it
-buys readability; drifting much further is a signal to switch to partial
-info-reveal. It must parse as natural English AND state every magnitude,
-range, and timing window. Information-reveal choices are baked in here.
+This is what the player sees on the journey card before opting in.
+Write it as natural prose — one or two coherent English sentences. No
+hard length cap; readability as a sentence is the priority, and brevity
+is earned only insofar as the prose stays natural. Do not compress to
+hit a target. It must state every magnitude, range, and timing window,
+and information-reveal choices are baked in here.
 
 ### Ability Description
 The resolved mechanical specification. No length limit — this is for
@@ -490,13 +519,14 @@ them.
 Before printing the design, verify:
 
 - Mode and category are stated and match the input
-- Ability text is at or near the 100-character soft cap (slight overruns
-  ok when they buy readability)
-- Ability text is literal, mechanical, AND reads as natural English —
-  no prose, metaphor, flavor, or patch-note shorthand. A reader should
-  know exactly what happens mechanically from the ability text alone,
-  including all magnitudes (or roll ranges), all timing windows, and
-  whether each identity/target is specific, chosen, or random
+- Ability text reads as one or two coherent English sentences — natural
+  prose, not compressed. If you had to use slashes, stacked mid-sentence
+  colons, or keyword-list shorthand to shorten it, lengthen it back out
+- Ability text is literal and mechanical — no flavor, metaphor, or
+  implication. A reader should know exactly what happens mechanically
+  from the ability text alone, including all magnitudes (or roll
+  ranges), all timing windows, and whether each identity/target is
+  specific, chosen, or random
 - Ability description fully specifies the effect — an implementer
   wouldn't have questions
 - If Mode 2B, the Cost / Benefit section is present
