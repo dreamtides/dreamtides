@@ -10,28 +10,28 @@
     {
       "dreamsign_id": "dreamsign_002",
       "effect_text": "When you play your first character in a turn, the next character you play this turn costs 2\u25cf less.",
-      "name": "Branch Tablet",
+      "name": "Pyramid Sigil",
       "image_file": "aertfact.png",
       "justification": "The branching panel feels like one action unlocking the next, which matches the first character setting up a cheaper second one."
     },
     {
       "dreamsign_id": "dreamsign_003",
       "effect_text": "The first character you play each turn costs 2\u25cf less if an ally left play this turn.",
-      "name": "Red Cap",
+      "name": "Amanita",
       "image_file": "amanita.png",
       "justification": "A mushroom after something leaves play fits the idea of new growth getting cheaper once an ally has died or been tucked away."
     },
     {
       "dreamsign_id": "dreamsign_004",
       "effect_text": "The first character you draw each turn costs 2\u25cf less until end of turn.",
-      "name": "Tide Ribbon",
+      "name": "Algae",
       "image_file": "algae.png",
       "justification": "The flowing algae ribbon suggests the first draw slipping forward into the rest of the turn, making the next character lighter to play."
     },
     {
       "dreamsign_id": "dreamsign_005",
       "effect_text": "The first character you play each turn costs 0\u25cf. Its spark becomes 1.",
-      "name": "Sun Apple",
+      "name": "Worm Apple",
       "image_file": "apple.png",
       "justification": "The apple is the simplest starter object here, so it suits a first character that comes down for free and leaves behind a little spark."
     },
@@ -45,28 +45,28 @@
     {
       "dreamsign_id": "dreamsign_007",
       "effect_text": "Your second event each turn costs 1\u25cf less.",
-      "name": "Cloud Lens",
+      "name": "Cloud Amulet",
       "image_file": "amulet_3.png",
       "justification": "The cloudy lens looks like a second look through haze, which is close enough to a second event costing less."
     },
     {
       "dreamsign_id": "dreamsign_008",
       "effect_text": "The first card you play each turn after you discard a card costs 1\u25cf less.",
-      "name": "Wolf Medallion",
+      "name": "Wolf Amulet",
       "image_file": "amulet_4.png",
       "justification": "The wolf mask suggests a hunt that only starts after something is shed, so the first card after a discard getting cheaper feels right."
     },
     {
       "dreamsign_id": "dreamsign_009",
       "effect_text": "When you return an ally to hand or banish an ally, the next character you play this turn costs 1\u25cf less.",
-      "name": "Claw Necklace",
+      "name": "Trinket Necklace",
       "image_file": "amulet_5.png",
       "justification": "The clawed necklace implies pulling something back into reach, which lines up with returning or banishing an ally and then easing the next character into play."
     },
     {
       "dreamsign_id": "dreamsign_010",
       "effect_text": "When you return an ally to hand, it costs 1\u25cf less this turn.",
-      "name": "Tool Talisman",
+      "name": "Fish Talisman",
       "image_file": "amulet_6.png",
       "justification": "This little talisman already looks like a tool for handling things in hand, so reducing the cost to return an ally is a clean fit."
     },
@@ -87,14 +87,14 @@
     {
       "dreamsign_id": "dreamsign_013",
       "effect_text": "The first character you materialize each turn has Unbound.",
-      "name": "Sky Medallion",
+      "name": "Spider Medallion",
       "image_file": "amulet_9.png",
       "justification": "The blue medallion feels airy and untethered, which matches the first materialized character each turn having Unbound."
     },
     {
       "dreamsign_id": "dreamsign_014",
       "effect_text": "Once per turn, when you abandon an ally, trigger its \u25b8 Materialized: ability.",
-      "name": "Travel Satchel",
+      "name": "Leather Satchel",
       "image_file": "bag_2.png",
       "justification": "A travel satchel is where you stow something before bringing it back out, so it fits abandoning an ally to trigger its effect."
     },
@@ -122,21 +122,21 @@
     {
       "dreamsign_id": "dreamsign_018",
       "effect_text": "When you play a character from your void, its \u25b8 Materialized: ability gains Echo",
-      "name": "Ringing Bell",
+      "name": "Bell",
       "image_file": "bell.png",
       "justification": "A bell is literally about triggering another ring after the first one, so it is a good stand-in for an ability that repeats and grows spark."
     },
     {
       "dreamsign_id": "dreamsign_019",
       "effect_text": "At end of turn, if you materialized 2 allies, trigger the last one's \u25b8 Materialized ability.",
-      "name": "Night Berry",
+      "name": "Belladonna",
       "image_file": "belladonna.png",
       "justification": "Belladonna is a poisonous night bloom, and that final burst of effect after two allies materialize has the same last-flash energy."
     },
     {
       "dreamsign_id": "dreamsign_020",
       "effect_text": "When a \u25b8 Materialized: ability of an ally triggers, that ally gains +1 base spark.",
-      "name": "Harvest Berries",
+      "name": "Berries",
       "image_file": "berries.png",
       "justification": "The clustered berries suggest many small yields building into one stronger harvest, which matches a trigger that adds base spark."
     },
@@ -150,7 +150,7 @@
     {
       "dreamsign_id": "dreamsign_022",
       "effect_text": "If you abandoned a character this turn, characters you materialize have unbound.",
-      "name": "Stone Bezoar",
+      "name": "Seed Cluster",
       "image_file": "bezoar.png",
       "justification": "A bezoar is a strange protective charm, so it can plausibly loosen restraints on the characters you materialize after an abandon."
     },
@@ -164,7 +164,7 @@
     {
       "dreamsign_id": "dreamsign_024",
       "effect_text": "While you control 3 or more Warriors, events you play gain Echo.",
-      "name": "Shadow Rose",
+      "name": "Black Rose",
       "image_file": "black_rose.png",
       "justification": "The black rose feels like a bloom that keeps repeating its own pattern, which works for events echoing while you have enough Warriors."
     },
@@ -185,49 +185,49 @@
     {
       "dreamsign_id": "dreamsign_027",
       "effect_text": "Your Warriors have Preeminence.",
-      "name": "Bone Horn",
+      "name": "Bone Pipe",
       "image_file": "bone.png",
       "justification": "The bone horn has a clear rallying-call feel, which fits Warriors carrying Preeminence as the front line."
     },
     {
       "dreamsign_id": "dreamsign_028",
       "effect_text": "Your events cost 1\u25cf less while you control 2+ Warriors.",
-      "name": "Spell Tome",
+      "name": "Red Book",
       "image_file": "book.png",
       "justification": "A spellbook naturally lowers the cost of the magic it contains, so the discount for events while you have enough Warriors lands cleanly."
     },
     {
       "dreamsign_id": "dreamsign_029",
       "effect_text": "Judgment: If you control 3 or more Warriors, draw a card.",
-      "name": "Paw Codex",
+      "name": "Paw Book",
       "image_file": "book_10.png",
       "justification": "The paw-marked codex hints at a pack in formation, which makes drawing a card once you control enough Warriors feel earned."
     },
     {
       "dreamsign_id": "dreamsign_030",
       "effect_text": "Supported Warriors have +1 spark and Preeminence.",
-      "name": "Tide Tome",
+      "name": "Cthulhu Book",
       "image_file": "book_11.png",
       "justification": "The jellyfish book looks like something sustained by the whole tide, which is a decent image for supported Warriors getting extra spark and stature."
     },
     {
       "dreamsign_id": "dreamsign_031",
       "effect_text": "Your Warriors cost 1\u25cf less.",
-      "name": "Bolt Tome",
+      "name": "Lightning Book",
       "image_file": "book_2.png",
       "justification": "The lightning book is the most direct cost-cutting image in the set, so it fits Warriors becoming cheaper to deploy."
     },
     {
       "dreamsign_id": "dreamsign_032",
       "effect_text": "Warriors in your void have Reclaim equal to their cost.",
-      "name": "Eye Grimoire",
+      "name": "Eye Book",
       "image_file": "book_3.png",
       "justification": "The eye grimoire feels like it keeps watch over what has fallen away, which suits Warriors in the void coming back with Reclaim."
     },
     {
       "dreamsign_id": "dreamsign_033",
       "effect_text": "Allied Figments count as Warriors.",
-      "name": "Skull Tome",
+      "name": "Skull Book",
       "image_file": "book_5.png",
       "justification": "The skull tome reads like a ledger of the dead, making it easy to accept Figments counting as full Warriors."
     },
@@ -241,35 +241,35 @@
     {
       "dreamsign_id": "dreamsign_035",
       "effect_text": "\u25b8 Judgment: If you have 4 or more allied Figments, gain 2\u25cf.",
-      "name": "Leaf Ledger",
+      "name": "Leaf Book",
       "image_file": "book_8.png",
       "justification": "The leaf ledger suggests a small stockpile of growth, so gaining energy when enough Figments are assembled feels plausible."
     },
     {
       "dreamsign_id": "dreamsign_036",
       "effect_text": "When you discard a card, materialize a Radiant Figment.",
-      "name": "Gem Codex",
+      "name": "Gem Book",
       "image_file": "book_9.png",
       "justification": "The gem codex radiates from the cover, which makes discarding a card and calling up a Radiant Figment feel like a spark from the pages."
     },
     {
       "dreamsign_id": "dreamsign_037",
       "effect_text": "Judgment: A random card in your hand costs 1\u25cf this turn.",
-      "name": "Potion Bowl",
+      "name": "Potion Mortar",
       "image_file": "bowl.png",
       "justification": "Grinding in a mortar is a good visual for narrowing a hand down, so a random card getting cheaper for the turn fits the bowl well."
     },
     {
       "dreamsign_id": "dreamsign_038",
       "effect_text": "Judgment: Lose 1\u25cf. Draw a card.",
-      "name": "Sweep Broom",
+      "name": "Broomstick",
       "image_file": "broomstick.png",
       "justification": "A broom sweeps something away and leaves room for what comes next, which is close enough to losing energy and drawing a card."
     },
     {
       "dreamsign_id": "dreamsign_039",
       "effect_text": "Judgment: Put the top 2 cards of your deck into your void.",
-      "name": "Frost Shard",
+      "name": "Ice Crystals",
       "image_file": "ice.png",
       "justification": "Ice naturally seals things under a cold layer, so putting the top two cards into the void feels like freezing them out of play."
     },
@@ -283,14 +283,14 @@
     {
       "dreamsign_id": "dreamsign_041",
       "effect_text": "Judgment: Gain 1\u25cf. When drafting cards, see 1 fewer choices.",
-      "name": "Shell Tokens",
+      "name": "Mushroom Caps",
       "image_file": "Champignon.png",
       "justification": "The layered shell-like tokens look like a payment laid out in advance, so gaining a little energy while surrendering one draft option feels like spending from a limited purse."
     },
     {
       "dreamsign_id": "dreamsign_042",
       "effect_text": "Judgment: Add a random fast card from the card pool to your hand.",
-      "name": "Prism Horn",
+      "name": "Rainbow Horn",
       "image_file": "horn_rainbow .png",
       "justification": "A bright horn feels like the sort of charm that sounds an instant response, which fits pulling a random fast card straight into hand."
     },
@@ -318,7 +318,7 @@
     {
       "dreamsign_id": "dreamsign_046",
       "effect_text": "\u25b8 Judgment: Return a random event you played last turn from your void to your hand.",
-      "name": "Hooded Idol",
+      "name": "Carved Relic",
       "image_file": "idol.png",
       "justification": "The hooded idol looks like something you petition for one lost favor, which makes calling a random event back from the void feel plausible."
     },
@@ -360,49 +360,49 @@
     {
       "dreamsign_id": "dreamsign_052",
       "effect_text": "With no allies in play, your events gain Echo.",
-      "name": "Lucky Clover",
+      "name": "Clover",
       "image_file": "clover.png",
       "justification": "Clover is the obvious luck charm, and events gaining Echo when you have no allies matches that solitary good-fortune vibe."
     },
     {
       "dreamsign_id": "dreamsign_053",
       "effect_text": "Once per turn, when you copy an event, gain 1\u25cf.",
-      "name": "Ember Button",
+      "name": "Ember Disc",
       "image_file": "damned_button.png",
       "justification": "A button is something you press to trigger a response, which fits getting a small burst of energy when you copy an event."
     },
     {
       "dreamsign_id": "dreamsign_054",
       "effect_text": "When you play an event, each focused ally gains +1 spark.",
-      "name": "Black Crow",
+      "name": "Crow",
       "image_file": "crow.png",
       "justification": "Crows are loud heralds, so having an event kindle allied spark feels like the bird calling the rest of the flock to attention."
     },
     {
       "dreamsign_id": "dreamsign_055",
       "effect_text": "Your events have reclaim equal to their cost.",
-      "name": "Bubbling Cauldron",
+      "name": "Cauldron",
       "image_file": "cauldron.png",
       "justification": "A cauldron is a vessel that keeps ingredients cycling, which matches reclaim behaving like a cost that gets brewed back into the event."
     },
     {
       "dreamsign_id": "dreamsign_056",
       "effect_text": "The first event you play from your void each turn costs 0\u25cf.",
-      "name": "Dark Knife",
+      "name": "Skull Dagger",
       "image_file": "dark_knife.png",
       "justification": "A knife cuts things down to size, which is a decent visual for making the first void-played event cost nothing."
     },
     {
       "dreamsign_id": "dreamsign_057",
       "effect_text": "The first event you reclaim each turn gains Echo.",
-      "name": "Dark Essence",
+      "name": "Shadow Droplet",
       "image_file": "dark-essense.png",
       "justification": "Dark liquid in a vial feels like stored power that can rebound, which suits the first reclaimed event also gaining Echo."
     },
     {
       "dreamsign_id": "dreamsign_058",
       "effect_text": "Characters with cost 5\u25cf or more in your void have Reclaim 3\u25cf.",
-      "name": "Eye Plant",
+      "name": "Eyeball Plant",
       "image_file": "creepy_plant.png",
       "justification": "The eye-like nodules make it feel watchful and stubborn, which is a reasonable image for a big void card hanging around with extra reclaim."
     },
@@ -430,7 +430,7 @@
     {
       "dreamsign_id": "dreamsign_062",
       "effect_text": "You may play fast events for 1\u25cf.",
-      "name": "Flash Powder",
+      "name": "Alchemical Powder",
       "image_file": "Alchemical_Powder.png",
       "justification": "Powder is the cleanest image for a quick burst of magic, so making fast events cheap reads like tossing a pinch into the spell."
     },
@@ -451,7 +451,7 @@
     {
       "dreamsign_id": "dreamsign_065",
       "effect_text": "When you play an event, kindle 1.",
-      "name": "Wax Candle",
+      "name": "Candle",
       "image_file": "candle.png",
       "justification": "A candle is the obvious spark source, so kindle 1 is basically the object doing what it does by existing."
     },
@@ -479,7 +479,7 @@
     {
       "dreamsign_id": "dreamsign_069",
       "effect_text": "When you kindle, double the amount of spark gained",
-      "name": "Gray Feathers",
+      "name": "Gray Feather",
       "image_file": "feathers.png",
       "justification": "A bundle of feathers feels like concentrated lift, so doubling kindle gains reads like piling more flight onto the same flame."
     },
@@ -507,7 +507,7 @@
     {
       "dreamsign_id": "dreamsign_073",
       "effect_text": "At the start of each battle, Foresee 3. Cards you leave on top this way cost 1\u25cf less.",
-      "name": "Hair Strand",
+      "name": "Hair Lock",
       "image_file": "hair.png",
       "justification": "Hair is something you comb into place, so arranging the top of the deck at battle start matches the image's strand-like order."
     },
@@ -521,21 +521,21 @@
     {
       "dreamsign_id": "dreamsign_075",
       "effect_text": "Once per turn, when you discard a card, gain 1\u25cf.",
-      "name": "Honeycomb",
+      "name": "Honeycombs",
       "image_file": "honeycombs.png",
       "justification": "Honeycomb stores sweetness in cells, so a discard paying back a small energy gain reads like a little harvest from the spent piece."
     },
     {
       "dreamsign_id": "dreamsign_076",
       "effect_text": "If you have discarded a card this turn, the first card you play from your void costs 1 less.",
-      "name": "Spiky Cactus",
+      "name": "Cactus",
       "image_file": "cactus .png",
       "justification": "A cactus only looks easy to touch after you have already dealt with the spikes, which is close enough to the first void play becoming cheaper after a discard."
     },
     {
       "dreamsign_id": "dreamsign_077",
       "effect_text": "Your events cost 1\u25cf less for each card you discarded this turn.",
-      "name": "Spice Blossom",
+      "name": "Spice Blossoms",
       "image_file": "cinnamon.png",
       "justification": "The spice pods suggest a turn getting more concentrated the longer you work it, so events costing less for each discard feels like the flavor intensifying."
     },
@@ -549,266 +549,266 @@
     {
       "dreamsign_id": "dreamsign_079",
       "effect_text": "The first time each turn you play a Spirit Animal, draw a card.",
-      "name": "Fish Totem",
+      "name": "Magic Fish",
       "image_file": "magic_fish.png",
       "justification": "A spirit animal is still an animal, and a fish totem reads like a charm you call on when the turn begins. Catching one should loosen the next card from the deck."
     },
     {
       "dreamsign_id": "dreamsign_080",
       "effect_text": "Allied characters with Judgment abilities have +1 spark.",
-      "name": "Mask Verdict",
+      "name": "Theater Mask",
       "image_file": "mask_2.png",
       "justification": "A mask fits judgment literally: it gives the ally a role to speak from. In a courtroom sort of way, that extra authority becomes spark."
     },
     {
       "dreamsign_id": "dreamsign_081",
       "effect_text": "Your deployed characters with two supporting characters have +2 spark.",
-      "name": "Necklace Bond",
+      "name": "Charm Bracelet",
       "image_file": "necklace.png",
       "justification": "Two supporting characters feel like matched charms on the same chain. The necklace image makes the pair read as a shared anchor that buffs the whole deployed line."
     },
     {
       "dreamsign_id": "dreamsign_082",
       "effect_text": "Allied Survivors have +2 spark.",
-      "name": "Mushroom Survivor",
+      "name": "Pig Nose",
       "image_file": "pig_nouse.png",
       "justification": "A mushroom survives by coming back after pressure, which is close enough to a Survivor tribe. The image sells hardiness more than elegance, which is the point."
     },
     {
       "dreamsign_id": "dreamsign_083",
       "effect_text": "Your deployed characters that share a subtype with another deployed character you control have +2 spark.",
-      "name": "Leaf Kin",
+      "name": "Oak Leaf",
       "image_file": "oak_leaf.png",
       "justification": "Leaves on the same branch are the same sort of thing, just not quite the same leaf. That is a decent squint-match for a subtype bonus."
     },
     {
       "dreamsign_id": "dreamsign_084",
       "effect_text": "Your characters with cost 5\u25cf or more have +2 spark.",
-      "name": "Opal Crown",
+      "name": "Opal",
       "image_file": "opal.png",
       "justification": "Opals are precious enough to feel like the expensive end of the roster. Bigger, costlier characters getting more spark reads like the prize stone lighting them up."
     },
     {
       "dreamsign_id": "dreamsign_085",
       "effect_text": "While you control the deployed character with the highest spark, your deployed characters have +1 spark.",
-      "name": "Orb Apex",
+      "name": "Crystal Orb",
       "image_file": "magic_ball_2.png",
       "justification": "The highest-spark character becomes the focal point, and the orb makes that feel literal. Once one piece is ahead, the whole board seems to orbit it."
     },
     {
       "dreamsign_id": "dreamsign_086",
       "effect_text": "Your deployed characters have +1 spark while your reserve is empty.",
-      "name": "Nest Empty",
+      "name": "Egg Nest",
       "image_file": "nest.png",
       "justification": "An empty reserve feels like an emptied nest: everything has already been committed to the field. That makes the deployed team feel more settled and stronger."
     },
     {
       "dreamsign_id": "dreamsign_087",
       "effect_text": "Supported allies have +1 spark and Dread 1.",
-      "name": "Jelly Dread",
+      "name": "Eyeball Slime",
       "image_file": "monster_jelly.png",
       "justification": "A many-eyed slime can support allies while still being unsettling. The dread rider feels like a creepy aura that clings to anything standing near it."
     },
     {
       "dreamsign_id": "dreamsign_088",
       "effect_text": "The first character you play each turn materializes with +1 spark.",
-      "name": "Key First",
+      "name": "Silver Key",
       "image_file": "key_2.png",
       "justification": "The first character is the one that unlocks the turn, so a key is a natural stand-in. It starts the board state and gets a little extra force."
     },
     {
       "dreamsign_id": "dreamsign_089",
       "effect_text": "Characters you materialize gain +1 spark for each other character materialized this turn.",
-      "name": "Larva Brood",
+      "name": "Larva",
       "image_file": "larva.png",
       "justification": "Larvae get stronger by existing in numbers, which is basically what this effect does. Each extra materialized ally makes the next one feel more alive."
     },
     {
       "dreamsign_id": "dreamsign_090",
       "effect_text": "Allied characters materialize with +1 spark for each ally that left play this turn.",
-      "name": "Feather Rise",
+      "name": "Phoenix Feather",
       "image_file": "phoenix_feather.png",
       "justification": "Phoenix feathers are the classic shorthand for rising after something else falls. The more allies that left play, the more the next one can come back roaring."
     },
     {
       "dreamsign_id": "dreamsign_091",
       "effect_text": "Characters you return to hand gain +2 spark.",
-      "name": "Note Return",
+      "name": "Notes",
       "image_file": "note_2.png",
       "justification": "Something returned to hand feels like a note being taken back up and reread. Repeated handling makes it more charged, so the spark bump is easy to justify."
     },
     {
       "dreamsign_id": "dreamsign_092",
       "effect_text": "When an ally dissolves an enemy in judgment, it gains +2 spark.",
-      "name": "Knife Verdict",
+      "name": "Knife",
       "image_file": "knife.png",
       "justification": "A knife in judgment reads like the exacting edge of a sentence being carried out. If the ally finishes an enemy that way, it should absolutely come back sharper."
     },
     {
       "dreamsign_id": "dreamsign_093",
       "effect_text": "Your unblocked attackers score 1 additional point.",
-      "name": "Piranha Surge",
+      "name": "Piranha",
       "image_file": "piranha.png",
       "justification": "A piranha is built for slipping past defenses and making a bite count. Unblocked attackers scoring an extra point is the cleanest fish-logic fit here."
     },
     {
       "dreamsign_id": "dreamsign_094",
       "effect_text": "Your ally with the most spark scores double \u272a.",
-      "name": "Orb Echo",
+      "name": "Eye Orb",
       "image_file": "magic_ball.png",
       "justification": "The highest-spark ally is the one everything reflects around, and an orb suggests that central focus. Doubling its score feels like the board mirroring its brilliance."
     },
     {
       "dreamsign_id": "dreamsign_095",
       "effect_text": "When you dissolve or banish an enemy character, gain 2\u25cf and draw a card.",
-      "name": "Leech Drain",
+      "name": "Black Horn",
       "image_file": "leech.png",
       "justification": "A leech draining life and resources is almost the effect text in object form. If it helps kill or banish something, getting cards and energy back makes sense."
     },
     {
       "dreamsign_id": "dreamsign_096",
       "effect_text": "Whenever you banish a character, gain 1\u25cf.",
-      "name": "Poison Bane",
+      "name": "Poison Bottle",
       "image_file": "poison.png",
       "justification": "Poison is the obvious icon for stripping enemies away and turning that loss into value. Banishing feels like the cleanest way to squeeze energy out of the toxin."
     },
     {
       "dreamsign_id": "dreamsign_097",
       "effect_text": "When you abandon an ally, its \u25b8 Dissolved: ability gains Echo",
-      "name": "Letter Echo",
+      "name": "Sealed Letter",
       "image_file": "letter_2.png",
       "justification": "A letter can be passed on, copied, or answered later, which is a decent model for Echo. Abandoning an ally and leaving behind a louder version of its death text fits."
     },
     {
       "dreamsign_id": "dreamsign_098",
       "effect_text": "Allied characters have '\u25b8 Dissolved: Draw a card.'",
-      "name": "Parchment Blank",
+      "name": "Parchment",
       "image_file": "parchment.png",
       "justification": "Parchment is where a dissolved ally can leave behind a written afterimage of itself. Drawing a card off the dissolve reads like the page giving up one more line."
     },
     {
       "dreamsign_id": "dreamsign_099",
       "effect_text": "Once per turn, when an ally is dissolved, return a random character with lower cost from your void to hand.",
-      "name": "Root Recall",
+      "name": "Mandrake Root",
       "image_file": "mandragora.png",
       "justification": "A mandragora is a root that looks like it could drag something back from underground. Pulling a lower-cost character from the void is a reasonable plant spell."
     },
     {
       "dreamsign_id": "dreamsign_100",
       "effect_text": "When an ally is dissolved, materialize a random character with lower cost from your void.",
-      "name": "Mortar Yield",
+      "name": "Herb Mortar",
       "image_file": "mortar_pestle.png",
       "justification": "A mortar and pestle suggests grinding one thing down so something smaller can be recovered from it. That makes a recycled void character feel natural."
     },
     {
       "dreamsign_id": "dreamsign_101",
       "effect_text": "At the end of your turn, materialize a random character you abandoned this turn. It has 1 spark.",
-      "name": "Petal Return",
+      "name": "Flower Petals",
       "image_file": "petals.png",
       "justification": "Petals fall off, scatter, and then somehow show up again when the flower is done. An abandoned ally returning at end of turn fits that loop well enough."
     },
     {
       "dreamsign_id": "dreamsign_102",
       "effect_text": "When you draw your second card each turn, gain 1 maximum \u25cf.",
-      "name": "Shell Vault",
+      "name": "Clam Shell",
       "image_file": "mollusk.png",
       "justification": "A shell is a tiny vault that can hold a little more every time it closes. Gaining maximum energy when the second card lands feels like capacity opening up."
     },
     {
       "dreamsign_id": "dreamsign_103",
       "effect_text": "Your \u25cf is conserved between turns.",
-      "name": "Stone Reserve",
+      "name": "Philosopher Stone",
       "image_file": "philosopher's_Stone.png",
       "justification": "A philosopher's stone is the classic symbol for carrying value across turns without losing it. Conservation between turns is basically alchemy as bookkeeping."
     },
     {
       "dreamsign_id": "dreamsign_104",
       "effect_text": "Once per turn, when you play a \u21affast card, draw a card.",
-      "name": "Wand Quick",
+      "name": "Steel Wand",
       "image_file": "Magicwand.png",
       "justification": "A fast card should feel like a snap-cast wand flick. Drawing another card immediately is exactly the sort of twitchy spellwork a wand implies."
     },
     {
       "dreamsign_id": "dreamsign_105",
       "effect_text": "When you play your second character each turn, gain 1\u25cf.",
-      "name": "Key Pair",
+      "name": "Gold Key",
       "image_file": "key_3.png",
       "justification": "The second character is the partner that unlocks the rest of the turn, so a second key works cleanly. The image reads like a door opening on more energy."
     },
     {
       "dreamsign_id": "dreamsign_106",
       "effect_text": "Characters cost you 1\u25cf less if one of your characters scored points during that turn.",
-      "name": "Powder Catalyst",
+      "name": "Powder Bowl",
       "image_file": "powder_magic.png",
       "justification": "Powder is the sort of thing that makes a reaction go further once momentum already exists. If one ally scored points, cheaper characters as a follow-up feels right."
     },
     {
       "dreamsign_id": "dreamsign_107",
       "effect_text": "Characters with cost 5\u25cf or more cost you 2\u25cf less.",
-      "name": "Potion Reduction",
+      "name": "Purple Potion",
       "image_file": "potion.png",
       "justification": "A potion is the most direct alchemy image for making costly things easier to handle. Cutting big characters down in price feels like a brewed discount."
     },
     {
       "dreamsign_id": "dreamsign_108",
       "effect_text": "When you play a card with cost 5\u25cf or more, draw a card.",
-      "name": "Wand Spark",
+      "name": "Crystal Wand",
       "image_file": "magic_stick_2.png",
       "justification": "A larger card should feel like a deliberate spell with a little more weight to it. The wand image makes the extra draw read as a payoff for casting hard."
     },
     {
       "dreamsign_id": "dreamsign_109",
       "effect_text": "When you score points during Judgment, draw a card.",
-      "name": "Pin Mark",
+      "name": "Red Pin",
       "image_file": "pin.png",
       "justification": "A pin is how you mark a result or keep score in place, which suits Judgment well. If judgment points are happening, the pin can turn that into a follow-up draw."
     },
     {
       "dreamsign_id": "dreamsign_110",
       "effect_text": "At the end of your turn, if you played no cards during your main phase, gain 1\u272a.",
-      "name": "Maquis Bloom",
+      "name": "Poppy Flower",
       "image_file": "maquis.png",
       "justification": "A maquis flower blooming when you leave the turn quiet gives the effect a nice natural cadence. No cards played becomes the kind of stillness that earns a star."
     },
     {
       "dreamsign_id": "dreamsign_111",
       "effect_text": "At the end of your turn, if you played no characters this turn, draw a card.",
-      "name": "Tail Fortune",
+      "name": "Rabbit Tail",
       "image_file": "rabbit_tail.png",
       "justification": "A rabbit tail is a luck charm, and luck is exactly what you want when you end the turn with nothing in play. The empty board becomes a lucky draw instead."
     },
     {
       "dreamsign_id": "dreamsign_112",
       "effect_text": "The first time each turn your hand becomes empty, draw a card.",
-      "name": "Void Pot",
+      "name": "Green Cauldron",
       "image_file": "pot.png",
       "justification": "An empty pot is a container waiting to be refilled, so the first empty-hand trigger makes sense. Once the hand is spent, the pot gives back another card."
     },
     {
       "dreamsign_id": "dreamsign_113",
       "effect_text": "When 2 or more allies score points, draw a card, then discard a card.",
-      "name": "Staff Blend",
+      "name": "Root Staff",
       "image_file": "magic_stick_3.png",
       "justification": "A staff can stand in for two allies working together, and blending often ends with one thing being thrown away. Draw then discard feels like a rough magical mix."
     },
     {
       "dreamsign_id": "dreamsign_114",
       "effect_text": "The first card you buy at each Shop costs 25% less essence and gains a random transfiguration.",
-      "name": "Charm Options",
+      "name": "Charm Staff",
       "image_file": "magic_stick_6.png",
       "justification": "A charm-studded staff feels like a shop trinket that can bend the first purchase into something better. Extra transfiguration on the first buy reads like a little store magic."
     },
     {
       "dreamsign_id": "dreamsign_115",
       "effect_text": "The first card you purchase from each Shop is added to your deck twice.",
-      "name": "Mirror Copy",
+      "name": "Cracked Mirror",
       "image_file": "mirror.png",
       "justification": "A mirror is the cleanest object for duplication. Buying the first card twice is exactly what reflection does when you squint at it from the right angle."
     },
     {
       "dreamsign_id": "dreamsign_116",
       "effect_text": "Each Shop site provides 2 additional options.",
-      "name": "Magic Ball",
+      "name": "Cracked Orb",
       "image_file": "magic-ball.png",
       "justification": "A shop orb feels like a fortune-teller widening the menu instead of narrowing it. More options at each site is just the ball showing you a few extra futures."
     },
@@ -829,14 +829,14 @@
     {
       "dreamsign_id": "dreamsign_119",
       "effect_text": "After you buy a card at a Shop, replace it with another card.",
-      "name": "Scroll Swap",
+      "name": "Sealed Scroll",
       "image_file": "scroll_3.png",
       "justification": "A scroll can be rewritten after the purchase, so the bought card gets replaced the way a revised order gets filed."
     },
     {
       "dreamsign_id": "dreamsign_120",
       "effect_text": "If your deck has 35 or more cards, cards you add to it are transfigured.",
-      "name": "Stone Gate",
+      "name": "Blue Crystal",
       "image_file": "stone.png",
       "justification": "Once the deck is heavy enough, new cards have to pass through a stone threshold and come out altered."
     },
@@ -857,7 +857,7 @@
     {
       "dreamsign_id": "dreamsign_123",
       "effect_text": "At Transfiguration sites, when you transfigure an Event, add a copy of it to your deck.",
-      "name": "Rune Echo",
+      "name": "Rune Stone",
       "image_file": "rune.png",
       "justification": "A single rune is already a copied mark, so transfiguring an event into a duplicate feels like letting the inscription resonate."
     },
@@ -871,21 +871,21 @@
     {
       "dreamsign_id": "dreamsign_125",
       "effect_text": "Once each dreamscape, the first card you add to your deck without a transfiguration gains one.",
-      "name": "Blue Facet",
+      "name": "Glow Crystal",
       "image_file": "stone_2.png",
       "justification": "The first plain card picks up a new facet the way a crystal catches light the first time it is touched."
     },
     {
       "dreamsign_id": "dreamsign_126",
       "effect_text": "Cards you add to your deck from battle rewards gain a random applicable transfiguration.",
-      "name": "Petal Bloom",
+      "name": "Rose Petals",
       "image_file": "rose_petals.png",
       "justification": "Battle rewards scatter like petals, and each fallen petal can take on a different transfiguration as it lands."
     },
     {
       "dreamsign_id": "dreamsign_127",
       "effect_text": "At each Transfiguration site you visit, transfigure two cards instead of one.",
-      "name": "Rune Hoard",
+      "name": "Rune Sack",
       "image_file": "runes.png",
       "justification": "A sack of runed stones looks packed with enough magic to push two cards through the site instead of one."
     },
@@ -899,35 +899,35 @@
     {
       "dreamsign_id": "dreamsign_129",
       "effect_text": "Double the essence you gain from essence sites.",
-      "name": "Twin Ring",
+      "name": "Star Badge",
       "image_file": "Ring_2.png",
       "justification": "A second ring naturally reads as a doubled payout, so the essence gain cleanly becomes twice what it was."
     },
     {
       "dreamsign_id": "dreamsign_130",
       "effect_text": "At each Essence site, you may forgo the essence gain to purge 2 cards from your deck.",
-      "name": "Purge Sickle",
+      "name": "Sickle",
       "image_file": "sickle.png",
       "justification": "A sickle is a cutting tool, so forgoing the essence to trim two cards feels like a neat harvest."
     },
     {
       "dreamsign_id": "dreamsign_131",
       "effect_text": "When you Purge a card, gain 50 essence.",
-      "name": "Skull Toll",
+      "name": "Human Skull",
       "image_file": "skull_2.png",
       "justification": "A skull feels like the kind of marker that charges a price for every card you purge, turning each removal into essence."
     },
     {
       "dreamsign_id": "dreamsign_132",
       "effect_text": "When you enter a new Dreamscape, gain essence equal to 20% of your current essence.",
-      "name": "Loop Worm",
+      "name": "Brown Worm",
       "image_file": "worm.png",
       "justification": "The worm curls back on itself, which matches carrying a percentage of your current essence into the next Dreamscape."
     },
     {
       "dreamsign_id": "dreamsign_133",
       "effect_text": "While you have at least 300 essence, Draft picks show 1 additional card.",
-      "name": "Urchin Crown",
+      "name": "Sea Urchin",
       "image_file": "sea_urchin.png",
       "justification": "The many spines make it feel like an abundance crown, which suits getting an extra draft choice when essence is already high."
     },
@@ -941,7 +941,7 @@
     {
       "dreamsign_id": "dreamsign_135",
       "effect_text": "When you draft cards, see an additional choice.",
-      "name": "Wing Fan",
+      "name": "Feather Fan",
       "image_file": "wing.png",
       "justification": "A wing opens the view, and an extra draft choice is basically one more card in the fan."
     },
@@ -955,28 +955,28 @@
     {
       "dreamsign_id": "dreamsign_137",
       "effect_text": "Before each battle, if you have more than 30 cards in your deck, you may purge cards of your choice while remaining at or above 30 cards.",
-      "name": "Scorpion Clamp",
+      "name": "Scorpion",
       "image_file": "scorpion.png",
       "justification": "A scorpion clamps down hard, like the pre-battle purge that trims the deck while still respecting the 30-card floor."
     },
     {
       "dreamsign_id": "dreamsign_138",
       "effect_text": "After you draw your opening hand, you may discard any number of cards, then draw that many.",
-      "name": "Tongue Flick",
+      "name": "Tongue",
       "image_file": "tongue.png",
       "justification": "A tongue flicks out, grabs a few cards, and tosses them back, which mirrors discard-then-draw perfectly."
     },
     {
       "dreamsign_id": "dreamsign_139",
       "effect_text": "When you gain this dreamsign, you may purge up to 4 starter cards from your deck.",
-      "name": "Twin Teeth",
+      "name": "Paired Teeth",
       "image_file": "teeaths.png",
       "justification": "Pulling starter cards out feels like extracting teeth, and the paired set keeps the loss tidy."
     },
     {
       "dreamsign_id": "dreamsign_140",
       "effect_text": "When you gain this dreamsign, pick an event card in your deck. That card is always in your opening hand.",
-      "name": "Tea Cup",
+      "name": "Spotted Goblet",
       "image_file": "tea.png",
       "justification": "An event card kept in your opening hand is like a cup served first: it is there before anything else has happened."
     },
@@ -990,21 +990,21 @@
     {
       "dreamsign_id": "dreamsign_142",
       "effect_text": "After each battle, you may purge a card from your deck.",
-      "name": "Slug Shed",
+      "name": "Conch Shell",
       "image_file": "slug.png",
       "justification": "A slug sheds and slimes its way onward, which matches getting one post-battle card out of the deck."
     },
     {
       "dreamsign_id": "dreamsign_143",
       "effect_text": "After each battle, you may duplicate a card in your deck.",
-      "name": "Spider Weave",
+      "name": "Spider",
       "image_file": "spider.png",
       "justification": "A spider naturally makes copies in a web, so duplicating a card after battle feels like a fresh strand."
     },
     {
       "dreamsign_id": "dreamsign_144",
       "effect_text": "Instead of receiving Battle Reward cards, choose a card in your deck and duplicate it.",
-      "name": "Slime Bloom",
+      "name": "Green Slime",
       "image_file": "speaces.png",
       "justification": "The slime mound can split and bulge into another copy, which suits choosing one card and duplicating it outright."
     },
@@ -1018,7 +1018,7 @@
     {
       "dreamsign_id": "dreamsign_146",
       "effect_text": "After winning a battle, you are offered a Dreamsign Draft instead of the battle reward pick.",
-      "name": "Cheese Wedge",
+      "name": "Red Wedge",
       "image_file": "red_cheese.png",
       "justification": "A flashy wedge can be traded instead of taken as-is, which makes the battle reward turning into a draft pick believable."
     },
@@ -1032,14 +1032,14 @@
     {
       "dreamsign_id": "dreamsign_148",
       "effect_text": "In each dreamscape, one additional site is Enhanced.",
-      "name": "Red Gem",
+      "name": "Red Shard",
       "image_file": "stone-red.png",
       "justification": "A bright faceted gem looks like a site that has been polished into a stronger, better-lit version."
     },
     {
       "dreamsign_id": "dreamsign_149",
       "effect_text": "Your dream journey effects apply twice, if able",
-      "name": "Worm Coil",
+      "name": "Hook Worm",
       "image_file": "tall.png",
       "justification": "The long curled shape gives the sense of an effect stretching out and looping back on itself, which is the heart of double application."
     },
@@ -1074,7 +1074,7 @@
     {
       "dreamsign_id": "dreamsign_154",
       "effect_text": "Draw 2 additional cards during your draw step. At the end of each turn, discard your hand.",
-      "name": "Twin Horns",
+      "name": "Antler Branch",
       "image_file": "horns.png",
       "justification": "Twin horns suggest abundance tipping into excess, which matches drawing more cards than you can comfortably keep and shedding the rest at turn end."
     }
