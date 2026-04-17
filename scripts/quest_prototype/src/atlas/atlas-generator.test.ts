@@ -28,13 +28,15 @@ beforeEach(() => {
 });
 
 describe("generateSiteComposition", () => {
-  it("produces 3-6 sites for level 0 first dreamscape", () => {
-    for (let i = 0; i < 50; i++) {
-      resetAtlasGenerator();
-      const sites = generateSiteComposition(0, true, defaultContext());
-      expect(sites.length).toBeGreaterThanOrEqual(3);
-      expect(sites.length).toBeLessThanOrEqual(6);
-    }
+  it("uses the fixed opening site layout for the first dreamscape", () => {
+    const sites = generateSiteComposition(0, true, defaultContext());
+    expect(sites.map((site) => site.type)).toEqual([
+      "Draft",
+      "Draft",
+      "DreamsignDraft",
+      "DreamJourney",
+      "Battle",
+    ]);
   });
 
   it("produces 3-6 sites for level 0 non-first dreamscape", () => {
@@ -227,6 +229,22 @@ describe("generateInitialAtlas", () => {
       );
       expect(dist).toBeCloseTo(200, 0);
     }
+  });
+
+  it("gives the auto-entered opening node the deterministic site mix", () => {
+    const atlas = generateInitialAtlas(0, defaultContext());
+    expect(atlas.nodes["dreamscape-1"]?.sites.map((site) => site.type)).toEqual([
+      "Draft",
+      "Draft",
+      "DreamsignDraft",
+      "DreamJourney",
+      "Battle",
+    ]);
+  });
+
+  it("keeps the other starting node on the normal level-0 site pool", () => {
+    const atlas = generateInitialAtlas(0, defaultContext());
+    expect(atlas.nodes["dreamscape-2"]?.sites.some((site) => site.type === "DreamJourney")).toBe(false);
   });
 
 });

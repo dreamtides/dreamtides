@@ -121,12 +121,51 @@ export function additionalSiteTypesForLevel(
   );
 }
 
+function generateOpeningDreamscapeSites(): SiteState[] {
+  return [
+    {
+      id: nextSiteId(),
+      type: "Draft",
+      isEnhanced: false,
+      isVisited: false,
+    },
+    {
+      id: nextSiteId(),
+      type: "Draft",
+      isEnhanced: false,
+      isVisited: false,
+    },
+    {
+      id: nextSiteId(),
+      type: "DreamsignDraft",
+      isEnhanced: false,
+      isVisited: false,
+    },
+    {
+      id: nextSiteId(),
+      type: "DreamJourney",
+      isEnhanced: false,
+      isVisited: false,
+    },
+    {
+      id: nextSiteId(),
+      type: "Battle",
+      isEnhanced: false,
+      isVisited: false,
+    },
+  ];
+}
+
 /** Generates the site composition for a dreamscape. Total: 3-6 sites. */
 export function generateSiteComposition(
   completionLevel: number,
-  _isFirstDreamscape: boolean,
+  isFirstDreamscape: boolean,
   context: SiteGenerationContext,
 ): SiteState[] {
+  if (isFirstDreamscape) {
+    return generateOpeningDreamscapeSites();
+  }
+
   const sites: SiteState[] = [];
 
   // Draft sites based on completion level
@@ -274,7 +313,7 @@ export function generateInitialAtlas(
     const node = createNode(
       { x, y },
       completionLevel,
-      true,
+      i === 0,
       [nexusId],
       context,
       usedBiomeNames,
