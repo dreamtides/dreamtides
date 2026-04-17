@@ -250,7 +250,9 @@ function createNode(
   const id = nextNodeId();
   const biome = assignBiome(usedBiomeNames);
   const sites = generateSiteComposition(completionLevel, isFirstDreamscape, context);
-  const enhancedSiteType = applyBiomeEnhancement(sites, biome);
+  const enhancedSiteType = isFirstDreamscape
+    ? null
+    : applyBiomeEnhancement(sites, biome);
 
   logEvent("atlas_node_generated", {
     nodeId: id,

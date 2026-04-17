@@ -24,6 +24,14 @@ body {
   min-height: 100vh;
 }
 
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 @media (min-width: 1280px) {
   .draft-pack-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr)) !important;

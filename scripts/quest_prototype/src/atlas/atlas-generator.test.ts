@@ -242,6 +242,15 @@ describe("generateInitialAtlas", () => {
     ]);
   });
 
+  it("never enhances sites in the opening dreamscape", () => {
+    const atlas = generateInitialAtlas(0, defaultContext());
+
+    expect(atlas.nodes["dreamscape-1"]?.enhancedSiteType).toBeNull();
+    expect(
+      atlas.nodes["dreamscape-1"]?.sites.every((site) => !site.isEnhanced),
+    ).toBe(true);
+  });
+
   it("keeps the other starting node on the normal level-0 site pool", () => {
     const atlas = generateInitialAtlas(0, defaultContext());
     expect(atlas.nodes["dreamscape-2"]?.sites.some((site) => site.type === "DreamJourney")).toBe(false);

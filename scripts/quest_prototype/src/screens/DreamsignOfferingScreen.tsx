@@ -19,6 +19,7 @@ export function DreamsignOfferingScreen({
 }: DreamsignOfferingScreenProps) {
   const { state, mutations, questContent } = useQuest();
   const { dreamsigns: currentDreamsigns } = state;
+  const selectedPackageTides = state.resolvedPackage?.selectedTides ?? [];
 
   const optionCount = site.isEnhanced ? 3 : 1;
   const revealedRef = useRef<ReturnType<typeof drawDreamsignOptions> | null>(null);
@@ -26,6 +27,7 @@ export function DreamsignOfferingScreen({
     revealedRef.current = drawDreamsignOptions(
       state.remainingDreamsignPool,
       questContent.dreamsignTemplates,
+      selectedPackageTides,
       optionCount,
     );
   }
@@ -264,16 +266,6 @@ function DreamsignCard({ dreamsign }: { dreamsign: Dreamsign }) {
         frameClassName="border border-fuchsia-300/25 shadow-[0_0_18px_rgba(168,85,247,0.18)]"
         placeholderClassName="text-3xl text-fuchsia-100"
       />
-      <span
-        className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-        style={{
-          background: "rgba(168, 85, 247, 0.16)",
-          color: "#d8b4fe",
-          border: "1px solid rgba(192, 132, 252, 0.4)",
-        }}
-      >
-        Dreamsign
-      </span>
       <h3
         className="text-center text-base font-bold"
         style={{ color: "#f5d0fe" }}

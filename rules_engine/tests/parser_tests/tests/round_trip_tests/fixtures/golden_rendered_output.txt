@@ -1,4 +1,4 @@
-A New Advenure|0|Draw 2 cards. Discard 2 cards. Gain <color=#00838F>2●</color>.
+A New Adventure|0|Draw 2 cards. Discard 2 cards. Gain <color=#00838F>2●</color>.
 Abolish|0|<color=#AA00FF>Prevent</color> a played card.
 Abomination of Memory|0|This character's spark is equal to the number of cards in your void.
 Abyssal Enforcer|0|▸ <b>Materialized:</b> Return an enemy to hand.

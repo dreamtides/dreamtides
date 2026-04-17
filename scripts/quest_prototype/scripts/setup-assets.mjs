@@ -111,6 +111,7 @@ export function transformDreamsign(dreamsign, altTextByImageName = new Map()) {
       altTextByImageName.get(dreamsign.image_name)
       ?? `${dreamsign.name} Dreamsign artwork`,
     effectDescription: dreamsign["rendered-text"] ?? "",
+    packageTides: Array.isArray(dreamsign.tides) ? [...dreamsign.tides] : [],
   };
 }
 

@@ -106,6 +106,7 @@ optional-tides = ["support", "tempo", "finish", "value"]
 id = "sign-1"
 name = "Test Sign"
 image_name = "test-sign.png"
+tides = ["core", "support"]
 rendered-text = "Use the canonical Dreamsign text."
 `,
     );
@@ -198,6 +199,7 @@ rendered-text = "Use the canonical Dreamsign text."
         imageName: "test-sign.png",
         imageAlt: "Small idol with a violet glow.",
         effectDescription: "Use the canonical Dreamsign text.",
+        packageTides: ["core", "support"],
       },
     ]);
     expect(existsSync(join(publicDir, "cards", "1.webp"))).toBe(true);

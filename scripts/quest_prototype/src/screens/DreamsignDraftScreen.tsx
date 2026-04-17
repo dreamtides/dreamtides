@@ -17,6 +17,7 @@ interface DreamsignDraftScreenProps {
 export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
   const { state, mutations, questContent } = useQuest();
   const { dreamsigns: currentDreamsigns } = state;
+  const selectedPackageTides = state.resolvedPackage?.selectedTides ?? [];
 
   const optionCount = site.isEnhanced ? 4 : 3;
   const revealedRef = useRef<ReturnType<typeof drawDreamsignOptions> | null>(null);
@@ -24,6 +25,7 @@ export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
     revealedRef.current = drawDreamsignOptions(
       state.remainingDreamsignPool,
       questContent.dreamsignTemplates,
+      selectedPackageTides,
       optionCount,
     );
   }
@@ -227,7 +229,7 @@ export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
         </div>
       )}
 
-      {/* Skip — both offered Dreamsigns leave the run pool */}
+      {/* Skip removes all currently shown Dreamsigns from the run pool. */}
       <button
         className="mt-8 rounded-lg px-6 py-2.5 text-base font-medium transition-colors"
         style={{
@@ -236,9 +238,9 @@ export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
           color: "#e2e8f0",
         }}
         onClick={handleSkip}
-        title="Skips this offering. Both shown Dreamsigns are removed from this run's pool."
+        title="Skips this offering. All shown Dreamsigns are removed from this run's pool."
       >
-        Skip (discards both Dreamsigns)
+        {options.length > 1 ? "Skip (discard both)" : "Skip"}
       </button>
     </motion.div>
   );
@@ -264,16 +266,6 @@ function DreamsignCard({ dreamsign }: { dreamsign: Dreamsign }) {
         frameClassName="border border-fuchsia-300/25 shadow-[0_0_18px_rgba(168,85,247,0.18)]"
         placeholderClassName="text-3xl text-fuchsia-100"
       />
-      <span
-        className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-        style={{
-          background: "rgba(168, 85, 247, 0.16)",
-          color: "#d8b4fe",
-          border: "1px solid rgba(192, 132, 252, 0.4)",
-        }}
-      >
-        Dreamsign
-      </span>
       <h3
         className="text-center text-sm font-bold"
         style={{ color: "#f5d0fe" }}
