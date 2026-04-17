@@ -1,0 +1,139 @@
+[[dreamsign]]
+id = "2CBCBEBB-FB79-4833-A770-2216873147C4"
+name = "Spotted Egg"
+image_name = "eggs_2.png"
+tides = ["event_chain", "reclaim_events"]
+rendered-text = "When you play your second event each turn, it gains Reclaim 0●."
+
+[[dreamsign]]
+id = "D2A916C1-321A-4AE3-9A50-0B7F13C5EFF6"
+name = "Flash Powder"
+image_name = "Alchemical_Powder.png"
+tides = ["fast_setup", "fast_tempo", "cost_reduction"]
+rendered-text = "You may play fast events for 1●."
+
+[[dreamsign]]
+id = "10F27800-99F8-4504-9D94-26BCB3C32788"
+name = "Essence Vial"
+image_name = "essence.png"
+tides = ["abandon_value", "reclaim_characters", "void_recursion"]
+rendered-text = "The first time each turn you abandon an ally or discard a character, that card gains Reclaim equal to its cost."
+
+[[dreamsign]]
+id = "946DBB36-0A90-495A-BF0F-17351C93D74B"
+name = "Green Fly"
+image_name = "fly.png"
+tides = ["void_setup", "void_recursion"]
+rendered-text = "The first card you put into your void from your deck each turn gains reclaim equal to its cost."
+
+[[dreamsign]]
+id = "89C83D7E-5617-49B4-B6CD-214680FE0627"
+name = "Candle"
+image_name = "candle.png"
+tides = ["event_chain", "spark_growth"]
+rendered-text = "When you play an event, kindle 1."
+
+[[dreamsign]]
+id = "8B87B0C7-E7D5-4C53-B99B-B1E2407CB519"
+name = "Red Heart"
+image_name = "heart.png"
+tides = ["void_setup", "spark_growth"]
+rendered-text = "When a card enters your void from your deck, kindle 1."
+
+[[dreamsign]]
+id = "73EFD845-6009-4686-860C-01C7F5B1C074"
+name = "Black Feather"
+image_name = "feather.png"
+tides = ["abandon_value", "spark_tall"]
+rendered-text = "When you abandon an ally, kindle X where X is that ally's spark."
+
+[[dreamsign]]
+id = "ADC23870-55F8-4F23-B973-A358FC257414"
+name = "Gold Feather"
+image_name = "feather_gold.png"
+tides = ["abandon_value"]
+rendered-text = "When you abandon a character, kindle 1."
+
+[[dreamsign]]
+id = "1A21186C-CAFD-4E0F-9304-1AC0EF55340A"
+name = "Gray Feather"
+image_name = "feathers.png"
+tides = ["spark_tall"]
+rendered-text = "When you kindle, double the amount of spark gained"
+
+[[dreamsign]]
+id = "FF8D8D4A-FE7B-4511-8192-E6E2E7712DAF"
+name = "Amber Eye"
+image_name = "eye_3.png"
+tides = ["void_threshold", "event_chain", "card_flow"]
+rendered-text = "While you have 8 or more cards in your void, draw a card when you play an event."
+
+[[dreamsign]]
+id = "A92D2B95-C63D-4C1C-831B-902C44DEEE57"
+name = "Garlic Bulb"
+image_name = "garlic.png"
+tides = ["event_setup", "foresee_selection"]
+rendered-text = "When you play your first event each turn, Foresee 1."
+
+[[dreamsign]]
+id = "39260DD5-CB43-47D5-A007-EFFBE13D6417"
+name = "Ginger Root"
+image_name = "ginger .png"
+kind = "neutral"
+rendered-text = "Once per turn, when you foresee, draw a card."
+
+[[dreamsign]]
+id = "4E51F321-9089-4872-A0E2-AB909E242B33"
+name = "Hair Lock"
+image_name = "hair.png"
+kind = "neutral"
+rendered-text = "At the start of each battle, Foresee 3. Cards you leave on top this way cost 1● less."
+
+[[dreamsign]]
+id = "268341C7-BB5B-49FB-AD8D-A792B7D631A0"
+name = "Witch Hat"
+image_name = "hat.png"
+tides = ["event_chain", "card_flow"]
+rendered-text = "When you play your second event in a turn, draw a card."
+
+[[dreamsign]]
+id = "9AAED05A-2223-42F2-9B9D-81A53EAB811C"
+name = "Honeycombs"
+image_name = "honeycombs.png"
+tides = ["discard_velocity", "resource_burst"]
+rendered-text = "Once per turn, when you discard a card, gain 1●."
+
+[[dreamsign]]
+id = "5190A8B8-25A0-4C60-A4DE-2E2C5A73AF77"
+name = "Cactus"
+image_name = "cactus .png"
+tides = ["discard_velocity", "void_recursion", "cost_reduction"]
+rendered-text = "If you have discarded a card this turn, the first card you play from your void costs 1 less."
+
+[[dreamsign]]
+id = "86F64A29-7338-4759-81DA-4C7656E543D2"
+name = "Spice Blossoms"
+image_name = "cinnamon.png"
+tides = ["discard_velocity", "event_chain", "cost_reduction"]
+rendered-text = "Your events cost 1● less for each card you discarded this turn."
+
+[[dreamsign]]
+id = "9D134DFC-4643-47F3-A7EC-EA770587CEA1"
+name = "Leaf Bundle"
+image_name = "bunch_of_leaves.png"
+tides = ["discard_velocity", "hand_cycling", "card_flow"]
+rendered-text = "Once per turn, when you discard a card, draw a card."
+
+[[dreamsign]]
+id = "3A22A33F-5682-4D00-B0EC-86E43B6ED9DF"
+name = "Magic Fish"
+image_name = "magic_fish.png"
+tides = ["spirit_growth", "card_flow"]
+rendered-text = "The first time each turn you play a Spirit Animal, draw a card."
+
+[[dreamsign]]
+id = "B3403800-7004-4775-915B-A19840E416B0"
+name = "Sea Tome"
+image_name = "book_11.png"
+tides = ["judgment_engines", "judgment_bodies", "spark_growth"]
+rendered-text = "Allied characters with Judgment abilities have +1 spark."
