@@ -49,16 +49,14 @@ const DREAMSIGN_TEMPLATES: DreamsignTemplate[] = [
   {
     id: "dreamsign-1",
     name: "Dreamsign One",
-    displayTide: "Bloom",
-    packageTides: ["alpha"],
     effectDescription: "First effect.",
+    imageName: "dreamsign-1.png",
   },
   {
     id: "dreamsign-2",
     name: "Dreamsign Two",
-    displayTide: "Arc",
-    packageTides: ["beta"],
     effectDescription: "Second effect.",
+    imageName: "dreamsign-2.png",
   },
 ];
 

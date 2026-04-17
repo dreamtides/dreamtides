@@ -8,7 +8,7 @@ import {
   type OfferEffect,
   type TemptingOffer,
 } from "../data/tempting-offers";
-import { DREAMSIGNS } from "../data/dreamsigns";
+import { createDreamsign } from "../data/dreamsigns";
 import { sampleRewardCards } from "../data/tide-weights";
 
 /** Props for the TemptingOfferScreen component. */
@@ -50,7 +50,7 @@ function describeOfferEffect(effect: OfferEffect): string {
 
 /** Shows 2 (or 3 enhanced) benefit/cost pairs. Accept one or skip. */
 export function TemptingOfferScreen({ site }: TemptingOfferScreenProps) {
-  const { state, mutations, cardDatabase } = useQuest();
+  const { state, mutations, cardDatabase, questContent } = useQuest();
   const { deck, dreamsigns: currentDreamsigns } = state;
   const selectedPackageTides = state.resolvedPackage?.selectedTides ?? [];
 
@@ -169,11 +169,15 @@ export function TemptingOfferScreen({ site }: TemptingOfferScreenProps) {
           break;
         case "addDreamsign": {
           const template =
-            DREAMSIGNS[Math.floor(Math.random() * DREAMSIGNS.length)];
-          mutations.addDreamsign(
-            { ...template, isBane: false },
-            "TemptingOffer",
-          );
+            questContent.dreamsignTemplates[
+              Math.floor(Math.random() * questContent.dreamsignTemplates.length)
+            ];
+          if (template !== undefined) {
+            mutations.addDreamsign(
+              createDreamsign(template),
+              "TemptingOffer",
+            );
+          }
           break;
         }
       }
@@ -184,6 +188,7 @@ export function TemptingOfferScreen({ site }: TemptingOfferScreenProps) {
       addRandomCards,
       addBaneCards,
       removeRandomCards,
+      questContent.dreamsignTemplates,
     ],
   );
 

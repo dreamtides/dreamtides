@@ -30,16 +30,14 @@ const DREAMSIGN_TEMPLATES: DreamsignTemplate[] = [
   {
     id: "dreamsign-1",
     name: "Dreamsign One",
-    displayTide: "Bloom",
-    packageTides: ["alpha"],
     effectDescription: "First effect.",
+    imageName: "dreamsign-1.png",
   },
   {
     id: "dreamsign-2",
     name: "Dreamsign Two",
-    displayTide: "Arc",
-    packageTides: ["beta"],
     effectDescription: "Second effect.",
+    imageName: "dreamsign-2.png",
   },
 ];
 
@@ -104,16 +102,21 @@ describe("generateRewardSiteData", () => {
 
     expect(result.reward).toEqual({
       rewardType: "dreamsign",
-      dreamsignId: "dreamsign-1",
-      dreamsignName: "Dreamsign One",
-      dreamsignTide: "Bloom",
-      dreamsignEffect: "First effect.",
+      dreamsign: {
+        id: "dreamsign-1",
+        name: "Dreamsign One",
+        effectDescription: "First effect.",
+        imageName: "dreamsign-1.png",
+        imageAlt: "Dreamsign One Dreamsign artwork",
+        tide: null,
+        isBane: false,
+      },
     });
     expect(result.spentDreamsignPoolIds).toEqual(["dreamsign-1"]);
     expect(result.remainingDreamsignPoolIds).toEqual(["dreamsign-2"]);
   });
 
-  it("falls back to broader Dreamsign pool entries when no adjacent ones remain", () => {
+  it("draws randomly from the remaining Dreamsign pool", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
 
     const result = generateRewardSiteData({
@@ -125,10 +128,15 @@ describe("generateRewardSiteData", () => {
 
     expect(result.reward).toEqual({
       rewardType: "dreamsign",
-      dreamsignId: "dreamsign-2",
-      dreamsignName: "Dreamsign Two",
-      dreamsignTide: "Arc",
-      dreamsignEffect: "Second effect.",
+      dreamsign: {
+        id: "dreamsign-2",
+        name: "Dreamsign Two",
+        effectDescription: "Second effect.",
+        imageName: "dreamsign-2.png",
+        imageAlt: "Dreamsign Two Dreamsign artwork",
+        tide: null,
+        isBane: false,
+      },
     });
     expect(result.remainingDreamsignPoolIds).toEqual([]);
   });

@@ -48,9 +48,12 @@ export interface Dreamcaller {
 
 /** A passive effect collected during the quest. */
 export interface Dreamsign {
+  id?: string;
   name: string;
-  tide: Tide;
   effectDescription: string;
+  imageName?: string;
+  imageAlt?: string;
+  tide?: Tide | null;
   isBane: boolean;
 }
 

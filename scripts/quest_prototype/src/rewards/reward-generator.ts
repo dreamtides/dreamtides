@@ -1,6 +1,8 @@
 import type { CardData } from "../types/cards";
 import type { DreamsignTemplate, PackageTideId } from "../types/content";
+import type { Dreamsign } from "../types/quest";
 import { isStarterCard } from "../data/card-database";
+import { createDreamsign } from "../data/dreamsigns";
 import { pickPackageAdjacentItem } from "../data/tide-weights";
 import {
   readDreamsignPool,
@@ -15,10 +17,7 @@ export type RewardSiteData =
     }
   | {
       rewardType: "dreamsign";
-      dreamsignId: string;
-      dreamsignName: string;
-      dreamsignTide: DreamsignTemplate["displayTide"];
-      dreamsignEffect: string;
+      dreamsign: Dreamsign;
     }
   | {
       rewardType: "essence";
@@ -50,11 +49,16 @@ export function generateRewardSiteData({
     selectedPackageTides,
   );
   const availableDreamsignPool = readDreamsignPool(remainingDreamsignPoolIds, dreamsignTemplates);
-  const dreamsignTemplate = pickPackageAdjacentItem(
-    resolveDreamsignTemplates(availableDreamsignPool.availableIds, dreamsignTemplates),
-    (candidate) => candidate.packageTides,
-    selectedPackageTides,
+  const availableDreamsigns = resolveDreamsignTemplates(
+    availableDreamsignPool.availableIds,
+    dreamsignTemplates,
   );
+  const dreamsignTemplate =
+    availableDreamsigns.length === 0
+      ? null
+      : availableDreamsigns[
+        Math.floor(Math.random() * availableDreamsigns.length)
+      ];
 
   if (
     card !== null &&
@@ -75,10 +79,7 @@ export function generateRewardSiteData({
     return {
       reward: {
         rewardType: "dreamsign",
-        dreamsignId: dreamsignTemplate.id,
-        dreamsignName: dreamsignTemplate.name,
-        dreamsignTide: dreamsignTemplate.displayTide,
-        dreamsignEffect: dreamsignTemplate.effectDescription,
+        dreamsign: createDreamsign(dreamsignTemplate),
       },
       remainingDreamsignPoolIds: availableDreamsignPool.availableIds.filter(
         (id) => id !== dreamsignTemplate.id,

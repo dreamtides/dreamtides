@@ -3,7 +3,6 @@ import {
   loadCardDatabase,
   packageTideAccent,
 } from "./card-database";
-import { DREAMSIGN_TEMPLATES } from "./dreamsigns";
 import { logEvent } from "../logging";
 import type {
   DreamcallerContent,
@@ -14,6 +13,7 @@ import type {
 import type { CardData, Tide } from "../types/cards";
 
 const DREAMCALLER_JSON_PATH = "/dreamcaller-data.json";
+const DREAMSIGN_JSON_PATH = "/dreamsign-data.json";
 const LEGAL_MIN_POOL_SIZE = 175;
 const LEGAL_MAX_POOL_SIZE = 225;
 const PREFERRED_MIN_POOL_SIZE = 190;
@@ -146,11 +146,23 @@ export async function loadDreamcallerContent(): Promise<DreamcallerContent[]> {
   return (await response.json()) as DreamcallerContent[];
 }
 
+/** Fetches normalized Dreamsign content from the asset pipeline output. */
+export async function loadDreamsignContent(): Promise<DreamsignTemplate[]> {
+  const response = await fetch(DREAMSIGN_JSON_PATH);
+  if (!response.ok) {
+    throw new Error(
+      `Failed to load Dreamsign data: ${String(response.status)} ${response.statusText}`,
+    );
+  }
+  return (await response.json()) as DreamsignTemplate[];
+}
+
 /** Loads normalized quest content and validates Dreamcaller package data up front. */
 export async function loadQuestContent(): Promise<QuestContent> {
-  const [cardDatabase, dreamcallers] = await Promise.all([
+  const [cardDatabase, dreamcallers, dreamsignTemplates] = await Promise.all([
     loadCardDatabase(),
     loadDreamcallerContent(),
+    loadDreamsignContent(),
   ]);
   const draftableCards = Array.from(cardDatabase.values()).filter(
     (card) => !isStarterCard(card),
@@ -170,7 +182,7 @@ export async function loadQuestContent(): Promise<QuestContent> {
         resolveDreamcallerPackage(
           dreamcaller,
           draftableCards,
-          DREAMSIGN_TEMPLATES,
+          dreamsignTemplates,
         ),
       );
       validDreamcallers.push(dreamcaller);
@@ -197,7 +209,7 @@ export async function loadQuestContent(): Promise<QuestContent> {
     cardDatabase,
     cardsByPackageTide,
     dreamcallers: validDreamcallers,
-    dreamsignTemplates: DREAMSIGN_TEMPLATES,
+    dreamsignTemplates,
     resolvedPackagesByDreamcallerId,
   };
 }
@@ -278,11 +290,7 @@ export function resolveDreamcallerPackage(
   const doubledCardCount = countDoubledCards(
     selectedCandidate.draftPoolCopiesByCard,
   );
-  const dreamsignPoolIds = dreamsignTemplates
-    .filter((template) =>
-      isPackageAdjacent(template.packageTides, selectedCandidate.selectedTides),
-    )
-    .map((template) => template.id);
+  const dreamsignPoolIds = dreamsignTemplates.map((template) => template.id);
 
   return {
     dreamcaller,

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { DreamsignImage } from "../components/DreamsignImage";
 import type { Dreamsign, SiteState } from "../types/quest";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
-import { TIDE_COLORS, tideIconUrl } from "../data/card-database";
 import { drawDreamsignOptions } from "../dreamsign/dreamsign-pool";
 
 const MAX_DREAMSIGNS = 12;
@@ -132,18 +132,15 @@ export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
               onClick={() => handlePurge(index)}
             >
               <div className="flex items-center gap-2">
-                <img
-                  src={tideIconUrl(sign.tide)}
-                  alt={sign.tide}
-                  className="h-6 w-6 rounded-full object-contain"
-                  style={{
-                    border: `1px solid ${TIDE_COLORS[sign.tide]}`,
-                  }}
+                <DreamsignImage
+                  name={sign.name}
+                  imageName={sign.imageName}
+                  imageAlt={sign.imageAlt}
+                  className="h-10 w-10"
+                  frameClassName="border border-white/10"
+                  placeholderClassName="text-sm text-slate-200"
                 />
-                <span
-                  className="text-xs font-bold"
-                  style={{ color: TIDE_COLORS[sign.tide] }}
-                >
+                <span className="text-xs font-bold" style={{ color: "#e9d5ff" }}>
                   {sign.name}
                 </span>
               </div>
@@ -247,39 +244,39 @@ export function DreamsignDraftScreen({ site }: DreamsignDraftScreenProps) {
   );
 }
 
-/** Renders a dreamsign card with tide icon, name, and effect description. */
+/** Renders a dreamsign card with artwork, name, and effect description. */
 function DreamsignCard({ dreamsign }: { dreamsign: Dreamsign }) {
-  const tideColor = TIDE_COLORS[dreamsign.tide];
-
   return (
     <div
       className="flex w-52 flex-1 flex-col items-center gap-2 rounded-lg p-4"
       style={{
         background:
           "linear-gradient(145deg, #1a1025 0%, #0f0a18 60%, #0d0814 100%)",
-        border: `1px solid ${tideColor}60`,
-        boxShadow: `0 0 12px ${tideColor}20`,
+        border: "1px solid rgba(192, 132, 252, 0.35)",
+        boxShadow: "0 0 12px rgba(168, 85, 247, 0.18)",
       }}
     >
-      <img
-        src={tideIconUrl(dreamsign.tide)}
-        alt={dreamsign.tide}
-        className="h-12 w-12 rounded-full object-contain"
-        style={{ border: `2px solid ${tideColor}` }}
+      <DreamsignImage
+        name={dreamsign.name}
+        imageName={dreamsign.imageName}
+        imageAlt={dreamsign.imageAlt}
+        className="h-24 w-24"
+        frameClassName="border border-fuchsia-300/25 shadow-[0_0_18px_rgba(168,85,247,0.18)]"
+        placeholderClassName="text-3xl text-fuchsia-100"
       />
       <span
         className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
         style={{
-          background: `${tideColor}20`,
-          color: tideColor,
-          border: `1px solid ${tideColor}40`,
+          background: "rgba(168, 85, 247, 0.16)",
+          color: "#d8b4fe",
+          border: "1px solid rgba(192, 132, 252, 0.4)",
         }}
       >
-        {dreamsign.tide}
+        Dreamsign
       </span>
       <h3
         className="text-center text-sm font-bold"
-        style={{ color: tideColor }}
+        style={{ color: "#f5d0fe" }}
       >
         {dreamsign.name}
       </h3>

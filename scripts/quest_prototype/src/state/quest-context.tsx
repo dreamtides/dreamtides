@@ -311,7 +311,7 @@ export function QuestProvider({
         if (prev.dreamsigns.length >= MAX_DREAMSIGNS) return prev;
         logEvent("dreamsign_acquired", {
           name: dreamsign.name,
-          tide: dreamsign.tide,
+          imageName: dreamsign.imageName ?? null,
           isBane: dreamsign.isBane,
           sourceSiteType,
         });
@@ -327,7 +327,7 @@ export function QuestProvider({
       if (!dreamsign) return prev;
       logEvent("dreamsign_removed", {
         name: dreamsign.name,
-        tide: dreamsign.tide,
+        imageName: dreamsign.imageName ?? null,
         reason,
       });
       const dreamsigns = prev.dreamsigns.filter((_, i) => i !== index);

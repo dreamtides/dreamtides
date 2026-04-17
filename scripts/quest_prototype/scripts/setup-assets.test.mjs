@@ -22,17 +22,25 @@ describe("setupAssets", () => {
     const publicDir = join(tempRoot, "public");
     const imageCacheDir = join(tempRoot, "image-cache");
     const dreamcallerArtDir = join(tempRoot, "dreamcaller-art");
+    const dreamsignArtDir = join(tempRoot, "dreamsign-art");
     const tideIconsDir = join(tempRoot, "tides-src");
     const cardTomlPath = join(tempRoot, "rendered-cards.toml");
     const dreamcallerTomlPath = join(tempRoot, "dreamcallers.toml");
+    const dreamsignTomlPath = join(tempRoot, "dreamsigns.toml");
     const cachedImagePath = join(imageCacheDir, imageHash(101));
 
     mkdirSync(imageCacheDir, { recursive: true });
     mkdirSync(dreamcallerArtDir, { recursive: true });
+    mkdirSync(dreamsignArtDir, { recursive: true });
     mkdirSync(tideIconsDir, { recursive: true });
     mkdirSync(dirname(cachedImagePath), { recursive: true });
     writeFileSync(cachedImagePath, "fake-webp");
     writeFileSync(join(dreamcallerArtDir, "0007.png"), "fake-png");
+    writeFileSync(join(dreamsignArtDir, "test-sign.png"), "fake-png");
+    writeFileSync(
+      join(dreamsignArtDir, "alt_text.txt"),
+      "test-sign.png\tSmall idol with a violet glow.\n",
+    );
     writeFileSync(join(tideIconsDir, "Bloom.png"), "fake-png");
     writeFileSync(
       cardTomlPath,
@@ -92,15 +100,26 @@ mandatory-tides = ["core", "bridge"]
 optional-tides = ["support", "tempo", "finish", "value"]
 `,
     );
+    writeFileSync(
+      dreamsignTomlPath,
+      `[[dreamsign]]
+id = "sign-1"
+name = "Test Sign"
+image_name = "test-sign.png"
+rendered-text = "Use the canonical Dreamsign text."
+`,
+    );
     vi.spyOn(console, "warn").mockImplementation(() => {});
 
     setupAssets({
       cardTomlPath,
       dreamcallerTomlPath,
+      dreamsignTomlPath,
       tideIconsDir,
       publicDir,
       imageCacheDir,
       dreamcallerArtDir,
+      dreamsignArtDir,
     });
 
     const cards = JSON.parse(
@@ -108,6 +127,9 @@ optional-tides = ["support", "tempo", "finish", "value"]
     );
     const dreamcallers = JSON.parse(
       readFileSync(join(publicDir, "dreamcaller-data.json"), "utf8"),
+    );
+    const dreamsigns = JSON.parse(
+      readFileSync(join(publicDir, "dreamsign-data.json"), "utf8"),
     );
 
     expect(cards).toEqual([
@@ -169,8 +191,18 @@ optional-tides = ["support", "tempo", "finish", "value"]
         optionalTides: ["support", "tempo", "finish", "value"],
       },
     ]);
+    expect(dreamsigns).toEqual([
+      {
+        id: "sign-1",
+        name: "Test Sign",
+        imageName: "test-sign.png",
+        imageAlt: "Small idol with a violet glow.",
+        effectDescription: "Use the canonical Dreamsign text.",
+      },
+    ]);
     expect(existsSync(join(publicDir, "cards", "1.webp"))).toBe(true);
     expect(existsSync(join(publicDir, "dreamcallers", "0007.png"))).toBe(true);
+    expect(existsSync(join(publicDir, "dreamsigns", "test-sign.png"))).toBe(true);
     expect(existsSync(join(publicDir, "tides", "Bloom.png"))).toBe(true);
   });
 });

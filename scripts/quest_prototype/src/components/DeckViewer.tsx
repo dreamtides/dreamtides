@@ -18,6 +18,7 @@ import { logEvent } from "../logging";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
 import { computeDeckSummary } from "./deck-summary";
 import { DreamcallerPortrait } from "./DreamcallerPortrait";
+import { DreamsignImage } from "./DreamsignImage";
 
 /** Sort criteria options. */
 type SortCriteria =
@@ -656,18 +657,19 @@ export function DeckViewer({
                         }}
                       >
                         <div className="flex items-center gap-1.5">
-                          <span
-                            className="flex h-4 w-4 items-center justify-center rounded-full text-[9px]"
-                            style={{
-                              background: sign.isBane
-                                ? "rgba(239, 68, 68, 0.15)"
-                                : "rgba(255, 255, 255, 0.08)",
-                              color: sign.isBane ? "#fca5a5" : "#cbd5f5",
-                            }}
-                            aria-hidden="true"
-                          >
-                            {sign.isBane ? "\u2620" : "\u2726"}
-                          </span>
+                          <DreamsignImage
+                            name={sign.name}
+                            imageName={sign.imageName}
+                            imageAlt={sign.imageAlt}
+                            className="h-8 w-8 shrink-0"
+                            frameClassName={sign.isBane
+                              ? "border border-red-300/20"
+                              : "border border-fuchsia-300/20"}
+                            placeholderClassName={sign.isBane
+                              ? "text-sm text-red-100"
+                              : "text-sm text-fuchsia-100"}
+                            isBane={sign.isBane}
+                          />
                           <span
                             className="text-[11px] font-bold"
                             style={{ color: "#f8fafc" }}
@@ -865,18 +867,19 @@ function MobileSidebar({
                       }}
                     >
                       <div className="flex items-center gap-1.5">
-                        <span
-                          className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px]"
-                          style={{
-                            background: sign.isBane
-                              ? "rgba(239, 68, 68, 0.15)"
-                              : "rgba(255, 255, 255, 0.08)",
-                            color: sign.isBane ? "#fca5a5" : "#cbd5f5",
-                          }}
-                          aria-hidden="true"
-                        >
-                          {sign.isBane ? "\u2620" : "\u2726"}
-                        </span>
+                        <DreamsignImage
+                          name={sign.name}
+                          imageName={sign.imageName}
+                          imageAlt={sign.imageAlt}
+                          className="h-6 w-6 shrink-0"
+                          frameClassName={sign.isBane
+                            ? "border border-red-300/20"
+                            : "border border-fuchsia-300/20"}
+                          placeholderClassName={sign.isBane
+                            ? "text-[10px] text-red-100"
+                            : "text-[10px] text-fuchsia-100"}
+                          isBane={sign.isBane}
+                        />
                         <span
                           className="text-[10px] font-medium"
                           style={{ color: "#f8fafc" }}

@@ -54,30 +54,26 @@ const DREAMSIGN_TEMPLATES: DreamsignTemplate[] = [
   {
     id: "embers-whisper",
     name: "Ember's Whisper",
-    displayTide: "Ignite",
-    packageTides: ["alpha"],
     effectDescription: "Fire.",
+    imageName: "embers-whisper.png",
   },
   {
     id: "glacial-insight",
     name: "Glacial Insight",
-    displayTide: "Rime",
-    packageTides: ["beta"],
     effectDescription: "Ice.",
+    imageName: "glacial-insight.png",
   },
   {
     id: "verdant-accord",
     name: "Verdant Accord",
-    displayTide: "Bloom",
-    packageTides: ["gamma"],
     effectDescription: "Growth.",
+    imageName: "verdant-accord.png",
   },
   {
     id: "stormthread-sigil",
     name: "Stormthread Sigil",
-    displayTide: "Arc",
-    packageTides: ["delta"],
     effectDescription: "Storm.",
+    imageName: "stormthread-sigil.png",
   },
 ];
 
@@ -167,7 +163,7 @@ function mount(element: ReactElement): {
 
 function clickButton(container: HTMLElement, label: string): void {
   const button = Array.from(container.querySelectorAll("button")).find(
-    (candidate) => candidate.textContent?.trim() === label,
+    (candidate) => candidate.textContent?.includes(label),
   );
   if (!button) {
     throw new Error(`Could not find button with label: ${label}`);

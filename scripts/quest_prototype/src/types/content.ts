@@ -17,8 +17,10 @@ export interface DreamsignTemplate {
   id: string;
   name: string;
   effectDescription: string;
-  displayTide: Tide;
-  packageTides: PackageTideId[];
+  imageName?: string;
+  imageAlt?: string;
+  displayTide?: Tide;
+  packageTides?: PackageTideId[];
 }
 
 export interface ResolvedDreamcallerPackage {

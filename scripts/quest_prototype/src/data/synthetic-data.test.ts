@@ -1,45 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { DREAMSIGN_TEMPLATES } from "./dreamsigns";
 import { DREAM_JOURNEYS } from "./dream-journeys";
 import { TEMPTING_OFFERS } from "./tempting-offers";
 import { BIOMES } from "./biomes";
-import type { Tide } from "../types/cards";
-
-const ALL_TIDES: Tide[] = [
-  "Bloom",
-  "Arc",
-  "Ignite",
-  "Pact",
-  "Umbra",
-  "Rime",
-  "Surge",
-  "Neutral",
-];
-const tideSet = new Set<string>(ALL_TIDES);
-
-describe("dreamsigns", () => {
-  it("has exactly 10 entries", () => {
-    expect(DREAMSIGN_TEMPLATES).toHaveLength(10);
-  });
-
-  it("every template has all required fields with valid display tides", () => {
-    for (const ds of DREAMSIGN_TEMPLATES) {
-      expect(ds.id.length).toBeGreaterThan(0);
-      expect(ds.name.length).toBeGreaterThan(0);
-      expect(tideSet.has(ds.displayTide)).toBe(true);
-      expect(ds.effectDescription.length).toBeGreaterThan(0);
-      expect(ds.packageTides.length).toBeGreaterThan(0);
-      for (const packageTideId of ds.packageTides) {
-        expect(packageTideId.length).toBeGreaterThan(0);
-      }
-    }
-  });
-
-  it("has unique names", () => {
-    const names = DREAMSIGN_TEMPLATES.map((ds) => ds.name);
-    expect(new Set(names).size).toBe(names.length);
-  });
-});
 
 describe("dream journeys", () => {
   it("has exactly 10 entries", () => {

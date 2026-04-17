@@ -14,6 +14,7 @@ const DREAMCALLER_ART_DIR_CANDIDATES = [
   join(homedir(), "Documents", "synty", "dreamcallers"),
   join(homedir(), "Documents", "sytny", "dreamcallers"),
 ];
+const DREAMSIGN_ART_DIR = join(homedir(), "Documents", "dreamsigns", "filtered");
 
 const PUBLIC_DIR = join(ROOT, "public");
 
@@ -99,6 +100,21 @@ export function transformDreamcaller(dreamcaller) {
 }
 
 /**
+ * Convert a TOML Dreamsign record to its JSON representation with runtime-facing keys.
+ */
+export function transformDreamsign(dreamsign, altTextByImageName = new Map()) {
+  return {
+    id: dreamsign.id,
+    name: dreamsign.name,
+    imageName: dreamsign.image_name,
+    imageAlt:
+      altTextByImageName.get(dreamsign.image_name)
+      ?? `${dreamsign.name} Dreamsign artwork`,
+    effectDescription: dreamsign["rendered-text"] ?? "",
+  };
+}
+
+/**
  * Compute the SHA-256 hash of the Shutterstock URL for a given image number.
  */
 export function imageHash(imageNumber) {
@@ -124,6 +140,28 @@ function defaultDreamcallerArtDir() {
   return DREAMCALLER_ART_DIR_CANDIDATES[0];
 }
 
+function readDreamsignAltText(dreamsignArtDir) {
+  const altTextPath = join(dreamsignArtDir, "alt_text.txt");
+  if (!existsSync(altTextPath)) {
+    return new Map();
+  }
+
+  const altTextByImageName = new Map();
+  for (const line of readFileSync(altTextPath, "utf8").split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed.length === 0) {
+      continue;
+    }
+
+    const [imageName, altText] = trimmed.split("\t");
+    if (imageName !== undefined && altText !== undefined) {
+      altTextByImageName.set(imageName, altText);
+    }
+  }
+
+  return altTextByImageName;
+}
+
 export function setupAssets({
   cardTomlPath = resolveAssetPath(
     "client",
@@ -139,6 +177,13 @@ export function setupAssets({
     "Tabula",
     "dreamcallers.toml",
   ),
+  dreamsignTomlPath = resolveAssetPath(
+    "client",
+    "Assets",
+    "StreamingAssets",
+    "Tabula",
+    "dreamsigns.toml",
+  ),
   tideIconsDir = resolveAssetPath(
     "client",
     "Assets",
@@ -149,12 +194,15 @@ export function setupAssets({
   publicDir = PUBLIC_DIR,
   imageCacheDir = IMAGE_CACHE_DIR,
   dreamcallerArtDir = defaultDreamcallerArtDir(),
+  dreamsignArtDir = DREAMSIGN_ART_DIR,
 } = {}) {
   const cardsDir = join(publicDir, "cards");
   const dreamcallersDir = join(publicDir, "dreamcallers");
+  const dreamsignsDir = join(publicDir, "dreamsigns");
   const tidesDir = join(publicDir, "tides");
   const cardJsonPath = join(publicDir, "card-data.json");
   const dreamcallerJsonPath = join(publicDir, "dreamcaller-data.json");
+  const dreamsignJsonPath = join(publicDir, "dreamsign-data.json");
 
   console.log("Parsing rendered-cards.toml...");
   const cardTomlContent = readFileSync(cardTomlPath, "utf8");
@@ -195,6 +243,27 @@ export function setupAssets({
   );
   console.log(
     `Wrote ${jsonDreamcallers.length} dreamcallers to dreamcaller-data.json`,
+  );
+
+  console.log("Parsing dreamsigns.toml...");
+  const dreamsignTomlContent = readFileSync(dreamsignTomlPath, "utf8");
+  const parsedDreamsigns = parse(dreamsignTomlContent);
+  const allDreamsigns = parsedDreamsigns.dreamsign;
+
+  if (!Array.isArray(allDreamsigns)) {
+    throw new Error("Expected [[dreamsign]] array in dreamsigns.toml");
+  }
+
+  const altTextByImageName = readDreamsignAltText(dreamsignArtDir);
+  const jsonDreamsigns = allDreamsigns.map((dreamsign) =>
+    transformDreamsign(dreamsign, altTextByImageName),
+  );
+  writeFileSync(
+    dreamsignJsonPath,
+    JSON.stringify(jsonDreamsigns, null, 2) + "\n",
+  );
+  console.log(
+    `Wrote ${jsonDreamsigns.length} dreamsigns to dreamsign-data.json`,
   );
 
   // Create card image symlinks
@@ -240,6 +309,29 @@ export function setupAssets({
 
   console.log(
     `Linked ${linkedDreamcallerArt} of ${jsonDreamcallers.length} dreamcaller portraits (${missingDreamcallerArt} missing)`,
+  );
+
+  recreateDir(dreamsignsDir);
+  let linkedDreamsignArt = 0;
+  let missingDreamsignArt = 0;
+
+  for (const dreamsign of jsonDreamsigns) {
+    const sourcePath = join(dreamsignArtDir, dreamsign.imageName);
+    const symlinkPath = join(dreamsignsDir, dreamsign.imageName);
+
+    if (existsSync(sourcePath)) {
+      symlinkSync(sourcePath, symlinkPath);
+      linkedDreamsignArt++;
+    } else {
+      console.warn(
+        `  Warning: missing dreamsign art for ${dreamsign.name} (${dreamsign.imageName})`,
+      );
+      missingDreamsignArt++;
+    }
+  }
+
+  console.log(
+    `Linked ${linkedDreamsignArt} of ${jsonDreamsigns.length} dreamsign images (${missingDreamsignArt} missing)`,
   );
 
   // Copy tide icon PNGs
