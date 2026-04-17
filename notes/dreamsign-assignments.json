@@ -10,7 +10,7 @@
     {
       "dreamsign_id": "dreamsign_002",
       "effect_text": "When you play your first character in a turn, the next character you play this turn costs 2\u25cf less.",
-      "name": "Pyramid Sigil",
+      "name": "Pyramid Relic",
       "image_file": "aertfact.png",
       "justification": "The branching panel feels like one action unlocking the next, which matches the first character setting up a cheaper second one."
     },
@@ -794,7 +794,7 @@
     {
       "dreamsign_id": "dreamsign_114",
       "effect_text": "The first card you buy at each Shop costs 25% less essence and gains a random transfiguration.",
-      "name": "Paw Ledger",
+      "name": "Bestiary",
       "image_file": "book_10.png",
       "justification": "A charm-studded staff feels like a shop trinket that can bend the first purchase into something better. Extra transfiguration on the first buy reads like a little store magic."
     },
