@@ -17,14 +17,15 @@ specialized roles.
 - Oblivion. 3 energy. When drawn, discard a card. Draw a card.
 - Betrayal. 3 energy. When drawn, abandon a character. Draw a card.
 - Envy. 2 energy. When drawn, your opponent draws a card. Draw a card.
-- Doubt. 3 energy. When drawn, reserve a random deployed character you control. Draw a card.
+- Doubt. 3 energy. When drawn, reserve a random deployed character you control.
+  Draw a card.
 - Silence. 2 energy. While this card is in your hand, cards in your void cannot
   be reclaimed. Draw a card.
 - Paranoia. 2 energy. While this card is in your hand, play with your hand and
   deck revealed. Draw a card.
 - Burden. 3 energy. While this card is in your hand, your first card each turn
   costs 1 energy more. Draw a card.
-- Paralysis. 3 energy. While this card is in your hand, you can't play cards during
-  your opponent's turn. Draw a card.
-- Lethargy. 4 energy. While this card is in your hand, you can't play more than 1
-  card each turn. Draw a card.
+- Paralysis. 3 energy. While this card is in your hand, you can't play cards
+  during your opponent's turn. Draw a card.
+- Lethargy. 4 energy. While this card is in your hand, you can't play more than
+  1 card each turn. Draw a card.

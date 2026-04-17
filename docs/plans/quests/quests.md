@@ -108,10 +108,10 @@ For quests, the important consequences are:
   tides plus a chosen optional subset.
 - Draft pools, Dreamsign pools, shops, and reward generators all key off these
   package tides.
-- Battles themselves use the core [battle
-  rules](../../battle_rules/battle_rules.md) resource model: cards are paid for
-  with **energy**, and energy production comes from the shared **Dreamwell**
-  rather than from tide-specific resources.
+- Battles themselves use the core
+  [battle rules](../../battle_rules/battle_rules.md) resource model: cards are
+  paid for with **energy**, and energy production comes from the shared
+  **Dreamwell** rather than from tide-specific resources.
 
 Cards and Dreamsigns may still expose one of the seven display tides
 (Bloom/Arc/Ignite/Pact/Umbra/Rime/Surge, plus Neutral) for iconography and card
@@ -236,13 +236,13 @@ Icon: "Sword"
 
 ### Draft
 
-The Draft site allows users to add cards to their deck via the [Draft Pool
-Construction](#draft-pool-construction) system. Each draft site provides 5 picks
-from the ongoing run multiset. Each pick shows 4 unique cards sampled from the
-remaining pool, weighted by remaining copies. Revealed cards are spent
-immediately whether or not they are chosen, so a Draft site always burns real
-run inventory. There is no default skip or reroll for draft picks, though
-dreamsigns and journeys may still override this.
+The Draft site allows users to add cards to their deck via the
+[Draft Pool Construction](#draft-pool-construction) system. Each draft site
+provides 5 picks from the ongoing run multiset. Each pick shows 4 unique cards
+sampled from the remaining pool, weighted by remaining copies. Revealed cards
+are spent immediately whether or not they are chosen, so a Draft site always
+burns real run inventory. There is no default skip or reroll for draft picks,
+though dreamsigns and journeys may still override this.
 
 **UI:** The cards available for the current pick are shown in multiple rows. The
 available cards animate in to be selected. Clicking a card animates it to the
@@ -284,9 +284,9 @@ Icon: "Crown"
 
 ### Specialty Shop
 
-A specialty shop operates in a similar manner to [Battle
-Rewards](#battle-rewards), showing a curated selection of powerful cards that
-prefer the run's selected package tides and then tighten further around the
+A specialty shop operates in a similar manner to
+[Battle Rewards](#battle-rewards), showing a curated selection of powerful cards
+that prefer the run's selected package tides and then tighten further around the
 player's actual deck composition.
 
 Future iterations may experiment with more novel offerings, such as:

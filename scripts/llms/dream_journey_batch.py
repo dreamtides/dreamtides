@@ -344,9 +344,7 @@ class BatchReporter:
         self._print(banner)
 
     def record_halt(self, *, agent_name: str, reason: str) -> None:
-        self._record_event(
-            {"event": "halt", "agent": agent_name, "reason": reason}
-        )
+        self._record_event({"event": "halt", "agent": agent_name, "reason": reason})
         banner = "#" * 72
         self._print(banner)
         self._print(
@@ -357,9 +355,7 @@ class BatchReporter:
         self._print(banner)
 
     def record_waiting(self, *, seconds: float, reason: str) -> None:
-        self._record_event(
-            {"event": "waiting", "seconds": seconds, "reason": reason}
-        )
+        self._record_event({"event": "waiting", "seconds": seconds, "reason": reason})
         self._print(
             f"[{_timestamp()}] WAIT — sleeping {_format_duration(seconds)} "
             f"({reason})."
@@ -545,8 +541,7 @@ def _assign_providers_for_group(
     if count < 0:
         raise ValueError("count must be non-negative")
     base = [
-        AGENT_ORDER[(index + start_offset) % len(AGENT_ORDER)]
-        for index in range(count)
+        AGENT_ORDER[(index + start_offset) % len(AGENT_ORDER)] for index in range(count)
     ]
     random.Random(seed_key).shuffle(base)
     return base
@@ -1012,7 +1007,9 @@ async def run_batch(
                             duration_seconds=duration,
                             until_timestamp=_timestamp_plus_seconds(duration),
                             reason=(
-                                result.errors[0] if result.errors else result.error_category
+                                result.errors[0]
+                                if result.errors
+                                else result.error_category
                             ),
                         )
 
