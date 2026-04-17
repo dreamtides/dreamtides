@@ -1,0 +1,1894 @@
+{
+  "art_directory": "/Users/dthurn/Documents/dreamsigns/filtered",
+  "count": 154,
+  "art": [
+    {
+      "art_id": "alchemical-powder",
+      "source_filename": "Alchemical_Powder.png",
+      "raw_alt_text": "Red-orange faceted gem or crystal with rough, glowing, rounded shape.",
+      "canonical_object": "alchemical powder",
+      "motif_tags": [
+        "crystal",
+        "essence",
+        "feather"
+      ],
+      "family_key": "alchemical_powder",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "champignon",
+      "source_filename": "Champignon.png",
+      "raw_alt_text": "Pale ivory circular shells or coins, layered and glossy, on warm tan background.",
+      "canonical_object": "shell token",
+      "motif_tags": [
+        "shell",
+        "token"
+      ],
+      "family_key": "champignon",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "magicwand",
+      "source_filename": "Magicwand.png",
+      "raw_alt_text": "Blue steel wand or dagger with brown wooden handle and glowing tip.",
+      "canonical_object": "wand",
+      "motif_tags": [
+        "feather",
+        "weapon"
+      ],
+      "family_key": "magicwand",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "ring-2",
+      "source_filename": "Ring_2.png",
+      "raw_alt_text": "Red star emblem over a white and gray circular badge.",
+      "canonical_object": "badge",
+      "motif_tags": [
+        "token"
+      ],
+      "family_key": "ring",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "white-tortoise-shell",
+      "source_filename": "White tortoise shell.png",
+      "raw_alt_text": "Silver segmented shell or armored dome, shaded white and gray.",
+      "canonical_object": "tortoise shell",
+      "motif_tags": [
+        "shell"
+      ],
+      "family_key": "white_tortoise_shell",
+      "ambiguity_flags": [
+        "filename_format"
+      ]
+    },
+    {
+      "art_id": "acorn-gold",
+      "source_filename": "acorn_gold.png",
+      "raw_alt_text": "Golden fruit-like charm with a mesh-patterned orb and smooth teardrop front.",
+      "canonical_object": "acorn gold",
+      "motif_tags": [
+        "crystal",
+        "plant"
+      ],
+      "family_key": "acorn_gold",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "aertfact",
+      "source_filename": "aertfact.png",
+      "raw_alt_text": "Blue-gray square panel with bright red-orange branching nodes and lines.",
+      "canonical_object": "sigil panel",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "aertfact",
+      "ambiguity_flags": [
+        "filename_typo"
+      ]
+    },
+    {
+      "art_id": "algae",
+      "source_filename": "algae.png",
+      "raw_alt_text": "Shimmering lime-green ribbon or liquid fabric twisting in soft waves.",
+      "canonical_object": "algae",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "algae",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "amanita",
+      "source_filename": "amanita.png",
+      "raw_alt_text": "Red spotted mushroom with white flecks and pale stem.",
+      "canonical_object": "amanita",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "amanita",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "amulet-2",
+      "source_filename": "amulet_2.png",
+      "raw_alt_text": "Bright green faceted gemstone pendant in a gold setting.",
+      "canonical_object": "amulet",
+      "motif_tags": [
+        "crystal",
+        "token"
+      ],
+      "family_key": "amulet",
+      "ambiguity_flags": [
+        "generic_alt",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "amulet-3",
+      "source_filename": "amulet_3.png",
+      "raw_alt_text": "Gold-rimmed circular lens filled with purple and magenta clouds.",
+      "canonical_object": "amulet",
+      "motif_tags": [
+        "token"
+      ],
+      "family_key": "amulet",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "amulet-4",
+      "source_filename": "amulet_4.png",
+      "raw_alt_text": "Gray wolf mask medallion with orange gem and dark beads.",
+      "canonical_object": "amulet",
+      "motif_tags": [
+        "crystal",
+        "dream",
+        "token"
+      ],
+      "family_key": "amulet",
+      "ambiguity_flags": [
+        "generic_alt",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "amulet-5",
+      "source_filename": "amulet_5.png",
+      "raw_alt_text": "Beaded gold necklace with hanging claws, tusks, and colored charms.",
+      "canonical_object": "amulet",
+      "motif_tags": [
+        "bone",
+        "token"
+      ],
+      "family_key": "amulet",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "amulet-6",
+      "source_filename": "amulet_6.png",
+      "raw_alt_text": "Small hanging talisman with beige face, orange beads, and metal tools.",
+      "canonical_object": "amulet",
+      "motif_tags": [
+        "token"
+      ],
+      "family_key": "amulet",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "amulet-7",
+      "source_filename": "amulet_7.png",
+      "raw_alt_text": "Gold triangular eye amulet with horns and carved sunburst details.",
+      "canonical_object": "amulet",
+      "motif_tags": [
+        "bone",
+        "dream",
+        "token"
+      ],
+      "family_key": "amulet",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "amulet-8",
+      "source_filename": "amulet_8.png",
+      "raw_alt_text": "Skull pendant with dangling chains, beige bone and dark eye sockets.",
+      "canonical_object": "amulet",
+      "motif_tags": [
+        "bone",
+        "dream",
+        "token"
+      ],
+      "family_key": "amulet",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "amulet-9",
+      "source_filename": "amulet_9.png",
+      "raw_alt_text": "Blue metal medallion with purple gem and small orb-like charm.",
+      "canonical_object": "amulet",
+      "motif_tags": [
+        "crystal",
+        "token"
+      ],
+      "family_key": "amulet",
+      "ambiguity_flags": [
+        "generic_alt",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "apple",
+      "source_filename": "apple.png",
+      "raw_alt_text": "Shiny red apple with green segmented stem and curled leaf.",
+      "canonical_object": "apple",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "apple",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "bag-2",
+      "source_filename": "bag_2.png",
+      "raw_alt_text": "Brown leather satchel with gold buckle, stitching, and flap closure.",
+      "canonical_object": "satchel",
+      "motif_tags": [
+        "container"
+      ],
+      "family_key": "bag",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "bag-3",
+      "source_filename": "bag_3.png",
+      "raw_alt_text": "Gray cloth pouch tied at the neck, glowing with cyan light.",
+      "canonical_object": "glow pouch",
+      "motif_tags": [
+        "container",
+        "feather"
+      ],
+      "family_key": "bag",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "bag-4",
+      "source_filename": "bag_4.png",
+      "raw_alt_text": "deep red leather pouch with gold cord, blue beads, and stitched flap",
+      "canonical_object": "charm pouch",
+      "motif_tags": [
+        "container"
+      ],
+      "family_key": "bag",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "bat-wings",
+      "source_filename": "bat_wings.png",
+      "raw_alt_text": "bluish-gray bat wing with dark shadows and a sleek curved membrane",
+      "canonical_object": "bat wing",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "bat_wings",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "bell",
+      "source_filename": "bell.png",
+      "raw_alt_text": "ivory and pink bell with red ribbon tied around the top",
+      "canonical_object": "bell",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "bell",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "belladonna",
+      "source_filename": "belladonna.png",
+      "raw_alt_text": "green-and-black berry-like orb surrounded by yellow spotted petals",
+      "canonical_object": "belladonna",
+      "motif_tags": [
+        "crystal",
+        "plant"
+      ],
+      "family_key": "belladonna",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "berries",
+      "source_filename": "berries.png",
+      "raw_alt_text": "multiple fantasy item icons on dark background, dominated by varied reds, golds, blues, and greens",
+      "canonical_object": "berries",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "berries",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "bettle",
+      "source_filename": "bettle.png",
+      "raw_alt_text": "bright green beetle with yellow highlights and glossy segmented shell",
+      "canonical_object": "beetle",
+      "motif_tags": [
+        "animal",
+        "shell"
+      ],
+      "family_key": "bettle",
+      "ambiguity_flags": [
+        "filename_typo"
+      ]
+    },
+    {
+      "art_id": "bezoar",
+      "source_filename": "bezoar.png",
+      "raw_alt_text": "brown and orange pile of rounded wooden nuts or seeds",
+      "canonical_object": "bezoar",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "bezoar",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "black-acorn",
+      "source_filename": "black-acorn.png",
+      "raw_alt_text": "amber acorn with tan cap and warm glowing highlights",
+      "canonical_object": "dark acorn",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "black_acorn",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "black-rose",
+      "source_filename": "black_rose.png",
+      "raw_alt_text": "gray-blue rose blossom with pale green stem and leaves",
+      "canonical_object": "black rose",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "black_rose",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "black-widow",
+      "source_filename": "black_widow.png",
+      "raw_alt_text": "clear blue jar holding a black spider with red markings",
+      "canonical_object": "spider jar",
+      "motif_tags": [
+        "animal"
+      ],
+      "family_key": "black_widow",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "blue-feather",
+      "source_filename": "blue_feather.png",
+      "raw_alt_text": "pale cyan feather with soft translucent barbs on a white background",
+      "canonical_object": "blue feather",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "blue_feather",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "bone",
+      "source_filename": "bone.png",
+      "raw_alt_text": "tan bone pipe or whistle with rounded joints and hollow end",
+      "canonical_object": "bone flute",
+      "motif_tags": [
+        "bone"
+      ],
+      "family_key": "bone",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "book",
+      "source_filename": "book.png",
+      "raw_alt_text": "red spellbook with turquoise gem, gold corners, and green ribbon",
+      "canonical_object": "book",
+      "motif_tags": [
+        "crystal",
+        "text"
+      ],
+      "family_key": "book",
+      "ambiguity_flags": [
+        "generic_alt",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "book-10",
+      "source_filename": "book_10.png",
+      "raw_alt_text": "brown book embossed with a paw print medallion on the cover",
+      "canonical_object": "beast codex",
+      "motif_tags": [
+        "text",
+        "token"
+      ],
+      "family_key": "book",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "book-11",
+      "source_filename": "book_11.png",
+      "raw_alt_text": "blue-gray book featuring a mint-green jellyfish over ocean waves",
+      "canonical_object": "tide codex",
+      "motif_tags": [
+        "animal",
+        "text"
+      ],
+      "family_key": "book",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "book-2",
+      "source_filename": "book_2.png",
+      "raw_alt_text": "gray wooden book with a bright orange lightning bolt across the cover",
+      "canonical_object": "storm codex",
+      "motif_tags": [
+        "text"
+      ],
+      "family_key": "book",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "book-3",
+      "source_filename": "book_3.png",
+      "raw_alt_text": "tan book with a glowing red eye and cracked mystical cover",
+      "canonical_object": "eye codex",
+      "motif_tags": [
+        "dream",
+        "feather",
+        "text"
+      ],
+      "family_key": "book",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "book-5",
+      "source_filename": "book_5.png",
+      "raw_alt_text": "black and gray book with skull emblem and bone corner guards",
+      "canonical_object": "death codex",
+      "motif_tags": [
+        "bone",
+        "text"
+      ],
+      "family_key": "book",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "book-6",
+      "source_filename": "book_6.png",
+      "raw_alt_text": "green book with a coiled serpent embossed on the cover",
+      "canonical_object": "serpent codex",
+      "motif_tags": [
+        "text"
+      ],
+      "family_key": "book",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "book-8",
+      "source_filename": "book_8.png",
+      "raw_alt_text": "brown strapped book with leaf corners and parchment peeking out",
+      "canonical_object": "field journal",
+      "motif_tags": [
+        "plant",
+        "text"
+      ],
+      "family_key": "book",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "book-9",
+      "source_filename": "book_9.png",
+      "raw_alt_text": "green book with a turquoise swirling gem set in the cover",
+      "canonical_object": "whorl codex",
+      "motif_tags": [
+        "crystal",
+        "text"
+      ],
+      "family_key": "book",
+      "ambiguity_flags": [
+        "generic_alt",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "bowl",
+      "source_filename": "bowl.png",
+      "raw_alt_text": "dark gray mortar holding bright yellow-green potion with a gold pestle",
+      "canonical_object": "mortar",
+      "motif_tags": [
+        "container",
+        "essence"
+      ],
+      "family_key": "bowl",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "broomstick",
+      "source_filename": "broomstick.png",
+      "raw_alt_text": "brown broom with red band and glowing yellow-green bristles",
+      "canonical_object": "broomstick",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "broomstick",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "bunch-of-leaves",
+      "source_filename": "bunch_of_leaves.png",
+      "raw_alt_text": "olive green leafy branch bound with yellow twine",
+      "canonical_object": "bunch of leaves",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "bunch_of_leaves",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "butterfly-wings",
+      "source_filename": "butterfly_wings.png",
+      "raw_alt_text": "red and black butterfly with white-spotted wing edges",
+      "canonical_object": "butterfly wings",
+      "motif_tags": [
+        "animal",
+        "feather"
+      ],
+      "family_key": "butterfly_wings",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "cactus",
+      "source_filename": "cactus .png",
+      "raw_alt_text": "green spiky cactus with small offshoots and pale thorns",
+      "canonical_object": "cactus",
+      "motif_tags": [
+        "bone",
+        "plant"
+      ],
+      "family_key": "cactus",
+      "ambiguity_flags": [
+        "filename_format"
+      ]
+    },
+    {
+      "art_id": "candle",
+      "source_filename": "candle.png",
+      "raw_alt_text": "cream candle with golden flame and melted wax drips",
+      "canonical_object": "candle",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "candle",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "card",
+      "source_filename": "card.png",
+      "raw_alt_text": "teal tarot card with gold crescent moon and star symbols",
+      "canonical_object": "card",
+      "motif_tags": [
+        "text"
+      ],
+      "family_key": "card",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "cat",
+      "source_filename": "cat.png",
+      "raw_alt_text": "black cat figurine with glowing amber eyes and curled tail",
+      "canonical_object": "cat",
+      "motif_tags": [
+        "animal",
+        "dream",
+        "feather"
+      ],
+      "family_key": "cat",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "cauldron",
+      "source_filename": "cauldron.png",
+      "raw_alt_text": "black cauldron filled with bubbling neon green liquid",
+      "canonical_object": "cauldron",
+      "motif_tags": [
+        "container"
+      ],
+      "family_key": "cauldron",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "cinnamon",
+      "source_filename": "cinnamon.png",
+      "raw_alt_text": "two brown star anise blossoms on warm amber background",
+      "canonical_object": "cinnamon",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "cinnamon",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "claw",
+      "source_filename": "claw.png",
+      "raw_alt_text": "ivory curved claw or tusk with brown spots",
+      "canonical_object": "claw",
+      "motif_tags": [
+        "bone"
+      ],
+      "family_key": "claw",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "clover",
+      "source_filename": "clover.png",
+      "raw_alt_text": "pale green clover leaf with white ringed center pattern",
+      "canonical_object": "clover",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "clover",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "creepy-plant",
+      "source_filename": "creepy_plant.png",
+      "raw_alt_text": "light green plant sprouting many eye-like nodules from a cracked pot",
+      "canonical_object": "creepy plant",
+      "motif_tags": [
+        "dream"
+      ],
+      "family_key": "creepy_plant",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "crow",
+      "source_filename": "crow.png",
+      "raw_alt_text": "black raven with glossy feathers and a pale blue eye",
+      "canonical_object": "crow",
+      "motif_tags": [
+        "animal",
+        "dream",
+        "feather"
+      ],
+      "family_key": "crow",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "crystal",
+      "source_filename": "crystal.png",
+      "raw_alt_text": "large faceted purple crystal on a brown pedestal",
+      "canonical_object": "crystal",
+      "motif_tags": [
+        "crystal"
+      ],
+      "family_key": "crystal",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "damned-button",
+      "source_filename": "damned_button.png",
+      "raw_alt_text": "orange glowing ember-like disc surrounded by soft pink aura",
+      "canonical_object": "damned button",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "damned_button",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "dark-essense",
+      "source_filename": "dark-essense.png",
+      "raw_alt_text": "sleek black-and-silver droplet of liquid or polished metal",
+      "canonical_object": "shadow droplet",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "dark_essense",
+      "ambiguity_flags": [
+        "filename_typo"
+      ]
+    },
+    {
+      "art_id": "dark-knife",
+      "source_filename": "dark_knife.png",
+      "raw_alt_text": "silver dagger with a skull hilt and dark handle",
+      "canonical_object": "dark knife",
+      "motif_tags": [
+        "bone",
+        "weapon"
+      ],
+      "family_key": "dark_knife",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "dead-rat",
+      "source_filename": "dead_rat.png",
+      "raw_alt_text": "blue-gray rat with red eyes on a brown branch",
+      "canonical_object": "dead rat",
+      "motif_tags": [
+        "animal",
+        "dream"
+      ],
+      "family_key": "dead_rat",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "doll",
+      "source_filename": "doll.png",
+      "raw_alt_text": "Beige rope doll with flowing strands, tied in loose knots, on orange-brown background.",
+      "canonical_object": "doll",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "doll",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "dreamcatcher",
+      "source_filename": "dreamcatcher.png",
+      "raw_alt_text": "Dark red woven orb with olive beads, wrapped in brown cords and gray tassels.",
+      "canonical_object": "dreamcatcher",
+      "motif_tags": [
+        "animal",
+        "crystal",
+        "dream"
+      ],
+      "family_key": "dreamcatcher",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "drum",
+      "source_filename": "drum.png",
+      "raw_alt_text": "Tan drum with carved skull lid, brown body, and gold tension cords.",
+      "canonical_object": "drum",
+      "motif_tags": [
+        "bone"
+      ],
+      "family_key": "drum",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "egg-dragon",
+      "source_filename": "egg_dragon.png",
+      "raw_alt_text": "Glowing red amber egg with fiery yellow core and dark crack lines.",
+      "canonical_object": "ember egg",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "egg_dragon",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "eggs-2",
+      "source_filename": "eggs_2.png",
+      "raw_alt_text": "Yellow-green spotted egg with large dark blotches and smooth rounded surface.",
+      "canonical_object": "spotted egg",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "eggs",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "essence",
+      "source_filename": "essence.png",
+      "raw_alt_text": "Blue glass vial containing black smoky liquid, capped with a brown stopper.",
+      "canonical_object": "essence",
+      "motif_tags": [
+        "container",
+        "essence"
+      ],
+      "family_key": "essence",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "eye-3",
+      "source_filename": "eye_3.png",
+      "raw_alt_text": "Bright golden eye with black slit pupil and glowing amber iris.",
+      "canonical_object": "gold eye",
+      "motif_tags": [
+        "dream",
+        "feather"
+      ],
+      "family_key": "eye",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "feather",
+      "source_filename": "feather.png",
+      "raw_alt_text": "Single black feather with layered barbs and a thin dark shaft.",
+      "canonical_object": "feather",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "feather",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "feather-gold",
+      "source_filename": "feather_gold.png",
+      "raw_alt_text": "White-gold feather glowing softly against a vivid yellow background.",
+      "canonical_object": "feather gold",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "feather_gold",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "feathers",
+      "source_filename": "feathers.png",
+      "raw_alt_text": "Pale gray feather with curved quill and soft layered barbs.",
+      "canonical_object": "feathers",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "feathers",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "fly",
+      "source_filename": "fly.png",
+      "raw_alt_text": "Green fly with translucent wings, brown legs, and copper eyes.",
+      "canonical_object": "fly",
+      "motif_tags": [
+        "animal",
+        "dream",
+        "feather"
+      ],
+      "family_key": "fly",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "garlic",
+      "source_filename": "garlic.png",
+      "raw_alt_text": "White garlic bulb with creamy cloves and faint beige shading.",
+      "canonical_object": "garlic",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "garlic",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "ginger",
+      "source_filename": "ginger .png",
+      "raw_alt_text": "Golden ginger root with sliced yellow pieces and warm brown shadows.",
+      "canonical_object": "ginger root",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "ginger",
+      "ambiguity_flags": [
+        "filename_format"
+      ]
+    },
+    {
+      "art_id": "hair",
+      "source_filename": "hair.png",
+      "raw_alt_text": "Bundled lock of brown hair tied at one end.",
+      "canonical_object": "hair",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "hair",
+      "ambiguity_flags": [
+        "manual_alt"
+      ]
+    },
+    {
+      "art_id": "hat",
+      "source_filename": "hat.png",
+      "raw_alt_text": "Dark brown witch hat with a black band and silver buckle.",
+      "canonical_object": "hat",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "hat",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "heart",
+      "source_filename": "heart.png",
+      "raw_alt_text": "Red anatomical heart with glossy veins and rounded chambers.",
+      "canonical_object": "heart",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "heart",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "honeycombs",
+      "source_filename": "honeycombs.png",
+      "raw_alt_text": "Three amber gem shards set in pale cream honeycomb frames.",
+      "canonical_object": "honeycombs",
+      "motif_tags": [
+        "crystal"
+      ],
+      "family_key": "honeycombs",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "horn-rainbow",
+      "source_filename": "horn_rainbow .png",
+      "raw_alt_text": "Rainbow twisted horn or horn-shaped spiral, fading from green to orange.",
+      "canonical_object": "rainbow horn",
+      "motif_tags": [
+        "bone"
+      ],
+      "family_key": "horn_rainbow",
+      "ambiguity_flags": [
+        "filename_format"
+      ]
+    },
+    {
+      "art_id": "horns",
+      "source_filename": "horns.png",
+      "raw_alt_text": "Antler-like bone branch in beige and brown, branching into smooth curves.",
+      "canonical_object": "horns",
+      "motif_tags": [
+        "bone"
+      ],
+      "family_key": "horns",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "hourglass",
+      "source_filename": "hourglass.png",
+      "raw_alt_text": "Wooden hourglass with pale sand, tilted in a warm brown frame.",
+      "canonical_object": "hourglass",
+      "motif_tags": [
+        "time"
+      ],
+      "family_key": "hourglass",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "ice",
+      "source_filename": "ice.png",
+      "raw_alt_text": "Two turquoise ice crystals with white veins and glossy rounded facets.",
+      "canonical_object": "ice",
+      "motif_tags": [
+        "crystal"
+      ],
+      "family_key": "ice",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "idol",
+      "source_filename": "idol.png",
+      "raw_alt_text": "brown hooded stone or shell with swirling cream streaks and a circular dark opening",
+      "canonical_object": "idol",
+      "motif_tags": [
+        "crystal",
+        "shell"
+      ],
+      "family_key": "idol",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "key-2",
+      "source_filename": "key_2.png",
+      "raw_alt_text": "silver metal key with round ornate bow and long cylindrical shaft",
+      "canonical_object": "silver key",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "key",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "key-3",
+      "source_filename": "key_3.png",
+      "raw_alt_text": "golden ornate key with curled filigree bow and bright polished shaft",
+      "canonical_object": "gold key",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "key",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "knife",
+      "source_filename": "knife.png",
+      "raw_alt_text": "curved silver blade with black grip, tan guard, and cyan glowing background",
+      "canonical_object": "knife",
+      "motif_tags": [
+        "feather",
+        "weapon"
+      ],
+      "family_key": "knife",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "larva",
+      "source_filename": "larva.png",
+      "raw_alt_text": "cream-white segmented grub with red head, orange legs, and black mandibles",
+      "canonical_object": "larva",
+      "motif_tags": [
+        "animal"
+      ],
+      "family_key": "larva",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "leech",
+      "source_filename": "leech.png",
+      "raw_alt_text": "curved black horn or claw with cream spots and bright green interior",
+      "canonical_object": "leech",
+      "motif_tags": [
+        "bone"
+      ],
+      "family_key": "leech",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "letter-2",
+      "source_filename": "letter_2.png",
+      "raw_alt_text": "dark red sealed envelope tied with ribbon and gold wax seal",
+      "canonical_object": "letter",
+      "motif_tags": [
+        "text"
+      ],
+      "family_key": "letter",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "magic-ball",
+      "source_filename": "magic-ball.png",
+      "raw_alt_text": "purple-black orb with branching cracks and a bright white glowing center",
+      "canonical_object": "cracked orb",
+      "motif_tags": [
+        "crystal",
+        "feather"
+      ],
+      "family_key": "magic_ball",
+      "ambiguity_flags": [
+        "generic_alt",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "magic-ball",
+      "source_filename": "magic_ball.png",
+      "raw_alt_text": "red fiery eye orb with vertical slit pupil on a brown base",
+      "canonical_object": "eye orb",
+      "motif_tags": [
+        "crystal",
+        "dream"
+      ],
+      "family_key": "magic_ball",
+      "ambiguity_flags": [
+        "generic_alt",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "magic-ball-2",
+      "source_filename": "magic_ball_2.png",
+      "raw_alt_text": "glossy pink and purple crystal sphere on a brown pedestal",
+      "canonical_object": "prism orb",
+      "motif_tags": [
+        "crystal"
+      ],
+      "family_key": "magic_ball",
+      "ambiguity_flags": [
+        "generic_alt",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "magic-fish",
+      "source_filename": "magic_fish.png",
+      "raw_alt_text": "yellow-gold fish with orange scales and bright fins",
+      "canonical_object": "magic fish",
+      "motif_tags": [
+        "animal"
+      ],
+      "family_key": "magic_fish",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "magic-stick-2",
+      "source_filename": "magic_stick_2.png",
+      "raw_alt_text": "red-wrapped wand with blue-purple crystal tip and hanging green leaves",
+      "canonical_object": "ribbon wand",
+      "motif_tags": [
+        "crystal",
+        "weapon"
+      ],
+      "family_key": "magic_stick",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "magic-stick-3",
+      "source_filename": "magic_stick_3.png",
+      "raw_alt_text": "wooden staff topped with glowing green gem and wrapped root-like branches",
+      "canonical_object": "root staff",
+      "motif_tags": [
+        "crystal",
+        "feather",
+        "plant",
+        "weapon"
+      ],
+      "family_key": "magic_stick",
+      "ambiguity_flags": [
+        "generic_alt",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "magic-stick-6",
+      "source_filename": "magic_stick_6.png",
+      "raw_alt_text": "curved black staff with copper wrappings, feathers, and dark hanging charms",
+      "canonical_object": "charm staff",
+      "motif_tags": [
+        "feather",
+        "weapon"
+      ],
+      "family_key": "magic_stick",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "mandragora",
+      "source_filename": "mandragora.png",
+      "raw_alt_text": "golden root vegetable with green leaves and twisted trailing tendrils",
+      "canonical_object": "mandragora",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "mandragora",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "maquis",
+      "source_filename": "maquis.png",
+      "raw_alt_text": "orange poppy-like flower with dark purple center and soft glowing petals",
+      "canonical_object": "maquis",
+      "motif_tags": [
+        "feather",
+        "plant"
+      ],
+      "family_key": "maquis",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "mask-2",
+      "source_filename": "mask_2.png",
+      "raw_alt_text": "cream theatrical mask with black eye makeup and dark hair backing",
+      "canonical_object": "theater mask",
+      "motif_tags": [
+        "dream"
+      ],
+      "family_key": "mask",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "mirror",
+      "source_filename": "mirror.png",
+      "raw_alt_text": "silver-framed mirror with cracked glass, purple jewel, and curled ornamentation",
+      "canonical_object": "mirror",
+      "motif_tags": [
+        "dream"
+      ],
+      "family_key": "mirror",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "mollusk",
+      "source_filename": "mollusk.png",
+      "raw_alt_text": "golden clam shell with a pale pearl-like interior and striped lid",
+      "canonical_object": "mollusk",
+      "motif_tags": [
+        "shell"
+      ],
+      "family_key": "mollusk",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "monster-jelly",
+      "source_filename": "monster_jelly.png",
+      "raw_alt_text": "bright green slime blob covered in multiple blinking eyeballs",
+      "canonical_object": "monster jelly",
+      "motif_tags": [
+        "dream"
+      ],
+      "family_key": "monster_jelly",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "mortar-pestle",
+      "source_filename": "mortar_pestle.png",
+      "raw_alt_text": "Gray stone bowl with green leaves and pale golden pestle or stem.",
+      "canonical_object": "herb mortar",
+      "motif_tags": [
+        "container",
+        "crystal",
+        "plant"
+      ],
+      "family_key": "mortar_pestle",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "necklace",
+      "source_filename": "necklace.png",
+      "raw_alt_text": "Brown ringed bracelet with black beads and tan claw-like hanging charms.",
+      "canonical_object": "necklace",
+      "motif_tags": [
+        "bone"
+      ],
+      "family_key": "necklace",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "nest",
+      "source_filename": "nest.png",
+      "raw_alt_text": "Orange-yellow eggs nestled in a woven brown nest.",
+      "canonical_object": "nest",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "nest",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "note-2",
+      "source_filename": "note_2.png",
+      "raw_alt_text": "Pale yellow parchment pages with dark handwritten notes and tiny diagram.",
+      "canonical_object": "notes",
+      "motif_tags": [
+        "text"
+      ],
+      "family_key": "note",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "oak-leaf",
+      "source_filename": "oak_leaf.png",
+      "raw_alt_text": "Golden autumn leaf with brown veins and glowing amber edges.",
+      "canonical_object": "oak leaf",
+      "motif_tags": [
+        "feather",
+        "plant"
+      ],
+      "family_key": "oak_leaf",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "opal",
+      "source_filename": "opal.png",
+      "raw_alt_text": "Iridescent oval gem shimmering orange, yellow, green, and blue.",
+      "canonical_object": "opal",
+      "motif_tags": [
+        "crystal"
+      ],
+      "family_key": "opal",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "parchment",
+      "source_filename": "parchment.png",
+      "raw_alt_text": "Cream-colored rolled parchment scroll with softly shaded edges.",
+      "canonical_object": "parchment",
+      "motif_tags": [
+        "text"
+      ],
+      "family_key": "parchment",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "petals",
+      "source_filename": "petals.png",
+      "raw_alt_text": "Dark magenta flower petals layered into a velvety blossom.",
+      "canonical_object": "petals",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "petals",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "philosopher-s-stone",
+      "source_filename": "philosopher's_Stone.png",
+      "raw_alt_text": "Faceted red-orange crystal with bright translucent highlights.",
+      "canonical_object": "philosopher stone",
+      "motif_tags": [
+        "crystal"
+      ],
+      "family_key": "philosopher's_stone",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "phoenix-feather",
+      "source_filename": "phoenix_feather.png",
+      "raw_alt_text": "Golden feather with brown shaft and warm orange glow.",
+      "canonical_object": "phoenix feather",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "phoenix_feather",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "pig-nouse",
+      "source_filename": "pig_nouse.png",
+      "raw_alt_text": "Pink speckled mushroom cap with two hollow dark openings.",
+      "canonical_object": "hollow cap",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "pig_nouse",
+      "ambiguity_flags": [
+        "filename_typo"
+      ]
+    },
+    {
+      "art_id": "pin",
+      "source_filename": "pin.png",
+      "raw_alt_text": "Glossy red lollipop or wand with a tapered silver stick.",
+      "canonical_object": "pin",
+      "motif_tags": [
+        "weapon"
+      ],
+      "family_key": "pin",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "piranha",
+      "source_filename": "piranha.png",
+      "raw_alt_text": "Blue-green fish with orange belly, sharp teeth, and speckled scales.",
+      "canonical_object": "piranha",
+      "motif_tags": [
+        "animal",
+        "bone"
+      ],
+      "family_key": "piranha",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "poison",
+      "source_filename": "poison.png",
+      "raw_alt_text": "Green potion bottle with black skull emblem and toxic glow.",
+      "canonical_object": "poison",
+      "motif_tags": [
+        "bone",
+        "container",
+        "essence"
+      ],
+      "family_key": "poison",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "pot",
+      "source_filename": "pot.png",
+      "raw_alt_text": "Black cauldron filled with bubbling neon green liquid.",
+      "canonical_object": "pot",
+      "motif_tags": [
+        "container"
+      ],
+      "family_key": "pot",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "potion",
+      "source_filename": "potion.png",
+      "raw_alt_text": "Glass vial of bright purple powder with cork stopper.",
+      "canonical_object": "potion",
+      "motif_tags": [
+        "container",
+        "essence"
+      ],
+      "family_key": "potion",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "powder-magic",
+      "source_filename": "powder_magic.png",
+      "raw_alt_text": "Shallow golden bowl holding sparkling violet powder or liquid.",
+      "canonical_object": "powder bowl",
+      "motif_tags": [
+        "container",
+        "essence"
+      ],
+      "family_key": "powder_magic",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "rabbit-tail",
+      "source_filename": "rabbit_tail.png",
+      "raw_alt_text": "Black-and-white swirling feather or seed form against blue background.",
+      "canonical_object": "swirl tuft",
+      "motif_tags": [
+        "feather",
+        "plant"
+      ],
+      "family_key": "rabbit_tail",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "rainbow-mushroom",
+      "source_filename": "rainbow mushroom.png",
+      "raw_alt_text": "Rainbow-capped mushroom with tan speckled stem and golden underside.",
+      "canonical_object": "rainbow mushroom",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "rainbow_mushroom",
+      "ambiguity_flags": [
+        "filename_format"
+      ]
+    },
+    {
+      "art_id": "rainbow-jellyfish",
+      "source_filename": "rainbow_jellyfish.png",
+      "raw_alt_text": "Translucent aqua shell with rainbow-dotted cap and flowing ruffled skirt.",
+      "canonical_object": "jelly veil",
+      "motif_tags": [
+        "feather",
+        "shell"
+      ],
+      "family_key": "rainbow_jellyfish",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "raven-skull",
+      "source_filename": "raven_skull.png",
+      "raw_alt_text": "Off-white skull with dark eye sockets and long beak-like nasal opening.",
+      "canonical_object": "raven skull",
+      "motif_tags": [
+        "animal",
+        "bone",
+        "dream"
+      ],
+      "family_key": "raven_skull",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "red-cheese",
+      "source_filename": "red_cheese.png",
+      "raw_alt_text": "Glowing red wedge-shaped gem or cheese-like shard with oval cutouts.",
+      "canonical_object": "ember wedge",
+      "motif_tags": [
+        "crystal",
+        "feather"
+      ],
+      "family_key": "red_cheese",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "rose-petals",
+      "source_filename": "rose_petals.png",
+      "raw_alt_text": "Swirling crimson and pink feather or flower petal form.",
+      "canonical_object": "rose swirl",
+      "motif_tags": [
+        "feather",
+        "plant"
+      ],
+      "family_key": "rose_petals",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "rosemary",
+      "source_filename": "rosemary.png",
+      "raw_alt_text": "Green leafy sprig with pale veins and soft brown stem.",
+      "canonical_object": "rosemary",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "rosemary",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "rune",
+      "source_filename": "rune.png",
+      "raw_alt_text": "Dark gray stone with bright cyan rune-like symbol inset.",
+      "canonical_object": "rune",
+      "motif_tags": [
+        "crystal",
+        "token"
+      ],
+      "family_key": "rune",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "runes",
+      "source_filename": "runes.png",
+      "raw_alt_text": "Reddish-orange sack spilling pale rune-marked stones or shells.",
+      "canonical_object": "runes",
+      "motif_tags": [
+        "crystal",
+        "shell",
+        "token"
+      ],
+      "family_key": "runes",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "scorpion",
+      "source_filename": "scorpion.png",
+      "raw_alt_text": "Copper-brown scorpion with segmented tail and raised claws.",
+      "canonical_object": "scorpion",
+      "motif_tags": [
+        "animal",
+        "bone"
+      ],
+      "family_key": "scorpion",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "scroll-3",
+      "source_filename": "scroll_3.png",
+      "raw_alt_text": "Beige scroll sealed with red ribbon and gold wax medal.",
+      "canonical_object": "sealed scroll",
+      "motif_tags": [
+        "text"
+      ],
+      "family_key": "scroll",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "sea-urchin",
+      "source_filename": "sea_urchin.png",
+      "raw_alt_text": "Olive-green spiny shell or seed pod dotted with bumps.",
+      "canonical_object": "sea urchin",
+      "motif_tags": [
+        "plant",
+        "shell"
+      ],
+      "family_key": "sea_urchin",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "shell-2",
+      "source_filename": "shell 2.png",
+      "raw_alt_text": "Cream and orange spotted spiral shell with rounded bands.",
+      "canonical_object": "spiral shell",
+      "motif_tags": [
+        "shell"
+      ],
+      "family_key": "shell",
+      "ambiguity_flags": [
+        "filename_format",
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "shell",
+      "source_filename": "shell.png",
+      "raw_alt_text": "Open blue-gray clam shell holding a glowing pearl.",
+      "canonical_object": "shell",
+      "motif_tags": [
+        "feather",
+        "shell"
+      ],
+      "family_key": "shell",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "sickle",
+      "source_filename": "sickle.png",
+      "raw_alt_text": "Silver crescent sickle with teal glow and wooden handle.",
+      "canonical_object": "sickle",
+      "motif_tags": [
+        "weapon"
+      ],
+      "family_key": "sickle",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "skull-2",
+      "source_filename": "skull_2.png",
+      "raw_alt_text": "Brown human skull with hollow eye sockets and teeth.",
+      "canonical_object": "human skull",
+      "motif_tags": [
+        "bone",
+        "dream"
+      ],
+      "family_key": "skull",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "slug",
+      "source_filename": "slug.png",
+      "raw_alt_text": "Pale beige conch shell with scattered brown speckles.",
+      "canonical_object": "slug",
+      "motif_tags": [
+        "animal",
+        "shell"
+      ],
+      "family_key": "slug",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "speaces",
+      "source_filename": "speaces.png",
+      "raw_alt_text": "Translucent green slime mound with rounded gelatinous bulges.",
+      "canonical_object": "green ooze",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "speaces",
+      "ambiguity_flags": [
+        "filename_typo"
+      ]
+    },
+    {
+      "art_id": "spider",
+      "source_filename": "spider.png",
+      "raw_alt_text": "Black and orange spider with blurred legs and open fangs.",
+      "canonical_object": "spider",
+      "motif_tags": [
+        "animal"
+      ],
+      "family_key": "spider",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "star-anise",
+      "source_filename": "star_anise.png",
+      "raw_alt_text": "Orange-brown star anise pod with eight pointed segments.",
+      "canonical_object": "star pod",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "star_anise",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "stick",
+      "source_filename": "stick.png",
+      "raw_alt_text": "White and ochre bird skull with elongated beak.",
+      "canonical_object": "stick",
+      "motif_tags": [
+        "bone"
+      ],
+      "family_key": "stick",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "stone-red",
+      "source_filename": "stone-red.png",
+      "raw_alt_text": "Bright red faceted crystal gem with sharp reflective planes.",
+      "canonical_object": "red shard",
+      "motif_tags": [
+        "crystal"
+      ],
+      "family_key": "stone_red",
+      "ambiguity_flags": [
+        "generic_alt"
+      ]
+    },
+    {
+      "art_id": "stone",
+      "source_filename": "stone.png",
+      "raw_alt_text": "Blue faceted crystal shard with glowing pale center.",
+      "canonical_object": "stone",
+      "motif_tags": [
+        "crystal",
+        "feather"
+      ],
+      "family_key": "stone",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "stone-2",
+      "source_filename": "stone_2.png",
+      "raw_alt_text": "Glowing blue crystal facets with white highlights and soft purple shadows",
+      "canonical_object": "glow shard",
+      "motif_tags": [
+        "crystal",
+        "feather"
+      ],
+      "family_key": "stone",
+      "ambiguity_flags": [
+        "duplicate_family"
+      ]
+    },
+    {
+      "art_id": "strange-fruit",
+      "source_filename": "strange_fruit.png",
+      "raw_alt_text": "Orange spiked egg with yellow spots and ember-like glowing highlights",
+      "canonical_object": "spike fruit",
+      "motif_tags": [
+        "feather",
+        "plant"
+      ],
+      "family_key": "strange_fruit",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "tall",
+      "source_filename": "tall.png",
+      "raw_alt_text": "Pale pink segmented worm curled into a hook shape with soft beige shading",
+      "canonical_object": "tall",
+      "motif_tags": [
+        "animal"
+      ],
+      "family_key": "tall",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "tea",
+      "source_filename": "tea.png",
+      "raw_alt_text": "Red spotted goblet filled with yellow liquid and a curled handle",
+      "canonical_object": "tea",
+      "motif_tags": [
+        "container"
+      ],
+      "family_key": "tea",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "teeaths",
+      "source_filename": "teeaths.png",
+      "raw_alt_text": "Cream-colored paired teeth with smooth ivory shading and dark root gaps",
+      "canonical_object": "paired teeth",
+      "motif_tags": [
+        "bone",
+        "plant"
+      ],
+      "family_key": "teeaths",
+      "ambiguity_flags": [
+        "filename_typo"
+      ]
+    },
+    {
+      "art_id": "toad",
+      "source_filename": "toad.png",
+      "raw_alt_text": "Olive green spotted toad with dark limbs and splayed webbed feet",
+      "canonical_object": "toad",
+      "motif_tags": [
+        "animal"
+      ],
+      "family_key": "toad",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "tongue",
+      "source_filename": "tongue.png",
+      "raw_alt_text": "Glossy red tongue-like organ with raised bumps and wet highlights",
+      "canonical_object": "tongue",
+      "motif_tags": [
+        "oddity"
+      ],
+      "family_key": "tongue",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "twisting-herbs",
+      "source_filename": "twisting_herbs.png",
+      "raw_alt_text": "Bound bundle of pale green herbs with purple and yellow flowers",
+      "canonical_object": "twisting herbs",
+      "motif_tags": [
+        "plant"
+      ],
+      "family_key": "twisting_herbs",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "vudu-doll",
+      "source_filename": "vudu_doll.png",
+      "raw_alt_text": "Stitched tan voodoo doll with pins, red button eye, and rough fabric",
+      "canonical_object": "vudu doll",
+      "motif_tags": [
+        "dream"
+      ],
+      "family_key": "vudu_doll",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "white-rat",
+      "source_filename": "white_rat.png",
+      "raw_alt_text": "Pale white mouse with red eyes and pink tail, curled in profile",
+      "canonical_object": "white rat",
+      "motif_tags": [
+        "animal",
+        "dream"
+      ],
+      "family_key": "white_rat",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "wing",
+      "source_filename": "wing.png",
+      "raw_alt_text": "Bright blue feather fan with green leaves at the base",
+      "canonical_object": "wing",
+      "motif_tags": [
+        "feather"
+      ],
+      "family_key": "wing",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "witch-coin",
+      "source_filename": "witch_coin.png",
+      "raw_alt_text": "Silver circular emblem with a white shard symbol on lavender and magenta background",
+      "canonical_object": "witch coin",
+      "motif_tags": [
+        "crystal",
+        "token"
+      ],
+      "family_key": "witch_coin",
+      "ambiguity_flags": []
+    },
+    {
+      "art_id": "worm",
+      "source_filename": "worm.png",
+      "raw_alt_text": "Brown banded worm curled in an S shape with glossy segmented rings",
+      "canonical_object": "worm",
+      "motif_tags": [
+        "animal"
+      ],
+      "family_key": "worm",
+      "ambiguity_flags": []
+    }
+  ]
+}
