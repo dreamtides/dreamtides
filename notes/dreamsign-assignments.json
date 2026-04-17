@@ -192,64 +192,64 @@
     {
       "dreamsign_id": "dreamsign_028",
       "effect_text": "Your events cost 1\u25cf less while you control 2+ Warriors.",
-      "name": "Red Book",
-      "image_file": "book.png",
+      "name": "Skull Drum",
+      "image_file": "drum.png",
       "justification": "A spellbook naturally lowers the cost of the magic it contains, so the discount for events while you have enough Warriors lands cleanly."
     },
     {
       "dreamsign_id": "dreamsign_029",
       "effect_text": "Judgment: If you control 3 or more Warriors, draw a card.",
-      "name": "Bestiary",
-      "image_file": "book_10.png",
+      "name": "Ivory Claw",
+      "image_file": "claw.png",
       "justification": "The paw-marked codex hints at a pack in formation, which makes drawing a card once you control enough Warriors feel earned."
     },
     {
       "dreamsign_id": "dreamsign_030",
       "effect_text": "Supported Warriors have +1 spark and Preeminence.",
-      "name": "Elder Tome",
-      "image_file": "book_11.png",
+      "name": "Charm Staff",
+      "image_file": "magic_stick_6.png",
       "justification": "The jellyfish book looks like something sustained by the whole tide, which is a decent image for supported Warriors getting extra spark and stature."
     },
     {
       "dreamsign_id": "dreamsign_031",
       "effect_text": "Your Warriors cost 1\u25cf less.",
-      "name": "Storm Tome",
-      "image_file": "book_2.png",
+      "name": "Curved Blade",
+      "image_file": "knife.png",
       "justification": "The lightning book is the most direct cost-cutting image in the set, so it fits Warriors becoming cheaper to deploy."
     },
     {
       "dreamsign_id": "dreamsign_032",
       "effect_text": "Warriors in your void have Reclaim equal to their cost.",
-      "name": "Eye Grimoire",
-      "image_file": "book_3.png",
+      "name": "Shadow Droplet",
+      "image_file": "dark-essense.png",
       "justification": "The eye grimoire feels like it keeps watch over what has fallen away, which suits Warriors in the void coming back with Reclaim."
     },
     {
       "dreamsign_id": "dreamsign_033",
       "effect_text": "Allied Figments count as Warriors.",
-      "name": "Skull Codex",
-      "image_file": "book_5.png",
+      "name": "Theater Mask",
+      "image_file": "mask_2.png",
       "justification": "The skull tome reads like a ledger of the dead, making it easy to accept Figments counting as full Warriors."
     },
     {
       "dreamsign_id": "dreamsign_034",
       "effect_text": "\u25b8 Judgment: Each allied Figment gains +1 spark.",
-      "name": "Serpent Manual",
-      "image_file": "book_6.png",
+      "name": "Rune Stone",
+      "image_file": "rune.png",
       "justification": "The serpent book has a living, invested feel, which matches allied Figments each gaining spark when Judgment lands."
     },
     {
       "dreamsign_id": "dreamsign_035",
       "effect_text": "\u25b8 Judgment: If you have 4 or more allied Figments, gain 2\u25cf.",
-      "name": "Leaf Ledger",
-      "image_file": "book_8.png",
+      "name": "Rune Sack",
+      "image_file": "runes.png",
       "justification": "The leaf ledger suggests a small stockpile of growth, so gaining energy when enough Figments are assembled feels plausible."
     },
     {
       "dreamsign_id": "dreamsign_036",
       "effect_text": "When you discard a card, materialize a Radiant Figment.",
-      "name": "Gem Codex",
-      "image_file": "book_9.png",
+      "name": "Purple Crystal",
+      "image_file": "crystal.png",
       "justification": "The gem codex radiates from the cover, which makes discarding a card and calling up a Radiant Figment feel like a spark from the pages."
     },
     {
@@ -339,8 +339,8 @@
     {
       "dreamsign_id": "dreamsign_049",
       "effect_text": "When you copy an event, copy it an additional time.",
-      "name": "Purple Crystal",
-      "image_file": "crystal.png",
+      "name": "Gem Codex",
+      "image_file": "book_9.png",
       "justification": "Faceted crystal naturally suggests refraction and duplication, which makes an extra copy on top of a copied event feel plausible."
     },
     {
@@ -353,8 +353,8 @@
     {
       "dreamsign_id": "dreamsign_051",
       "effect_text": "Your events that cost 2\u25cf or less are copied.",
-      "name": "Ivory Claw",
-      "image_file": "claw.png",
+      "name": "Storm Tome",
+      "image_file": "book_2.png",
       "justification": "A claw leaves more than one scratch, so copying cheap events feels like the same sharp motion landing twice instead of once."
     },
     {
@@ -395,8 +395,8 @@
     {
       "dreamsign_id": "dreamsign_057",
       "effect_text": "The first event you reclaim each turn gains Echo.",
-      "name": "Shadow Droplet",
-      "image_file": "dark-essense.png",
+      "name": "Eye Grimoire",
+      "image_file": "book_3.png",
       "justification": "Dark liquid in a vial feels like stored power that can rebound, which suits the first reclaimed event also gaining Echo."
     },
     {
@@ -409,8 +409,8 @@
     {
       "dreamsign_id": "dreamsign_059",
       "effect_text": "You may play cards with the Reclaim ability from your void for Reclaim 0.",
-      "name": "Skull Drum",
-      "image_file": "drum.png",
+      "name": "Skull Codex",
+      "image_file": "book_5.png",
       "justification": "A drum sets a beat, so pulling a card from the void and drawing again feels like the next strike in the rhythm."
     },
     {
@@ -556,8 +556,8 @@
     {
       "dreamsign_id": "dreamsign_080",
       "effect_text": "Allied characters with Judgment abilities have +1 spark.",
-      "name": "Theater Mask",
-      "image_file": "mask_2.png",
+      "name": "Sea Tome",
+      "image_file": "book_11.png",
       "justification": "A mask fits judgment literally: it gives the ally a role to speak from. In a courtroom sort of way, that extra authority becomes spark."
     },
     {
@@ -640,8 +640,8 @@
     {
       "dreamsign_id": "dreamsign_092",
       "effect_text": "When an ally dissolves an enemy in judgment, it gains +2 spark.",
-      "name": "Curved Blade",
-      "image_file": "knife.png",
+      "name": "Serpent Manual",
+      "image_file": "book_6.png",
       "justification": "A knife in judgment reads like the exacting edge of a sentence being carried out. If the ally finishes an enemy that way, it should absolutely come back sharper."
     },
     {
@@ -794,8 +794,8 @@
     {
       "dreamsign_id": "dreamsign_114",
       "effect_text": "The first card you buy at each Shop costs 25% less essence and gains a random transfiguration.",
-      "name": "Charm Staff",
-      "image_file": "magic_stick_6.png",
+      "name": "Paw Ledger",
+      "image_file": "book_10.png",
       "justification": "A charm-studded staff feels like a shop trinket that can bend the first purchase into something better. Extra transfiguration on the first buy reads like a little store magic."
     },
     {
@@ -857,8 +857,8 @@
     {
       "dreamsign_id": "dreamsign_123",
       "effect_text": "At Transfiguration sites, when you transfigure an Event, add a copy of it to your deck.",
-      "name": "Rune Stone",
-      "image_file": "rune.png",
+      "name": "Spell Tome",
+      "image_file": "book.png",
       "justification": "A single rune is already a copied mark, so transfiguring an event into a duplicate feels like letting the inscription resonate."
     },
     {
@@ -885,8 +885,8 @@
     {
       "dreamsign_id": "dreamsign_127",
       "effect_text": "At each Transfiguration site you visit, transfigure two cards instead of one.",
-      "name": "Rune Sack",
-      "image_file": "runes.png",
+      "name": "Leaf Ledger",
+      "image_file": "book_8.png",
       "justification": "A sack of runed stones looks packed with enough magic to push two cards through the site instead of one."
     },
     {
