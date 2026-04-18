@@ -293,6 +293,8 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevBattleRef = useRef<BattleView | null>(null);
   const wasPollingRef = useRef(false);
+  const judgmentPauseRef = useRef(false);
+  const dreamwellRevealRef = useRef<DreamwellReveal | null>(null);
   // Generation counter to invalidate stale in-flight polls
   const pollGenerationRef = useRef(0);
   // Timestamp until which polling should pause (for stack visibility)
@@ -308,9 +310,26 @@ export function BattleProvider({ children }: { children: ReactNode }) {
     log.logPollingStop(reason ?? "unknown");
   }, []);
 
+  useEffect(() => {
+    judgmentPauseRef.current = judgmentPause;
+  }, [judgmentPause]);
+
+  useEffect(() => {
+    dreamwellRevealRef.current = dreamwellReveal;
+  }, [dreamwellReveal]);
+
   const enqueueDreamwellReveals = useCallback((reveals: DreamwellReveal[]) => {
     if (reveals.length === 0) return;
-    setDreamwellRevealQueue((current) => [...current, ...reveals]);
+    if (judgmentPauseRef.current || dreamwellRevealRef.current != null) {
+      setDreamwellRevealQueue((current) => [...current, ...reveals]);
+      return;
+    }
+    const [nextReveal, ...rest] = reveals;
+    dreamwellRevealRef.current = nextReveal;
+    setDreamwellReveal(nextReveal);
+    if (rest.length > 0) {
+      setDreamwellRevealQueue((current) => [...current, ...rest]);
+    }
   }, []);
 
   useEffect(() => {
