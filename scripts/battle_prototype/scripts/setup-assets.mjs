@@ -64,6 +64,18 @@ function transformCard(card) {
   return result;
 }
 
+function transformDreamwellCard(card) {
+  return {
+    name: card.name,
+    id: card.id,
+    cardType: "Dreamwell",
+    energyProduced: card["energy-produced"] ?? null,
+    phase: card.phase ?? null,
+    imageNumber: card["image-number"],
+    assetPath: `/cards/dreamwell-${card["image-number"]}.webp`,
+  };
+}
+
 function imageHash(imageNumber) {
   const url = `https://www.shutterstock.com/image-illustration/-260nw-${imageNumber}.jpg`;
   return createHash("sha256").update(url).digest("hex");
@@ -76,35 +88,51 @@ function recreateDir(dir) {
 
 function main() {
   const tomlPath = resolveAssetPath("client", "Assets", "StreamingAssets", "Tabula", "rendered-cards.toml");
+  const dreamwellPath = resolveAssetPath("client", "Assets", "StreamingAssets", "Tabula", "dreamwell.toml");
   const tideIconsDir = resolveAssetPath("client", "Assets", "ThirdParty", "GameAssets", "Tides");
 
   console.log("Parsing rendered-cards.toml...");
   const tomlContent = readFileSync(tomlPath, "utf8");
   const parsed = parse(tomlContent);
   const allCards = parsed.cards;
+  const dreamwellContent = readFileSync(dreamwellPath, "utf8");
+  const dreamwellParsed = parse(dreamwellContent);
+  const allDreamwellCards = dreamwellParsed.dreamwell;
 
   if (!Array.isArray(allCards)) {
     throw new Error("Expected [[cards]] array in TOML file");
+  }
+  if (!Array.isArray(allDreamwellCards)) {
+    throw new Error("Expected [[dreamwell]] array in TOML file");
   }
 
   console.log(`Found ${allCards.length} total cards`);
   const cards = allCards.filter((c) => c.rarity !== "Special");
   console.log(`Filtered to ${cards.length} non-Special cards`);
 
-  const jsonCards = cards.map(transformCard);
+  const jsonCards = cards.map((card) => {
+    const transformed = transformCard(card);
+    return {
+      ...transformed,
+      assetPath: `/cards/${transformed.cardNumber}.webp`,
+    };
+  });
+  const jsonDreamwellCards = allDreamwellCards.map(transformDreamwellCard);
+  const imageData = [...jsonCards, ...jsonDreamwellCards];
 
   mkdirSync(PUBLIC_DIR, { recursive: true });
-  writeFileSync(JSON_PATH, JSON.stringify(jsonCards, null, 2) + "\n");
-  console.log(`Wrote ${jsonCards.length} cards to card-data.json`);
+  writeFileSync(JSON_PATH, JSON.stringify(imageData, null, 2) + "\n");
+  console.log(`Wrote ${imageData.length} cards to card-data.json`);
 
   recreateDir(CARDS_DIR);
   let linked = 0;
   let missing = 0;
 
-  for (const card of jsonCards) {
+  for (const card of imageData) {
     const hash = imageHash(card.imageNumber);
     const cachePath = join(IMAGE_CACHE_DIR, hash);
-    const symlinkPath = join(CARDS_DIR, `${card.cardNumber}.webp`);
+    const assetFileName = card.assetPath.replace("/cards/", "");
+    const symlinkPath = join(CARDS_DIR, assetFileName);
 
     if (existsSync(cachePath)) {
       symlinkSync(cachePath, symlinkPath);
@@ -114,7 +142,7 @@ function main() {
     }
   }
 
-  console.log(`Linked ${linked} of ${jsonCards.length} card images (${missing} missing)`);
+  console.log(`Linked ${linked} of ${imageData.length} card images (${missing} missing)`);
 
   recreateDir(TIDES_DIR);
 

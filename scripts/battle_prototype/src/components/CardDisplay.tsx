@@ -17,24 +17,27 @@ function colorToCSS(c: DisplayColor): string {
   return `rgba(${Math.round(c.red * 255)}, ${Math.round(c.green * 255)}, ${Math.round(c.blue * 255)}, ${c.alpha})`;
 }
 
-// Map from imageNumber (in sprite address) to cardNumber (filename)
-let imageNumberToCardNumber: Record<string, number> | null = null;
+// Map from imageNumber (in sprite address) to public image path
+let imageNumberToAssetPath: Record<string, string> | null = null;
 let loadingPromise: Promise<void> | null = null;
 
 function loadCardData(): Promise<void> {
-  if (imageNumberToCardNumber) return Promise.resolve();
+  if (imageNumberToAssetPath) return Promise.resolve();
   if (loadingPromise) return loadingPromise;
   loadingPromise = fetch("/card-data.json")
     .then((r) => r.json())
-    .then((data: Array<{ imageNumber: number; cardNumber: number }>) => {
-      const map: Record<string, number> = {};
+    .then((data: Array<{ imageNumber: number; assetPath?: string; cardNumber?: number }>) => {
+      const map: Record<string, string> = {};
       for (const card of data) {
-        map[String(card.imageNumber)] = card.cardNumber;
+        const assetPath = card.assetPath ?? (card.cardNumber != null ? `/cards/${card.cardNumber}.webp` : null);
+        if (assetPath != null) {
+          map[String(card.imageNumber)] = assetPath;
+        }
       }
-      imageNumberToCardNumber = map;
+      imageNumberToAssetPath = map;
     })
     .catch(() => {
-      imageNumberToCardNumber = {};
+      imageNumberToAssetPath = {};
     });
   return loadingPromise;
 }
@@ -45,10 +48,10 @@ function getCardImageUrl(card: CardView): string | null {
   if ("Sprite" in img) {
     const sprite = img.Sprite.sprite;
     const match = /(\d+)/.exec(sprite);
-    if (match && imageNumberToCardNumber) {
-      const cardNum = imageNumberToCardNumber[match[1]];
-      if (cardNum != null) {
-        return `/cards/${cardNum}.webp`;
+    if (match && imageNumberToAssetPath) {
+      const assetPath = imageNumberToAssetPath[match[1]];
+      if (assetPath != null) {
+        return assetPath;
       }
     }
   }
@@ -108,7 +111,7 @@ export function CardDisplay({
   onDragStart,
   onDragEnd,
 }: CardDisplayProps) {
-  const [dataLoaded, setDataLoaded] = useState(imageNumberToCardNumber != null);
+  const [dataLoaded, setDataLoaded] = useState(imageNumberToAssetPath != null);
 
   useEffect(() => {
     if (!dataLoaded) {
