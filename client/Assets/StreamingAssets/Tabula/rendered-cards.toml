@@ -3691,107 +3691,98 @@ tide = ""
 tide-cost = ""
 
 [[cards]]
-name = "Fangbound"
-id = "4bf0723b-ff81-4748-8253-a6b3540110e2"
-tide = "Arc"
-tide-cost = 1
-rendered-text = "▸ Materialized: Banish an enemy with cost 3● or less until this character leaves play."
-energy-cost = 3
+name = "Nocturne Strummer"
+id = "a1b2c3d4-1111-4000-8000-000000000001"
+tide = ""
+tide-cost = ""
+rendered-text = ""
+energy-cost = 1
 card-type = "Character"
-subtype = "Spirit Animal"
-rarity = "Uncommon"
+subtype = ""
+rarity = "Common"
 is-fast = false
-spark = 2
-image-number = 2438838887
+spark = 1
+image-number = 1792373848
 art-owned = false
 card-number = 223
 
 [[cards]]
-name = "Infernal Cavalier"
-id = "a9d5a6b0-e6fe-4f34-b955-4e5129c1ab0f"
-tide = "Pact"
-tide-cost = 1
-rendered-text = "▸ Dissolved: Return all enemies to hand."
-energy-cost = 5
+name = "Ringwatcher"
+id = "a1b2c3d4-2222-4000-8000-000000000002"
+tide = ""
+tide-cost = ""
+rendered-text = ""
+energy-cost = 2
 card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
+subtype = ""
+rarity = "Common"
 is-fast = false
-spark = 0
-image-number = 2421338075
+spark = 2
+image-number = 1016596168
 art-owned = false
 card-number = 224
 
 [[cards]]
-name = "Grim Pursuer"
-id = "5bfed3c9-cd1b-4fe7-a40b-dcec654db206"
-tide = "Rime"
-tide-cost = 1
-rendered-text = "▸ Materialized: Banish a chosen card from the opponent's hand until this character leaves play."
-energy-cost = 2
+name = "Runebound Champion"
+id = "a1b2c3d4-3333-4000-8000-000000000003"
+tide = ""
+tide-cost = ""
+rendered-text = ""
+energy-cost = 3
 card-type = "Character"
-subtype = "Detective"
-rarity = "Uncommon"
+subtype = ""
+rarity = "Common"
 is-fast = false
-spark = 1
-image-number = 1219782715
+spark = 3
+image-number = 2427491211
 art-owned = false
 card-number = 225
 
 [[cards]]
-name = "Gatebound Warden"
-id = "a2a3c102-4dc9-4dc2-9058-412e877c958e"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-▸ Materialized: Banish an enemy until this character leaves play.
-
-Abandon this character: Foresee 2."""
-energy-cost = 3
+name = "Marked Direwolf"
+id = "a1b2c3d4-4444-4000-8000-000000000004"
+tide = ""
+tide-cost = ""
+rendered-text = ""
+energy-cost = 4
 card-type = "Character"
-subtype = "Warrior"
-rarity = "Rare"
-is-fast = true
-spark = 1
-image-number = 287269511
+subtype = ""
+rarity = "Uncommon"
+is-fast = false
+spark = 5
+image-number = 2654359867
 art-owned = false
 card-number = 226
 
 [[cards]]
-name = "Breach Artist"
-id = "78e2c238-58c7-4bd7-b8f2-5415eda2f6cb"
-tide = "Arc"
-tide-cost = 1
-rendered-text = """
-Banish a card from hand: Play this character for 0●, then abandon it.
-
-▸ Materialized: Return an enemy to hand."""
-energy-cost = 4
+name = "Final Witness"
+id = "a1b2c3d4-5555-4000-8000-000000000005"
+tide = ""
+tide-cost = ""
+rendered-text = ""
+energy-cost = 5
 card-type = "Character"
-subtype = "Renegade"
-rarity = "Rare"
-is-fast = true
-spark = 2
-image-number = 2127752144
+subtype = ""
+rarity = "Uncommon"
+is-fast = false
+spark = 7
+image-number = 1793552419
 art-owned = false
 card-number = 227
 
 [[cards]]
-name = "Vanishing Inquisitor"
-id = "c9862d86-5a1f-46c1-b45a-0c2549eb5b25"
-tide = "Rime"
-tide-cost = 1
-rendered-text = """
-Banish a card from hand: Play this character for 0●, then abandon it.
-
-▸ Materialized: Discard a chosen card from the opponent's hand."""
-energy-cost = 4
+name = "Wildflower Colossus"
+id = "a1b2c3d4-7777-4000-8000-000000000006"
+tide = ""
+tide-cost = ""
+rendered-text = ""
+energy-cost = 7
 card-type = "Character"
-subtype = "Outsider"
+subtype = ""
 rarity = "Rare"
 is-fast = false
-spark = 3
-image-number = 461706976
+spark = 10
+image-number = 2123360831
 art-owned = false
 card-number = 228
 
