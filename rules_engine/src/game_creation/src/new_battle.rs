@@ -44,7 +44,7 @@ pub fn create_and_start(
         first_player,
         front_row_size,
         back_row_size,
-        BalanceMode::None,
+        BalanceMode::FourFiveCards,
     );
     battle.animations = Some(AnimationData::default());
     battle.tracing = Some(BattleTracing::default());

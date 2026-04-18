@@ -148,7 +148,9 @@ Each turn progresses through these phases in order:
    during this window. Once the opponent also passes, end-of-turn triggers fire
    and the turn passes to the opponent.
 
-**Game start:** Each player draws 5 cards as their opening hand.
+**Game start:** The starting player draws 4 cards and skips the first turn's
+draw step. The second player draws 5 cards and draws normally on their first
+turn.
 
 ## Playing Cards and the Stack
 
