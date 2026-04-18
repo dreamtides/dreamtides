@@ -83,7 +83,9 @@ function stripIconChars(text: string): string {
 const OVERRIDE_RULES_TEXT_BY_NAME: Record<string, string> = {
   "Duskborn Sentry": "Supported characters gain +2 spark.",
   "Duskborne Sentry": "Supported characters gain +2 spark.",
+  "Nocturne Strummer": "Supported characters gain +2 spark.",
   "Veilward Knight": "At end of turn, each supporting character gains +1 spark.",
+  "Runebound Champion": "At end of turn, each supporting character gains +1 spark.",
 };
 
 function displayRulesText(name: string, rulesText: string): string {

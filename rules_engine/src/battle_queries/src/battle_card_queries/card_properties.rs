@@ -7,7 +7,7 @@ use core_data::types::PlayerName;
 
 use crate::battle_card_queries::card;
 
-const DUSKBORNE_SENTRY: &str = "Duskborne Sentry";
+const NOCTURNE_STRUMMER: &str = "Nocturne Strummer";
 
 /// Returns the energy cost of a card, or 0 if it has no energy cost.
 ///
@@ -71,7 +71,7 @@ fn supported_sentry_bonus(
     let count = supporters
         .into_iter()
         .filter_map(|slot| battlefield.back.get(slot).copied().flatten())
-        .filter(|id| has_displayed_name(battle, *id, DUSKBORNE_SENTRY))
+        .filter(|id| has_displayed_name(battle, *id, NOCTURNE_STRUMMER))
         .count();
     Spark((count as u32) * 2)
 }

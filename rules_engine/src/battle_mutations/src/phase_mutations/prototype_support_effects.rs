@@ -9,7 +9,7 @@ use core_data::types::PlayerName;
 
 use crate::card_mutations::spark;
 
-const VEILWARD_KNIGHT: &str = "Veilward Knight";
+const RUNEBOUND_CHAMPION: &str = "Runebound Champion";
 
 pub fn apply_end_of_turn_support_gains(
     battle: &mut BattleState,
@@ -29,7 +29,7 @@ pub fn apply_end_of_turn_support_gains(
         let Some(card_id) = card_id else {
             continue;
         };
-        if !is_veilward_knight(battle, card_id) {
+        if !is_runebound_champion(battle, card_id) {
             continue;
         }
         for back_slot in
@@ -40,7 +40,7 @@ pub fn apply_end_of_turn_support_gains(
                 continue;
             };
             battle_trace!(
-                "Applying Veilward Knight support gain",
+                "Applying Runebound Champion support gain",
                 battle,
                 player,
                 front_slot,
@@ -52,6 +52,6 @@ pub fn apply_end_of_turn_support_gains(
     }
 }
 
-fn is_veilward_knight(battle: &BattleState, id: CharacterId) -> bool {
-    card::get_definition(battle, id).displayed_name == VEILWARD_KNIGHT
+fn is_runebound_champion(battle: &BattleState, id: CharacterId) -> bool {
+    card::get_definition(battle, id).displayed_name == RUNEBOUND_CHAMPION
 }
