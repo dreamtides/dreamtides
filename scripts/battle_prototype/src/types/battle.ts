@@ -294,9 +294,17 @@ export interface UpdateBattleCommand {
   update_sound?: AudioClipAddress;
 }
 
+export interface DisplayDreamwellActivationCommand {
+  card_id: ClientCardId;
+  new_energy?: Energy | null;
+  new_produced_energy?: Energy | null;
+  player: DisplayPlayer;
+}
+
 // Command: externally tagged enum. We only care about UpdateBattle.
 export type Command =
   | { UpdateBattle: UpdateBattleCommand }
+  | { DisplayDreamwellActivation: DisplayDreamwellActivationCommand }
   | Record<string, unknown>;
 
 export interface ParallelCommandGroup {

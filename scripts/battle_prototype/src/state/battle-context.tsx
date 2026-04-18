@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
   type ReactNode,
@@ -9,12 +10,16 @@ import {
 import type {
   BattleView,
   CardView,
+  DisplayPlayer,
   GameAction,
   TestDeckName,
 } from "../types/battle";
 import * as api from "../api/client";
 import { resetUserId } from "../api/client";
-import { extractBattleView } from "../util/command-parser";
+import {
+  parseCommandSequence,
+  type ParsedBattleCommands,
+} from "../util/command-parser";
 import * as log from "../api/logger";
 
 function stripTags(text: string): string {
@@ -80,6 +85,11 @@ interface GenerateEventsResult {
   events: string[];
   /** True when judgment happened AND something meaningful occurred (score change or combat) */
   judgmentPause: boolean;
+}
+
+interface DreamwellReveal {
+  card: CardView;
+  player: DisplayPlayer;
 }
 
 function generateEvents(oldBattle: BattleView, newBattle: BattleView): GenerateEventsResult {
@@ -234,6 +244,15 @@ function generateEvents(oldBattle: BattleView, newBattle: BattleView): GenerateE
   return { events, judgmentPause: judgmentOccurred && (judgmentHadAction || scoreChanged) };
 }
 
+function resolveDreamwellReveals(parsed: ParsedBattleCommands): DreamwellReveal[] {
+  if (!parsed.battle) return [];
+  const cards = new Map(parsed.battle.cards.map((card) => [card.id, card]));
+  return parsed.dreamwellActivations.flatMap((activation) => {
+    const card = cards.get(activation.card_id);
+    return card ? [{ card, player: activation.player }] : [];
+  });
+}
+
 interface BattleContextValue {
   battle: BattleView | null;
   isPolling: boolean;
@@ -241,6 +260,7 @@ interface BattleContextValue {
   events: string[];
   yourTurnCounter: number;
   judgmentPause: boolean;
+  dreamwellReveal: DreamwellReveal | null;
   continueFromJudgment: () => void;
   sendAction: (action: GameAction) => void;
   sendDebugAction: (action: GameAction) => void;
@@ -257,6 +277,7 @@ export function useBattle(): BattleContextValue {
 
 const POLL_INTERVAL_MS = 200;
 const STACK_PAUSE_MS = 500;
+const DREAMWELL_REVEAL_MS = 3000;
 
 export function BattleProvider({ children }: { children: ReactNode }) {
   const [battle, setBattle] = useState<BattleView | null>(null);
@@ -265,6 +286,9 @@ export function BattleProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<string[]>([]);
   const [yourTurnCounter, setYourTurnCounter] = useState(0);
   const [judgmentPause, setJudgmentPause] = useState(false);
+  const [dreamwellReveal, setDreamwellReveal] = useState<DreamwellReveal | null>(null);
+  const [dreamwellRevealQueue, setDreamwellRevealQueue] = useState<DreamwellReveal[]>([]);
+  const [pendingResumePolling, setPendingResumePolling] = useState(false);
   const responseVersionRef = useRef<string | undefined>(undefined);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevBattleRef = useRef<BattleView | null>(null);
@@ -283,6 +307,26 @@ export function BattleProvider({ children }: { children: ReactNode }) {
     setIsPolling(false);
     log.logPollingStop(reason ?? "unknown");
   }, []);
+
+  const enqueueDreamwellReveals = useCallback((reveals: DreamwellReveal[]) => {
+    if (reveals.length === 0) return;
+    setDreamwellRevealQueue((current) => [...current, ...reveals]);
+  }, []);
+
+  useEffect(() => {
+    if (judgmentPause || dreamwellReveal || dreamwellRevealQueue.length === 0) return;
+    const [nextReveal, ...rest] = dreamwellRevealQueue;
+    setDreamwellReveal(nextReveal);
+    setDreamwellRevealQueue(rest);
+  }, [dreamwellReveal, dreamwellRevealQueue, judgmentPause]);
+
+  useEffect(() => {
+    if (!dreamwellReveal) return;
+    const timer = window.setTimeout(() => {
+      setDreamwellReveal(null);
+    }, DREAMWELL_REVEAL_MS);
+    return () => window.clearTimeout(timer);
+  }, [dreamwellReveal]);
 
   const startPolling = useCallback(() => {
     // Clear any existing polling interval before starting a new one
@@ -312,7 +356,9 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           const pollMs = performance.now() - pollStart;
           // Check if this poll generation is still current
           if (pollGenerationRef.current !== myGeneration) return;
-          const view = pollRes.commands ? extractBattleView(pollRes.commands) : null;
+          const parsed = pollRes.commands ? parseCommandSequence(pollRes.commands) : null;
+          const view = parsed?.battle ?? null;
+          const dreamwellReveals = parsed ? resolveDreamwellReveals(parsed) : [];
           log.logPollResult(
             pollRes.response_type,
             pollRes.response_version,
@@ -320,6 +366,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
             view?.user.can_act ?? null,
             pollMs,
           );
+          enqueueDreamwellReveals(dreamwellReveals);
           if (view) {
             if (prevBattleRef.current) {
               const result = generateEvents(prevBattleRef.current, view);
@@ -330,6 +377,9 @@ export function BattleProvider({ children }: { children: ReactNode }) {
               if (result.judgmentPause && !view.game_over) {
                 prevBattleRef.current = view;
                 setBattle(view);
+                if (dreamwellReveals.length > 0 && !view.user.can_act) {
+                  setPendingResumePolling(true);
+                }
                 setJudgmentPause(true);
                 log.logJudgmentPause(view.turn_number, view.user.score, view.enemy.score);
                 if (pollRes.response_version) {
@@ -347,6 +397,15 @@ export function BattleProvider({ children }: { children: ReactNode }) {
               stackPauseUntilRef.current = performance.now() + STACK_PAUSE_MS;
             }
             log.logStateUpdate("poll", view.turn_number, view.user.score, view.enemy.score, view.user.can_act, view.user.energy, view.game_over);
+            if (dreamwellReveals.length > 0 && !view.user.can_act && !view.game_over) {
+              setPendingResumePolling(true);
+              if (pollRes.response_version) {
+                log.logResponseVersionUpdate("poll_dreamwell", responseVersionRef.current, pollRes.response_version);
+                responseVersionRef.current = pollRes.response_version;
+              }
+              stopPolling("dreamwell_reveal");
+              return;
+            }
             if (view.user.can_act || view.game_over) {
               if (wasPollingRef.current && !view.game_over) {
                 setYourTurnCounter((c) => c + 1);
@@ -373,11 +432,30 @@ export function BattleProvider({ children }: { children: ReactNode }) {
       })();
     }, POLL_INTERVAL_MS);
     pollIntervalRef.current = interval;
-  }, [stopPolling]);
+  }, [enqueueDreamwellReveals, stopPolling]);
+
+  useEffect(() => {
+    if (!pendingResumePolling || judgmentPause || dreamwellReveal || dreamwellRevealQueue.length > 0) {
+      return;
+    }
+    if (!battle || battle.user.can_act || battle.game_over) {
+      setPendingResumePolling(false);
+      return;
+    }
+    setPendingResumePolling(false);
+    startPolling();
+  }, [
+    battle,
+    dreamwellReveal,
+    dreamwellRevealQueue.length,
+    judgmentPause,
+    pendingResumePolling,
+    startPolling,
+  ]);
 
   const sendAction = useCallback(
     (action: GameAction) => {
-      if (isPolling) return;
+      if (isPolling || dreamwellReveal || dreamwellRevealQueue.length > 0) return;
       log.logAction(action, responseVersionRef.current);
       void (async () => {
         const actionStart = performance.now();
@@ -388,8 +466,11 @@ export function BattleProvider({ children }: { children: ReactNode }) {
             responseVersionRef.current,
           );
           const durationMs = performance.now() - actionStart;
-          const view = extractBattleView(res.commands);
+          const parsed = parseCommandSequence(res.commands);
+          const view = parsed.battle;
+          const dreamwellReveals = resolveDreamwellReveals(parsed);
           log.logActionResult(action, durationMs, !!view, view?.user.can_act ?? null, null);
+          enqueueDreamwellReveals(dreamwellReveals);
           if (view) {
             if (prevBattleRef.current) {
               const result = generateEvents(prevBattleRef.current, view);
@@ -400,6 +481,9 @@ export function BattleProvider({ children }: { children: ReactNode }) {
               if (result.judgmentPause && !view.game_over) {
                 prevBattleRef.current = view;
                 setBattle(view);
+                if (dreamwellReveals.length > 0 && !view.user.can_act) {
+                  setPendingResumePolling(true);
+                }
                 setJudgmentPause(true);
                 log.logJudgmentPause(view.turn_number, view.user.score, view.enemy.score);
                 return;
@@ -411,6 +495,12 @@ export function BattleProvider({ children }: { children: ReactNode }) {
               stackPauseUntilRef.current = performance.now() + STACK_PAUSE_MS;
             }
             log.logStateUpdate("action", view.turn_number, view.user.score, view.enemy.score, view.user.can_act, view.user.energy, view.game_over);
+            if (dreamwellReveals.length > 0) {
+              if (!view.user.can_act && !view.game_over) {
+                setPendingResumePolling(true);
+              }
+              return;
+            }
             if (view.user.can_act || view.game_over) return;
           }
           startPolling();
@@ -421,7 +511,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
         }
       })();
     },
-    [isPolling, startPolling],
+    [dreamwellReveal, dreamwellRevealQueue.length, enqueueDreamwellReveals, isPolling, startPolling],
   );
 
   const sendDebugAction = useCallback(
@@ -435,17 +525,29 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           setError(null);
           const res = await api.performAction(action, undefined);
           log.logActionResult(action, performance.now() - actionStart, false, null, null);
-          let view = extractBattleView(res.commands);
+          const parsed = parseCommandSequence(res.commands);
+          const initialDreamwellReveals = resolveDreamwellReveals(parsed);
+          let deferPollingForDreamwell = false;
+          enqueueDreamwellReveals(initialDreamwellReveals);
+          let view = parsed.battle;
           if (view) {
             setBattle(view);
+          }
+          if (view && initialDreamwellReveals.length > 0 && !view.user.can_act && !view.game_over) {
+            setPendingResumePolling(true);
+            deferPollingForDreamwell = true;
+            return;
           }
           // Poll with retries to get the updated state.
           for (let attempt = 0; attempt < 8; attempt++) {
             await new Promise((r) => setTimeout(r, 150 + attempt * 100));
             const pollStart = performance.now();
             const pollRes = await api.poll();
-            const pollView = pollRes.commands ? extractBattleView(pollRes.commands) : null;
+            const parsedPoll = pollRes.commands ? parseCommandSequence(pollRes.commands) : null;
+            const pollView = parsedPoll?.battle ?? null;
+            const dreamwellReveals = parsedPoll ? resolveDreamwellReveals(parsedPoll) : [];
             log.logPollResult(pollRes.response_type, pollRes.response_version, !!pollView, pollView?.user.can_act ?? null, performance.now() - pollStart);
+            enqueueDreamwellReveals(dreamwellReveals);
             if (pollView) {
               setBattle(pollView);
               view = pollView;
@@ -453,6 +555,11 @@ export function BattleProvider({ children }: { children: ReactNode }) {
             if (pollRes.response_version) {
               log.logResponseVersionUpdate("debug_poll", responseVersionRef.current, pollRes.response_version);
               responseVersionRef.current = pollRes.response_version;
+            }
+            if (pollView && dreamwellReveals.length > 0 && !pollView.user.can_act && !pollView.game_over) {
+              setPendingResumePolling(true);
+              deferPollingForDreamwell = true;
+              break;
             }
             if (pollRes.response_type === "Final") {
               break;
@@ -470,7 +577,7 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           if (view) {
             log.logStateUpdate("debug_action", view.turn_number, view.user.score, view.enemy.score, view.user.can_act, view.user.energy, view.game_over);
           }
-          if (view && !view.user.can_act) {
+          if (view && !view.user.can_act && !deferPollingForDreamwell) {
             startPolling();
           }
         } catch (e) {
@@ -480,19 +587,22 @@ export function BattleProvider({ children }: { children: ReactNode }) {
         }
       })();
     },
-    [stopPolling, startPolling],
+    [enqueueDreamwellReveals, startPolling, stopPolling],
   );
 
   const continueFromJudgment = useCallback(() => {
     log.logJudgmentContinue();
     setJudgmentPause(false);
+    if (dreamwellReveal || dreamwellRevealQueue.length > 0 || pendingResumePolling) {
+      return;
+    }
     if (battle && !battle.user.can_act && !battle.game_over) {
       startPolling();
     } else if (battle && battle.user.can_act) {
       setYourTurnCounter((c) => c + 1);
       wasPollingRef.current = false;
     }
-  }, [battle, startPolling]);
+  }, [battle, dreamwellReveal, dreamwellRevealQueue.length, pendingResumePolling, startPolling]);
 
   const reconnect = useCallback(
     (deck?: TestDeckName, userGoesSecond?: boolean) => {
@@ -502,6 +612,10 @@ export function BattleProvider({ children }: { children: ReactNode }) {
         try {
           setError(null);
           setEvents([]);
+          setDreamwellReveal(null);
+          setDreamwellRevealQueue([]);
+          setPendingResumePolling(false);
+          setJudgmentPause(false);
           stopPolling("reconnect");
           setBattle(null);
           resetUserId();
@@ -509,7 +623,9 @@ export function BattleProvider({ children }: { children: ReactNode }) {
           const durationMs = performance.now() - connectStart;
           log.logResponseVersionUpdate("connect", responseVersionRef.current, res.response_version);
           responseVersionRef.current = res.response_version;
-          const view = extractBattleView(res.commands);
+          const parsed = parseCommandSequence(res.commands);
+          const view = parsed.battle;
+          enqueueDreamwellReveals(resolveDreamwellReveals(parsed));
           if (view) {
             prevBattleRef.current = view;
             setBattle(view);
@@ -524,12 +640,12 @@ export function BattleProvider({ children }: { children: ReactNode }) {
         }
       })();
     },
-    [stopPolling],
+    [enqueueDreamwellReveals, stopPolling],
   );
 
   return (
     <BattleContext.Provider
-      value={{ battle, isPolling, error, events, yourTurnCounter, judgmentPause, continueFromJudgment, sendAction, sendDebugAction, reconnect }}
+      value={{ battle, isPolling, error, events, yourTurnCounter, judgmentPause, dreamwellReveal, continueFromJudgment, sendAction, sendDebugAction, reconnect }}
     >
       {children}
     </BattleContext.Provider>

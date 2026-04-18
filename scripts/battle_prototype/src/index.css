@@ -34,3 +34,28 @@ body {
   75% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.05); }
 }
+
+@keyframes dreamwellRevealBackdrop {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes dreamwellRevealPanel {
+  0% { opacity: 0; transform: translateY(20px) scale(0.94); }
+  12% { opacity: 1; transform: translateY(0) scale(1); }
+  82% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-12px) scale(1.03); }
+}
+
+.dreamwell-reveal-backdrop {
+  animation: dreamwellRevealBackdrop 3s ease forwards;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.dreamwell-reveal-panel {
+  animation: dreamwellRevealPanel 3s ease forwards;
+  min-width: min(18rem, calc(100vw - 2rem));
+}

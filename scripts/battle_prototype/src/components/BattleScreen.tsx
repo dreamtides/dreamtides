@@ -11,6 +11,11 @@ import { CardDisplay } from "./CardDisplay";
 
 type CardOrderTarget = "Deck" | "Void";
 
+interface DreamwellRevealView {
+  card: CardView;
+  player: DisplayPlayer;
+}
+
 interface BattleScreenProps {
   battle: BattleView;
   onAction: (action: GameAction) => void;
@@ -18,6 +23,7 @@ interface BattleScreenProps {
   onReconnect: (userGoesSecond?: boolean) => void;
   events: string[];
   disabled: boolean;
+  dreamwellReveal?: DreamwellRevealView | null;
   yourTurnCounter: number;
   judgmentPause?: boolean;
   onContinueFromJudgment?: () => void;
@@ -70,7 +76,18 @@ function cardOrderTarget(card: CardView): CardOrderTarget {
   return "Deck";
 }
 
-export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, events, disabled, yourTurnCounter, judgmentPause, onContinueFromJudgment }: BattleScreenProps) {
+export function BattleScreen({
+  battle,
+  onAction,
+  onDebugAction,
+  onReconnect,
+  events,
+  disabled,
+  dreamwellReveal,
+  yourTurnCounter,
+  judgmentPause,
+  onContinueFromJudgment,
+}: BattleScreenProps) {
   const [showDebug, setShowDebug] = useState(false);
   const [showVoid, setShowVoid] = useState<DisplayPlayer | null>(null);
   const [showLog, setShowLog] = useState(false);
@@ -114,6 +131,9 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
   }, [battle.cards, ui.card_order_selector]);
 
   const isGameOver = battle.game_over;
+  const cardOrderSelector = ui.card_order_selector;
+  const canAssignDeckOrder = cardOrderSelector?.include_deck ?? false;
+  const canAssignVoidOrder = cardOrderSelector?.include_void ?? false;
   const selectorCards = cardOrderCards(battle.cards)
     .sort((a, b) => a.position.sorting_key - b.position.sorting_key);
 
@@ -163,6 +183,38 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
           >
             Play Again
           </button>
+        </div>
+      )}
+
+      {dreamwellReveal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-60 dreamwell-reveal-backdrop"
+          style={{ pointerEvents: "none", zIndex: 60 }}
+        >
+          <div
+            className="dreamwell-reveal-panel rounded-2xl p-5 flex flex-col items-center gap-4"
+            style={{
+              background: "rgba(15, 23, 42, 0.92)",
+              border: "1px solid rgba(168, 85, 247, 0.4)",
+              boxShadow: "0 24px 80px rgba(0, 0, 0, 0.45)",
+            }}
+          >
+            <div className="text-center">
+              <div
+                className="text-xs tracking-[0.35em] uppercase"
+                style={{ color: "var(--color-gold-light)" }}
+              >
+                {dreamwellReveal.player === "User" ? "Your Dreamwell" : "Enemy Dreamwell"}
+              </div>
+              <div
+                className="text-sm mt-1"
+                style={{ color: "var(--color-text-dim)" }}
+              >
+                Dreamwell phase activation
+              </div>
+            </div>
+            <CardDisplay card={dreamwellReveal.card} disabled />
+          </div>
         </div>
       )}
 
@@ -470,7 +522,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
       )}
 
       {/* Card order selector (Foresee) */}
-      {ui.card_order_selector && selectorCards.length > 0 && (
+      {cardOrderSelector && selectorCards.length > 0 && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50"
           style={{ background: "rgba(0, 0, 0, 0.7)" }}
@@ -489,7 +541,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
               Choose a destination for each card.
             </p>
             <div className="grid gap-3 md:grid-cols-2">
-              {ui.card_order_selector!.include_deck && (
+              {canAssignDeckOrder && (
                 <div
                   className="rounded-lg p-3"
                   style={{
@@ -534,7 +586,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
                             >
                               {"\u2192"} Top of Deck
                             </button>
-                            {ui.card_order_selector!.include_void && (
+                            {canAssignVoidOrder && (
                               <button
                                 onClick={() => selectCardOrderTarget(card, "Void")}
                                 disabled={disabled || cardId == null}
@@ -557,7 +609,7 @@ export function BattleScreen({ battle, onAction, onDebugAction, onReconnect, eve
                   </div>
                 </div>
               )}
-              {ui.card_order_selector!.include_void && (
+              {canAssignVoidOrder && (
                 <div
                   className="rounded-lg p-3"
                   style={{
