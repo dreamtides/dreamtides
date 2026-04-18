@@ -2062,6 +2062,7 @@ dependencies = [
  "serde",
  "tabula_data",
  "tabula_generated",
+ "tracing",
  "user_state",
  "uuid",
 ]

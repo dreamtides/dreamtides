@@ -100,6 +100,7 @@ impl TestSession {
                     enemy: opponent.clone(),
                     seed: self.seed.or(Some(314159265358979323)),
                     deck_override: Some(TestDeckName::Vanilla),
+                    opening_hand_card_name: None,
                     dreamwell_override: Some(
                         self.dreamwell_list
                             .as_ref()

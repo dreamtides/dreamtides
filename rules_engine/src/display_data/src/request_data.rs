@@ -77,6 +77,9 @@ pub struct DebugConfiguration {
     /// players.
     pub deck_override: Option<TestDeckName>,
 
+    /// If specified, the human player will start with the named card in hand.
+    pub opening_hand_card_name: Option<String>,
+
     /// If specified, the battle will be created with the given dreamwell.
     pub dreamwell_override: Option<DreamwellCardIdList>,
 

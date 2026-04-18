@@ -3804,14 +3804,14 @@ subtype = ""
 spark = ""
 
 [[cards]]
-name = "Duskborne Sentry"
+name = "Nocturne Strummer"
 id = "a1b2c3d4-1111-4000-8000-000000000001"
 energy-cost = 1
 rules-text = ""
 variables = ""
 card-type = "Character"
 is-fast = false
-image-number = 0
+image-number = 1792373848
 rarity = "Common"
 art-owned = false
 card-number = 223
@@ -3819,14 +3819,14 @@ subtype = ""
 spark = 1
 
 [[cards]]
-name = "Glimmer Scout"
+name = "Ringwatcher"
 id = "a1b2c3d4-2222-4000-8000-000000000002"
 energy-cost = 2
 rules-text = ""
 variables = ""
 card-type = "Character"
 is-fast = false
-image-number = 0
+image-number = 1016596168
 rarity = "Common"
 art-owned = false
 card-number = 224
@@ -3834,14 +3834,14 @@ subtype = ""
 spark = 2
 
 [[cards]]
-name = "Veilward Knight"
+name = "Runebound Champion"
 id = "a1b2c3d4-3333-4000-8000-000000000003"
 energy-cost = 3
 rules-text = ""
 variables = ""
 card-type = "Character"
 is-fast = false
-image-number = 0
+image-number = 2427491211
 rarity = "Common"
 art-owned = false
 card-number = 225
@@ -3849,14 +3849,14 @@ subtype = ""
 spark = 3
 
 [[cards]]
-name = "Embertide Warrior"
+name = "Marked Direwolf"
 id = "a1b2c3d4-4444-4000-8000-000000000004"
 energy-cost = 4
 rules-text = ""
 variables = ""
 card-type = "Character"
 is-fast = false
-image-number = 0
+image-number = 2654359867
 rarity = "Uncommon"
 art-owned = false
 card-number = 226
@@ -3864,14 +3864,14 @@ subtype = ""
 spark = 5
 
 [[cards]]
-name = "Starforged Titan"
+name = "Final Witness"
 id = "a1b2c3d4-5555-4000-8000-000000000005"
 energy-cost = 5
 rules-text = ""
 variables = ""
 card-type = "Character"
 is-fast = false
-image-number = 0
+image-number = 1793552419
 rarity = "Uncommon"
 art-owned = false
 card-number = 227
@@ -3879,14 +3879,14 @@ subtype = ""
 spark = 7
 
 [[cards]]
-name = "Abyssal Colossus"
+name = "Wildflower Colossus"
 id = "a1b2c3d4-7777-4000-8000-000000000006"
 energy-cost = 7
 rules-text = ""
 variables = ""
 card-type = "Character"
 is-fast = false
-image-number = 0
+image-number = 2123360831
 rarity = "Rare"
 art-owned = false
 card-number = 228

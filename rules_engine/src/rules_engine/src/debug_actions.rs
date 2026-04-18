@@ -36,6 +36,7 @@ pub fn execute<P>(
                 PlayerName::One,
                 None,
                 None,
+                None,
             );
             provider.clear_undo_stack(battle.id);
         }
@@ -50,6 +51,7 @@ pub fn execute<P>(
                 battle.players.two.as_create_battle_player(),
                 battle.request_context.clone(),
                 PlayerName::Two,
+                None,
                 None,
                 None,
             );
@@ -72,6 +74,7 @@ pub fn execute<P>(
                 },
                 battle.request_context.clone(),
                 PlayerName::One,
+                None,
                 None,
                 None,
             );

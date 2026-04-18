@@ -333,6 +333,7 @@ export interface DebugConfiguration {
   enemy?: unknown;
   seed?: number;
   deck_override?: TestDeckName;
+  opening_hand_card_name?: string;
   dreamwell_override?: unknown;
   front_row_size?: number;
   back_row_size?: number;

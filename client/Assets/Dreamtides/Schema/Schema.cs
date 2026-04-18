@@ -134,6 +134,12 @@ namespace Dreamtides.Schema
     public partial class DebugConfiguration
     {
         /// <summary>
+        /// If specified, the number of back-row slots per player.
+        /// </summary>
+        [JsonProperty("back_row_size")]
+        public long? BackRowSize { get; set; }
+
+        /// <summary>
         /// If specified, the battle will be created with the given deck for both
         /// players.
         /// </summary>
@@ -153,11 +159,29 @@ namespace Dreamtides.Schema
         public PlayerType Enemy { get; set; }
 
         /// <summary>
+        /// If specified, the number of front-row slots per player.
+        /// </summary>
+        [JsonProperty("front_row_size")]
+        public long? FrontRowSize { get; set; }
+
+        /// <summary>
+        /// If specified, the human player will start with the named card in hand.
+        /// </summary>
+        [JsonProperty("opening_hand_card_name")]
+        public string OpeningHandCardName { get; set; }
+
+        /// <summary>
         /// If specified, the battle will be seeded with the given value. Otherwise
         /// a random seed will be used.
         /// </summary>
         [JsonProperty("seed")]
         public long? Seed { get; set; }
+
+        /// <summary>
+        /// If true, the human player goes second (on the draw) instead of first.
+        /// </summary>
+        [JsonProperty("user_goes_second")]
+        public bool? UserGoesSecond { get; set; }
     }
 
     public partial class PlayerType
@@ -176,6 +200,27 @@ namespace Dreamtides.Schema
 
         [JsonProperty("MonteCarloSingleThreaded", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? MonteCarloSingleThreaded { get; set; }
+
+        [JsonProperty("MonteCarloV2", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarloV2 { get; set; }
+
+        [JsonProperty("MonteCarloV3", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarloV3 { get; set; }
+
+        [JsonProperty("MonteCarloV4", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarloV4 { get; set; }
+
+        [JsonProperty("MonteCarloV5", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarloV5 { get; set; }
+
+        [JsonProperty("MonteCarloV6", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarloV6 { get; set; }
+
+        [JsonProperty("MonteCarloV7", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarloV7 { get; set; }
+
+        [JsonProperty("MonteCarloV8", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarloV8 { get; set; }
 
         [JsonProperty("MonteCarloHybridV1", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? MonteCarloHybridV1 { get; set; }
@@ -470,6 +515,13 @@ namespace Dreamtides.Schema
     /// Select a modal effect choice for an effect or item on the stack
     ///
     /// Select which activated ability to activate from a character
+    ///
+    /// Move a character to a specific front rank position (0-7).
+    ///
+    /// Move a character to a specific back rank position (0-7).
+    ///
+    /// Select a back-rank character to move forward, awaiting column
+    /// assignment via a subsequent MoveCharacterToFrontRank action.
     /// </summary>
     public partial class BattleActionClass
     {
@@ -511,6 +563,15 @@ namespace Dreamtides.Schema
 
         [JsonProperty("SelectActivatedAbilityChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectActivatedAbilityChoice { get; set; }
+
+        [JsonProperty("MoveCharacterToFrontRank", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<long> MoveCharacterToFrontRank { get; set; }
+
+        [JsonProperty("MoveCharacterToBackRank", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<long> MoveCharacterToBackRank { get; set; }
+
+        [JsonProperty("SelectCharacterForPositioning", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectCharacterForPositioning { get; set; }
     }
 
     /// <summary>
@@ -521,8 +582,6 @@ namespace Dreamtides.Schema
     /// Set the points total of the player
     ///
     /// Set the produced energy of the player
-    ///
-    /// Set the spark bonus of the player
     ///
     /// Add a specific card to hand
     ///
@@ -540,6 +599,11 @@ namespace Dreamtides.Schema
     /// Sets the `next_index` for the dreamwell to draw the card with the
     /// indicated definition ID. Panics if this card is not present in the
     /// dreamwell.
+    ///
+    /// Place a character directly into the front rank at a specific position.
+    /// Bypasses summoning sickness.
+    ///
+    /// Place a character directly into the back rank at a specific position.
     /// </summary>
     public partial class DebugBattleActionClass
     {
@@ -554,9 +618,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("SetProducedEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetProducedEnergy SetProducedEnergy { get; set; }
-
-        [JsonProperty("SetSparkBonus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SetSparkBonus SetSparkBonus { get; set; }
 
         [JsonProperty("AddCardToHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public AddCardToHand AddCardToHand { get; set; }
@@ -578,6 +639,24 @@ namespace Dreamtides.Schema
 
         [JsonProperty("SetNextDreamwellCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetNextDreamwellCard SetNextDreamwellCard { get; set; }
+
+        [JsonProperty("AddCardToFrontRank", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public AddCardToFrontRank AddCardToFrontRank { get; set; }
+
+        [JsonProperty("AddCardToBackRank", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public AddCardToBackRank AddCardToBackRank { get; set; }
+    }
+
+    public partial class AddCardToBackRank
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public Guid Card { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+
+        [JsonProperty("position", Required = Required.Always)]
+        public long Position { get; set; }
     }
 
     public partial class AddCardToBattlefield
@@ -587,6 +666,18 @@ namespace Dreamtides.Schema
 
         [JsonProperty("player", Required = Required.Always)]
         public PlayerName Player { get; set; }
+    }
+
+    public partial class AddCardToFrontRank
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public Guid Card { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+
+        [JsonProperty("position", Required = Required.Always)]
+        public long Position { get; set; }
     }
 
     public partial class AddCardToHand
@@ -665,15 +756,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("player", Required = Required.Always)]
         public PlayerName Player { get; set; }
-    }
-
-    public partial class SetSparkBonus
-    {
-        [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
-
-        [JsonProperty("spark", Required = Required.Always)]
-        public long Spark { get; set; }
     }
 
     public partial class DeckCardSelectedOrder
@@ -1318,7 +1400,7 @@ namespace Dreamtides.Schema
         /// The player to display the dreamwell activation for.
         /// </summary>
         [JsonProperty("player", Required = Required.Always)]
-        public DisplayPlayer Player { get; set; }
+        public PlayerEnum Player { get; set; }
     }
 
     public partial class DisplayEffectCommand
@@ -1372,13 +1454,13 @@ namespace Dreamtides.Schema
         public string CardId { get; set; }
 
         [JsonProperty("Deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Deck { get; set; }
+        public PlayerEnum? Deck { get; set; }
 
         [JsonProperty("Void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Void { get; set; }
+        public PlayerEnum? Void { get; set; }
 
         [JsonProperty("Avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Avatar { get; set; }
+        public PlayerEnum? Avatar { get; set; }
 
         [JsonProperty("QuestObject", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public QuestObjectId? QuestObject { get; set; }
@@ -1405,7 +1487,7 @@ namespace Dreamtides.Schema
         /// The player to display the judgment animation for.
         /// </summary>
         [JsonProperty("player", Required = Required.Always)]
-        public DisplayPlayer Player { get; set; }
+        public PlayerEnum Player { get; set; }
     }
 
     public partial class DissolveCardCommand
@@ -1588,34 +1670,34 @@ namespace Dreamtides.Schema
         public StackType? OnStack { get; set; }
 
         [JsonProperty("InHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InHand { get; set; }
+        public PlayerEnum? InHand { get; set; }
 
         [JsonProperty("InDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InDeck { get; set; }
+        public PlayerEnum? InDeck { get; set; }
 
         [JsonProperty("InVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InVoid { get; set; }
+        public PlayerEnum? InVoid { get; set; }
 
         [JsonProperty("InBanished", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InBanished { get; set; }
+        public PlayerEnum? InBanished { get; set; }
 
         [JsonProperty("OnBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? OnBattlefield { get; set; }
+        public List<OnBattlefield> OnBattlefield { get; set; }
 
         [JsonProperty("InPlayerStatus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InPlayerStatus { get; set; }
+        public PlayerEnum? InPlayerStatus { get; set; }
 
         [JsonProperty("CardOrderSelector", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardOrderSelectionTargetDiscriminants? CardOrderSelector { get; set; }
 
         [JsonProperty("InDreamwell", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InDreamwell { get; set; }
+        public PlayerEnum? InDreamwell { get; set; }
 
         [JsonProperty("HiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string HiddenWithinCard { get; set; }
 
         [JsonProperty("AboveVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? AboveVoid { get; set; }
+        public PlayerEnum? AboveVoid { get; set; }
 
         [JsonProperty("SiteDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Guid? SiteDeck { get; set; }
@@ -1838,6 +1920,13 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("spark")]
         public string Spark { get; set; }
+
+        /// <summary>
+        /// True if this character has summoning sickness and cannot move to the
+        /// front rank this turn.
+        /// </summary>
+        [JsonProperty("summoning_sick", Required = Required.Always)]
+        public bool SummoningSick { get; set; }
     }
 
     /// <summary>
@@ -2174,7 +2263,7 @@ namespace Dreamtides.Schema
     public partial class ShuffleVoidIntoDeckCommand
     {
         [JsonProperty("player", Required = Required.Always)]
-        public DisplayPlayer Player { get; set; }
+        public PlayerEnum Player { get; set; }
     }
 
     public partial class UpdateBattleCommand
@@ -2218,6 +2307,12 @@ namespace Dreamtides.Schema
         public PlayerView Enemy { get; set; }
 
         /// <summary>
+        /// True if the game has ended
+        /// </summary>
+        [JsonProperty("game_over", Required = Required.Always)]
+        public bool GameOver { get; set; }
+
+        /// <summary>
         /// Unique identifier for this dream battle
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]
@@ -2228,6 +2323,13 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("interface", Required = Required.Always)]
         public InterfaceView Interface { get; set; }
+
+        /// <summary>
+        /// Current opponent AI mode, or a label indicating a human-controlled
+        /// opponent
+        /// </summary>
+        [JsonProperty("opponent_ai_label", Required = Required.Always)]
+        public string OpponentAiLabel { get; set; }
 
         /// <summary>
         /// Preview of the next state of the battle, used e.g. when confirming
@@ -2651,13 +2753,17 @@ namespace Dreamtides.Schema
     /// ordering prompt.
     ///
     /// Confirm the selected cards to mulligan
+    ///
+    /// Transition from card-play sub-phase to positioning sub-phase.
     /// </summary>
-    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitHandCardTargets, SubmitMulligan, SubmitVoidCardTargets };
+    public enum BattleActionEnum { BeginPositioning, EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitHandCardTargets, SubmitMulligan, SubmitVoidCardTargets };
 
     /// <summary>
     /// Cause the opponent to take a 'continue' legal action
+    ///
+    /// Skip directly to the Judgment phase.
     /// </summary>
-    public enum DebugBattleActionEnum { OpponentContinue };
+    public enum DebugBattleActionEnum { OpponentContinue, SkipToJudgment };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -2677,7 +2783,7 @@ namespace Dreamtides.Schema
 
     public enum PanelAddressEnum { AddCardToHand, Developer, PlayOpponentCard, SetOpponentAgent };
 
-    public enum DebugActionEnum { RestartBattle, SetOpponentAsHuman };
+    public enum DebugActionEnum { RestartBattle, RestartBattleOnTheDraw, SetOpponentAsHuman };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -2727,7 +2833,7 @@ namespace Dreamtides.Schema
     ///
     /// The player to display the dreamwell activation for.
     /// </summary>
-    public enum DisplayPlayer { Enemy, User };
+    public enum PlayerEnum { Enemy, User };
 
     public enum QuestObjectId { EssenceTotal, QuestDeck };
 
@@ -2784,6 +2890,20 @@ namespace Dreamtides.Schema
     /// Auto-generated discriminant enum variants
     /// </summary>
     public enum CardOrderSelectionTargetDiscriminants { Deck, Void };
+
+    /// <summary>
+    /// Represents a player within the context of the display layer.
+    ///
+    /// The "viewer" is always the player operating the game client, this may
+    /// correspond to either of the actual players in the game.
+    ///
+    /// The player to display the judgment animation for.
+    ///
+    /// The player to display the dreamwell activation for.
+    ///
+    /// Represents the rank (row) of a character on the battlefield.
+    /// </summary>
+    public enum DisplayPlayer { Back, Enemy, Front, User };
 
     public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
 
@@ -2921,6 +3041,15 @@ namespace Dreamtides.Schema
         public bool IsNull => OnClickClass == null && Enum == null;
     }
 
+    public partial struct OnBattlefield
+    {
+        public DisplayPlayer? Enum;
+        public long? Integer;
+
+        public static implicit operator OnBattlefield(DisplayPlayer Enum) => new OnBattlefield { Enum = Enum };
+        public static implicit operator OnBattlefield(long Integer) => new OnBattlefield { Integer = Integer };
+    }
+
     /// <summary>
     /// Position category
     ///
@@ -3023,11 +3152,13 @@ namespace Dreamtides.Schema
                 ScrollBarVisibilityConverter.Singleton,
                 TouchScrollBehaviorConverter.Singleton,
                 SliderDirectionConverter.Singleton,
-                DisplayPlayerConverter.Singleton,
+                PlayerEnumConverter.Singleton,
                 QuestObjectIdConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 PositionConverter.Singleton,
                 CardOrderSelectionTargetDiscriminantsConverter.Singleton,
+                OnBattlefieldConverter.Singleton,
+                DisplayPlayerConverter.Singleton,
                 StackTypeConverter.Singleton,
                 StartBattleDisplayTypeConverter.Singleton,
                 TemptingOfferTypeConverter.Singleton,
@@ -3439,6 +3570,8 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
+                        case "BeginPositioning":
+                            return new BattleAction { Enum = BattleActionEnum.BeginPositioning };
                         case "EndTurn":
                             return new BattleAction { Enum = BattleActionEnum.EndTurn };
                         case "PassPriority":
@@ -3469,6 +3602,9 @@ namespace Dreamtides.Schema
             {
                 switch (value.Enum)
                 {
+                    case BattleActionEnum.BeginPositioning:
+                        serializer.Serialize(writer, "BeginPositioning");
+                        return;
                     case BattleActionEnum.EndTurn:
                         serializer.Serialize(writer, "EndTurn");
                         return;
@@ -3514,9 +3650,12 @@ namespace Dreamtides.Schema
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
-                    if (stringValue == "OpponentContinue")
+                    switch (stringValue)
                     {
-                        return new DebugBattleAction { Enum = DebugBattleActionEnum.OpponentContinue };
+                        case "OpponentContinue":
+                            return new DebugBattleAction { Enum = DebugBattleActionEnum.OpponentContinue };
+                        case "SkipToJudgment":
+                            return new DebugBattleAction { Enum = DebugBattleActionEnum.SkipToJudgment };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -3531,10 +3670,14 @@ namespace Dreamtides.Schema
             var value = (DebugBattleAction)untypedValue;
             if (value.Enum != null)
             {
-                if (value.Enum == DebugBattleActionEnum.OpponentContinue)
+                switch (value.Enum)
                 {
-                    serializer.Serialize(writer, "OpponentContinue");
-                    return;
+                    case DebugBattleActionEnum.OpponentContinue:
+                        serializer.Serialize(writer, "OpponentContinue");
+                        return;
+                    case DebugBattleActionEnum.SkipToJudgment:
+                        serializer.Serialize(writer, "SkipToJudgment");
+                        return;
                 }
             }
             if (value.DebugBattleActionClass != null)
@@ -3597,9 +3740,12 @@ namespace Dreamtides.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "OpponentContinue")
+            switch (value)
             {
-                return DebugBattleActionEnum.OpponentContinue;
+                case "OpponentContinue":
+                    return DebugBattleActionEnum.OpponentContinue;
+                case "SkipToJudgment":
+                    return DebugBattleActionEnum.SkipToJudgment;
             }
             throw new Exception("Cannot unmarshal type DebugBattleActionEnum");
         }
@@ -3612,10 +3758,14 @@ namespace Dreamtides.Schema
                 return;
             }
             var value = (DebugBattleActionEnum)untypedValue;
-            if (value == DebugBattleActionEnum.OpponentContinue)
+            switch (value)
             {
-                serializer.Serialize(writer, "OpponentContinue");
-                return;
+                case DebugBattleActionEnum.OpponentContinue:
+                    serializer.Serialize(writer, "OpponentContinue");
+                    return;
+                case DebugBattleActionEnum.SkipToJudgment:
+                    serializer.Serialize(writer, "SkipToJudgment");
+                    return;
             }
             throw new Exception("Cannot marshal type DebugBattleActionEnum");
         }
@@ -3712,6 +3862,8 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "BeginPositioning":
+                    return BattleActionEnum.BeginPositioning;
                 case "EndTurn":
                     return BattleActionEnum.EndTurn;
                 case "PassPriority":
@@ -3740,6 +3892,9 @@ namespace Dreamtides.Schema
             var value = (BattleActionEnum)untypedValue;
             switch (value)
             {
+                case BattleActionEnum.BeginPositioning:
+                    serializer.Serialize(writer, "BeginPositioning");
+                    return;
                 case BattleActionEnum.EndTurn:
                     serializer.Serialize(writer, "EndTurn");
                     return;
@@ -4065,6 +4220,8 @@ namespace Dreamtides.Schema
                     {
                         case "RestartBattle":
                             return new DebugAction { Enum = DebugActionEnum.RestartBattle };
+                        case "RestartBattleOnTheDraw":
+                            return new DebugAction { Enum = DebugActionEnum.RestartBattleOnTheDraw };
                         case "SetOpponentAsHuman":
                             return new DebugAction { Enum = DebugActionEnum.SetOpponentAsHuman };
                     }
@@ -4085,6 +4242,9 @@ namespace Dreamtides.Schema
                 {
                     case DebugActionEnum.RestartBattle:
                         serializer.Serialize(writer, "RestartBattle");
+                        return;
+                    case DebugActionEnum.RestartBattleOnTheDraw:
+                        serializer.Serialize(writer, "RestartBattleOnTheDraw");
                         return;
                     case DebugActionEnum.SetOpponentAsHuman:
                         serializer.Serialize(writer, "SetOpponentAsHuman");
@@ -4114,6 +4274,8 @@ namespace Dreamtides.Schema
             {
                 case "RestartBattle":
                     return DebugActionEnum.RestartBattle;
+                case "RestartBattleOnTheDraw":
+                    return DebugActionEnum.RestartBattleOnTheDraw;
                 case "SetOpponentAsHuman":
                     return DebugActionEnum.SetOpponentAsHuman;
             }
@@ -4132,6 +4294,9 @@ namespace Dreamtides.Schema
             {
                 case DebugActionEnum.RestartBattle:
                     serializer.Serialize(writer, "RestartBattle");
+                    return;
+                case DebugActionEnum.RestartBattleOnTheDraw:
+                    serializer.Serialize(writer, "RestartBattleOnTheDraw");
                     return;
                 case DebugActionEnum.SetOpponentAsHuman:
                     serializer.Serialize(writer, "SetOpponentAsHuman");
@@ -5196,9 +5361,9 @@ namespace Dreamtides.Schema
         public static readonly SliderDirectionConverter Singleton = new SliderDirectionConverter();
     }
 
-    internal class DisplayPlayerConverter : JsonConverter
+    internal class PlayerEnumConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(DisplayPlayer) || t == typeof(DisplayPlayer?);
+        public override bool CanConvert(Type t) => t == typeof(PlayerEnum) || t == typeof(PlayerEnum?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -5207,11 +5372,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "Enemy":
-                    return DisplayPlayer.Enemy;
+                    return PlayerEnum.Enemy;
                 case "User":
-                    return DisplayPlayer.User;
+                    return PlayerEnum.User;
             }
-            throw new Exception("Cannot unmarshal type DisplayPlayer");
+            throw new Exception("Cannot unmarshal type PlayerEnum");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -5221,20 +5386,20 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (DisplayPlayer)untypedValue;
+            var value = (PlayerEnum)untypedValue;
             switch (value)
             {
-                case DisplayPlayer.Enemy:
+                case PlayerEnum.Enemy:
                     serializer.Serialize(writer, "Enemy");
                     return;
-                case DisplayPlayer.User:
+                case PlayerEnum.User:
                     serializer.Serialize(writer, "User");
                     return;
             }
-            throw new Exception("Cannot marshal type DisplayPlayer");
+            throw new Exception("Cannot marshal type PlayerEnum");
         }
 
-        public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
+        public static readonly PlayerEnumConverter Singleton = new PlayerEnumConverter();
     }
 
     internal class QuestObjectIdConverter : JsonConverter
@@ -5495,6 +5660,119 @@ namespace Dreamtides.Schema
         }
 
         public static readonly CardOrderSelectionTargetDiscriminantsConverter Singleton = new CardOrderSelectionTargetDiscriminantsConverter();
+    }
+
+    internal class OnBattlefieldConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(OnBattlefield) || t == typeof(OnBattlefield?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.Integer:
+                    var integerValue = serializer.Deserialize<long>(reader);
+                    return new OnBattlefield { Integer = integerValue };
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    switch (stringValue)
+                    {
+                        case "Back":
+                            return new OnBattlefield { Enum = DisplayPlayer.Back };
+                        case "Enemy":
+                            return new OnBattlefield { Enum = DisplayPlayer.Enemy };
+                        case "Front":
+                            return new OnBattlefield { Enum = DisplayPlayer.Front };
+                        case "User":
+                            return new OnBattlefield { Enum = DisplayPlayer.User };
+                    }
+                    break;
+            }
+            throw new Exception("Cannot unmarshal type OnBattlefield");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (OnBattlefield)untypedValue;
+            if (value.Integer != null)
+            {
+                serializer.Serialize(writer, value.Integer.Value);
+                return;
+            }
+            if (value.Enum != null)
+            {
+                switch (value.Enum)
+                {
+                    case DisplayPlayer.Back:
+                        serializer.Serialize(writer, "Back");
+                        return;
+                    case DisplayPlayer.Enemy:
+                        serializer.Serialize(writer, "Enemy");
+                        return;
+                    case DisplayPlayer.Front:
+                        serializer.Serialize(writer, "Front");
+                        return;
+                    case DisplayPlayer.User:
+                        serializer.Serialize(writer, "User");
+                        return;
+                }
+            }
+            throw new Exception("Cannot marshal type OnBattlefield");
+        }
+
+        public static readonly OnBattlefieldConverter Singleton = new OnBattlefieldConverter();
+    }
+
+    internal class DisplayPlayerConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DisplayPlayer) || t == typeof(DisplayPlayer?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Back":
+                    return DisplayPlayer.Back;
+                case "Enemy":
+                    return DisplayPlayer.Enemy;
+                case "Front":
+                    return DisplayPlayer.Front;
+                case "User":
+                    return DisplayPlayer.User;
+            }
+            throw new Exception("Cannot unmarshal type DisplayPlayer");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DisplayPlayer)untypedValue;
+            switch (value)
+            {
+                case DisplayPlayer.Back:
+                    serializer.Serialize(writer, "Back");
+                    return;
+                case DisplayPlayer.Enemy:
+                    serializer.Serialize(writer, "Enemy");
+                    return;
+                case DisplayPlayer.Front:
+                    serializer.Serialize(writer, "Front");
+                    return;
+                case DisplayPlayer.User:
+                    serializer.Serialize(writer, "User");
+                    return;
+            }
+            throw new Exception("Cannot marshal type DisplayPlayer");
+        }
+
+        public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
     }
 
     internal class StackTypeConverter : JsonConverter

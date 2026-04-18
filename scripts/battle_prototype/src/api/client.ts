@@ -32,9 +32,11 @@ export async function connect(
   const params = new URLSearchParams(window.location.search);
   const frontRowSize = params.get("front") ? parseInt(params.get("front")!, 10) : undefined;
   const backRowSize = params.get("back") ? parseInt(params.get("back")!, 10) : undefined;
-  const debugConfig = deckOverride || userGoesSecond || frontRowSize || backRowSize
+  const openingHandCard = params.get("opening_hand_card") ?? undefined;
+  const debugConfig = deckOverride || userGoesSecond || frontRowSize || backRowSize || openingHandCard
     ? {
         deck_override: deckOverride ?? undefined,
+        opening_hand_card_name: openingHandCard,
         user_goes_second: userGoesSecond ?? undefined,
         front_row_size: frontRowSize,
         back_row_size: backRowSize,

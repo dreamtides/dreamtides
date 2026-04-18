@@ -8,6 +8,7 @@ pub mod dreamwell_tests;
 mod duplicate_action_prevention_tests;
 mod enemy_message_tests;
 mod modal_effect_tests;
+mod opening_hand_debug_tests;
 mod outcome_simulation_tests;
 mod prompt_message_tests;
 mod stack_interaction_tests;
