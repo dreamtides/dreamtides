@@ -84,6 +84,7 @@ function makeMutations(): QuestMutations {
     setCurrentDreamscape: vi.fn(),
     updateAtlas: vi.fn(),
     setDraftState: vi.fn(),
+    setFailureSummary: vi.fn(),
     resetQuest: vi.fn(),
   };
 }
@@ -136,6 +137,7 @@ function makeState(): QuestState {
     draftState: null,
     screen: { type: "dreamscape" },
     activeSiteId: null,
+    failureSummary: null,
   };
 }
 

@@ -9,37 +9,67 @@ import { DeckViewer } from "./components/DeckViewer";
 import { DebugScreen } from "./screens/DebugScreen";
 import { CardSourceOverlay } from "./screens/CardSourceOverlay";
 import { STARTER_CARD_NUMBERS } from "./data/starter-cards";
+import type { RuntimeConfig } from "./runtime/runtime-config";
+import { createPlayableBattleBootstrapController } from "./runtime/playable-battle-bootstrap";
+import type { QuestState } from "./types/quest";
 
 /** Inner component that renders the screen router and HUD. */
 export function QuestApp({
   cardDatabase,
+  runtimeConfig,
 }: {
   cardDatabase: Map<number, CardData>;
+  runtimeConfig: RuntimeConfig;
 }) {
-  const { state, questContent } = useQuest();
-  const showHud = state.screen.type !== "questStart";
+  const { state, mutations, questContent } = useQuest();
+  const showHud = state.screen.type !== "questStart"
+    && !isPlayableBattleHudHidden(state, runtimeConfig);
   const [deckViewerOpen, setDeckViewerOpen] = useState(false);
   const [starterDeckIntroOpen, setStarterDeckIntroOpen] = useState(false);
   const [debugScreenOpen, setDebugScreenOpen] = useState(false);
   const [cardSourceOverlayOpen, setCardSourceOverlayOpen] = useState(false);
   const previousScreenTypeRef = useRef(state.screen.type);
+  const playableBattleBootstrapRef = useRef(createPlayableBattleBootstrapController());
+
+  useEffect(() => {
+    if (
+      runtimeConfig.battleMode !== "playable" ||
+      !runtimeConfig.startInBattle ||
+      playableBattleBootstrapRef.current.isDone()
+    ) {
+      return;
+    }
+
+    playableBattleBootstrapRef.current.advance({
+      state,
+      mutations,
+      questContent,
+      cardDatabase,
+    });
+  }, [
+    runtimeConfig.battleMode,
+    runtimeConfig.startInBattle,
+    state,
+    mutations,
+    questContent,
+    cardDatabase,
+  ]);
 
   const hasDraftData = state.resolvedPackage !== null;
   const hasCardSourceDebug = state.cardSourceDebug !== null;
 
   useEffect(() => {
-    const leftQuestStart =
-      previousScreenTypeRef.current === "questStart"
-      && state.screen.type !== "questStart";
-    const hasStarterDeck = STARTER_CARD_NUMBERS.every((cardNumber) =>
-      state.deck.some((entry) => entry.cardNumber === cardNumber),
-    );
-
-    if (leftQuestStart && state.dreamcaller !== null && hasStarterDeck) {
-      setDeckViewerOpen(true);
-      setStarterDeckIntroOpen(true);
-    }
-
+    // FIND-01-6 (Stage 4): do NOT auto-open the deck viewer when leaving the
+    // quest-start screen. The mid-quest-start deck overlay hid the first
+    // site beneath a blocking modal. The starter-deck reference is one
+    // "View Deck" click away on the HUD; let the player land on the site
+    // unobstructed. We still observe the transition to keep the ref
+    // up-to-date in case future logic needs it.
+    //
+    // `STARTER_CARD_NUMBERS` import retained for future starter-deck flows
+    // (e.g. per-dreamcaller tutorials); underscore prefix silences unused
+    // warnings without deleting the import, which other tests still rely on.
+    void STARTER_CARD_NUMBERS;
     previousScreenTypeRef.current = state.screen.type;
   }, [state.deck, state.dreamcaller, state.screen.type]);
 
@@ -82,7 +112,7 @@ export function QuestApp({
 
   return (
     <div style={{ paddingBottom: showHud ? "48px" : "0" }}>
-      <ScreenRouter />
+      <ScreenRouter runtimeConfig={runtimeConfig} />
       {showHud && (
         <HUD
           onOpenDeckViewer={handleOpenDeckViewer}
@@ -118,7 +148,25 @@ export function QuestApp({
   );
 }
 
-export default function App() {
+function isPlayableBattleHudHidden(
+  state: QuestState,
+  runtimeConfig: RuntimeConfig,
+): boolean {
+  if (runtimeConfig.battleMode !== "playable" || state.screen.type !== "site") {
+    return false;
+  }
+
+  if (state.currentDreamscape === null) {
+    return false;
+  }
+
+  const siteId = state.screen.siteId;
+  return state.atlas.nodes[state.currentDreamscape]
+    ?.sites.some((site) => site.id === siteId && site.type === "Battle")
+    ?? false;
+}
+
+export default function App({ runtimeConfig }: { runtimeConfig: RuntimeConfig }) {
   const [questContent, setQuestContent] = useState<QuestContent | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -186,8 +234,12 @@ export default function App() {
     <QuestProvider
       cardDatabase={questContent.cardDatabase}
       questContent={questContent}
+      runtimeConfig={runtimeConfig}
     >
-      <QuestApp cardDatabase={questContent.cardDatabase} />
+      <QuestApp
+        cardDatabase={questContent.cardDatabase}
+        runtimeConfig={runtimeConfig}
+      />
     </QuestProvider>
   );
 }

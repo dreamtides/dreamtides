@@ -1,6 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
-import type { CardData } from "../types/cards";
-import { cardImageUrl } from "../data/card-database";
+import type { CardData, FrozenCardData } from "../types/cards";
+import {
+  cardAccentTide,
+  cardImageUrl,
+  TIDE_COLORS,
+} from "../data/card-database";
 import { tokenizeRulesText, formatTypeLine } from "./card-text";
 
 /** Color used for each symbol type when rendering rules text. */
@@ -10,12 +14,11 @@ const SYMBOL_COLORS: Readonly<Record<string, string>> = {
   trigger: "#f97316",
   fast: "#facc15",
 };
-const CHARACTER_CHROME_COLOR = "#60a5fa";
 const EVENT_CHROME_COLOR = "#c084fc";
 
 /** Props for the CardDisplay component. */
 interface CardDisplayProps {
-  card: CardData;
+  card: CardData | FrozenCardData;
   onClick?: () => void;
   selected?: boolean;
   selectionColor?: string;
@@ -46,7 +49,7 @@ function renderRulesText(text: string): ReactNode[] {
 }
 
 /**
- * Renders a Dreamtides card with type-driven chrome.
+ * Renders a Dreamtides card with tide-driven chrome.
  */
 export function CardDisplay({
   card,
@@ -63,14 +66,25 @@ export function CardDisplay({
     setImageError(false);
   }, [card.cardNumber]);
 
+  const accentTide = cardAccentTide(card);
+  const accentColor = TIDE_COLORS[accentTide];
   const chromeColor =
-    card.cardType === "Event" ? EVENT_CHROME_COLOR : CHARACTER_CHROME_COLOR;
-  const borderColor = `${chromeColor}80`;
+    card.cardType === "Event" ? EVENT_CHROME_COLOR : accentColor;
+  const borderColor =
+    card.cardType === "Event"
+      ? chromeColor
+      : accentTide === "Neutral"
+      ? "rgba(255, 255, 255, 0.18)"
+      : `${chromeColor}55`;
+  const nameColor =
+    accentTide === "Neutral" ? "#f8fafc" : accentColor;
   const typeLine = formatTypeLine(card);
 
   const borderStyle = selected
     ? { boxShadow: `0 0 0 3px ${selectionColor}, 0 0 12px ${selectionColor}` }
-    : { boxShadow: `0 0 18px ${chromeColor}26` };
+    : card.cardType === "Event"
+      ? { boxShadow: `0 0 18px ${EVENT_CHROME_COLOR}26` }
+      : {};
 
   const isInteractive = onClick !== undefined;
 
@@ -100,7 +114,7 @@ export function CardDisplay({
         className="pointer-events-none absolute inset-x-0 top-0 h-1"
         style={{
           background: `linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, ${chromeColor} 50%, rgba(255, 255, 255, 0.08) 100%)`,
-          opacity: 0.8,
+          opacity: card.cardType === "Event" || accentTide !== "Neutral" ? 0.8 : 0.35,
         }}
       />
 
@@ -150,12 +164,12 @@ export function CardDisplay({
           <div
             className="flex h-full w-full items-center justify-center p-2"
             style={{
-              background: `linear-gradient(135deg, ${chromeColor}24, rgba(255, 255, 255, 0.05))`,
+              background: `linear-gradient(135deg, ${accentColor}24, rgba(255, 255, 255, 0.05))`,
             }}
           >
             <span
               className="text-center text-sm font-medium opacity-60"
-              style={{ color: "#f8fafc" }}
+              style={{ color: nameColor }}
             >
               {card.name}
             </span>
@@ -175,7 +189,7 @@ export function CardDisplay({
         {/* Card name */}
         <h3
           className={`truncate ${large ? "text-xl" : "text-sm"} leading-tight font-bold`}
-          style={{ color: "#f8fafc" }}
+          style={{ color: nameColor }}
         >
           {card.name}
         </h3>

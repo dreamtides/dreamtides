@@ -17,6 +17,7 @@ import {
   applyDreamcallerSelection,
   applyRemainingDreamsignPool,
   createDefaultState,
+  deriveEntryIdCounter,
   useQuest,
   type QuestContextValue,
 } from "./quest-context";
@@ -126,6 +127,31 @@ function makeCardSourceDebugState(): CardSourceDebugState {
 
 beforeEach(() => {
   vi.spyOn(console, "log").mockImplementation(() => {});
+});
+
+describe("deriveEntryIdCounter", () => {
+  it("returns 0 for an empty deck", () => {
+    expect(deriveEntryIdCounter([])).toBe(0);
+  });
+
+  it("returns the highest numeric suffix for matching deck-N entry ids", () => {
+    expect(
+      deriveEntryIdCounter([
+        { entryId: "deck-1", cardNumber: 1, transfiguration: null, isBane: false },
+        { entryId: "deck-7", cardNumber: 2, transfiguration: null, isBane: false },
+        { entryId: "deck-3", cardNumber: 3, transfiguration: null, isBane: false },
+      ]),
+    ).toBe(7);
+  });
+
+  it("ignores entry ids that do not match the deck-N pattern", () => {
+    expect(
+      deriveEntryIdCounter([
+        { entryId: "deck-2", cardNumber: 1, transfiguration: null, isBane: false },
+        { entryId: "starter-9", cardNumber: 2, transfiguration: null, isBane: false },
+      ]),
+    ).toBe(2);
+  });
 });
 
 describe("QuestProvider default state contract", () => {

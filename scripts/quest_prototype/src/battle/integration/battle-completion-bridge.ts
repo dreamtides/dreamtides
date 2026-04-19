@@ -1,0 +1,181 @@
+import { generateNewNodes } from "../../atlas/atlas-generator";
+import { logEvent } from "../../logging";
+import type { QuestMutations } from "../../state/quest-context";
+import type { CardData, FrozenCardData } from "../../types/cards";
+import type { DreamAtlas } from "../../types/quest";
+
+/**
+ * Ownership note (spec K-5 / K-6, L-1):
+ * Although this module lives under `src/battle/integration/`, the events it
+ * emits (`essence_granted`, `site_completed`, `dreamscape_completed`) are
+ * semantically quest-level. Spec K-6 says the battle module emits only
+ * `battle_proto_*` events; this bridge is exempt because it is the sanctioned
+ * adapter that translates a battle victory into persistent quest-state
+ * mutations. The file's physical location reflects the caller (playable
+ * battle screen) rather than the logical owner of the emitted events.
+ */
+
+interface PendingHandoffTimer {
+  timerId: ReturnType<typeof setTimeout>;
+  controller: AbortController;
+}
+
+const completedBattleIds = new Set<string>();
+const pendingPostVictoryHandoffTimers = new Set<PendingHandoffTimer>();
+
+export interface CompleteBattleSiteVictoryInput {
+  battleId: string;
+  siteId: string;
+  dreamscapeId: string | null;
+  completionLevelAtBattleStart: number;
+  atlasSnapshot: DreamAtlas;
+  selectedRewardCard: CardData | FrozenCardData;
+  essenceReward: number;
+  isMiniboss: boolean;
+  isFinalBoss: boolean;
+  playerHasBanes: boolean;
+  mutations: Pick<
+    QuestMutations,
+    | "addCard"
+    | "changeEssence"
+    | "incrementCompletionLevel"
+    | "markSiteVisited"
+    | "setCurrentDreamscape"
+    | "setScreen"
+    | "updateAtlas"
+  >;
+  postVictoryHandoffDelayMs?: number;
+}
+
+export function completeBattleSiteVictory(
+  input: CompleteBattleSiteVictoryInput,
+): void {
+  const {
+    battleId,
+    siteId,
+    dreamscapeId,
+    completionLevelAtBattleStart,
+    atlasSnapshot,
+    selectedRewardCard,
+    essenceReward,
+    isMiniboss,
+    isFinalBoss,
+    playerHasBanes,
+    mutations,
+    postVictoryHandoffDelayMs,
+  } = input;
+
+  if (completedBattleIds.has(battleId)) {
+    // Spec K-3: bridge execution is idempotent per battleId. Surface the
+    // skipped re-entry for debugging so repeated dispatches (e.g. double
+    // clicks, hot-reload) are visible in the log stream.
+    logEvent("battle_proto_completion_skipped_duplicate", {
+      battleId,
+      siteId,
+      dreamscapeId,
+      reason: "already_applied",
+    });
+    return;
+  }
+  completedBattleIds.add(battleId);
+
+  mutations.changeEssence(essenceReward, "battle_reward");
+  logEvent("essence_granted", {
+    amount: essenceReward,
+    source: "battle_reward",
+    battleId,
+    siteId,
+  });
+  mutations.addCard(selectedRewardCard.cardNumber, "battle_reward");
+  mutations.markSiteVisited(siteId);
+  mutations.incrementCompletionLevel(
+    essenceReward,
+    selectedRewardCard.cardNumber,
+    selectedRewardCard.name,
+    isMiniboss,
+  );
+  logEvent("battle_proto_completion_applied", {
+    battleId,
+    completionLevelAtBattleStart,
+    completionLevelAfterVictory: completionLevelAtBattleStart + 1,
+    dreamscapeId,
+    essenceReward,
+    isFinalBoss,
+    isMiniboss,
+    rewardCardName: selectedRewardCard.name,
+    rewardCardNumber: selectedRewardCard.cardNumber,
+    siteId,
+  });
+
+  logEvent("site_completed", {
+    siteType: "Battle",
+    outcome: `Victory - earned ${String(essenceReward)} essence, card #${String(selectedRewardCard.cardNumber)}`,
+  });
+
+  const completeQuestHandoff = () => {
+    if (!isFinalBoss) {
+      mutations.setScreen({ type: "atlas" });
+    }
+
+    if (dreamscapeId === null) {
+      return;
+    }
+
+    const dreamscapeNode = atlasSnapshot.nodes[dreamscapeId];
+    const updatedAtlas = generateNewNodes(
+      atlasSnapshot,
+      dreamscapeId,
+      completionLevelAtBattleStart,
+      {
+        playerHasBanes,
+      },
+    );
+
+    mutations.updateAtlas(updatedAtlas);
+    logEvent("dreamscape_completed", {
+      dreamscapeId,
+      sitesVisitedCount: dreamscapeNode?.sites.length ?? 0,
+    });
+    mutations.setCurrentDreamscape(null);
+  };
+
+  if ((postVictoryHandoffDelayMs ?? 0) > 0) {
+    const controller = new AbortController();
+    const handle: PendingHandoffTimer = {
+      timerId: 0 as unknown as ReturnType<typeof setTimeout>,
+      controller,
+    };
+    handle.timerId = setTimeout(() => {
+      pendingPostVictoryHandoffTimers.delete(handle);
+      if (controller.signal.aborted) {
+        return;
+      }
+      completeQuestHandoff();
+    }, postVictoryHandoffDelayMs);
+    pendingPostVictoryHandoffTimers.add(handle);
+    return;
+  }
+
+  completeQuestHandoff();
+}
+
+function clearBridgeState(): void {
+  for (const handle of pendingPostVictoryHandoffTimers) {
+    handle.controller.abort();
+    clearTimeout(handle.timerId);
+  }
+  pendingPostVictoryHandoffTimers.clear();
+  completedBattleIds.clear();
+}
+
+/**
+ * Production-facing reset hook. Called by `resetQuest()` so a brand-new run
+ * starts with an empty idempotency set and no pending atlas-handoff timers.
+ * Any timer scheduled by a prior session is marked aborted before being
+ * cleared, so a callback that has already been pulled off the event loop
+ * becomes a no-op when it fires. Tests use this same entry point; there is no
+ * separate "for tests" wrapper (bug-028).
+ */
+export function resetBattleCompletionBridge(): void {
+  clearBridgeState();
+}

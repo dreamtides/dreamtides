@@ -2,11 +2,17 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
   type ReactNode,
 } from "react";
+import {
+  createPlayableBattleCache,
+  PlayableBattleCacheProvider,
+  type PlayableBattleCache,
+} from "../components/playable-battle-cache";
 import type { QuestContent } from "../data/quest-content";
 import { toQuestDreamcaller } from "../data/dreamcaller-selection";
 import type { CardData } from "../types/cards";
@@ -16,6 +22,7 @@ import type {
   DeckEntry,
   DreamAtlas,
   Dreamsign,
+  QuestFailureSummary,
   QuestState,
   Screen,
   TransfigurationType,
@@ -26,6 +33,14 @@ import {
   countRemainingUniqueCards,
 } from "../draft/draft-engine";
 import { logEvent, resetLog } from "../logging";
+import { resetBattleCompletionBridge } from "../battle/integration/battle-completion-bridge";
+import {
+  clearPersistedQuestState,
+  loadQuestState,
+  saveQuestState,
+} from "./quest-state-storage";
+import type { RuntimeConfig } from "../runtime/runtime-config";
+import { createStartInBattleState } from "../runtime/start-in-battle-state";
 
 const MAX_DREAMSIGNS = 12;
 
@@ -63,6 +78,10 @@ export interface QuestMutations {
   setCurrentDreamscape: (nodeId: string | null) => void;
   updateAtlas: (atlas: DreamAtlas) => void;
   setDraftState: (draftState: DraftState, source: string) => void;
+  setFailureSummary: (
+    failureSummary: QuestFailureSummary | null,
+    source: string,
+  ) => void;
   resetQuest: () => void;
 }
 
@@ -100,6 +119,7 @@ export function createDefaultState(): QuestState {
     draftState: null,
     screen: { type: "questStart" },
     activeSiteId: null,
+    failureSummary: null,
   };
 }
 
@@ -156,18 +176,77 @@ export function applyDraftState(
   };
 }
 
+/**
+ * Recovers the high-water mark for the `deck-N` entry id sequence from a
+ * (possibly restored) deck. Without this, hydrating from `sessionStorage`
+ * would reset the counter to `0` and the first newly-added card after
+ * reload would collide with `deck-1` from the original session.
+ */
+export function deriveEntryIdCounter(deck: readonly DeckEntry[]): number {
+  let max = 0;
+  for (const entry of deck) {
+    const match = /^deck-(\d+)$/.exec(entry.entryId);
+    if (match === null) continue;
+    const value = Number(match[1]);
+    if (Number.isFinite(value) && value > max) {
+      max = value;
+    }
+  }
+  return max;
+}
+
 /** Provides quest state and mutation functions to the component tree. */
 export function QuestProvider({
   children,
   cardDatabase,
   questContent,
+  runtimeConfig = {
+    battleMode: "auto",
+    seedOverride: null,
+    startInBattle: false,
+  },
 }: {
   children: ReactNode;
   cardDatabase: Map<number, CardData>;
   questContent: QuestContent;
+  runtimeConfig?: RuntimeConfig;
 }) {
-  const [state, setState] = useState<QuestState>(createDefaultState);
-  const entryIdCounter = useRef(0);
+  const isStartInBattleFixture =
+    runtimeConfig.battleMode === "playable" && runtimeConfig.startInBattle;
+  // FIND-01-2: hydrate from sessionStorage so an in-tab reload preserves the
+  // dreamcaller pick and quest progress. `loadQuestState()` validates and
+  // version-checks the snapshot, returning `null` (default state) on any
+  // schema mismatch or storage error.
+  const [state, setState] = useState<QuestState>(
+    () =>
+      (isStartInBattleFixture
+        ? createStartInBattleState(questContent)
+        : loadQuestState())
+      ?? createDefaultState(),
+  );
+  // Track the highest deck `entryId` numeric suffix observed in the restored
+  // snapshot so newly-added cards continue from the right counter rather than
+  // colliding with restored ids.
+  const entryIdCounter = useRef(deriveEntryIdCounter(state.deck));
+  // Scoped playable-battle bootstrap cache (bug-013). Held per `QuestProvider`
+  // instance so dev overlays, embedded demos, and parallel tests cannot leak
+  // frozen `BattleInit` snapshots across providers.
+  const playableBattleCacheRef = useRef<PlayableBattleCache | null>(null);
+  if (playableBattleCacheRef.current === null) {
+    playableBattleCacheRef.current = createPlayableBattleCache();
+  }
+  const playableBattleCache = playableBattleCacheRef.current;
+
+  // FIND-01-2: write through to sessionStorage on every state change so a
+  // mid-run reload (F5, accidental refresh, crash recovery) lands back on the
+  // same screen with the same dreamcaller, deck, atlas, and active site.
+  useEffect(() => {
+    if (isStartInBattleFixture) {
+      clearPersistedQuestState();
+      return;
+    }
+    saveQuestState(state);
+  }, [isStartInBattleFixture, state]);
 
   function nextEntryId(): string {
     entryIdCounter.current += 1;
@@ -447,16 +526,44 @@ export function QuestProvider({
     setState((prev) => applyDraftState(prev, draftState));
   }, []);
 
+  const setFailureSummary = useCallback(
+    (failureSummary: QuestFailureSummary | null, source: string) => {
+      logEvent("quest_failure_summary_updated", {
+        source,
+        isPresent: failureSummary !== null,
+        battleId: failureSummary?.battleId ?? null,
+        result: failureSummary?.result ?? null,
+        siteId: failureSummary?.siteId ?? null,
+        dreamscapeIdOrNone: failureSummary?.dreamscapeIdOrNone ?? null,
+      });
+      setState((prev) => ({
+        ...prev,
+        failureSummary: failureSummary === null ? null : { ...failureSummary },
+      }));
+    },
+    [],
+  );
+
   const resetQuest = useCallback(() => {
+    // Ordering invariant: `resetLog()` clears the ring buffer before any
+    // dependent reset hooks run so downstream subscribers (bridge,
+    // cache, queries) observe the cleared log. `resetBattleCompletionBridge`
+    // and `playableBattleCache.reset` are intentionally silent today — if
+    // either ever starts emitting a reset event, either reorder this so
+    // `resetLog()` happens last, or log `quest_reset` before wiping so the
+    // reset sequence stays visible.
     resetLog();
     entryIdCounter.current = 0;
+    resetBattleCompletionBridge();
+    playableBattleCache.reset();
+    clearPersistedQuestState();
     logEvent("quest_reset", {
       remainingDreamsignPoolSize: 0,
       hasResolvedPackage: false,
       hasDraftState: false,
     });
     setState(createDefaultState());
-  }, []);
+  }, [playableBattleCache]);
 
   const mutations = useMemo<QuestMutations>(
     () => ({
@@ -476,6 +583,7 @@ export function QuestProvider({
       setCurrentDreamscape,
       updateAtlas,
       setDraftState,
+      setFailureSummary,
       resetQuest,
     }),
     [
@@ -495,6 +603,7 @@ export function QuestProvider({
       setCurrentDreamscape,
       updateAtlas,
       setDraftState,
+      setFailureSummary,
       resetQuest,
     ],
   );
@@ -505,7 +614,11 @@ export function QuestProvider({
   );
 
   return (
-    <QuestContext.Provider value={value}>{children}</QuestContext.Provider>
+    <QuestContext.Provider value={value}>
+      <PlayableBattleCacheProvider cache={playableBattleCache}>
+        {children}
+      </PlayableBattleCacheProvider>
+    </QuestContext.Provider>
   );
 }
 

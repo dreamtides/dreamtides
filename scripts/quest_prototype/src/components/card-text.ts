@@ -42,7 +42,7 @@ export function tokenizeRulesText(text: string): TextSegment[] {
 }
 
 /** Format the card type and subtype line. */
-export function formatTypeLine(card: CardData): string {
+export function formatTypeLine(card: Pick<CardData, "cardType" | "subtype">): string {
   if (card.cardType === "Character") {
     if (card.subtype && card.subtype !== "" && card.subtype !== "*") {
       return card.subtype;

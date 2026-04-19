@@ -4,10 +4,9 @@ import { useQuest } from "../state/quest-context";
 import { AtlasScreen } from "../screens/AtlasScreen";
 import { QuestStartScreen } from "../screens/QuestStartScreen";
 import { QuestCompleteScreen } from "../screens/QuestCompleteScreen";
+import { QuestFailedScreen } from "../screens/QuestFailedScreen";
 import { DreamscapeScreen } from "../screens/DreamscapeScreen";
 import { DraftSiteScreen } from "../screens/DraftSiteScreen";
-
-import { BattleScreen } from "../screens/BattleScreen";
 import { ShopScreen } from "../screens/ShopScreen";
 import { SpecialtyShopScreen } from "../screens/SpecialtyShopScreen";
 import { EssenceSiteScreen } from "../screens/EssenceSiteScreen";
@@ -23,6 +22,8 @@ import { CleanseSiteScreen } from "../screens/CleanseSiteScreen";
 import { siteTypeName } from "../atlas/atlas-generator";
 import { logEvent } from "../logging";
 import type { Screen, SiteState } from "../types/quest";
+import type { RuntimeConfig } from "../runtime/runtime-config";
+import { BattleSiteRoute } from "./BattleSiteRoute";
 
 /** Computes a stable key for AnimatePresence from the current screen. */
 function screenKey(screen: Screen): string {
@@ -33,7 +34,11 @@ function screenKey(screen: Screen): string {
 }
 
 /** Routes to the correct screen component based on quest state. */
-export function ScreenRouter() {
+export function ScreenRouter({
+  runtimeConfig,
+}: {
+  runtimeConfig: RuntimeConfig;
+}) {
   const { state } = useQuest();
   const { screen } = state;
 
@@ -46,9 +51,11 @@ export function ScreenRouter() {
       case "dreamscape":
         return <DreamscapeScreen />;
       case "site":
-        return <SiteScreen siteId={screen.siteId} />;
+        return <SiteScreen siteId={screen.siteId} runtimeConfig={runtimeConfig} />;
       case "questComplete":
         return <QuestCompleteScreen />;
+      case "questFailed":
+        return <QuestFailedScreen />;
     }
   }
 
@@ -56,6 +63,7 @@ export function ScreenRouter() {
     <AnimatePresence mode="wait">
       <motion.div
         key={screenKey(screen)}
+        data-quest-screen={screen.type}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -68,7 +76,13 @@ export function ScreenRouter() {
 }
 
 /** Resolves the active site from state and renders the appropriate screen. */
-function SiteScreen({ siteId }: { siteId: string }) {
+function SiteScreen({
+  siteId,
+  runtimeConfig,
+}: {
+  siteId: string;
+  runtimeConfig: RuntimeConfig;
+}) {
   const { state, cardDatabase } = useQuest();
   const { atlas, currentDreamscape } = state;
 
@@ -88,7 +102,13 @@ function SiteScreen({ siteId }: { siteId: string }) {
   }
 
   if (site.type === "Battle") {
-    return <BattleScreen site={site} cardDatabase={cardDatabase} />;
+    return (
+      <BattleSiteRoute
+        site={site}
+        cardDatabase={cardDatabase}
+        runtimeConfig={runtimeConfig}
+      />
+    );
   }
 
   if (site.type === "Shop") {
@@ -185,4 +205,3 @@ function GenericSitePlaceholder({ site }: { site: SiteState }) {
     </div>
   );
 }
-

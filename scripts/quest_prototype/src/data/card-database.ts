@@ -60,7 +60,7 @@ export function isStarterCard(card: Pick<CardData, "isStarter">): boolean {
 }
 
 /** Returns the accent tide used for legacy display surfaces. */
-export function cardAccentTide(card: Pick<CardData, "tides">): Tide {
+export function cardAccentTide(card: { tides: readonly CardData["tides"][number][] }): Tide {
   if (card.tides.length === 0) {
     return "Neutral";
   }

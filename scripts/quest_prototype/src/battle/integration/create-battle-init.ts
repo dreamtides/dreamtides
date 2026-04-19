@@ -1,0 +1,494 @@
+import { cardAccentTide } from "../../data/card-database";
+import { dreamcallerAccentTide } from "../../data/quest-content";
+import { selectBattleRewards } from "../../data/tide-weights";
+import type { CardData, FrozenCardData, Tide } from "../../types/cards";
+import type { DreamcallerContent } from "../../types/content";
+import type { QuestState, SiteState } from "../../types/quest";
+import { createBattleRngStreams, deriveBattleSeed } from "../random";
+import type { BattleRng } from "../random";
+import type {
+  BattleDeckCardDefinition,
+  BattleDreamcallerSummary,
+  BattleDreamsignSummary,
+  BattleEnemyDescriptor,
+  BattleInit,
+  BattleQuestDeckEntry,
+} from "../types";
+
+const ENEMY_PREFIXES = [
+  "Shadow",
+  "Nightmare",
+  "Phantom",
+  "Dark",
+  "Cursed",
+  "Twisted",
+  "Fallen",
+  "Spectral",
+] as const;
+const ENEMY_SUBTITLES = [
+  "Dreamcaller Echo",
+  "Recovered Nightmare",
+  "Atlas Warden",
+  "Hollow Adversary",
+  "False Pilgrim",
+  "Storm-Bound Usurper",
+] as const;
+const ENEMY_DECK_SIZE = 12;
+
+export interface CreateBattleInitInput {
+  battleEntryKey: string;
+  site: SiteState;
+  state: Pick<
+    QuestState,
+    | "atlas"
+    | "completionLevel"
+    | "currentDreamscape"
+    | "deck"
+    | "dreamcaller"
+    | "dreamsigns"
+    | "resolvedPackage"
+  >;
+  cardDatabase: ReadonlyMap<number, CardData>;
+  dreamcallers: readonly DreamcallerContent[];
+  seedOverride?: number | null;
+}
+
+export function createBattleInit(input: CreateBattleInitInput): BattleInit {
+  const {
+    battleEntryKey,
+    site,
+    state,
+    cardDatabase,
+    dreamcallers,
+    seedOverride,
+  } = input;
+  const seed = resolveSeed(battleEntryKey, seedOverride);
+  const streams = createBattleRngStreams(seed);
+  const rewardOptions = selectBattleRewards(
+    cardDatabase,
+    state.resolvedPackage?.selectedTides ?? [],
+    streams.reward.nextFloat,
+  ).map(freezeCardData);
+  const questDeckEntries: readonly BattleQuestDeckEntry[] = Object.freeze(
+    state.deck.map((entry) => Object.freeze({
+      entryId: entry.entryId,
+      cardNumber: entry.cardNumber,
+      transfiguration: entry.transfiguration,
+      isBane: entry.isBane,
+    })),
+  );
+  const playerDeckOrder = streams.playerDeckOrder
+    .shuffle(state.deck)
+    .map((entry) => {
+      const card = cardDatabase.get(entry.cardNumber);
+      if (card === undefined) {
+        throw new Error(`Missing card data for quest deck entry #${String(entry.cardNumber)}`);
+      }
+      return freezeBattleDeckCardDefinition(normalizePlayerDeckCard(entry, card));
+    });
+  const enemyDescriptor = freezeBattleEnemyDescriptor(
+    createEnemyDescriptor(dreamcallers, streams.enemyDescriptor.nextFloat),
+  );
+  const enemyDeckDefinition = createEnemyDeckDefinition(
+    cardDatabase,
+    enemyDescriptor.tide,
+    streams.enemyDeckOrder,
+  ).map(freezeBattleDeckCardDefinition);
+  const dreamcallerSummary = freezeBattleDreamcallerSummary(state.dreamcaller);
+  const dreamsignSummaries = state.dreamsigns.map(freezeBattleDreamsignSummary);
+  const completionLevelAtStart = state.completionLevel;
+
+  // Phase 2 runtime invariants (B-6, C-10): the player always starts and
+  // skips the round-one draw. The `BattleInit` field types are widened to
+  // `BattleSide` / `boolean` (bug-039) so tests can exercise the no-skip and
+  // enemy-first paths without lying to the type system; the runtime values
+  // here enforce the phase's invariant.
+  const startingSide: BattleInit["startingSide"] = "player";
+  const playerDrawSkipsTurnOne: BattleInit["playerDrawSkipsTurnOne"] = true;
+
+  return Object.freeze({
+    // bug-032: battleId and battleEntryKey were previously the same string,
+    // which conflated the cache-bucket identity (entry key) with the
+    // session-scope identity (battleId used for logs and completion tracking).
+    // A `battle:` prefix keeps them semantically distinct even though they
+    // remain 1:1 today; callers should not rely on string equality.
+    battleId: `battle:${battleEntryKey}`,
+    battleEntryKey,
+    seed,
+    siteId: site.id,
+    dreamscapeId: state.currentDreamscape,
+    completionLevelAtStart,
+    isMiniboss: completionLevelAtStart === 3,
+    isFinalBoss: completionLevelAtStart === 6,
+    essenceReward: 100 + completionLevelAtStart * 50,
+    openingHandSize: 5,
+    scoreToWin: 25,
+    turnLimit: 50,
+    maxEnergyCap: 10,
+    startingSide,
+    playerDrawSkipsTurnOne,
+    rewardOptions: Object.freeze(rewardOptions),
+    questDeckEntries,
+    playerDeckOrder: Object.freeze(playerDeckOrder),
+    enemyDescriptor,
+    enemyDeckDefinition: Object.freeze(enemyDeckDefinition),
+    dreamcallerSummary,
+    dreamsignSummaries: Object.freeze(dreamsignSummaries),
+    atlasSnapshot: freezeAtlasSnapshot(state.atlas),
+  });
+}
+
+/**
+ * Resolves the session seed, validating `seedOverride` so only non-negative
+ * safe integers are accepted (bug-008). Unexpected values (NaN, Infinity,
+ * negatives, floats) are loud errors — silent fallback would mask caller bugs
+ * in tests and future programmatic entry points.
+ */
+function resolveSeed(
+  battleEntryKey: string,
+  seedOverride: number | null | undefined,
+): number {
+  if (seedOverride === undefined || seedOverride === null) {
+    return deriveBattleSeed(battleEntryKey);
+  }
+  if (
+    !Number.isFinite(seedOverride) ||
+    !Number.isInteger(seedOverride) ||
+    seedOverride < 0 ||
+    seedOverride > Number.MAX_SAFE_INTEGER
+  ) {
+    throw new Error(
+      `createBattleInit: seedOverride must be a non-negative safe integer, received ${String(seedOverride)}`,
+    );
+  }
+  return seedOverride;
+}
+
+export function createEnemyDescriptor(
+  dreamcallers: readonly DreamcallerContent[],
+  random: () => number,
+): BattleEnemyDescriptor {
+  if (dreamcallers.length === 0) {
+    return {
+      id: "enemy:fallback",
+      name: "Spectral Rival",
+      subtitle: "Battlefield Projection",
+      portraitSeed: 0,
+      tide: "Neutral",
+      abilityText: "A synthetic opponent assembled for prototype combat.",
+      dreamsignCount: 1,
+    };
+  }
+
+  const template = pickRandom(dreamcallers, random);
+  const prefix = pickRandom(ENEMY_PREFIXES, random);
+  const subtitleSeed = pickRandom(ENEMY_SUBTITLES, random);
+  const dreamsignCount = Math.floor(random() * 5) + 1;
+  const portraitSeed = Math.floor(random() * 1_000_000);
+  const tide = dreamcallerAccentTide(template);
+  const baseName = template.name.split(",")[0].split(" the ")[0];
+
+  return {
+    id: `enemy:${template.id}:${String(portraitSeed)}`,
+    name: `${prefix} ${baseName}`,
+    subtitle: `${subtitleSeed} • ${template.title}`,
+    portraitSeed,
+    tide,
+    abilityText: template.renderedText,
+    dreamsignCount,
+  };
+}
+
+function createEnemyDeckDefinition(
+  cardDatabase: ReadonlyMap<number, CardData>,
+  accentTide: Tide,
+  rng: BattleRng,
+): BattleDeckCardDefinition[] {
+  const numericCards = Array.from(cardDatabase.values()).filter(
+    (card) => !card.isStarter && card.energyCost !== null,
+  );
+  const characters = numericCards.filter((card) => card.cardType === "Character");
+  const events = numericCards.filter((card) => card.cardType !== "Character");
+  const chosen: BattleDeckCardDefinition[] = [];
+
+  addEnemyCards(
+    chosen,
+    filterByCostBand(filterByAccent(characters, accentTide), "cheap"),
+    filterByCostBand(characters, "cheap"),
+    numericCards,
+    3,
+    rng,
+  );
+  addEnemyCards(
+    chosen,
+    filterByCostBand(filterByAccent(characters, accentTide), "mid"),
+    filterByCostBand(characters, "mid"),
+    numericCards,
+    3,
+    rng,
+  );
+  addEnemyCards(
+    chosen,
+    filterByCostBand(filterByAccent(characters, accentTide), "expensive"),
+    filterByCostBand(characters, "expensive"),
+    numericCards,
+    2,
+    rng,
+  );
+  addEnemyCards(
+    chosen,
+    filterByCostBand(filterByAccent(events, accentTide), "cheapOrMid"),
+    filterByCostBand(events, "cheapOrMid"),
+    numericCards,
+    2,
+    rng,
+  );
+  addEnemyCards(
+    chosen,
+    filterByAccent(events, accentTide),
+    events,
+    numericCards,
+    2,
+    rng,
+  );
+
+  if (chosen.length < ENEMY_DECK_SIZE) {
+    addEnemyCards(
+      chosen,
+      filterByAccent(numericCards, accentTide),
+      numericCards,
+      numericCards,
+      ENEMY_DECK_SIZE - chosen.length,
+      rng,
+    );
+  }
+
+  return rng
+    .shuffle(chosen)
+    .slice(0, ENEMY_DECK_SIZE)
+    .map(cloneBattleDeckCardDefinition);
+}
+
+/**
+ * Fills a bucket with up to `count` cards, walking three distinct layers in the
+ * order required by spec §B-19:
+ *   1. matching-accent candidates for the requested kind/cost slice
+ *   2. any non-starter numeric-cost card (widening past the kind/cost slice)
+ *   3. duplicates of cards already chosen for this bucket
+ *
+ * Layer 1 and layer 2 are kept strictly separate so that an empty accent pool
+ * falls through to the broader non-starter pool rather than collapsing into it
+ * (bug-009). `widePool` is typically the full non-starter numeric-cost roster.
+ */
+function addEnemyCards(
+  chosen: BattleDeckCardDefinition[],
+  accentPool: readonly CardData[],
+  fallbackPool: readonly CardData[],
+  widePool: readonly CardData[],
+  count: number,
+  rng: BattleRng,
+): void {
+  const orderedAccentPool = rng.shuffle(accentPool);
+  const orderedFallbackPool = rng.shuffle(fallbackPool);
+  const bucket: BattleDeckCardDefinition[] = [];
+  const usedCardNumbers = new Set<number>();
+
+  fillLayer(bucket, usedCardNumbers, orderedAccentPool, count);
+  fillLayer(bucket, usedCardNumbers, orderedFallbackPool, count);
+
+  // Only shuffle the broader non-starter numeric-cost pool when accent and
+  // kind+cost layers cannot satisfy the bucket. Keeping this shuffle lazy
+  // preserves upstream RNG consumption for the normal case where accent and
+  // fallback already fill the bucket.
+  let orderedWidePool: readonly CardData[] | null = null;
+  if (bucket.length < count) {
+    orderedWidePool = rng.shuffle(widePool);
+    fillLayer(bucket, usedCardNumbers, orderedWidePool, count);
+  }
+
+  const duplicateFallback = bucket.length > 0
+    ? bucket
+    : (orderedWidePool ?? rng.shuffle(widePool)).map(normalizeEnemyDeckCard);
+
+  while (bucket.length < count && duplicateFallback.length > 0) {
+    bucket.push(cloneBattleDeckCardDefinition(duplicateFallback[bucket.length % duplicateFallback.length]));
+  }
+
+  chosen.push(...bucket);
+}
+
+function fillLayer(
+  bucket: BattleDeckCardDefinition[],
+  usedCardNumbers: Set<number>,
+  orderedPool: readonly CardData[],
+  count: number,
+): void {
+  for (const card of orderedPool) {
+    if (bucket.length >= count) {
+      return;
+    }
+    if (usedCardNumbers.has(card.cardNumber)) {
+      continue;
+    }
+    bucket.push(normalizeEnemyDeckCard(card));
+    usedCardNumbers.add(card.cardNumber);
+  }
+}
+
+function cloneBattleDeckCardDefinition(
+  definition: BattleDeckCardDefinition,
+): BattleDeckCardDefinition {
+  return {
+    ...definition,
+    tides: [...definition.tides],
+  };
+}
+
+/**
+ * Returns only cards whose accent tide matches `accentTide` (empty array when
+ * there is no match). The caller is responsible for providing a separate,
+ * broader fallback pool — this function must not silently widen on empty
+ * (bug-009). For the Neutral sentinel tide, every card is treated as matching
+ * because "Neutral" is a display accent only per spec §B-14.
+ */
+function filterByAccent(cards: readonly CardData[], accentTide: Tide): CardData[] {
+  if (accentTide === "Neutral") {
+    return [...cards];
+  }
+  return cards.filter((card) => cardAccentTide(card) === accentTide);
+}
+
+function filterByCostBand(
+  cards: readonly CardData[],
+  band: "cheap" | "mid" | "expensive" | "cheapOrMid",
+): CardData[] {
+  return cards.filter((card) => {
+    const cost = card.energyCost ?? 0;
+    if (band === "cheap") {
+      return cost <= 2;
+    }
+    if (band === "mid") {
+      return cost >= 3 && cost <= 4;
+    }
+    if (band === "expensive") {
+      return cost >= 5;
+    }
+    return cost <= 4;
+  });
+}
+
+function normalizePlayerDeckCard(
+  entry: QuestState["deck"][number],
+  card: CardData,
+): BattleDeckCardDefinition {
+  return {
+    sourceDeckEntryId: entry.entryId,
+    cardNumber: card.cardNumber,
+    name: card.name,
+    battleCardKind: card.cardType === "Character" ? "character" : "event",
+    subtype: card.subtype,
+    energyCost: card.energyCost ?? 0,
+    printedEnergyCost: card.energyCost,
+    printedSpark: card.spark ?? 0,
+    isFast: card.isFast,
+    tides: [...card.tides],
+    renderedText: card.renderedText,
+    imageNumber: card.imageNumber,
+    transfiguration: entry.transfiguration,
+    isBane: entry.isBane,
+  };
+}
+
+function normalizeEnemyDeckCard(card: CardData): BattleDeckCardDefinition {
+  return {
+    sourceDeckEntryId: null,
+    cardNumber: card.cardNumber,
+    name: card.name,
+    battleCardKind: card.cardType === "Character" ? "character" : "event",
+    subtype: card.subtype,
+    energyCost: card.energyCost ?? 0,
+    printedEnergyCost: card.energyCost,
+    printedSpark: card.spark ?? 0,
+    isFast: card.isFast,
+    tides: [...card.tides],
+    renderedText: card.renderedText,
+    imageNumber: card.imageNumber,
+    transfiguration: null,
+    isBane: false,
+  };
+}
+
+function freezeBattleDeckCardDefinition(
+  definition: BattleDeckCardDefinition,
+): BattleDeckCardDefinition {
+  return Object.freeze({
+    ...definition,
+    tides: Object.freeze([...definition.tides]),
+  });
+}
+
+function freezeCardData(card: CardData): FrozenCardData {
+  return Object.freeze({
+    ...card,
+    tides: Object.freeze([...card.tides]),
+  }) as FrozenCardData;
+}
+
+function freezeBattleEnemyDescriptor(
+  descriptor: BattleEnemyDescriptor,
+): BattleEnemyDescriptor {
+  return Object.freeze({ ...descriptor });
+}
+
+function freezeBattleDreamcallerSummary(
+  dreamcaller: QuestState["dreamcaller"],
+): BattleDreamcallerSummary | null {
+  if (dreamcaller === null) {
+    return null;
+  }
+
+  return Object.freeze({
+    id: dreamcaller.id,
+    name: dreamcaller.name,
+    title: dreamcaller.title,
+    awakening: dreamcaller.awakening,
+    renderedText: dreamcaller.renderedText,
+    imageNumber: dreamcaller.imageNumber,
+    accentTide: dreamcaller.accentTide,
+  });
+}
+
+function freezeBattleDreamsignSummary(
+  dreamsign: QuestState["dreamsigns"][number],
+): BattleDreamsignSummary {
+  return Object.freeze({
+    name: dreamsign.name,
+    tide: dreamsign.tide,
+    effectDescription: dreamsign.effectDescription,
+    isBane: dreamsign.isBane,
+  });
+}
+
+function freezeAtlasSnapshot(atlas: QuestState["atlas"]): QuestState["atlas"] {
+  return deepFreeze(structuredClone(atlas));
+}
+
+function deepFreeze<T>(value: T): T {
+  // bug-033: never early-exit on a frozen parent. A caller that passes in a
+  // partially-frozen graph (e.g. a `ReadonlyArray` literal whose elements are
+  // still mutable objects) must still have its subtrees walked. `Object.freeze`
+  // on an already-frozen value is a no-op.
+  if (value === null || typeof value !== "object") {
+    return value;
+  }
+
+  for (const key of Object.keys(value as object)) {
+    deepFreeze((value as Record<string, unknown>)[key]);
+  }
+
+  return Object.freeze(value);
+}
+
+function pickRandom<T>(items: readonly T[], random: () => number): T {
+  return items[Math.floor(random() * items.length)];
+}

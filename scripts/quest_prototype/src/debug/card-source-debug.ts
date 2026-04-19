@@ -1,4 +1,4 @@
-import type { CardData } from "../types/cards";
+import type { CardData, FrozenCardData } from "../types/cards";
 import type { ResolvedDreamcallerPackage } from "../types/content";
 import type {
   CardSourceDebugEntry,
@@ -11,7 +11,7 @@ function sortTides(tides: readonly string[]): string[] {
 }
 
 function buildCardSourceDebugEntry(
-  card: CardData,
+  card: CardData | FrozenCardData,
   resolvedPackage: ResolvedDreamcallerPackage | null,
 ): CardSourceDebugEntry {
   const mandatoryTides = new Set(resolvedPackage?.mandatoryTides ?? []);
@@ -33,7 +33,7 @@ function buildCardSourceDebugEntry(
 export function buildCardSourceDebugState(
   screenLabel: string,
   surface: CardSourceDebugSurface,
-  cards: readonly CardData[],
+  cards: readonly (CardData | FrozenCardData)[],
   resolvedPackage: ResolvedDreamcallerPackage | null,
 ): CardSourceDebugState | null {
   if (cards.length === 0) {

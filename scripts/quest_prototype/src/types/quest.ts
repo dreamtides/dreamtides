@@ -109,13 +109,50 @@ export interface DreamAtlas {
   nexusId: string;
 }
 
+/** Runtime mode used to resolve a battle site. */
+export type BattleModeId = "auto" | "playable";
+
+/** Terminal battle result stored on a frozen failure summary. */
+export type QuestFailureBattleResult = "defeat" | "draw";
+
+/**
+ * Discriminated reason for a terminal battle result, mirrored from the
+ * battle-module `BattleResultReason` type so the quest layer does not have
+ * to import battle internals.
+ */
+export type QuestFailureReason =
+  | "score_target_reached"
+  | "turn_limit_reached"
+  | "forced_result";
+
+/**
+ * Frozen snapshot describing why a playable battle ended without victory.
+ *
+ * Captured before leaving the battle surface so the downstream `questFailed`
+ * screen can render the summary even if the live battle state is later
+ * discarded by `resetQuest()`.
+ */
+export interface QuestFailureSummary {
+  battleId: string;
+  battleMode: BattleModeId;
+  result: QuestFailureBattleResult;
+  reason: QuestFailureReason;
+  siteId: string;
+  siteLabel: string;
+  dreamscapeIdOrNone: string | null;
+  turnNumber: number;
+  playerScore: number;
+  enemyScore: number;
+}
+
 /** Discriminated union for the current screen. */
 export type Screen =
   | { type: "questStart" }
   | { type: "atlas" }
   | { type: "dreamscape" }
   | { type: "site"; siteId: string }
-  | { type: "questComplete" };
+  | { type: "questComplete" }
+  | { type: "questFailed" };
 
 /** The top-level quest state object. */
 export interface QuestState {
@@ -133,4 +170,5 @@ export interface QuestState {
   draftState: DraftState | null;
   screen: Screen;
   activeSiteId: string | null;
+  failureSummary: QuestFailureSummary | null;
 }

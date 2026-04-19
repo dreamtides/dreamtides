@@ -52,7 +52,7 @@ afterEach(() => {
 });
 
 describe("CardDisplay", () => {
-  it("renders Character cards with consistent blue chrome and white names", () => {
+  it("renders neutral Character cards with subdued chrome and white names", () => {
     const { container, root } = mount(
       <CardDisplay card={makeCard({ tides: [] })} />,
     );
@@ -66,8 +66,8 @@ describe("CardDisplay", () => {
       throw new Error("Missing card content");
     }
 
-    expect(cardRoot.style.border).toContain("rgba(96, 165, 250, 0.5)");
-    expect(cardRoot.style.boxShadow).toContain("#60a5fa");
+    expect(cardRoot.style.border).toContain("rgba(255, 255, 255, 0.18)");
+    expect(cardRoot.style.boxShadow).toBe("");
     expect(cardName.style.color).toBe("rgb(248, 250, 252)");
 
     act(() => {
@@ -75,7 +75,7 @@ describe("CardDisplay", () => {
     });
   });
 
-  it("renders Event cards with distinctive purple border chrome", () => {
+  it("renders Event cards with purple border chrome and tide-colored names", () => {
     const { container, root } = mount(
       <CardDisplay
         card={makeCard({
@@ -94,9 +94,9 @@ describe("CardDisplay", () => {
       throw new Error("Missing card content");
     }
 
-    expect(cardRoot.style.border).toContain("rgba(192, 132, 252, 0.5)");
+    expect(cardRoot.style.border).toContain("rgb(192, 132, 252)");
     expect(cardRoot.style.boxShadow).toContain("#c084fc");
-    expect(cardName.style.color).toBe("rgb(248, 250, 252)");
+    expect(cardName.style.color).toBe("rgb(16, 185, 129)");
 
     act(() => {
       root.unmount();

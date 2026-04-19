@@ -19,7 +19,7 @@ vi.mock("./components/ScreenRouter", () => ({
 }));
 
 vi.mock("./components/HUD", () => ({
-  HUD: () => <div>HUD</div>,
+  HUD: () => <div data-testid="hud">HUD</div>,
 }));
 
 const deckViewerMock = vi.fn<
@@ -63,6 +63,7 @@ function makeMutations(): QuestMutations {
     setCurrentDreamscape: vi.fn(),
     updateAtlas: vi.fn(),
     setDraftState: vi.fn(),
+    setFailureSummary: vi.fn(),
     resetQuest: vi.fn(),
   };
 }
@@ -87,6 +88,7 @@ function makeState(overrides: Partial<QuestState> = {}): QuestState {
     draftState: null,
     screen: { type: "questStart" },
     activeSiteId: null,
+    failureSummary: null,
     ...overrides,
   };
 }
@@ -121,6 +123,8 @@ function mount(element: ReactElement): {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null));
   (
     globalThis as typeof globalThis & {
       IS_REACT_ACT_ENVIRONMENT?: boolean;
@@ -133,10 +137,15 @@ afterEach(() => {
 });
 
 describe("QuestApp", () => {
-  it("automatically opens the deck viewer after leaving quest start with the starter deck", () => {
+  it("does not auto-open the deck viewer after leaving quest start (FIND-01-6)", () => {
     setQuestState(makeState());
 
-    const { root } = mount(<QuestApp cardDatabase={new Map()} />);
+    const { root } = mount(
+      <QuestApp
+        cardDatabase={new Map()}
+        runtimeConfig={{ battleMode: "auto", seedOverride: null, startInBattle: false }}
+      />,
+    );
 
     expect(deckViewerMock).toHaveBeenLastCalledWith(
       expect.objectContaining({ isOpen: false }),
@@ -164,12 +173,231 @@ describe("QuestApp", () => {
     );
 
     act(() => {
-      root.render(<QuestApp cardDatabase={new Map()} />);
+      root.render(
+        <QuestApp
+          cardDatabase={new Map()}
+          runtimeConfig={{ battleMode: "auto", seedOverride: null, startInBattle: false }}
+        />,
+      );
     });
 
+    // FIND-01-6 (Stage 4): player lands on the site screen unobstructed.
+    // The deck viewer stays closed; View Deck on the HUD opens it on demand.
     expect(deckViewerMock).toHaveBeenLastCalledWith(
-      expect.objectContaining({ introMode: true, isOpen: true }),
+      expect.objectContaining({ isOpen: false }),
     );
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  it("invokes the playable-battle bootstrap when startInBattle is set on playable mode", () => {
+    const mutations = makeMutations();
+    const dreamcaller = {
+      id: "caller-1",
+      name: "Test Caller",
+      title: "Of Tests",
+      awakening: 4,
+      renderedText: "Pick.",
+      imageNumber: "0001",
+      mandatoryTides: ["Bloom"],
+      optionalTides: ["Arc", "Ignite", "Pact", "Rime"],
+    };
+    const resolvedPackage = {
+      dreamcaller,
+      mandatoryTides: ["Bloom"],
+      optionalSubset: ["Arc", "Ignite", "Pact"],
+      selectedTides: ["Bloom", "Arc", "Ignite", "Pact"],
+      draftPoolCopiesByCard: { "101": 2 },
+      dreamsignPoolIds: ["dreamsign-1"],
+      mandatoryOnlyPoolSize: 12,
+      draftPoolSize: 24,
+      doubledCardCount: 1,
+      legalSubsetCount: 4,
+      preferredSubsetCount: 2,
+    };
+    vi.mocked(useQuest).mockReturnValue({
+      state: makeState(),
+      mutations,
+      cardDatabase: new Map<number, CardData>(),
+      questContent: {
+        cardDatabase: new Map(),
+        cardsByPackageTide: new Map(),
+        dreamcallers: [dreamcaller],
+        dreamsignTemplates: [
+          {
+            id: "dreamsign-1",
+            name: "Bloom Echo",
+            effectDescription: "Test.",
+            displayTide: "Bloom",
+            packageTides: ["Bloom"],
+          },
+        ],
+        resolvedPackagesByDreamcallerId: new Map([
+          [dreamcaller.id, resolvedPackage],
+        ]),
+      },
+    });
+
+    const { root } = mount(
+      <QuestApp
+        cardDatabase={new Map()}
+        runtimeConfig={{
+          battleMode: "playable",
+          seedOverride: null,
+          startInBattle: true,
+        }}
+      />,
+    );
+
+    expect(mutations.setDreamcallerSelection).toHaveBeenCalledOnce();
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  it("does not invoke the playable-battle bootstrap when startInBattle is false", () => {
+    const mutations = makeMutations();
+    vi.mocked(useQuest).mockReturnValue({
+      state: makeState(),
+      mutations,
+      cardDatabase: new Map<number, CardData>(),
+      questContent: {
+        cardDatabase: new Map(),
+        cardsByPackageTide: new Map(),
+        dreamcallers: [],
+        dreamsignTemplates: [],
+        resolvedPackagesByDreamcallerId: new Map(),
+      },
+    });
+
+    const { root } = mount(
+      <QuestApp
+        cardDatabase={new Map()}
+        runtimeConfig={{
+          battleMode: "playable",
+          seedOverride: null,
+          startInBattle: false,
+        }}
+      />,
+    );
+
+    expect(mutations.setDreamcallerSelection).not.toHaveBeenCalled();
+    expect(mutations.setScreen).not.toHaveBeenCalled();
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  it("does not invoke the playable-battle bootstrap in auto mode regardless of startInBattle", () => {
+    const mutations = makeMutations();
+    const dreamcaller = {
+      id: "caller-1",
+      name: "Test Caller",
+      title: "Of Tests",
+      awakening: 4,
+      renderedText: "Pick.",
+      imageNumber: "0001",
+      mandatoryTides: ["Bloom"],
+      optionalTides: ["Arc", "Ignite", "Pact", "Rime"],
+    };
+    const resolvedPackage = {
+      dreamcaller,
+      mandatoryTides: ["Bloom"],
+      optionalSubset: ["Arc", "Ignite", "Pact"],
+      selectedTides: ["Bloom", "Arc", "Ignite", "Pact"],
+      draftPoolCopiesByCard: { "101": 2 },
+      dreamsignPoolIds: ["dreamsign-1"],
+      mandatoryOnlyPoolSize: 12,
+      draftPoolSize: 24,
+      doubledCardCount: 1,
+      legalSubsetCount: 4,
+      preferredSubsetCount: 2,
+    };
+    vi.mocked(useQuest).mockReturnValue({
+      state: makeState(),
+      mutations,
+      cardDatabase: new Map<number, CardData>(),
+      questContent: {
+        cardDatabase: new Map(),
+        cardsByPackageTide: new Map(),
+        dreamcallers: [dreamcaller],
+        dreamsignTemplates: [
+          {
+            id: "dreamsign-1",
+            name: "Bloom Echo",
+            effectDescription: "Test.",
+            displayTide: "Bloom",
+            packageTides: ["Bloom"],
+          },
+        ],
+        resolvedPackagesByDreamcallerId: new Map([
+          [dreamcaller.id, resolvedPackage],
+        ]),
+      },
+    });
+
+    const { root } = mount(
+      <QuestApp
+        cardDatabase={new Map()}
+        runtimeConfig={{
+          battleMode: "auto",
+          seedOverride: null,
+          startInBattle: true,
+        }}
+      />,
+    );
+
+    expect(mutations.setDreamcallerSelection).not.toHaveBeenCalled();
+    expect(mutations.setScreen).not.toHaveBeenCalled();
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  it("hides the shared HUD on playable battle sites so the battle dock stays usable", () => {
+    setQuestState(
+      makeState({
+        atlas: {
+          nodes: {
+            "dreamscape-1": {
+              id: "dreamscape-1",
+              biomeName: "Test Dreamscape",
+              biomeColor: "#112233",
+              sites: [
+                {
+                  id: "site-1",
+                  type: "Battle",
+                  isEnhanced: false,
+                  isVisited: false,
+                },
+              ],
+              position: { x: 0, y: 0 },
+              status: "available",
+              enhancedSiteType: null,
+            },
+          },
+          edges: [],
+          nexusId: "dreamscape-1",
+        },
+        currentDreamscape: "dreamscape-1",
+        screen: { type: "site", siteId: "site-1" },
+        activeSiteId: "site-1",
+      }),
+    );
+
+    const { container, root } = mount(
+      <QuestApp
+        cardDatabase={new Map()}
+        runtimeConfig={{ battleMode: "playable", seedOverride: null, startInBattle: false }}
+      />,
+    );
+
+    expect(container.querySelector('[data-testid="hud"]')).toBeNull();
 
     act(() => {
       root.unmount();

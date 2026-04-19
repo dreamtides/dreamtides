@@ -7,6 +7,7 @@ export function weightedSample<T>(
   pool: ReadonlyArray<T>,
   count: number,
   weightFn: (item: T) => number,
+  random: () => number = Math.random,
 ): T[] {
   const weighted: Array<[T, number]> = pool.map((item) => [
     item,
@@ -22,7 +23,7 @@ export function weightedSample<T>(
       continue;
     }
 
-    let roll = Math.random() * total;
+    let roll = random() * total;
     let chosenIndex = remaining.length - 1;
 
     for (let index = 0; index < remaining.length; index += 1) {
@@ -56,6 +57,7 @@ export function samplePackageAdjacentItems<T>(
   count: number,
   packageTides: (item: T) => readonly PackageTideId[],
   selectedPackageTides: readonly PackageTideId[],
+  random: () => number = Math.random,
 ): T[] {
   const candidates = packageAdjacentCandidatesOrFallback(
     items,
@@ -63,9 +65,12 @@ export function samplePackageAdjacentItems<T>(
     selectedPackageTides,
   );
 
-  return weightedSample(candidates, count, (candidate) => candidate.overlapCount).map(
-    (candidate) => candidate.item,
-  );
+  return weightedSample(
+    candidates,
+    count,
+    (candidate) => candidate.overlapCount,
+    random,
+  ).map((candidate) => candidate.item);
 }
 
 /** Selects rare rewards from the package-adjacent pool without touching the draft multiset. */
@@ -73,18 +78,21 @@ export function sampleRewardCards(
   cardDatabase: ReadonlyMap<number, CardData>,
   count: number,
   selectedPackageTides: readonly PackageTideId[] = [],
+  random: () => number = Math.random,
 ): CardData[] {
   return samplePackageAdjacentItems(
     Array.from(cardDatabase.values()).filter((card) => !isStarterCard(card)),
     count,
     (card) => card.tides,
     selectedPackageTides,
+    random,
   );
 }
 
 export function selectBattleRewards(
   cardDatabase: ReadonlyMap<number, CardData>,
   selectedPackageTides: readonly PackageTideId[] = [],
+  random: () => number = Math.random,
 ): CardData[] {
-  return sampleRewardCards(cardDatabase, 4, selectedPackageTides);
+  return sampleRewardCards(cardDatabase, 4, selectedPackageTides, random);
 }
