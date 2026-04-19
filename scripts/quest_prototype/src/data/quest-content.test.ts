@@ -65,19 +65,22 @@ const DREAMSIGN_TEMPLATES: DreamsignTemplate[] = [
     id: "adjacent-sign",
     name: "Adjacent Sign",
     effectDescription: "Adjacent effect.",
-    imageName: "adjacent-sign.png",
+    displayTide: "Bloom",
+    packageTides: ["o4", "support"],
   },
   {
     id: "mandatory-sign",
     name: "Mandatory Sign",
     effectDescription: "Mandatory effect.",
-    imageName: "mandatory-sign.png",
+    displayTide: "Arc",
+    packageTides: ["m2"],
   },
   {
     id: "off-package-sign",
     name: "Off Package Sign",
     effectDescription: "Off package effect.",
-    imageName: "off-package-sign.png",
+    displayTide: "Rime",
+    packageTides: ["unused"],
   },
 ];
 
@@ -194,7 +197,7 @@ describe("resolveDreamcallerPackage", () => {
     expect(resolved.optionalSubset).toEqual(["o1", "o2", "o3"]);
   });
 
-  it("includes the full canonical Dreamsign pool for the run", () => {
+  it("surfaces only Dreamsign templates adjacent to the resolved package", () => {
     const cards = buildCards({
       m1: 40,
       m2: 40,
@@ -214,7 +217,6 @@ describe("resolveDreamcallerPackage", () => {
     expect(resolved.dreamsignPoolIds).toEqual([
       "adjacent-sign",
       "mandatory-sign",
-      "off-package-sign",
     ]);
   });
 });
@@ -246,12 +248,6 @@ describe("loadQuestContent", () => {
             ok: true,
             json: () =>
               Promise.resolve([makeDreamcaller(["o1", "o2", "o3", "o4"])]),
-          });
-        }
-        if (path === "/dreamsign-data.json") {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(DREAMSIGN_TEMPLATES),
           });
         }
         return Promise.reject(new Error(`Unexpected fetch path: ${path}`));
@@ -303,12 +299,6 @@ describe("loadQuestContent", () => {
                 { ...makeDreamcaller(["o1", "o2", "o3", "o4"]), id: "bad-1", name: "Bad One" },
                 { ...makeDreamcaller(["x1", "x2", "x3", "x4"]), id: "bad-2", name: "Bad Two" },
               ]),
-          });
-        }
-        if (path === "/dreamsign-data.json") {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(DREAMSIGN_TEMPLATES),
           });
         }
         return Promise.reject(new Error(`Unexpected fetch path: ${path}`));

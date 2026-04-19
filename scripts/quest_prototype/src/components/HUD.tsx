@@ -76,9 +76,22 @@ export function HUD({
   const dreamcallerName = state.dreamcaller?.name ?? null;
   const dreamcallerColor = dreamcallerName !== null ? "#e2e8f0" : "#6b7280";
 
+  // FIND-10-11 / FIND-10-12 (Stage 4): shared class for right-side HUD
+  // buttons. Gives every button ≥36px height, visible hover/focus rings,
+  // and rounded design-token chrome.
+  const hudButtonBase =
+    "flex min-h-[36px] cursor-pointer items-center gap-1 rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors md:text-sm "
+    + "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 "
+    + "disabled:cursor-not-allowed disabled:opacity-50";
+
   return (
     <div
-      className="fixed right-0 bottom-0 left-0 z-50 flex items-center justify-between px-3 py-2 md:px-6"
+      // FIND-10-13 (Stage 4): the 1024x768 layout previously let the
+      // dreamcaller subtitle truncate under pressure from the center
+      // Battles counter. Switch to a 3-column grid so the left/center/right
+      // sections do not shove each other at narrow viewports, and drop
+      // the dreamcaller subtitle below lg so it never collides with Signs.
+      className="fixed right-0 bottom-0 left-0 z-50 grid grid-cols-[1fr_auto_auto] items-center gap-3 px-3 py-2 md:gap-6 md:px-6"
       style={{
         background:
           "linear-gradient(180deg, rgba(10, 6, 18, 0.85) 0%, rgba(10, 6, 18, 0.95) 100%)",
@@ -87,9 +100,9 @@ export function HUD({
       }}
     >
       {/* Left section: essence, deck, dreamcaller */}
-      <div className="flex items-center gap-3 md:gap-5">
+      <div className="flex min-w-0 items-center gap-3 md:gap-5">
         {/* Essence counter */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-1.5">
           <span
             className="text-base md:text-lg"
             style={{ color: "#fbbf24" }}
@@ -103,25 +116,25 @@ export function HUD({
           >
             {String(animatedEssence)}
           </span>
-          <span className="hidden text-xs opacity-50 lg:inline">Essence</span>
+          <span className="hidden text-xs opacity-50 xl:inline">Essence</span>
         </div>
 
         {/* Deck size */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-1.5">
           <span className="text-sm opacity-70 md:text-base" aria-label="Deck">
             {"\uD83C\uDCCF"}
           </span>
           <span className="text-sm font-bold md:text-base">
             {String(state.deck.length)}
           </span>
-          <span className="hidden text-xs opacity-50 lg:inline">Cards</span>
+          <span className="hidden text-xs opacity-50 xl:inline">Cards</span>
         </div>
 
         {/* Dreamcaller portrait */}
-        <div className="group relative flex items-center gap-1.5">
+        <div className="group relative flex min-w-0 items-center gap-1.5">
           <button
             type="button"
-            className="flex items-center gap-2 rounded-md px-1 py-0.5 text-left"
+            className="flex min-w-0 items-center gap-2 rounded-md px-1 py-0.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             style={{
               color: dreamcallerColor,
             }}
@@ -133,15 +146,19 @@ export function HUD({
                   variant="thumb"
                   style={{ height: 30, width: 30, flexShrink: 0 }}
                 />
-                <span className="hidden min-w-0 flex-col lg:flex">
+                {/* FIND-10-13 (Stage 4): only expose the dreamcaller text
+                    beside the portrait at xl+ viewports. At 1024px only the
+                    portrait is shown, so the subtitle cannot truncate next
+                    to the Battles counter. */}
+                <span className="hidden min-w-0 flex-col xl:flex">
                   <span
-                    className="max-w-[128px] truncate text-xs font-semibold"
+                    className="max-w-[140px] truncate text-xs font-semibold"
                     style={{ color: dreamcallerColor }}
                   >
                     {state.dreamcaller.name}
                   </span>
                   <span
-                    className="max-w-[128px] truncate text-[10px] italic opacity-70"
+                    className="max-w-[140px] truncate text-[11px] italic opacity-70"
                     style={{ color: "#cbd5f5" }}
                   >
                     {state.dreamcaller.title}
@@ -174,7 +191,7 @@ export function HUD({
         </div>
 
         {/* Dreamsign count */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-1.5">
           <span
             className="text-sm opacity-70 md:text-base"
             aria-label="Dreamsigns"
@@ -184,21 +201,21 @@ export function HUD({
           <span className="text-sm font-bold md:text-base">
             {String(state.dreamsigns.length)}
           </span>
-          <span className="hidden text-xs opacity-50 lg:inline">Signs</span>
+          <span className="hidden text-xs opacity-50 xl:inline">Signs</span>
         </div>
       </div>
 
-      {/* Center: completion level */}
-      <div className="flex items-center">
+      {/* Center: completion level (FIND-01-13: labelled so "0/7" is not ambiguous). */}
+      <div className="flex shrink-0 items-center whitespace-nowrap">
         <span className="text-xs font-medium opacity-70 md:text-sm">
-          Battle {String(state.completionLevel)}/7
+          Battles won {String(state.completionLevel)}/7
         </span>
       </div>
 
       {/* Right section: buttons */}
-      <div className="flex items-center gap-2 md:gap-3">
+      <div className="flex shrink-0 items-center gap-2 md:gap-3">
         <button
-          className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
+          className={`${hudButtonBase} focus-visible:ring-fuchsia-300`}
           style={{
             background: "rgba(124, 58, 237, 0.2)",
             border: "1px solid rgba(124, 58, 237, 0.4)",
@@ -211,7 +228,7 @@ export function HUD({
         </button>
         {hasCardSourceDebug && (
           <button
-            className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
+            className={`${hudButtonBase} focus-visible:ring-sky-300`}
             style={{
               background: isCardSourceOverlayOpen
                 ? "rgba(96, 165, 250, 0.24)"
@@ -227,7 +244,7 @@ export function HUD({
         )}
         {hasDraftData && (
           <button
-            className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
+            className={`${hudButtonBase} focus-visible:ring-rose-300`}
             style={{
               background: "rgba(239, 68, 68, 0.15)",
               border: "1px solid rgba(239, 68, 68, 0.3)",
@@ -240,7 +257,7 @@ export function HUD({
           </button>
         )}
         <button
-          className="cursor-pointer rounded px-2 py-1 text-xs font-medium transition-colors md:px-3 md:text-sm"
+          className={`${hudButtonBase} focus-visible:ring-amber-300`}
           style={{
             background: "rgba(212, 160, 23, 0.15)",
             border: "1px solid rgba(212, 160, 23, 0.3)",

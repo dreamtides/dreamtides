@@ -10,6 +10,9 @@ export function DreamscapeScreen() {
   const { currentDreamscape, completionLevel } = state;
 
   const node = currentDreamscape !== null ? state.atlas.nodes[currentDreamscape] : undefined;
+  const remainingNonBattleSiteCount = node?.sites.filter(
+    (site) => site.type !== "Battle" && !site.isVisited,
+  ).length ?? 0;
 
   const allNonBattleVisited = useMemo(() => {
     if (!node) return false;
@@ -66,7 +69,11 @@ export function DreamscapeScreen() {
           {node.biomeName}
         </h2>
         <p className="mt-1 text-sm opacity-50">
-          Visit all sites to unlock the battle
+          {allNonBattleVisited
+            ? "Battle unlocked"
+            : remainingNonBattleSiteCount === 1
+              ? "Complete 1 remaining site to unlock the battle"
+              : `Complete ${String(remainingNonBattleSiteCount)} remaining sites to unlock the battle`}
         </p>
       </div>
 
@@ -83,6 +90,7 @@ export function DreamscapeScreen() {
               isLocked={isLocked}
               completionLevel={completionLevel}
               biomeColor={node.biomeColor}
+              remainingSitesToUnlockBattle={remainingNonBattleSiteCount}
               onSiteClick={handleSiteClick}
             />
           );

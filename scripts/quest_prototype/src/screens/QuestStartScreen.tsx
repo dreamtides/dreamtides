@@ -11,7 +11,7 @@ const DREAMCALLER_ACCENT = "#c084fc";
 const DREAMCALLER_HOVER_TRANSITION = { duration: 0.12, delay: 0 } as const;
 const DREAMCALLER_TAP_TRANSITION = { duration: 0.08, delay: 0 } as const;
 const TIDES_LABEL_HOVER_BLURB =
-  "These tidal pools are shuffled together to build the final draft pool.";
+  "The tidal pools are shuffled together to build the final draft pool.";
 
 /** Intro screen where the player picks a dreamcaller to start the quest. */
 export function QuestStartScreen() {
@@ -81,7 +81,10 @@ export function QuestStartScreen() {
       </motion.p>
 
       <motion.div
-        className="flex flex-col items-center gap-3 md:flex-row md:items-start md:gap-5"
+        // FIND-01-12: use the available desktop width. On xl+ viewports the
+        // three dreamcaller cards now span a wider column with bigger gaps
+        // so 1728 wide no longer leaves ~830 px of empty gutter.
+        className="flex w-full max-w-[1200px] flex-col items-center gap-3 px-6 md:flex-row md:items-start md:gap-6 xl:max-w-[1440px] xl:gap-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
@@ -95,7 +98,7 @@ export function QuestStartScreen() {
           return (
             <motion.div
               key={dreamcaller.name}
-              className="flex w-full max-w-[286px] flex-col items-center gap-3"
+              className="flex w-full max-w-[286px] flex-1 flex-col items-center gap-3 xl:max-w-[380px]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}

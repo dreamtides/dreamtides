@@ -54,7 +54,6 @@ describe("drawDreamsignOptions", () => {
     const draw = drawDreamsignOptions(
       ["embers-whisper", "glacial-insight", "verdant-accord"],
       DREAMSIGN_TEMPLATES,
-      [],
       2,
     );
 
@@ -67,13 +66,11 @@ describe("drawDreamsignOptions", () => {
     const first = drawDreamsignOptions(
       ["embers-whisper", "glacial-insight", "verdant-accord"],
       DREAMSIGN_TEMPLATES,
-      [],
       2,
     );
     const second = drawDreamsignOptions(
       first.remainingDreamsignPool,
       DREAMSIGN_TEMPLATES,
-      [],
       2,
     );
 
@@ -89,7 +86,6 @@ describe("drawDreamsignOptions", () => {
     const draw = drawDreamsignOptions(
       ["missing-id", "glacial-insight"],
       DREAMSIGN_TEMPLATES,
-      [],
       2,
     );
 
@@ -99,48 +95,12 @@ describe("drawDreamsignOptions", () => {
 
   it("degrades to a clean no-offer path when the pool is exhausted", () => {
     expect(
-      drawDreamsignOptions(["missing-id"], DREAMSIGN_TEMPLATES, [], 3),
+      drawDreamsignOptions(["missing-id"], DREAMSIGN_TEMPLATES, 3),
     ).toEqual({
       offeredIds: [],
       offeredDreamsigns: [],
       remainingDreamsignPool: [],
     });
-  });
-
-  it("only reveals dreamsigns matching the selected package tides", () => {
-    const draw = drawDreamsignOptions(
-      ["embers-whisper", "glacial-insight", "verdant-accord"],
-      DREAMSIGN_TEMPLATES,
-      ["beta"],
-      3,
-    );
-
-    expect(draw.offeredIds).toEqual(["glacial-insight"]);
-    expect(draw.remainingDreamsignPool).toEqual([
-      "embers-whisper",
-      "verdant-accord",
-    ]);
-  });
-
-  it("keeps neutral dreamsigns eligible for any package", () => {
-    const draw = drawDreamsignOptions(
-      ["embers-whisper", "glacial-insight", "neutral-sign"],
-      [
-        ...DREAMSIGN_TEMPLATES,
-        {
-          id: "neutral-sign",
-          name: "Neutral Sign",
-          effectDescription: "Always eligible.",
-        },
-      ],
-      ["beta"],
-      2,
-    );
-
-    expect(draw.offeredIds.sort()).toEqual([
-      "glacial-insight",
-      "neutral-sign",
-    ]);
   });
 });
 
@@ -157,26 +117,5 @@ describe("resolveDreamsignTemplates", () => {
         DREAMSIGN_TEMPLATES,
       ).map((template) => template.id),
     ).toEqual(["glacial-insight", "embers-whisper"]);
-  });
-
-  it("filters resolved templates to matching and neutral dreamsigns", () => {
-    expect(
-      resolveDreamsignTemplates(
-        [
-          "glacial-insight",
-          "embers-whisper",
-          "neutral-sign",
-        ],
-        [
-          ...DREAMSIGN_TEMPLATES,
-          {
-            id: "neutral-sign",
-            name: "Neutral Sign",
-            effectDescription: "Always eligible.",
-          },
-        ],
-        ["beta"],
-      ).map((template) => template.id),
-    ).toEqual(["glacial-insight", "neutral-sign"]);
   });
 });

@@ -7,6 +7,7 @@ interface SiteCardProps {
   isLocked: boolean;
   completionLevel: number;
   biomeColor: string;
+  remainingSitesToUnlockBattle: number;
   onSiteClick: (siteId: string) => void;
 }
 
@@ -30,6 +31,7 @@ export function SiteCard({
   isLocked,
   completionLevel,
   biomeColor,
+  remainingSitesToUnlockBattle,
   onSiteClick,
 }: SiteCardProps) {
   const isBattle = site.type === "Battle";
@@ -116,7 +118,9 @@ export function SiteCard({
         {/* Site type subtext for battle */}
         {isBattle && isLocked && (
           <span className="text-xs opacity-50">
-            Complete all other sites to unlock
+            {remainingSitesToUnlockBattle === 1
+              ? "Complete 1 remaining site to unlock"
+              : `Complete ${String(remainingSitesToUnlockBattle)} remaining sites to unlock`}
           </span>
         )}
         {/* Reward preview */}

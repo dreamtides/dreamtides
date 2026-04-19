@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { CardData } from "../types/cards";
-import { DreamsignImage } from "../components/DreamsignImage";
 import type { SiteState } from "../types/quest";
 import { CardDisplay } from "../components/CardDisplay";
 import { CardOverlay } from "../components/CardOverlay";
@@ -363,14 +362,27 @@ function ShopSlotCard({
             boxShadow: "0 0 8px rgba(168, 85, 247, 0.12)",
           }}
         >
-          <DreamsignImage
-            name={ds.name}
-            imageName={ds.imageName}
-            imageAlt={ds.imageAlt}
-            className="h-20 w-20"
-            frameClassName="border border-fuchsia-300/25"
-            placeholderClassName="text-3xl text-fuchsia-100"
-          />
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-full text-lg"
+            style={{
+              background: "rgba(255, 255, 255, 0.08)",
+              border: "2px solid rgba(168, 85, 247, 0.35)",
+              color: "#cbd5f5",
+            }}
+            aria-label={`${ds.name} sigil`}
+          >
+            {"\u2726"}
+          </div>
+          <span
+            className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+            style={{
+              background: "rgba(168, 85, 247, 0.16)",
+              color: "#c4b5fd",
+              border: "1px solid rgba(168, 85, 247, 0.35)",
+            }}
+          >
+            Dreamsign
+          </span>
           <h3
             className="text-center text-sm font-bold"
             style={{ color: "#f8fafc" }}

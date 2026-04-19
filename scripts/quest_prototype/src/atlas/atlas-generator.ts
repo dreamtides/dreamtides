@@ -121,51 +121,12 @@ export function additionalSiteTypesForLevel(
   );
 }
 
-function generateOpeningDreamscapeSites(): SiteState[] {
-  return [
-    {
-      id: nextSiteId(),
-      type: "Draft",
-      isEnhanced: false,
-      isVisited: false,
-    },
-    {
-      id: nextSiteId(),
-      type: "Draft",
-      isEnhanced: false,
-      isVisited: false,
-    },
-    {
-      id: nextSiteId(),
-      type: "DreamsignDraft",
-      isEnhanced: false,
-      isVisited: false,
-    },
-    {
-      id: nextSiteId(),
-      type: "DreamJourney",
-      isEnhanced: false,
-      isVisited: false,
-    },
-    {
-      id: nextSiteId(),
-      type: "Battle",
-      isEnhanced: false,
-      isVisited: false,
-    },
-  ];
-}
-
 /** Generates the site composition for a dreamscape. Total: 3-6 sites. */
 export function generateSiteComposition(
   completionLevel: number,
-  isFirstDreamscape: boolean,
+  _isFirstDreamscape: boolean,
   context: SiteGenerationContext,
 ): SiteState[] {
-  if (isFirstDreamscape) {
-    return generateOpeningDreamscapeSites();
-  }
-
   const sites: SiteState[] = [];
 
   // Draft sites based on completion level
@@ -250,9 +211,7 @@ function createNode(
   const id = nextNodeId();
   const biome = assignBiome(usedBiomeNames);
   const sites = generateSiteComposition(completionLevel, isFirstDreamscape, context);
-  const enhancedSiteType = isFirstDreamscape
-    ? null
-    : applyBiomeEnhancement(sites, biome);
+  const enhancedSiteType = applyBiomeEnhancement(sites, biome);
 
   logEvent("atlas_node_generated", {
     nodeId: id,
@@ -315,7 +274,7 @@ export function generateInitialAtlas(
     const node = createNode(
       { x, y },
       completionLevel,
-      i === 0,
+      true,
       [nexusId],
       context,
       usedBiomeNames,
@@ -481,7 +440,13 @@ export function previewSiteTypes(node: DreamscapeNode): SiteType[] {
     .slice(0, 3);
 }
 
-/** Returns a reward preview label for atlas tooltip display, or null if not a reward site. */
-export function rewardPreviewLabel(site: SiteState): string | null {
-  return site.type === "Reward" ? "Reward" : null;
+/**
+ * Returns a reward preview label for atlas tooltip display, or null if not a
+ * reward site. FIND-01-7: Reward sites already show "Reward" as their primary
+ * label via `siteTypeName`, so returning "Reward" here duplicated the copy.
+ * Return null instead — the absence of a subtitle is preferable to repeating
+ * the title.
+ */
+export function rewardPreviewLabel(_site: SiteState): string | null {
+  return null;
 }

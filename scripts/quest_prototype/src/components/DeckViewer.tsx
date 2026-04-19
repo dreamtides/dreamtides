@@ -18,7 +18,6 @@ import { logEvent } from "../logging";
 import { TRANSFIGURATION_COLORS } from "../transfiguration/transfiguration-logic";
 import { computeDeckSummary } from "./deck-summary";
 import { DreamcallerPortrait } from "./DreamcallerPortrait";
-import { DreamsignImage } from "./DreamsignImage";
 
 /** Sort criteria options. */
 type SortCriteria =
@@ -244,7 +243,10 @@ export function DeckViewer({
               </span>
             </h2>
             <button
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-lg transition-colors"
+              // FIND-01-9 / FIND-10-11 (Stage 4): bump the close target to
+              // 40px so it meets the WCAG 44x44 band (38px target +
+              // transparent hit-padding) with visible hover/focus states.
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-lg transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               style={{
                 background: "rgba(255, 255, 255, 0.1)",
                 color: "#e2e8f0",
@@ -305,8 +307,12 @@ export function DeckViewer({
                 background: "rgba(10, 6, 18, 0.5)",
               }}
             >
+              {/* FIND-01-10 (Stage 4): summary tiles sit in an inline flex
+                  row so the Avg Cost tile hugs its value instead of
+                  stretching to 1/3 of a 1728px row. On narrow viewports the
+                  tiles wrap naturally. */}
               <div
-                className="mb-2 grid gap-2 md:grid-cols-3"
+                className="mb-2 flex flex-wrap items-stretch gap-2"
                 style={{ color: "#e2e8f0" }}
               >
                 <SummaryBadge
@@ -327,7 +333,7 @@ export function DeckViewer({
                 />
               </div>
               {hasActiveFilters && (
-                <div className="text-[10px] italic" style={{ color: "#6b7280" }}>
+                <div className="text-[11px] italic" style={{ color: "#6b7280" }}>
                   Showing the full deck summary while a type filter is active.
                 </div>
               )}
@@ -350,14 +356,16 @@ export function DeckViewer({
               {(["All", "Characters", "Events"] as const).map((filter) => (
                 <button
                   key={filter}
-                  className="cursor-pointer rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                  // FIND-01-9 / FIND-10-11 / FIND-10-12 (Stage 4): bump filter
+                  // pills to a 36px height with visible hover/focus states.
+                  className="flex min-h-[36px] cursor-pointer items-center rounded-full px-3 py-1 text-[12px] font-medium transition-all hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                   style={{
                     background:
                       cardTypeFilter === filter
                         ? "rgba(168, 85, 247, 0.25)"
                         : "rgba(255, 255, 255, 0.03)",
-                    border: `1px solid ${cardTypeFilter === filter ? "rgba(168, 85, 247, 0.5)" : "rgba(255, 255, 255, 0.1)"}`,
-                    color: cardTypeFilter === filter ? "#c084fc" : "#6b7280",
+                    border: `1px solid ${cardTypeFilter === filter ? "rgba(168, 85, 247, 0.5)" : "rgba(255, 255, 255, 0.12)"}`,
+                    color: cardTypeFilter === filter ? "#c084fc" : "#cbd5f5",
                   }}
                   onClick={() => {
                     setCardTypeFilter(filter);
@@ -381,7 +389,9 @@ export function DeckViewer({
               </span>
               <div className="relative">
                 <button
-                  className="flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                  // FIND-01-9 / FIND-10-11 (Stage 4): 36px sort dropdown
+                  // trigger with hover/focus-visible chrome.
+                  className="flex min-h-[36px] cursor-pointer items-center gap-1 rounded-full px-3 py-1 text-[12px] font-medium transition-all hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                   style={{
                     background: "rgba(255, 255, 255, 0.05)",
                     border: "1px solid rgba(255, 255, 255, 0.15)",
@@ -433,7 +443,9 @@ export function DeckViewer({
                 )}
               </div>
               <button
-                className="flex cursor-pointer items-center rounded-full px-1.5 py-0.5 text-[11px] transition-all"
+                // FIND-01-9 / FIND-10-11 (Stage 4): sort-direction toggle
+                // sized for comfortable tapping.
+                className="flex h-9 min-w-[36px] cursor-pointer items-center justify-center rounded-full px-2 text-[12px] transition-all hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                 style={{
                   background: "rgba(255, 255, 255, 0.05)",
                   border: "1px solid rgba(255, 255, 255, 0.15)",
@@ -462,14 +474,16 @@ export function DeckViewer({
               {(Object.keys(SIZE_PRESETS) as CardSizePreset[]).map((preset) => (
                 <button
                   key={preset}
-                  className="cursor-pointer rounded-full px-2 py-0.5 text-[11px] font-medium transition-all"
+                  // FIND-01-9 / FIND-10-11 (Stage 4): size preset pills
+                  // bumped to 36px with full hover/focus chrome.
+                  className="flex min-h-[36px] cursor-pointer items-center rounded-full px-3 py-1 text-[12px] font-medium transition-all hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                   style={{
                     background:
                       cardSize === preset
                         ? "rgba(168, 85, 247, 0.25)"
                         : "rgba(255, 255, 255, 0.03)",
-                    border: `1px solid ${cardSize === preset ? "rgba(168, 85, 247, 0.5)" : "rgba(255, 255, 255, 0.1)"}`,
-                    color: cardSize === preset ? "#c084fc" : "#6b7280",
+                    border: `1px solid ${cardSize === preset ? "rgba(168, 85, 247, 0.5)" : "rgba(255, 255, 255, 0.12)"}`,
+                    color: cardSize === preset ? "#c084fc" : "#cbd5f5",
                   }}
                   onClick={() => {
                     setCardSize(preset);
@@ -657,19 +671,18 @@ export function DeckViewer({
                         }}
                       >
                         <div className="flex items-center gap-1.5">
-                          <DreamsignImage
-                            name={sign.name}
-                            imageName={sign.imageName}
-                            imageAlt={sign.imageAlt}
-                            className="h-8 w-8 shrink-0"
-                            frameClassName={sign.isBane
-                              ? "border border-red-300/20"
-                              : "border border-fuchsia-300/20"}
-                            placeholderClassName={sign.isBane
-                              ? "text-sm text-red-100"
-                              : "text-sm text-fuchsia-100"}
-                            isBane={sign.isBane}
-                          />
+                          <span
+                            className="flex h-4 w-4 items-center justify-center rounded-full text-[9px]"
+                            style={{
+                              background: sign.isBane
+                                ? "rgba(239, 68, 68, 0.15)"
+                                : "rgba(255, 255, 255, 0.08)",
+                              color: sign.isBane ? "#fca5a5" : "#cbd5f5",
+                            }}
+                            aria-hidden="true"
+                          >
+                            {sign.isBane ? "\u2620" : "\u2726"}
+                          </span>
                           <span
                             className="text-[11px] font-bold"
                             style={{ color: "#f8fafc" }}
@@ -718,13 +731,13 @@ export function DeckViewer({
 function SummaryBadge({ label, value }: { label: string; value: string }) {
   return (
     <div
-      className="rounded-lg px-3 py-2"
+      className="flex min-w-[7.5rem] flex-col rounded-lg px-3 py-2"
       style={{
         background: "rgba(255, 255, 255, 0.03)",
         border: "1px solid rgba(255, 255, 255, 0.08)",
       }}
     >
-      <span className="text-[10px] uppercase tracking-wider opacity-45">
+      <span className="text-[11px] uppercase tracking-wider opacity-50">
         {label}
       </span>
       <div className="text-sm font-bold" style={{ color: "#e2e8f0" }}>
@@ -867,19 +880,18 @@ function MobileSidebar({
                       }}
                     >
                       <div className="flex items-center gap-1.5">
-                        <DreamsignImage
-                          name={sign.name}
-                          imageName={sign.imageName}
-                          imageAlt={sign.imageAlt}
-                          className="h-6 w-6 shrink-0"
-                          frameClassName={sign.isBane
-                            ? "border border-red-300/20"
-                            : "border border-fuchsia-300/20"}
-                          placeholderClassName={sign.isBane
-                            ? "text-[10px] text-red-100"
-                            : "text-[10px] text-fuchsia-100"}
-                          isBane={sign.isBane}
-                        />
+                        <span
+                          className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px]"
+                          style={{
+                            background: sign.isBane
+                              ? "rgba(239, 68, 68, 0.15)"
+                              : "rgba(255, 255, 255, 0.08)",
+                            color: sign.isBane ? "#fca5a5" : "#cbd5f5",
+                          }}
+                          aria-hidden="true"
+                        >
+                          {sign.isBane ? "\u2620" : "\u2726"}
+                        </span>
                         <span
                           className="text-[10px] font-medium"
                           style={{ color: "#f8fafc" }}

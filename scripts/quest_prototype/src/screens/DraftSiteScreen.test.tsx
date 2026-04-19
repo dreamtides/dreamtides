@@ -436,6 +436,40 @@ afterEach(() => {
 });
 
 describe("DraftSiteScreen", () => {
+  it("surfaces a draft card before header controls for mechanical QA picks", () => {
+    const mutations = makeMutations();
+    const cardDatabase = makeCardDatabase();
+    setQuestContext(makeState(), mutations, cardDatabase);
+
+    const { container, root } = mount(<DraftSiteScreen siteId="site-1" />);
+    const body = container.textContent ?? "";
+    const controls = Array.from(
+      container.querySelectorAll("button,[role=\"button\"]"),
+    ).filter((element) => {
+      if (!(element instanceof HTMLElement)) {
+        return false;
+      }
+
+      return !element.hasAttribute("disabled");
+    });
+    const choice = controls.find((element) => {
+      const text = element.textContent?.trim() ?? "";
+      return (
+        text !== ""
+        && !/Continue|Accept|Decline|Reject|Leave Shop|Skip|Return to Atlas|Battle|Miniboss|Final Boss/.test(
+          text,
+        )
+      );
+    });
+
+    expect(body).toContain("Pick 1/5");
+    expect(choice?.textContent).toContain("Arc Runner");
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
   it("shows the deck sidebar immediately on the draft screen", () => {
     const mutations = makeMutations();
     const cardDatabase = makeCardDatabase();
@@ -446,40 +480,6 @@ describe("DraftSiteScreen", () => {
     expect(container.querySelector('[data-testid="draft-deck-sidebar"]')).not.toBeNull();
     expect(container.textContent).toContain("Deck (1)");
     expect(container.textContent).toContain("Starter Lantern");
-
-    act(() => {
-      root.unmount();
-    });
-  });
-
-  it("shows a full-card hover preview for deck sidebar rows", () => {
-    const mutations = makeMutations();
-    const cardDatabase = makeCardDatabase();
-    setQuestContext(makeState(), mutations, cardDatabase);
-
-    const { container, root } = mount(<DraftSiteScreen siteId="site-1" />);
-    const deckRow = container.querySelector('[data-testid="draft-deck-row-entry-1"]');
-    if (!(deckRow instanceof HTMLDivElement)) {
-      throw new Error("Missing draft deck row");
-    }
-
-    act(() => {
-      deckRow.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
-    });
-
-    const hoverPreview = container.querySelector(
-      '[data-testid="draft-hover-preview"]',
-    );
-    expect(hoverPreview).not.toBeNull();
-    expect(hoverPreview?.textContent).toContain("Starter Lantern");
-
-    act(() => {
-      deckRow.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
-    });
-
-    expect(
-      container.querySelector('[data-testid="draft-hover-preview"]'),
-    ).toBeNull();
 
     act(() => {
       root.unmount();

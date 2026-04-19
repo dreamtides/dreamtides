@@ -172,13 +172,6 @@ describe("bootstrapQuestStart", () => {
       (node) => node.status === "available",
     );
     expect(availableNode).toBeDefined();
-    expect(availableNode?.sites.map((site) => site.type)).toEqual([
-      "Draft",
-      "Draft",
-      "DreamsignDraft",
-      "DreamJourney",
-      "Battle",
-    ]);
     expect(mutations.setCurrentDreamscape).toHaveBeenCalledWith(availableNode?.id);
     expect(mutations.setScreen).toHaveBeenCalledWith({ type: "dreamscape" });
 

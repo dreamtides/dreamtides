@@ -4,6 +4,7 @@ import type { DeckEntry, Dreamsign } from "../types/quest";
 
 import { isStarterCard } from "../data/card-database";
 import { countPackageOverlap } from "../data/quest-content";
+import { pickPackageAdjacentItem } from "../data/tide-weights";
 import {
   readDreamsignPool,
   resolveDreamsignTemplates,
@@ -211,16 +212,14 @@ export function generateShopInventory(
         remainingDreamsignPoolIds,
         options.dreamsignTemplates,
       );
-      const availableDreamsigns = resolveDreamsignTemplates(
-        dreamsignPoolState.availableIds,
-        options.dreamsignTemplates,
+      const template = pickPackageAdjacentItem(
+        resolveDreamsignTemplates(
+          dreamsignPoolState.availableIds,
+          options.dreamsignTemplates,
+        ),
+        (candidate) => candidate.packageTides,
+        selectedPackageTides,
       );
-      const template =
-        availableDreamsigns.length === 0
-          ? null
-          : availableDreamsigns[
-            Math.floor(Math.random() * availableDreamsigns.length)
-          ];
       if (template !== null) {
         remainingDreamsignPoolIds = dreamsignPoolState.availableIds.filter(
           (id) => id !== template.id,

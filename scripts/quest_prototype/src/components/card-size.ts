@@ -6,12 +6,15 @@ export const SIZE_PRESETS: Readonly<
   Record<CardSizePreset, { columns: string; gap: string; label: string }>
 > = {
   small: {
-    columns: "repeat(auto-fill, minmax(112px, 1fr))",
+    // FIND-01-8 (Stage 4): bump minimum small-card tile from 112px to 144px
+    // so the 10px rules-text body reads at an acceptable visual size
+    // without needing a cross-cutting CardDisplay typography change.
+    columns: "repeat(auto-fill, minmax(144px, 1fr))",
     gap: "0.375rem",
     label: "S",
   },
   medium: {
-    columns: "repeat(auto-fill, minmax(160px, 1fr))",
+    columns: "repeat(auto-fill, minmax(176px, 1fr))",
     gap: "0.5rem",
     label: "M",
   },

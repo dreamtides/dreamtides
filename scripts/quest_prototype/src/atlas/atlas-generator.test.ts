@@ -28,15 +28,13 @@ beforeEach(() => {
 });
 
 describe("generateSiteComposition", () => {
-  it("uses the fixed opening site layout for the first dreamscape", () => {
-    const sites = generateSiteComposition(0, true, defaultContext());
-    expect(sites.map((site) => site.type)).toEqual([
-      "Draft",
-      "Draft",
-      "DreamsignDraft",
-      "DreamJourney",
-      "Battle",
-    ]);
+  it("produces 3-6 sites for level 0 first dreamscape", () => {
+    for (let i = 0; i < 50; i++) {
+      resetAtlasGenerator();
+      const sites = generateSiteComposition(0, true, defaultContext());
+      expect(sites.length).toBeGreaterThanOrEqual(3);
+      expect(sites.length).toBeLessThanOrEqual(6);
+    }
   });
 
   it("produces 3-6 sites for level 0 non-first dreamscape", () => {
@@ -70,6 +68,15 @@ describe("generateSiteComposition", () => {
     const sites = generateSiteComposition(0, false, defaultContext());
     const drafts = sites.filter((s) => s.type === "Draft");
     expect(drafts.length).toBe(2);
+  });
+
+  it("requires clearing at least 4 non-battle sites before the first level-0 battle unlocks", () => {
+    const sites = generateSiteComposition(0, true, defaultContext());
+    const nonBattleSites = sites.filter((site) => site.type !== "Battle");
+
+    expect(nonBattleSites.length).toBeGreaterThanOrEqual(4);
+    expect(nonBattleSites[0].type).toBe("Draft");
+    expect(nonBattleSites[1].type).toBe("Draft");
   });
 
   it("includes 1 draft site at level 2", () => {
@@ -231,31 +238,6 @@ describe("generateInitialAtlas", () => {
     }
   });
 
-  it("gives the auto-entered opening node the deterministic site mix", () => {
-    const atlas = generateInitialAtlas(0, defaultContext());
-    expect(atlas.nodes["dreamscape-1"]?.sites.map((site) => site.type)).toEqual([
-      "Draft",
-      "Draft",
-      "DreamsignDraft",
-      "DreamJourney",
-      "Battle",
-    ]);
-  });
-
-  it("never enhances sites in the opening dreamscape", () => {
-    const atlas = generateInitialAtlas(0, defaultContext());
-
-    expect(atlas.nodes["dreamscape-1"]?.enhancedSiteType).toBeNull();
-    expect(
-      atlas.nodes["dreamscape-1"]?.sites.every((site) => !site.isEnhanced),
-    ).toBe(true);
-  });
-
-  it("keeps the other starting node on the normal level-0 site pool", () => {
-    const atlas = generateInitialAtlas(0, defaultContext());
-    expect(atlas.nodes["dreamscape-2"]?.sites.some((site) => site.type === "DreamJourney")).toBe(false);
-  });
-
 });
 
 describe("generateNewNodes", () => {
@@ -380,14 +362,14 @@ describe("previewSiteTypes", () => {
 });
 
 describe("rewardPreviewLabel", () => {
-  it("returns a generic label for reward sites", () => {
+  it("returns null for reward sites so the caller does not duplicate 'Reward' (FIND-01-7)", () => {
     const site: SiteState = {
       id: "s1",
       type: "Reward",
       isEnhanced: false,
       isVisited: false,
     };
-    expect(rewardPreviewLabel(site)).toBe("Reward");
+    expect(rewardPreviewLabel(site)).toBeNull();
   });
 
   it("returns null for non-reward sites", () => {

@@ -54,29 +54,30 @@ const DREAMSIGN_TEMPLATES: DreamsignTemplate[] = [
   {
     id: "embers-whisper",
     name: "Ember's Whisper",
+    displayTide: "Ignite",
+    packageTides: ["alpha"],
     effectDescription: "Fire.",
-    imageName: "embers-whisper.png",
-    packageTides: ["ember"],
   },
   {
     id: "glacial-insight",
     name: "Glacial Insight",
+    displayTide: "Rime",
+    packageTides: ["beta"],
     effectDescription: "Ice.",
-    imageName: "glacial-insight.png",
-    packageTides: ["frost"],
   },
   {
     id: "verdant-accord",
     name: "Verdant Accord",
+    displayTide: "Bloom",
+    packageTides: ["gamma"],
     effectDescription: "Growth.",
-    imageName: "verdant-accord.png",
-    packageTides: ["grove"],
   },
   {
     id: "stormthread-sigil",
     name: "Stormthread Sigil",
+    displayTide: "Arc",
+    packageTides: ["delta"],
     effectDescription: "Storm.",
-    imageName: "stormthread-sigil.png",
   },
 ];
 
@@ -138,34 +139,6 @@ function makeSite(overrides: Partial<SiteState> = {}): SiteState {
   };
 }
 
-function makeResolvedPackage(
-  selectedTides: string[],
-  dreamsignPoolIds: string[],
-) {
-  return {
-    dreamcaller: {
-      id: "dc-1",
-      name: "Dreamcaller",
-      title: "Title",
-      awakening: 1,
-      renderedText: "",
-      imageNumber: "0001",
-      mandatoryTides: selectedTides,
-      optionalTides: [],
-    },
-    mandatoryTides: [...selectedTides],
-    optionalSubset: [],
-    selectedTides: [...selectedTides],
-    draftPoolCopiesByCard: {},
-    dreamsignPoolIds: [...dreamsignPoolIds],
-    mandatoryOnlyPoolSize: 0,
-    draftPoolSize: 0,
-    doubledCardCount: 0,
-    legalSubsetCount: 0,
-    preferredSubsetCount: 0,
-  };
-}
-
 function setQuestContext(state: QuestState, mutations: QuestMutations): void {
   vi.mocked(useQuest).mockReturnValue({
     state,
@@ -196,7 +169,7 @@ function mount(element: ReactElement): {
 
 function clickButton(container: HTMLElement, label: string): void {
   const button = Array.from(container.querySelectorAll("button")).find(
-    (candidate) => candidate.textContent?.includes(label),
+    (candidate) => candidate.textContent?.trim() === label,
   );
   if (!button) {
     throw new Error(`Could not find button with label: ${label}`);
@@ -221,10 +194,6 @@ describe("DreamsignOfferingScreen", () => {
     setQuestContext(
       makeState({
         remainingDreamsignPool: ["embers-whisper", "glacial-insight"],
-        resolvedPackage: makeResolvedPackage(
-          ["ember"],
-          ["embers-whisper", "glacial-insight"],
-        ),
       }),
       mutations,
     );
@@ -263,10 +232,6 @@ describe("DreamsignOfferingScreen", () => {
           effectDescription: "Existing.",
           isBane: false,
         })),
-        resolvedPackage: makeResolvedPackage(
-          ["ember"],
-          ["embers-whisper", "glacial-insight"],
-        ),
       }),
       mutations,
     );
@@ -307,15 +272,6 @@ describe("DreamsignDraftScreen", () => {
           "verdant-accord",
           "stormthread-sigil",
         ],
-        resolvedPackage: makeResolvedPackage(
-          ["ember", "frost", "grove"],
-          [
-            "embers-whisper",
-            "glacial-insight",
-            "verdant-accord",
-            "stormthread-sigil",
-          ],
-        ),
       }),
       mutations,
     );
@@ -334,7 +290,7 @@ describe("DreamsignDraftScreen", () => {
       "dreamsign_draft_revealed",
     );
 
-    clickButton(container, "Skip (discard both)");
+    clickButton(container, "Skip (discards both Dreamsigns)");
 
     expect(mutations.addDreamsign).not.toHaveBeenCalled();
     expect(mutations.markSiteVisited).toHaveBeenCalledWith("site-1");
@@ -350,7 +306,6 @@ describe("DreamsignDraftScreen", () => {
     setQuestContext(
       makeState({
         remainingDreamsignPool: ["missing-id"],
-        resolvedPackage: makeResolvedPackage(["ember"], ["missing-id"]),
       }),
       mutations,
     );
@@ -369,50 +324,10 @@ describe("DreamsignDraftScreen", () => {
       "dreamsign_draft_revealed",
     );
 
-    clickButton(container, "Skip");
+    clickButton(container, "Skip (discards both Dreamsigns)");
 
     expect(mutations.addDreamsign).not.toHaveBeenCalled();
     expect(mutations.markSiteVisited).toHaveBeenCalledWith("site-1");
-
-    act(() => {
-      root.unmount();
-    });
-  });
-
-  it("filters draft options to selected and neutral dreamsigns", () => {
-    const mutations = makeMutations();
-    setQuestContext(
-      makeState({
-        remainingDreamsignPool: [
-          "embers-whisper",
-          "glacial-insight",
-          "stormthread-sigil",
-        ],
-        resolvedPackage: makeResolvedPackage(
-          ["ember"],
-          [
-            "embers-whisper",
-            "glacial-insight",
-            "stormthread-sigil",
-          ],
-        ),
-      }),
-      mutations,
-    );
-
-    const { container, root } = mount(
-      <DreamsignDraftScreen
-        site={makeSite({ type: "DreamsignDraft" })}
-      />,
-    );
-
-    expect(container.textContent).toContain("Ember's Whisper");
-    expect(container.textContent).toContain("Stormthread Sigil");
-    expect(container.textContent).not.toContain("Glacial Insight");
-    expect(mutations.setRemainingDreamsignPool).toHaveBeenCalledWith(
-      ["glacial-insight"],
-      "dreamsign_draft_revealed",
-    );
 
     act(() => {
       root.unmount();

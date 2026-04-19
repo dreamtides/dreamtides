@@ -1,5 +1,5 @@
 import { createDreamsign } from "../data/dreamsigns";
-import type { DreamsignTemplate, PackageTideId } from "../types/content";
+import type { DreamsignTemplate } from "../types/content";
 import type { Dreamsign } from "../types/quest";
 
 export interface DreamsignPoolDraw {
@@ -11,23 +11,6 @@ export interface DreamsignPoolDraw {
 export interface DreamsignPoolState {
   availableIds: string[];
   templatesById: Map<string, DreamsignTemplate>;
-}
-
-function isDreamsignEligible(
-  template: DreamsignTemplate,
-  selectedPackageTides: readonly PackageTideId[],
-): boolean {
-  if (selectedPackageTides.length === 0) {
-    return true;
-  }
-
-  if ((template.packageTides?.length ?? 0) === 0) {
-    return true;
-  }
-
-  return template.packageTides!.some((packageTideId) =>
-    selectedPackageTides.includes(packageTideId),
-  );
 }
 
 function canonicalizeDreamsignPool(
@@ -76,19 +59,15 @@ export function readDreamsignPool(
 export function drawDreamsignOptions(
   remainingDreamsignPool: readonly string[],
   templates: readonly DreamsignTemplate[],
-  selectedPackageTides: readonly PackageTideId[],
   count: number,
 ): DreamsignPoolDraw {
   const { availableIds, templatesById } = canonicalizeDreamsignPool(
     remainingDreamsignPool,
     templates,
   );
-  const eligibleIds = availableIds.filter((id) =>
-    isDreamsignEligible(templatesById.get(id)!, selectedPackageTides),
-  );
   const offeredIds = shufflePick(
-    eligibleIds,
-    Math.min(count, eligibleIds.length),
+    availableIds,
+    Math.min(count, availableIds.length),
   );
 
   return {
@@ -107,14 +86,11 @@ export function drawDreamsignOptions(
 export function resolveDreamsignTemplates(
   remainingDreamsignPool: readonly string[],
   templates: readonly DreamsignTemplate[],
-  selectedPackageTides: readonly PackageTideId[] = [],
 ): DreamsignTemplate[] {
   const { availableIds, templatesById } = readDreamsignPool(
     remainingDreamsignPool,
     templates,
   );
 
-  return availableIds
-    .filter((id) => isDreamsignEligible(templatesById.get(id)!, selectedPackageTides))
-    .map((id) => templatesById.get(id)!);
+  return availableIds.map((id) => templatesById.get(id)!);
 }

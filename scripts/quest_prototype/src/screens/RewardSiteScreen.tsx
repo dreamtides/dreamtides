@@ -2,11 +2,10 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import type { SiteState, Dreamsign } from "../types/quest";
 import { buildCardSourceDebugState } from "../debug/card-source-debug";
-import { DreamsignImage } from "../components/DreamsignImage";
 import { useQuest } from "../state/quest-context";
 import { logEvent } from "../logging";
 import { CardDisplay } from "../components/CardDisplay";
-import type { CardData } from "../types/cards";
+import type { CardData, Tide } from "../types/cards";
 import {
   generateRewardSiteData,
   type RewardSiteData,
@@ -103,7 +102,13 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
     if (rewardData.rewardType === "card") {
       mutations.addCard(rewardData.cardNumber, "reward_site");
     } else if (rewardData.rewardType === "dreamsign") {
-      mutations.addDreamsign(rewardData.dreamsign, "Reward");
+      const dreamsign: Dreamsign = {
+        name: rewardData.dreamsignName,
+        tide: rewardData.dreamsignTide,
+        effectDescription: rewardData.dreamsignEffect,
+        isBane: false,
+      };
+      mutations.addDreamsign(dreamsign, "Reward");
     } else {
       mutations.changeEssence(rewardData.essenceAmount, "reward_site");
     }
@@ -150,7 +155,11 @@ export function RewardSiteScreen({ site }: RewardSiteScreenProps) {
           <CardRewardDisplay cardNumber={rewardData.cardNumber} />
         )}
         {rewardData.rewardType === "dreamsign" && (
-          <DreamsignRewardDisplay dreamsign={rewardData.dreamsign} />
+          <DreamsignRewardDisplay
+            name={rewardData.dreamsignName}
+            tide={rewardData.dreamsignTide}
+            effectDescription={rewardData.dreamsignEffect}
+          />
         )}
         {rewardData.rewardType === "essence" && (
           <EssenceRewardDisplay
@@ -224,9 +233,13 @@ function CardRewardDisplay({ cardNumber }: { cardNumber: number }) {
 
 /** Renders a dreamsign reward with tide icon, name, and effect. */
 function DreamsignRewardDisplay({
-  dreamsign,
+  name,
+  tide: _tide,
+  effectDescription,
 }: {
-  dreamsign: Dreamsign;
+  name: string;
+  tide: Tide;
+  effectDescription: string;
 }) {
   return (
     <div
@@ -241,25 +254,38 @@ function DreamsignRewardDisplay({
       <p className="text-xs font-bold uppercase tracking-wider opacity-50">
         Dreamsign Reward
       </p>
-      <DreamsignImage
-        name={dreamsign.name}
-        imageName={dreamsign.imageName}
-        imageAlt={dreamsign.imageAlt}
-        className="h-28 w-28"
-        frameClassName="border border-fuchsia-300/25 shadow-[0_0_24px_rgba(168,85,247,0.16)]"
-        placeholderClassName="text-4xl text-fuchsia-100"
-      />
+      <div
+        className="flex h-14 w-14 items-center justify-center rounded-full text-2xl"
+        style={{
+          background: "rgba(255, 255, 255, 0.08)",
+          border: "2px solid rgba(168, 85, 247, 0.35)",
+          color: "#cbd5f5",
+        }}
+        aria-label={`${name} sigil`}
+      >
+        {"\u2726"}
+      </div>
+      <span
+        className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+        style={{
+          background: "rgba(168, 85, 247, 0.16)",
+          color: "#c4b5fd",
+          border: "1px solid rgba(168, 85, 247, 0.35)",
+        }}
+      >
+        Dreamsign
+      </span>
       <h3
         className="text-center text-lg font-bold"
         style={{ color: "#f8fafc" }}
       >
-        {dreamsign.name}
+        {name}
       </h3>
       <p
         className="text-center text-sm leading-relaxed opacity-70"
         style={{ color: "#e2e8f0" }}
       >
-        {dreamsign.effectDescription}
+        {effectDescription}
       </p>
     </div>
   );
