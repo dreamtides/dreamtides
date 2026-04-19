@@ -4,9 +4,72 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dreamtides Quest Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+      /* FIND-01-11 (Stage 4): paint a splash before the JS bundles load so
+         the first frame is not a flash of black. Tailwind / app CSS loads
+         asynchronously; this inline style guarantees sub-200ms paint. */
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #05020a;
+        color: #e2e8f0;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+      }
+      #root {
+        min-height: 100vh;
+      }
+      /* The #initial-splash element is rendered into #root so React's first
+         render replaces it atomically. Keep it visually similar to the
+         eventual design-token surface: slate backdrop, cyan accent. */
+      #initial-splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        background: #05020a;
+        color: #cbd5f5;
+        font-size: 14px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      #initial-splash .ring {
+        width: 42px;
+        height: 42px;
+        border-radius: 9999px;
+        border: 3px solid rgba(103, 232, 249, 0.18);
+        border-top-color: #67e8f9;
+        animation: initial-splash-spin 0.9s linear infinite;
+      }
+      #initial-splash .title {
+        font-size: 20px;
+        letter-spacing: 0.32em;
+        color: #67e8f9;
+      }
+      #initial-splash .sub {
+        font-size: 11px;
+        letter-spacing: 0.28em;
+        color: #64748b;
+      }
+      @keyframes initial-splash-spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="initial-splash" aria-label="Loading Dreamtides Quest Prototype">
+        <div class="ring" aria-hidden="true"></div>
+        <div class="title">Dreamtides</div>
+        <div class="sub">Quest Prototype</div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
