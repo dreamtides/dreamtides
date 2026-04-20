@@ -68,7 +68,8 @@ site's effect, often with a 3D animated NPC character introducing the site's
 concept. Once all of the sites in a given dreamscape have been visited, the user
 must navigate to the "battle" site to initiate a card battle. After completing a
 battle, the user is able to select another dreamscape to navigate to, and the
-process repeats.
+process repeats. By default, quests are single elimination: if the player loses
+any battle, the quest ends immediately.
 
 ## Current Quest Prototype
 
@@ -226,6 +227,7 @@ Dreamwell-and-energy rules from
 [`docs/battle_rules/battle_rules.md`](../../battle_rules/battle_rules.md): the
 Dreamwell phase increases energy production, current energy resets to production
 each turn, and playing cards only checks energy cost, not tide membership.
+Quests are single elimination by default, so losing this battle ends the run.
 
 **UI:** The camera pans in to the battle scene. The "full body" card
 representation of the enemy dreamcaller animates in from a small size at the
@@ -552,9 +554,11 @@ Icon: "Snowflake"
 
 ## Victory & Defeat
 
-Initially, a Quest ends in defeat if the user loses a battle. As described in
-the [Meta Progression](meta_progression.md) document, the user eventually
-unlocks the ability to continue in a quest after a first loss.
+By default, quests are single elimination: if the user loses any battle, the
+quest ends immediately in defeat. As described in the
+[Meta Progression](meta_progression.md) document, the user may eventually unlock
+an exception that allows continuing after a first loss, but that is a
+meta-progression reward layered on top of the base rule.
 
 **UI:** When a battle ends, a particle effect plays alongside a sound effect,
 and the word "Victory" or "Defeat" is displayed at screen center. The text then
