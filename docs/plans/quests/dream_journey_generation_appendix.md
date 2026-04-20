@@ -4,17 +4,14 @@
 
 This appendix supplements
 [dream_journey_generation.md](dream_journey_generation.md). It contains worked
-generation examples, an explicit mapping from the older brainstorm note to the
-shape-first model, testing expectations, telemetry expectations, and operational
-notes that were split out to keep the core spec focused.
+generation examples, Journey-content classification guidance, testing
+expectations, telemetry expectations, and operational notes that were split out
+to keep the core spec focused.
 
 ## Related Information
 
 - [Dream Journey Generation](dream_journey_generation.md) Core shape-first
   Journey generation design.
-- [Procedural Journeys Brainstorm](../../../.llms/notes/procedural_journeys.md)
-  Earlier Journey note whose `Shapes` section is translated into the canonical
-  Journey Shape set.
 - [Quest Master Design](quests.md) High-level quest flow and site context that
   this appendix assumes.
 
@@ -161,18 +158,17 @@ accept-or-pass at each step.
 Why it works:
 
 The scene feels like browsing a sequence of proposals rather than reading a
-fixed three-column comparison. It uses a real brainstormed shape that does not
-fit cleanly into a simple static menu.
+fixed three-column comparison. It uses a Journey Shape that does not fit cleanly
+into a simple static menu.
 
-## Mapping The Brainstorm Note Into The Shape-First Model
+## Classifying Journey Content In The Shape-First Model
 
-The old brainstorm note remains useful, but its categories are not all the same
-kind of thing. The shape-first model classifies them explicitly.
+Journey content categories are not all the same kind of thing. The shape-first
+model classifies them explicitly.
 
 ### Direct Journey Shape Inputs
 
-The following brainstorm ideas map directly or nearly directly to Journey
-Shapes:
+The following Journey ideas map directly or nearly directly to Journey Shapes:
 
 - "all cost + simple effect", "three options with the same cost and different
   effects", and many "shop-like" setups map to `same_cost_different_rewards`,
@@ -201,7 +197,7 @@ Shapes:
 
 ### Shape Modifiers Rather Than New Top-Level Shapes
 
-Many brainstorm bullets are useful, but they should be fields on Journey Shapes
+Many Journey ideas are useful, but they should be fields on Journey Shapes
 rather than additional top-level shapes:
 
 - shared cost across all options
@@ -217,7 +213,7 @@ rather than additional top-level shapes:
 
 ### Effect-List Content
 
-Several brainstorm sections are effect-list material rather than shape material:
+Several content categories are effect-list material rather than shape material:
 
 - `Simple Effects` become reusable reward-effect entries
 - `Costs` become cost or burden entries
@@ -226,7 +222,7 @@ Several brainstorm sections are effect-list material rather than shape material:
 
 ### Fill Parameters
 
-Several brainstorm sections are parameters that Journey Shapes can use while
+Several content categories are parameters that Journey Shapes can use while
 filling:
 
 - `Conditions/Triggers`
@@ -235,7 +231,7 @@ filling:
 
 ### Payload Surfaces With Separate V1 Scope Decisions
 
-Several brainstorm sections are payload surfaces that may plug into Journey
+Several content categories are payload surfaces that may plug into Journey
 Shapes later if they survive the V1 scope filter:
 
 - `Custom Cards, Dreamsigns, and Transfigurations`
@@ -254,6 +250,7 @@ The implementation should support three test layers.
 For fixed seeds and run states, assert:
 
 - chosen Journey Shape
+- chosen site tag profile
 - visible options
 - hidden-policy metadata
 - committed outcomes
@@ -283,6 +280,7 @@ Maintain curated seed sets for:
 - essence-rich runs
 - essence-poor runs
 - Journey Shape coverage reviews
+- site-tag coverage reviews
 
 Golden-seed review is not just a correctness check. It is the main authored-feel
 check.
@@ -292,7 +290,7 @@ check.
 The runtime should log enough to answer:
 
 - which Journey Shapes appear
-- which option-relation tags appear
+- which site tags appear
 - which options players choose
 - how long they take
 - which Journey Shapes are skipped
@@ -308,9 +306,9 @@ temptations, opaque repeated loops, or late-run clutter.
 
 Because site manifests are precommitted, save data should persist the committed
 manifests, not just the seed and a promise to regenerate them later. Each
-manifest should record a content version or hash and the chosen Journey Shape.
-Repair steps and fallback use should be visible in logs rather than silently
-swallowed.
+manifest should record a content version or hash, the chosen Journey Shape, and
+the final site tag profile. Repair steps and fallback use should be visible in
+logs rather than silently swallowed.
 
 Players should be able to inspect active delayed hooks in quest UI. The system
 should not depend on the player remembering unresolved future promises.

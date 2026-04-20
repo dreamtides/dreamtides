@@ -61,11 +61,9 @@ should define those reusable effect lists in more detail.
   Dreamwell rules, battlefield structure, spark, and dreamsign context
   referenced by some Journey effects.
 - [Dream Journey Generation Appendix](dream_journey_generation_appendix.md)
-  Worked examples, brainstorm-note mapping, testing strategy, telemetry, and
-  operational notes that were split out to keep the core spec focused.
-- [Procedural Journeys Brainstorm](../../../.llms/notes/procedural_journeys.md)
-  Earlier Journey design note whose `Shapes` section becomes the basis of the
-  Journey Shape model in this document.
+  Worked examples, Journey-content classification guidance, testing strategy,
+  telemetry, and operational notes that were split out to keep the core spec
+  focused.
 
 ## Problem And Context
 
@@ -86,8 +84,8 @@ events: random offers, mismatched costs, incoherent option sets, repeated nouns
 with no remembered identity, or technically interesting scenes that are hard to
 compare at a glance.
 
-The earlier Dream Journey brainstorm note contains many useful ideas, but it
-mixes several different kinds of design material:
+Dream Journey design ideas naturally mix several different kinds of design
+material:
 
 - choice topologies such as "same cost, different rewards"
 - reward and cost payloads such as gain essence or gain Banes
@@ -101,9 +99,9 @@ bucket a scene belongs to before they can describe how the choice works. That
 extra layer increases cognitive load without clearly matching what designers are
 trying to author or what players are most likely to recognize.
 
-The strongest common thread across the brainstorm is not reward noun or flavor
-label. It is **choice topology**. The recurring ideas that feel most useful are
-all shapes:
+The strongest common thread across strong Journey concepts is not reward noun or
+flavor label. It is **choice topology**. The recurring ideas that feel most
+useful are all shapes:
 
 - same cost, different rewards
 - same reward, different costs
@@ -125,8 +123,8 @@ can understand it end to end.
 - Generate Dream Journey sites that feel curated rather than improvised.
 - Support strong replay variety through bounded recombination.
 - Make Journey Shapes the main authoring and balancing lever.
-- Preserve a broad set of brainstormed shapes instead of collapsing to a tiny
-  fixed menu.
+- Preserve a broad set of Journey Shapes instead of collapsing to a tiny fixed
+  menu.
 - Adapt moderately to current run state without solving the run for the player.
 - Guarantee that generated sites are legal, comprehensible, and strategically
   meaningful.
@@ -226,6 +224,7 @@ A Journey Shape is the primary authored unit. It defines:
 - the root choice structure
 - how visible options relate to each other
 - what kinds of effects can fill it
+- what kinds of site tags it can plausibly support
 - what information must be revealed
 - what counts as a valid or invalid instantiation
 - where in the run the shape tends to belong
@@ -243,6 +242,23 @@ from. They include things such as:
 - future hooks
 - reveal styles
 
+Each effect entry should also carry a small set of **site tags** describing what
+the generated site is really doing. V1 should keep this vocabulary broad and
+readable.
+
+Useful tag families include:
+
+- function tags such as `build`, `cleanup`, `refine`, `convert`, `economy`, and
+  `route`
+- horizon tags such as `immediate`, `delayed`, and `persistent`
+- stake tags such as `risk`, `sacrifice`, and `gamble`
+- intensity tags such as `broad`, `precise`, and `structural`
+
+A generated Journey site's tag profile should come mainly from its filled
+effects, costs, and burdens. Journey Shape may contribute a small number of
+secondary tags, but stage pacing should be driven primarily by the site's tag
+profile, not by the shape alone.
+
 ### Run Context Snapshot
 
 A Run Context Snapshot is the generator input when a dreamscape becomes
@@ -254,16 +270,17 @@ reason about.
 A Site Manifest is the committed output for one Journey site. It contains:
 
 - Journey Shape ID
+- site tag profile
 - chosen effects, targets, and timings
 - preview text
 - reveal policy
 - precommitted random outcomes
 - generation metadata for replay and debugging
 
-## Mapping Existing Journey Notes
+## Classifying Journey Content
 
-The earlier brainstorm note already contains most of the raw material needed for
-this system. The shape-first rewrite classifies that material as follows:
+Journey content naturally falls into a few different buckets inside this system.
+The shape-first model classifies that material as follows:
 
 - `Shapes` become the canonical Journey Shape set.
 - `Simple Effects` become reusable reward-effect entries.
@@ -412,9 +429,9 @@ Common fill rules include:
 - bounded random envelope
 - visible delayed payoff
 
-Many brainstorm bullets that look like "mini shapes" are better expressed as
-these fill rules inside a canonical Journey Shape. This keeps the top-level
-catalog stable while still preserving expressive power.
+Many Journey ideas that look like "mini shapes" are better expressed as these
+fill rules inside a canonical Journey Shape. This keeps the top-level catalog
+stable while still preserving expressive power.
 
 ## Effect Lists
 
@@ -479,12 +496,12 @@ V1 reveal styles should include:
 
 ### Payload Surfaces With Separate V1 Scope Decisions
 
-Some brainstorm categories are not new Journey Shapes. They are payload surfaces
-that may or may not participate in V1 depending on scope. The main examples are
-custom cards and custom dreamsigns, battlefield slot mutations, and deep
-persistent status rewrites. These can plug into the effect lists later if they
-survive the V1 scope filter. This keeps the Journey Shape model stable even as
-the payload surface grows.
+Some Journey content categories are not new Journey Shapes. They are payload
+surfaces that may or may not participate in V1 depending on scope. The main
+examples are custom cards and custom dreamsigns, battlefield slot mutations, and
+deep persistent status rewrites. These can plug into the effect lists later if
+they survive the V1 scope filter. This keeps the Journey Shape model stable even
+as the payload surface grows.
 
 ## Run Context Snapshot
 
@@ -509,20 +526,16 @@ At minimum it should include:
 - dreamsign count
 - active follow-up hooks
 - recent Journey Shape history
-- recent reward-category history
-- recent burden-category history
+- recent site-tag history
 - remaining atlas outlook known to the run
 
 The generator may derive a small number of synthetic signals such as:
 
 - stage
-- build pressure
-- cleanup need
-- refinement pressure
-- economy pressure
+- broad run need
 - hook saturation
 - recent shape fatigue
-- recent topology fatigue
+- recent site-tag fatigue
 
 Moderate adaptation means the generator may react to summary features of the
 run, but it should not attempt to solve the run card by card or hand the player
@@ -536,6 +549,7 @@ At minimum there should be separate deterministic branches for:
 
 - atlas expansion
 - dreamscape site roster selection
+- desired site-tag selection
 - Journey Shape selection
 - effect filling
 - reveal-policy commitment
@@ -563,12 +577,30 @@ dreamscape on the Dream Atlas.
 ### 1. Build The Snapshot
 
 Read quest state and produce the Run Context Snapshot for this dreamscape. Also
-derive the synthetic signals such as stage, cleanup need, refinement pressure,
-economy pressure, and hook saturation.
+derive the synthetic signals such as stage, broad run need, hook saturation,
+recent shape fatigue, and recent site-tag fatigue.
 
-### 2. Enumerate Legal Journey Shapes
+### 2. Choose Desired Site Tags
 
-Enumerate only Journey Shapes that are legal for this stage and this state.
+Choose a small desired site-tag profile for this Journey site based on stage,
+broad run need, and current hook saturation.
+
+Examples:
+
+- early build site: `build`, `reward`, `immediate`, `broad`
+- early cleanup site: `cleanup`, `immediate`, `precise`
+- mid refinement site: `refine`, `precise`
+- mid temptation site: `reward`, `risk`
+- late conversion site: `convert`, `precise`, `sacrifice`
+- late climax site: `gamble`, `structural`
+
+This step should stay coarse. It is a way of saying what kind of site the run
+needs next, not a deck solver.
+
+### 3. Enumerate Legal Journey Shapes
+
+Enumerate only Journey Shapes that are legal for this state and can plausibly
+support the desired site tags.
 
 Examples of hard exclusions:
 
@@ -579,34 +611,44 @@ Examples of hard exclusions:
 - `alter_future_dreamscape` when too few dreamscapes remain for the effect to
   matter
 
-### 3. Score Journey Shapes
+### 4. Score Journey Shapes
 
-Score each legal Journey Shape using a deterministic weighted sum of:
+Journey Shape scoring should stay simple. Each Journey Shape should carry a
+small set of supported tag profiles, but stage sequencing should be driven
+mostly by the site's chosen tags rather than by the shape itself.
 
-- stage weight
-- run-state resonance
-- economy-state affinity
-- build-versus-refine fit
+Score each legal Journey Shape using a deterministic weighted sum of just five
+factors:
+
+- desired site-tag fit
+- broad run-need fit
 - target-availability quality
-- recent shape penalty
-- recent topology penalty
-- reward-category repetition penalty
-- burden-category repetition penalty
-- persistence-footprint fit
-- novelty bonus
-- small authored flavor biases
+- recent exact-shape repetition penalty
+- recent site-tag repetition penalty
+
+`broad run need` should stay coarse. V1 only needs categories such as:
+
+- build
+- cleanup
+- refine
+- economy
+
+The goal is not to solve the run. The goal is to choose a site whose tags fit
+the current stage, loosely match what the run still needs, and avoid repeating
+the same shape or the same tags too often.
 
 Journey Shape selection should never be uniform.
 
-### 4. Select A Journey Shape
+### 5. Select A Journey Shape
 
 Choose within the top scoring band using deterministic weighted sampling rather
 than pure argmax or pure uniform sampling. This produces replay variety without
 letting obviously weak candidates through.
 
-### 5. Fill The Journey Shape
+### 6. Fill The Journey Shape
 
-Instantiate the selected Journey Shape from the effect lists.
+Instantiate the selected Journey Shape from the effect lists in a way that
+actually satisfies the desired site-tag profile.
 
 Recommended fill order:
 
@@ -620,12 +662,12 @@ Recommended fill order:
 
 This order helps prevent incoherent scenes.
 
-### 6. Validate
+### 7. Validate
 
 Run legality, coherence, choice-quality, information-contract, and persistence
 checks.
 
-### 7. Repair
+### 8. Repair
 
 If validation fails, repair in this order:
 
@@ -635,7 +677,7 @@ If validation fails, repair in this order:
 
 Repair should be deterministic and logged.
 
-### 8. Freeze
+### 9. Freeze
 
 Once the site validates, persist the final Site Manifest. Entering the site
 later only resolves the already committed choices. It does not generate new
@@ -691,21 +733,21 @@ The design intent is:
 - remove obvious friction
 - give direction
 
-Shapes that should be weighted high or medium-high early include:
+Tags that should be weighted high or medium-high early include:
 
-- `curated_reward_trio`
-- `service_menu`
-- `same_cost_different_rewards`
-- simple `same_reward_different_costs`
-- `one_operation_many_targets`
-- modest `now_vs_later`
+- `build`
+- `cleanup`
+- `reward`
+- `immediate`
+- `broad`
 
-Shapes that should be weighted low early include:
+Tags that should be weighted low early include:
 
-- `push_your_luck`
-- `commit_now_future_payoff`
-- `alter_future_dreamscape`
-- aggressive `sequential_offers`
+- `convert`
+- `route`
+- `structural`
+- `sacrifice`
+- heavy `persistent`
 
 ### Mid Stage
 
@@ -718,15 +760,17 @@ The design intent is:
 - sharpen identity
 - begin asking for real tradeoffs
 
-Shapes that should be weighted high or medium-high mid-run include:
+Tags that should be weighted high or medium-high mid-run include:
 
-- `one_target_many_operations`
-- `same_reward_different_costs`
-- `reward_after_trigger`
-- `now_vs_later`
-- `risk_or_skip`
-- `take_up_to_n`
-- `sequential_offers`
+- `refine`
+- `precise`
+- `risk`
+- moderate `delayed`
+- moderate `persistent`
+
+This is the stage where the run can start supporting sharper surgery, visible
+future promises, and real tradeoffs without collapsing into pure endgame
+conversion.
 
 ### Late Stage
 
@@ -739,17 +783,23 @@ The design intent is:
 - optimize
 - gamble sharply
 
-Shapes that should be weighted high or medium-high late include:
+Tags that should be weighted high or medium-high late include:
 
-- precise `one_target_many_operations`
-- `push_your_luck`
-- `take_up_to_n`
-- `commit_now_future_payoff`
-- `alter_future_dreamscape`
-- `escalating_search`
+- `convert`
+- `precise`
+- `sacrifice`
+- `gamble`
+- `structural`
 
-Low-impact broad acquisition shapes should be weighted down late unless they are
-filled at unusually high precision or magnitude.
+Tags that should be weighted low late include:
+
+- `build`
+- `broad`
+- payoff profiles that need a long runway to matter
+
+Journey Shapes may still appear in any stage, but they should be filled with tag
+profiles that match that stage. The same shape can therefore read early, mid, or
+late depending on its costs, rewards, and persistence.
 
 Summarized simply: early Journeys build, mid Journeys shape, and late Journeys
 convert.
@@ -759,26 +809,23 @@ convert.
 The generator should maintain a run-level pacing ledger tracking:
 
 - how often each Journey Shape has appeared
-- how often each option topology has appeared
-- recent reward categories
-- recent burden categories
+- how often each site tag has appeared
 - active follow-up hooks
-- active persistent mutations
-- recent safe-versus-risky distribution
 
 The ledger should feed both shape scoring and repair choices.
 
 Its job is to prevent:
 
 - exact Journey Shape spam
-- repeated topology spam
+- repeated tag spam
 - too much early refinement
 - too much late raw acquisition
 - too many future hooks at once
-- flat risk texture
+- flat tag distribution
 
 This replaces family-based cooldown logic. Repetition control should operate on
-the actual shapes and comparison structures the player is experiencing.
+exact Journey Shapes plus a small tag vocabulary rather than a large hidden
+scoring model.
 
 ## Persistence Budget
 
@@ -798,9 +845,8 @@ V1 should follow conservative rules:
 
 - a normal site should create at most one major persistent hook
 - a site may combine one persistent hook with one local immediate effect
-- if the run already holds several unresolved hooks, shapes such as
-  `reward_after_trigger`, `now_vs_later`, `commit_now_future_payoff`, and
-  `alter_future_dreamscape` should be downweighted
+- if the run already holds several unresolved hooks, site tags such as
+  `delayed`, `persistent`, and `route` should be downweighted
 - at most two unresolved long-tail hooks should exist at once, and at most one
   of those may be a route-altering structural hook
 
@@ -817,10 +863,10 @@ A Journey Shape definition should specify:
 - option count
 - root interaction flow
 - comparison relation
+- supported site tags
+- forbidden site tags if any
 - allowed effect categories
 - allowed fill rules
-- stage weights
-- repetition tags
 - persistence footprint
 - reveal-style allowances
 - invalid-state rules
@@ -834,6 +880,7 @@ An effect-list entry should specify:
 - payload identity
 - payload description
 - payload category
+- contributed site tags
 - magnitude band
 - compatibility tags
 - exclusion tags
@@ -914,7 +961,7 @@ matching the thing designers and players most directly reason about. Two scenes
 inside the same dramatic family can still feel unlike each other, while two
 shapes with different flavor framing may share the same real choice topology.
 Pacing, repetition control, and telemetry are clearer when applied directly to
-Journey Shapes and their option-relation tags.
+Journey Shapes and their site tags.
 
 ### Giant Static Event Catalog
 
@@ -926,7 +973,7 @@ that every generated site should feel like one authored unit.
 
 V1 should prefer:
 
-- a broad set of Journey Shapes from the brainstorm list
+- a broad set of Journey Shapes from the canonical catalog
 - bounded repeated accept-or-continue flows
 - visible triggers such as next victory, next battle, or next dreamscape
 - explicit reveal envelopes for random outcomes
