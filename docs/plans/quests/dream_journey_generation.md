@@ -148,6 +148,22 @@ can understand it end to end.
 - Support every extreme quest-rule rewrite in V1.
 - Solve final balancing numerics in this document.
 
+## Out Of Scope
+
+There are a few things that Dreamtides journeys do not do:
+
+- Initiate battles in any way.
+- Trigger off of the player losing battles, since Dreamtides is
+  single-elimination by default.
+- Allow the player to have an extremely deterministic deck as a result of a
+  single journey, such as having 15 or fewer cards or strongly controlling their
+  starting hand.
+- Directly apply ongoing player benefits instead of using a Dreamsign.
+- Allow more than one Dreamcaller per battle.
+- Show named tides to the player to pick from, or require the player to
+  understand which tides are good for their deck.
+- Play mini games beyond sequential button clicks, such as a matching game.
+
 ## Constraints And Requirements
 
 - Dream Journeys are generated when a dreamscape becomes available and then
