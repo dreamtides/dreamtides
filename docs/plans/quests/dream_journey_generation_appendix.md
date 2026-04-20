@@ -75,7 +75,7 @@ Run state:
 Generation:
 
 `risk_or_skip` scores well because the run is stable enough to consider a sharp
-tradeoff. The offered action grants a premium visible dreamsign and adds two
+temptation. The offered action grants a premium visible dreamsign and adds two
 visible Banes. The player may refuse.
 
 Why it works:
@@ -161,6 +161,64 @@ The scene feels like browsing a sequence of proposals rather than reading a
 fixed three-column comparison. It uses a Journey Shape that does not fit cleanly
 into a simple static menu.
 
+### Example 8: Mid Single Offer
+
+Run state:
+
+- completion level 2
+- deck still contains several weak starter cards
+- essence is moderate
+
+Generation:
+
+`single_offer` scores well because the run can still benefit from one clean
+service transaction without needing a full comparison menu. The site offers:
+"Pay 75 essence to purge a chosen card." The player may accept or leave.
+
+Why it works:
+
+The tension is purely whether the exchange is worth the price. There is no
+uncertainty and no hidden sting, so the scene should not be modeled as
+`risk_or_skip`.
+
+### Example 9: Mid Choose Your Loss
+
+Run state:
+
+- completion level 3
+- deck identity is established
+- several weak pieces still remain
+- one sharp negative scene is acceptable
+
+Generation:
+
+`choose_your_loss` scores well because the run can survive one visible
+sacrifice. The site presents three specific cards and asks the player which one
+to lose.
+
+Why it works:
+
+The player is not choosing where to place a desired operation. The point of the
+scene is to absorb a loss in the least harmful way.
+
+### Example 10: Mid Single Wager
+
+Run state:
+
+- completion level 3
+- essence is healthy
+- the run can tolerate one swingy economy scene
+
+Generation:
+
+`single_wager` scores well. The site offers one visible gamble: "Stake 60
+essence. 50%: gain 180 essence. 50%: gain nothing."
+
+Why it works:
+
+This is a one-shot bet with a bounded envelope. It should not be modeled as
+`push_your_luck` because the scene does not ask the player whether to continue.
+
 ## Classifying Journey Content In The Shape-First Model
 
 Journey content categories are not all the same kind of thing. The shape-first
@@ -170,24 +228,35 @@ model classifies them explicitly.
 
 The following Journey ideas map directly or nearly directly to Journey Shapes:
 
+- intentionally eclectic option sets map to `random_allocation`
 - "all cost + simple effect", "three options with the same cost and different
   effects", and many "shop-like" setups map to `same_cost_different_rewards`,
-  `service_menu`, or `shop_row`
+  `service_menu`, `shop_row`, or `single_offer` depending on option count and
+  purchasing frame
 - "three options with the same effect and different costs" and "gain a small
   reward or more with a cost" map to `same_reward_different_costs`
 - "two effect choices on the same card" and "different effects where you choose
   the card" map to `one_target_many_operations`
+- tightly parallel operation menus map to `mirrored_operations` when the overt
+  symmetry is the point of the scene rather than a secondary fill rule
 - "pick one of three cards to apply a transfiguration to" and several "same
   operation, different target" ideas map to `one_operation_many_targets`
+- "choose one of these visible losses" maps to `choose_your_loss`
+- "take this deterministic deal or leave it" maps to `single_offer`
+- burdened temptations with an explicit refusal path map to `risk_or_skip`
+- one-shot bets with a visible stake and bounded outcome envelope map to
+  `single_wager`
 - "gain a reward now or wait" maps to `now_vs_later`
 - "gain a reward if you complete some condition" and other mini-quest promises
   map to `reward_after_trigger`
+- shared-window menus such as "for your next battle, choose one of these
+  effects" map to `timed_window_menu` when the common duration is the scene
+  identity
 - "gain a reward up to N times" maps to `take_up_to_n`
 - "pay repeatedly to scale an effect" maps to `repeat_to_scale`
-- "push your luck", "all-gambling setup", and related escalating chance scenes
-  map to `push_your_luck`
-- "a single option where the player can take a risk or skip" maps to
-  `risk_or_skip`
+- escalating gamble scenes with stop-or-continue tension map to `push_your_luck`
+- fixed small random series with bounded outcomes map to
+  `resolved_random_series`
 - "see sequential offers" maps to `sequential_offers`
 - "reach deeper" and related digging scenes map to `escalating_search`
 - "pair a major quest effect with a major reward" often maps to
@@ -198,18 +267,20 @@ The following Journey ideas map directly or nearly directly to Journey Shapes:
 ### Shape Modifiers Rather Than New Top-Level Shapes
 
 Many Journey ideas are useful, but they should be fields on Journey Shapes
-rather than additional top-level shapes:
+rather than additional top-level shapes unless that shared property is itself
+the core promise of the scene:
 
 - shared cost across all options
 - shared reward class across all options
 - shared target across all options
-- shared timing across all options
+- shared timing across all options when the timing is not itself the scene
 - shared burden across all options
-- mechanically linked effect pool
+- mechanically linked effect pool when the linkage is support rather than the
+  main identity
 - thematically related objects across options
 - explicit refusal option
 - explicit stop-or-continue after each acceptance
-- bounded random envelope
+- bounded random envelope when the fixed random cadence is not itself the scene
 
 ### Effect-List Content
 

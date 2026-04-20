@@ -301,6 +301,12 @@ classify new ideas quickly.
 This list is the stable top-level catalog for V1. A new Journey idea should
 first ask whether it is an instance of one of these shapes.
 
+### random_allocation
+
+The site presents a small deliberately eclectic set of offers without a strong
+symmetry constraint. This shape should be rare, strongly validated, and still
+read as one authored scene rather than as a uniform random grab bag.
+
 ### same_cost_different_rewards
 
 All visible options ask the player to pay or accept the same price and differ
@@ -343,17 +349,45 @@ The site focuses on one chosen or visible target and presents several different
 operations for that same object. This is a core deck-surgery shape for
 transfiguration, duplication, merging, or other precise rewrites.
 
+### mirrored_operations
+
+The site presents a tightly parallel operation set whose overt symmetry is the
+main promise of the scene. This shape is useful for matched menus such as
+purge-versus-duplicate-versus-transfigure when the mirrored verbs themselves are
+the point, not merely a fill detail.
+
 ### one_operation_many_targets
 
 The site applies one operation across several possible targets and asks the
 player which target deserves it. This is a natural shape for upgrading,
 duplicating, purging, or otherwise rewriting one of several cards or dreamsigns.
+It is for deciding where a mostly desired action should land, not for choosing
+which loss to absorb.
+
+### choose_your_loss
+
+The site presents several visible negative outcomes and asks the player which
+one they are willing to accept. This shape is about damage control, triage, and
+picking the least harmful sacrifice, not about seeking upside.
+
+### single_offer
+
+The site presents one deterministic take-it-or-leave-it exchange. This is the
+right shape for ordinary priced services, clean one-shot bargains, and other
+cases where the tension is simply whether the deal is worth taking.
 
 ### risk_or_skip
 
-The player is offered a tempting action with a clearly signaled downside and may
-refuse. This is a compact high-tension shape for one-shot gambles, cursed gifts,
-or corruption scenes that should remain optional.
+The player is offered one tempting non-routine action with a clearly signaled
+downside, uncertainty, or corruption burden and may refuse. This is a compact
+high-tension shape for cursed gifts, dangerous boons, and other optional
+temptations that should not read like an ordinary priced service.
+
+### single_wager
+
+The site offers one visible one-shot gamble with a known stake and a bounded
+outcome envelope. Unlike `push_your_luck`, the player commits once and the scene
+does not ask whether to continue.
 
 ### now_vs_later
 
@@ -366,6 +400,12 @@ the noun being rewarded.
 The player accepts a visible future promise tied to a visible trigger. This
 shape supports mini-quests, delayed payoff objects, and stored value without
 changing the atlas structure itself.
+
+### timed_window_menu
+
+The site presents several options that all share the same temporary window,
+duration, or future timing. This shape is useful when the shared timing is the
+main identity of the scene rather than a secondary fill detail.
 
 ### take_up_to_n
 
@@ -384,6 +424,12 @@ than `take_up_to_n`.
 The player repeatedly risks an increasing downside or uncertain outcome in order
 to chase a stronger result. The stop-or-continue tension is the point of the
 scene.
+
+### resolved_random_series
+
+The site resolves a fixed small series of bounded random outcomes after one
+commitment. Unlike `push_your_luck`, there is no repeated stop-or-continue
+choice once the scene begins.
 
 ### sequential_offers
 
@@ -431,7 +477,11 @@ Common fill rules include:
 
 Many Journey ideas that look like "mini shapes" are better expressed as these
 fill rules inside a canonical Journey Shape. This keeps the top-level catalog
-stable while still preserving expressive power.
+stable while still preserving expressive power. The main exception is when a
+shared property is itself the authored promise of the scene. If overt symmetry,
+shared timing, or fixed random cadence is the thing the player is primarily
+reacting to, it may deserve an explicit top-level shape such as
+`mirrored_operations`, `timed_window_menu`, or `resolved_random_series`.
 
 ## Effect Lists
 
@@ -946,73 +996,3 @@ Reject or penalize sites where:
 - too many long-tail effects are stacked
 - a normal-band Journey Shape tries to inject multiple major persistent changes
 - a future-facing shape creates an untrackable or uninspectable promise
-
-## Alternatives Considered
-
-### Freeform Atomic Composer
-
-Rejected because it would maximize raw variance at the cost of scene coherence,
-balancing tractability, and player trust.
-
-### Family-First Taxonomy
-
-Rejected because it adds an extra authored and runtime layer without clearly
-matching the thing designers and players most directly reason about. Two scenes
-inside the same dramatic family can still feel unlike each other, while two
-shapes with different flavor framing may share the same real choice topology.
-Pacing, repetition control, and telemetry are clearer when applied directly to
-Journey Shapes and their site tags.
-
-### Giant Static Event Catalog
-
-Rejected as the primary model because it would undershoot Dreamtides' replay
-variety goals, though the final design still borrows the static-catalog lesson
-that every generated site should feel like one authored unit.
-
-## V1 Scope Boundaries
-
-V1 should prefer:
-
-- a broad set of Journey Shapes from the canonical catalog
-- bounded repeated accept-or-continue flows
-- visible triggers such as next victory, next battle, or next dreamscape
-- explicit reveal envelopes for random outcomes
-
-V1 should deliberately defer or tightly constrain:
-
-- broad procedural custom-card generation
-- broad procedural custom-dreamsign generation
-- battlefield slot modifications as a major pillar
-- deep battle-rule rewrites
-- hidden punishments resolved after commitment
-- long recursive follow-up chains
-- arbitrary random-effect chains
-- player-facing tide instruction or tide picking inside Journeys
-- too many simultaneous persistent run mutations
-
-These ideas may be revisited later, but they should not define the first Journey
-generation system.
-
-## Acceptance Criteria
-
-The Dream Journey generation system should be considered successful when:
-
-- generated sites are consistently recognizable as one coherent Journey Shape
-- early, mid, and late runs show distinct Journey texture
-- designers can explain a generated site in terms of one Journey Shape plus its
-  filled effects
-- every generated site is deterministic, replayable, and inspectable
-- incoherent sites are prevented by validation rather than manual cleanup
-- the content layer can extend the system without turning into a scripting
-  language
-- playtesting indicates that the outputs feel closer to curated event design
-  than to uniform random combination
-
-## Final Recommendation
-
-Implement Dream Journey generation as a deterministic, Journey-Shape-first,
-stage-textured site generator. Select one authored Journey Shape per site, fill
-it with bounded effects from reusable effect lists, validate it, and freeze it
-when the dreamscape becomes available. Keep the system centered on the choice
-topologies designers actually reason about, and keep every other piece of the
-model subordinate to that goal.
