@@ -76,7 +76,7 @@ Why it works:
 The scene has a strong emotional identity. The burden is visible. The player is
 not being asked to parse a generic trade menu.
 
-### Example 4: Mid Omen
+### Example 4: Mid Vision
 
 Run state:
 
@@ -87,7 +87,7 @@ Run state:
 
 Generation:
 
-Omens score well, but Thresholds are slightly downweighted because the run
+Visions score well, but Thresholds are slightly downweighted because the run
 already has one future hook. The selected pattern is smaller now versus larger
 later. The filled options offer a modest visible reward now or a larger visible
 package after the next victory.

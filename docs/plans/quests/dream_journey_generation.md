@@ -58,12 +58,6 @@ should define those raw component catalogs.
 - [Battle Rules](../../battle_rules/battle_rules.md) Core battle vocabulary,
   Dreamwell rules, battlefield structure, spark, and dreamsign context
   referenced by some Journey effects.
-- [Procedural Journeys Brainstorming Dump](../../../.llms/notes/procedural_journeys.md)
-  Raw idea inventory that motivated this design. This document deliberately
-  replaces that note's tentative abstraction model.
-- [Quest Prototype Guide](../../quest_prototype/quest_prototype.md) Useful
-  implementation context for the current quest prototype and quest state
-  handling.
 - [Dream Journey Generation Appendix](dream_journey_generation_appendix.md)
   Worked examples, testing strategy, telemetry, and operational notes that were
   split out to keep the core spec within the requested line budget.
@@ -81,17 +75,6 @@ surprising. They are where the game can:
 - force a sharp late-run commitment
 - deliver a memorable push-your-luck scene
 
-The brainstorming source material already identifies many useful ingredients:
-
-- rewards
-- costs
-- compound effects
-- durations
-- predicates
-- battlefield modifications
-- statuses
-- scene shapes
-
 Those ingredients are useful, but they are the wrong primary abstraction. A
 naive generator built directly from them would tend to produce legal but weak
 events: random offers, mismatched costs, incoherent option sets, repeated nouns
@@ -105,7 +88,7 @@ shape:
 - a shady bargain
 - a dangerous temptation
 - a card surgery workshop
-- a healing shrine
+- a cleansing refuge
 - a risky excavation
 - a future-facing prophecy
 
@@ -134,8 +117,6 @@ than to procedurally assemble events from ever smaller atoms.
 
 - Exhaustively list all raw reward and cost payloads.
 - Treat costs, predicates, durations, or triggers as top-level event families.
-- Preserve the brainstorming note's original terminology where it obscures the
-  real design.
 - Create a general-purpose scripting language for Journey behavior.
 - Support every extreme quest-rule rewrite in V1.
 - Solve final balancing numerics in this document.
@@ -152,8 +133,8 @@ cost-reward tuple with a delayed rider."
 
 The top-level taxonomy should be based on how the scene works, not on what noun
 it gives. A dreamsign reward can appear in a Bargain, a Windfall, a Temptation,
-an Omen, or a Threshold. Those scenes are different because the interaction form
-is different.
+a Vision, or a Threshold. Those scenes are different because the interaction
+form is different.
 
 ### Precommitment Builds Trust
 
@@ -245,24 +226,22 @@ The V1 family set should be:
 - Windfalls
 - Reforging
 - Sanctuaries
-- Omens
+- Visions
 - Ordeals
 - Thresholds
 
-This set was chosen because:
-
-- every Slay the Spire event in the validation inventory can map to one family
-- Monster Train events also map cleanly enough to the same set
-- the families are player-facing and learnable
-- Dreamtides-specific route shaping fits naturally inside Thresholds instead of
-  needing its own top-level family
+Every Slay the Spire event in the validation inventory can map to one family,
+Monster Train events also fit cleanly enough to the same set, the families are
+player-facing and learnable, and Dreamtides-specific route shaping fits
+naturally inside Thresholds instead of needing its own top-level family.
 
 ## Family Definitions
 
 ### Bargains
 
 An explicit exchange, service, toll, or trade. The player gives up something
-knowable to get something knowable.
+knowable to get something knowable. The price is supposed to feel legible and
+transactional rather than corrupting.
 
 Common scene patterns:
 
@@ -274,7 +253,8 @@ Common scene patterns:
 ### Temptations
 
 A seductive upside with a sting. The scene is about greed, corruption, danger,
-or burdened convenience.
+or burdened convenience. The player is being offered more than a normal Bargain,
+but the attached poison is the point of the scene.
 
 Common scene patterns:
 
@@ -285,8 +265,8 @@ Common scene patterns:
 
 ### Windfalls
 
-A low-friction gift, cache, patronage offer, or boon menu. The scene helps more
-than it asks.
+A low-friction gain scene. Windfalls add positive matter to the run without
+first asking the player to repair an existing problem.
 
 Common scene patterns:
 
@@ -310,21 +290,22 @@ Common scene patterns:
 
 ### Sanctuaries
 
-A refuge, rest site, cleansing shrine, or stabilizing alcove. The scene reduces
-friction and prevents collapse.
+A stabilizing or cleansing scene. Sanctuaries remove liabilities already inside
+the run or restore a depleted quest resource such as essence.
 
 Common scene patterns:
 
-- heal versus cleanse
-- restore versus stabilize
+- cleanse versus restore essence
+- remove burden versus stabilize
 - refuge menu
 - Bane cleansing
 
-### Omens
+### Visions
 
 A scene about visions, prophecy, memory, future-facing value, or delayed fate.
 The identity is not the reward noun. It is the fact that the scene points
-forward.
+forward. A Vision may promise or delay value, but it does not structurally
+reroute the future atlas the way a Threshold does.
 
 Common scene patterns:
 
@@ -356,6 +337,26 @@ Common scene patterns:
 - seed a follow-up encounter
 - alter future dreamscape composition
 - store something and reclaim it later
+
+## Family Boundary Rules
+
+The family layer only works if the lines are hard enough that content authors
+and runtime validators can classify a scene the same way every time.
+
+- `Bargains` versus `Temptations`: A Bargain is a legible trade with a
+  fair-price texture. A Temptation offers an outsized upside with attached
+  corruption, fragility, or poison. If the scene is meant to make the player
+  feel greedy or compromised, it is a Temptation.
+- `Windfalls` versus `Sanctuaries`: A Windfall grows the run by adding positive
+  matter. A Sanctuary repairs the run by removing liabilities or replenishing a
+  depleted resource. If the scene is reactive and stabilizing, it is a
+  Sanctuary.
+- `Sanctuaries` versus `Reforging`: A Sanctuary reduces friction. Reforging
+  changes build structure. If the scene asks the player to choose how to rewrite
+  a target, it is Reforging even if the result also improves stability.
+- `Visions` versus `Thresholds`: A Vision points forward through information,
+  timing, or delayed payoff. A Threshold changes the later shape of the run
+  itself through route changes, follow-up scenes, or structural commitments.
 
 ## Scene Pattern Layer
 
@@ -547,7 +548,7 @@ Examples of hard exclusions:
 - a Reforging pattern that requires a valid chosen target when no such target
   exists
 - a Bargain with a cost the player cannot pay
-- an Omen or Threshold that would exceed the persistence budget
+- a Vision or Threshold that would exceed the persistence budget
 
 ### 3. Score Families
 
@@ -679,7 +680,7 @@ Family emphasis should be roughly:
 - Sanctuaries high
 - Bargains medium-high
 - Reforging medium with simple patterns
-- Omens low to medium
+- Visions low to medium
 - Temptations low
 - Ordeals low to medium
 - Thresholds low
@@ -703,7 +704,7 @@ Family emphasis should be roughly:
 
 - Reforging high
 - Bargains medium-high
-- Omens medium-high
+- Visions medium-high
 - Temptations medium
 - Sanctuaries medium
 - Windfalls medium-low
@@ -730,7 +731,7 @@ Family emphasis should be roughly:
 - Temptations medium-high
 - Thresholds high
 - Ordeals medium-high
-- Omens medium
+- Visions medium
 - Bargains medium
 - Sanctuaries low to medium
 - Windfalls low
@@ -800,7 +801,7 @@ V1 should follow conservative rules:
 
 - a normal site should create at most one major persistent hook
 - a site may combine one persistent hook with one local immediate effect
-- if the run already holds several unresolved hooks, new Omens and Thresholds
+- if the run already holds several unresolved hooks, new Visions and Thresholds
   should be downweighted
 - at most two unresolved long-tail hooks should exist at once, and at most one
   of those may be a structural Threshold hook
