@@ -237,6 +237,8 @@ The following Journey ideas map directly or nearly directly to Journey Shapes:
   reward or more with a cost" map to `same_reward_different_costs`
 - "two effect choices on the same card" and "different effects where you choose
   the card" map to `one_target_many_operations`
+- "pick a frame, then a modifier" and other bounded multi-step construction
+  scenes that assemble one final object map to `staged_assembly`
 - tightly parallel operation menus map to `mirrored_operations` when the overt
   symmetry is the point of the scene rather than a secondary fill rule
 - "pick one of three cards to apply a transfiguration to" and several "same

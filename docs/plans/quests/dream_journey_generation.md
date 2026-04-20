@@ -368,6 +368,14 @@ The site focuses on one chosen or visible target and presents several different
 operations for that same object. This is a core deck-surgery shape for
 transfiguration, duplication, merging, or other precise rewrites.
 
+### staged_assembly
+
+The site walks the player through a short bounded sequence of component choices
+that assemble one final reward. The intermediate picks are partial ingredients,
+not standalone offers. This shape is useful when the scene's identity is the
+construction process itself, such as building a custom card or forging a
+composite object from several visible parts.
+
 ### mirrored_operations
 
 The site presents a tightly parallel operation set whose overt symmetry is the
