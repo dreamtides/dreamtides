@@ -242,7 +242,8 @@ The following Journey ideas map directly or nearly directly to Journey Shapes:
 - "pick one of three cards to apply a transfiguration to" and several "same
   operation, different target" ideas map to `one_operation_many_targets`
 - "choose one of these visible losses" maps to `choose_your_loss`
-- "take this deterministic deal or leave it" maps to `single_offer`
+- "gain this one deterministic boon" maps to `single_reward`
+- "take this deterministic costed deal or leave it" maps to `single_offer`
 - burdened temptations with an explicit refusal path map to `risk_or_skip`
 - one-shot bets with a visible stake and bounded outcome envelope map to
   `single_wager`
@@ -252,9 +253,12 @@ The following Journey ideas map directly or nearly directly to Journey Shapes:
 - shared-window menus such as "for your next battle, choose one of these
   effects" map to `timed_window_menu` when the common duration is the scene
   identity
+- "take any number of these visible rewards" maps to `take_any_number`
 - "gain a reward up to N times" maps to `take_up_to_n`
 - "pay repeatedly to scale an effect" maps to `repeat_to_scale`
 - escalating gamble scenes with stop-or-continue tension map to `push_your_luck`
+- single-roll random scenes with a visible bounded outcome table map to
+  `single_random_outcome`
 - fixed small random series with bounded outcomes map to
   `resolved_random_series`
 - "see sequential offers" maps to `sequential_offers`

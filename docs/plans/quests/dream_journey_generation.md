@@ -107,9 +107,12 @@ useful are all shapes:
 - same reward, different costs
 - one target, many operations
 - one operation, many targets
+- singular reward
 - risk or skip
 - now versus later
+- take any number from a revealed menu
 - take up to N
+- one-shot random outcome
 - push your luck
 - sequential offers
 
@@ -370,11 +373,22 @@ The site presents several visible negative outcomes and asks the player which
 one they are willing to accept. This shape is about damage control, triage, and
 picking the least harmful sacrifice, not about seeking upside.
 
+### single_reward
+
+The site grants one deterministic reward effect with little or no tension,
+price, or refusal structure. This is the right shape for singular boons, free
+cleanses, and other cases where the scene is simply "receive this reward" rather
+than "decide whether this exchange is worth it." If the player is deciding
+whether to pay, sacrifice, or otherwise accept a meaningful trade, use
+`single_offer` instead.
+
 ### single_offer
 
-The site presents one deterministic take-it-or-leave-it exchange. This is the
-right shape for ordinary priced services, clean one-shot bargains, and other
-cases where the tension is simply whether the deal is worth taking.
+The site presents one deterministic take-it-or-leave-it exchange with a visible
+cost, burden, sacrifice, or other meaningful trade. This is the right shape for
+ordinary priced services, clean one-shot bargains, and other cases where the
+tension is simply whether the deal is worth taking, not what the outcome will
+be.
 
 ### risk_or_skip
 
@@ -407,6 +421,13 @@ The site presents several options that all share the same temporary window,
 duration, or future timing. This shape is useful when the shared timing is the
 main identity of the scene rather than a secondary fill detail.
 
+### take_any_number
+
+The site reveals a bounded menu of rewards and lets the player claim any subset
+of them from one unified scene. This is useful for cache-like or stash-like
+Journeys that should read as "open this dream and take whatever you want" rather
+than as a repeated accept-or-continue loop.
+
 ### take_up_to_n
 
 The player may accept rewards or burdens repeatedly up to a visible cap, usually
@@ -430,6 +451,12 @@ scene.
 The site resolves a fixed small series of bounded random outcomes after one
 commitment. Unlike `push_your_luck`, there is no repeated stop-or-continue
 choice once the scene begins.
+
+### single_random_outcome
+
+The site resolves one bounded random outcome after entry. This is the right
+shape for wheel, orb, or omen scenes where the identity is not betting, digging,
+or choosing, but simply submitting to one visible random table.
 
 ### sequential_offers
 
