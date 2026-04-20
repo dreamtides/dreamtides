@@ -31,12 +31,13 @@ when possible.
 ## Overview
 
 Quests revolve primarily around drafting and refining a deck to bring into
-future battles. Quests use a currency called "essence" which can be spent on
-shops and in various other ways. Players start each quest with 250 essence and a
-fixed starter deck, then choose a Dreamcaller to define the run. By default,
-quests have a maximum essence cap of 500; any essence gained beyond this cap is
-lost unless the cap has been increased by an effect such as a Dream Journey
-reward.
+future battles. Quests use two currencies: "essence" and "omens". Essence is the
+main quest currency and is spent on shops and in various other ways. Omens are
+used only for shop dreamsign purchases and shop rerolls. Players start each
+quest with 250 essence and a fixed starter deck, then choose a Dreamcaller to
+define the run. By default, quests have a maximum essence cap of 500; any
+essence gained beyond this cap is lost unless the cap has been increased by an
+effect such as a Dream Journey reward. Omens have no cap.
 
 In addition to deck cards, users during a quest will select a Dreamcaller to
 lead their deck and may have some number of Dreamsigns:
@@ -307,11 +308,13 @@ Icon: "Store Alt 2"
 
 ### Shop
 
-The shop is the primary site in which the user can spend their essence. Shops
+The shop is the primary site in which the user can spend quest currencies. Shops
 offer individual cards, dreamsigns, and rerolls for purchase, and may rarely
 offer other site options such as purchasing journeys, purging cards,
-transfiguring cards, duplicating cards, etc. Shops do offer the ability to spend
-essence to reroll and generate a new set of shop items.
+transfiguring cards, duplicating cards, etc. Cards and most other shop options
+cost essence. Dreamsigns cost omens rather than essence, typically around 1-3
+omens. Rerolling the shop also costs omens rather than essence, typically 1
+omen.
 
 Shop cards should prefer content that overlaps the run's selected package tides,
 then weight further toward the packages the player's current deck has actually
@@ -319,23 +322,25 @@ started to accumulate. If no package-adjacent content is available, the shop may
 fall back to the broader card pool. Dreamsign offers are drawn from the shared
 remaining Dreamsign pool for the run.
 
-Shop base prices and the overall essence economy are defined in TOML. The shop
-implements a random "discount" system where one or more items can be displayed
-as being on sale, for between 30% and 90% cost reduction. Things like dreamsigns
-or journey effects can also modify shop prices.
+Shop base prices and the overall essence/omen economy are defined in TOML. The
+shop implements a random "discount" system where one or more items can be
+displayed as being on sale, for between 30% and 90% cost reduction. Things like
+dreamsigns or journey effects can also modify shop prices.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. Two rows of three items
 each are displayed, along with a close button. The items are beside the NPC in
 landscape mode and below the NPC in portrait mode. Each item has a purple button
-under it showing the essence cost to purchase that item. Clicking the button for
-a card or dreamsign animates it to the quest deck or dreamsign display in the
-bottom right corner of the screen. The other items do not move on purchase,
-leaving a gap. One of the items shown may be a "reroll" option. When this is
-selected, the items do a staggered scale-down animation, then the 6 new options
-perform a scale-up animation in-place. Clicking the close button completes the
-site visit and pulls the camera back to the map screen. The items remain in
-place visually rather than animating away, but the site cannot be revisited.
+under it showing the relevant cost to purchase that item. Cards and most shop
+services show an essence cost, while dreamsigns and rerolls show an omen cost.
+Clicking the button for a card or dreamsign animates it to the quest deck or
+dreamsign display in the bottom right corner of the screen. The other items do
+not move on purchase, leaving a gap. One of the items shown may be a "reroll"
+option. When this is selected, the items do a staggered scale-down animation,
+then the 6 new options perform a scale-up animation in-place. Clicking the close
+button completes the site visit and pulls the camera back to the map screen. The
+items remain in place visually rather than animating away, but the site cannot
+be revisited.
 
 Icon: "Store"
 
@@ -561,12 +566,12 @@ custom cards in their decks. See [Boss Dreamcallers](bosses.md) for details.
 ### Battle Rewards
 
 Completing a battle always grants an essence reward, which increases as the user
-completes more dreamscapes. The user also gets a 4-card reward pick drawn from a
-package-adjacent reward pool. This reward generator should prefer cards
-overlapping the run's selected package tides, with a fallback to the broader
-pool if necessary. Battle rewards do not consume the main draft multiset, so
-they are a separate way to inject high-synergy cards into the deck. This draft
-pick cannot be skipped.
+completes more dreamscapes. On victory, the user also gains 1-3 omens. The user
+then gets a 4-card reward pick drawn from a package-adjacent reward pool. This
+reward generator should prefer cards overlapping the run's selected package
+tides, with a fallback to the broader pool if necessary. Battle rewards do not
+consume the main draft multiset, so they are a separate way to inject
+high-synergy cards into the deck. This draft pick cannot be skipped.
 
 ## Limits
 
@@ -577,6 +582,8 @@ their choice to get back down under 50 cards.
 Quest runs also have a maximum essence cap of 500 by default. If the player
 would gain essence above their current cap, the excess is lost. This cap can be
 increased by effects such as Dream Journey rewards.
+
+Omens have no cap.
 
 Quest decks must contain a minimum of 25 cards. If the user has not completed
 enough drafts to reach this threshold, additional copies of their deck are added
