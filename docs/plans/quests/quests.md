@@ -33,7 +33,10 @@ when possible.
 Quests revolve primarily around drafting and refining a deck to bring into
 future battles. Quests use a currency called "essence" which can be spent on
 shops and in various other ways. Players start each quest with 250 essence and a
-fixed starter deck, then choose a Dreamcaller to define the run.
+fixed starter deck, then choose a Dreamcaller to define the run. By default,
+quests have a maximum essence cap of 500; any essence gained beyond this cap is
+lost unless the cap has been increased by an effect such as a Dream Journey
+reward.
 
 In addition to deck cards, users during a quest will select a Dreamcaller to
 lead their deck and may have some number of Dreamsigns:
@@ -431,6 +434,8 @@ Icon: "Hot"
 ### Essence
 
 An essence site grants the user a fixed amount of essence, often around 200-300.
+Essence is capped at 500 by default, and any amount above the current cap is
+lost. Effects such as Dream Journey rewards may increase this cap.
 
 **UI:** Unlike with other sites, the camera does not zoom in to essence sites.
 Instead the button simply vanishes on click and a purple particle effect
@@ -568,6 +573,10 @@ pick cannot be skipped.
 Quest decks can contain a maximum of 50 cards during battles. If this limit is
 exceeded, before the battle starts the user gains the ability to purge cards of
 their choice to get back down under 50 cards.
+
+Quest runs also have a maximum essence cap of 500 by default. If the player
+would gain essence above their current cap, the excess is lost. This cap can be
+increased by effects such as Dream Journey rewards.
 
 Quest decks must contain a minimum of 25 cards. If the user has not completed
 enough drafts to reach this threshold, additional copies of their deck are added
