@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import threading
@@ -21,6 +23,8 @@ import analyze_review_perf
 import profile_cargo_test
 import review_perf_log
 import review_scope
+
+REVIEW_IN_WORKTREE_SCRIPT = REVIEW_DIR / "review_in_worktree.sh"
 
 
 class ReviewPerfLogTests(unittest.TestCase):
@@ -729,6 +733,110 @@ class ReviewScopePlannerTests(unittest.TestCase):
         errors = review_scope.validate_scope_configuration(broken, self.metadata)
         self.assertTrue(
             any("missing required global full triggers" in error for error in errors)
+        )
+
+
+class ReviewInWorktreeShellTests(unittest.TestCase):
+    """Regression tests for review worktree slot cleanup helpers."""
+
+    def test_normalize_slot_reclaims_locked_slot_named_branch(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            repo_root = temp_path / "repo"
+            slot_path = temp_path / "worktrees" / "alpha"
+
+            self._init_repo(repo_root)
+            base = self._git_stdout(repo_root, "rev-parse", "HEAD")
+            self._git(repo_root, "worktree", "add", "-b", "alpha", str(slot_path), base)
+
+            (slot_path / "tracked.txt").write_text("slot change\n", encoding="utf-8")
+            self._git(slot_path, "commit", "-am", "slot branch change")
+            (slot_path / "scratch.txt").write_text("temp\n", encoding="utf-8")
+            (slot_path / ".review-lock").write_text("", encoding="utf-8")
+            self._git(slot_path, "add", "-f", ".review-lock")
+
+            self._run_bash(
+                f'source "{REVIEW_IN_WORKTREE_SCRIPT}"; '
+                f'normalize_slot_for_review alpha "{slot_path}" "{base}" true',
+                repo_root,
+                temp_dir,
+            )
+
+            self.assertEqual(self._git_stdout(slot_path, "rev-parse", "HEAD"), base)
+            self.assertEqual(
+                self._git_stdout(slot_path, "branch", "--show-current"), ""
+            )
+            self.assertEqual(self._git_stdout(slot_path, "status", "--short"), "")
+            self.assertEqual(
+                self._git_stdout(repo_root, "branch", "--list", "alpha"), ""
+            )
+
+    def test_normalize_slot_skips_non_pool_feature_branch(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            repo_root = temp_path / "repo"
+            slot_path = temp_path / "worktrees" / "alpha"
+
+            self._init_repo(repo_root)
+            base = self._git_stdout(repo_root, "rev-parse", "HEAD")
+            self._git(
+                repo_root,
+                "worktree",
+                "add",
+                "-b",
+                "feature-review",
+                str(slot_path),
+                base,
+            )
+
+            self._run_bash(
+                f'source "{REVIEW_IN_WORKTREE_SCRIPT}"; '
+                f'normalize_slot_for_review alpha "{slot_path}" "{base}"',
+                repo_root,
+                temp_dir,
+            )
+
+            self.assertEqual(
+                self._git_stdout(slot_path, "branch", "--show-current"),
+                "feature-review",
+            )
+            self.assertIn(
+                "feature-review",
+                self._git_stdout(repo_root, "branch", "--list", "feature-review"),
+            )
+
+    def _git(self, cwd: Path, *args: str) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            ["git", *args],
+            check=True,
+            cwd=cwd,
+            text=True,
+            capture_output=True,
+        )
+
+    def _git_stdout(self, cwd: Path, *args: str) -> str:
+        return self._git(cwd, *args).stdout.strip()
+
+    def _init_repo(self, repo_root: Path) -> None:
+        repo_root.mkdir(parents=True)
+        self._git(repo_root, "init", "-b", "master")
+        self._git(repo_root, "config", "user.email", "review-tests@example.com")
+        self._git(repo_root, "config", "user.name", "Review Tests")
+        (repo_root / "tracked.txt").write_text("base\n", encoding="utf-8")
+        self._git(repo_root, "add", "tracked.txt")
+        self._git(repo_root, "commit", "-m", "initial")
+
+    def _run_bash(self, command: str, repo_root: Path, home: str) -> None:
+        env = os.environ.copy()
+        env["DREAMTIDES_REPO_ROOT"] = str(repo_root)
+        env["HOME"] = home
+        subprocess.run(
+            ["bash", "-lc", command],
+            check=True,
+            cwd=repo_root,
+            env=env,
+            text=True,
+            capture_output=True,
         )
 
 
