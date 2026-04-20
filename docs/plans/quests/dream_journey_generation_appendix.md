@@ -219,6 +219,30 @@ Why it works:
 This is a one-shot bet with a bounded envelope. It should not be modeled as
 `push_your_luck` because the scene does not ask the player whether to continue.
 
+### Example 11: Mid Paired Return
+
+Run state:
+
+- completion level 3
+- one long-tail hook slot is still available
+- no other recurring callback scene is active
+- the deck contains at least one card or object worth investing in
+
+Generation:
+
+`paired_return` scores well because the run can support one remembered callback.
+The seed scene asks the player to entrust a chosen card to a dream artisan for
+repair. On acceptance, the site records the specific entrusted object, reserves
+a return Journey two dreamscapes later, and precommits that return Journey's
+branch. When the callback scene appears, it references the same entrusted object
+and offers a related payoff or refinement rather than a generic reward.
+
+Why it works:
+
+The player experiences a true callback rather than a delayed number package. The
+revisit is the scene's identity, so it should not be flattened into
+`reward_after_trigger` or `commit_now_future_payoff`.
+
 ## Classifying Journey Content In The Shape-First Model
 
 Journey content categories are not all the same kind of thing. The shape-first
@@ -235,6 +259,8 @@ The following Journey ideas map directly or nearly directly to Journey Shapes:
   purchasing frame
 - "three options with the same effect and different costs" and "gain a small
   reward or more with a cost" map to `same_reward_different_costs`
+- "two intentionally different lanes", including cases where one lane contains a
+  small internal sub-choice, map to `heterogeneous_pair`
 - "two effect choices on the same card" and "different effects where you choose
   the card" map to `one_target_many_operations`
 - "pick a frame, then a modifier" and other bounded multi-step construction
@@ -245,13 +271,16 @@ The following Journey ideas map directly or nearly directly to Journey Shapes:
   operation, different target" ideas map to `one_operation_many_targets`
 - "choose one of these visible losses" maps to `choose_your_loss`
 - "gain this one deterministic boon" maps to `single_reward`
-- "take this deterministic costed deal or leave it" maps to `single_offer`
+- "take this deterministic costed deal or leave it" maps to `single_offer`, even
+  if the same authored wrapper can recur later with a stronger version
 - burdened temptations with an explicit refusal path map to `risk_or_skip`
 - one-shot bets with a visible stake and bounded outcome envelope map to
   `single_wager`
 - "gain a reward now or wait" maps to `now_vs_later`
 - "gain a reward if you complete some condition" and other mini-quest promises
   map to `reward_after_trigger`
+- "seed a later callback scene that deliberately reconnects to this one" and
+  other authored return-pair structures map to `paired_return`
 - shared-window menus such as "for your next battle, choose one of these
   effects" map to `timed_window_menu` when the common duration is the scene
   identity
@@ -270,6 +299,11 @@ The following Journey ideas map directly or nearly directly to Journey Shapes:
 - "add or remove future sites" and related route shaping map to
   `alter_future_dreamscape`
 
+One authored scene shell may still have conditional variants keyed by run state
+or remembered choices. That does not create a new top-level shape. Each actual
+instantiated site should be classified by the local choice topology it presents
+to the player at runtime.
+
 ### Shape Modifiers Rather Than New Top-Level Shapes
 
 Many Journey ideas are useful, but they should be fields on Journey Shapes
@@ -284,6 +318,9 @@ the core promise of the scene:
 - mechanically linked effect pool when the linkage is support rather than the
   main identity
 - thematically related objects across options
+- conditional branch variants keyed by run state or remembered choices
+- a small nested selector inside one visible branch when the root comparison
+  remains the real promise
 - explicit refusal option
 - explicit stop-or-continue after each acceptance
 - bounded random envelope when the fixed random cadence is not itself the scene
