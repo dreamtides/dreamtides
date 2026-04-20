@@ -37,7 +37,9 @@ used only for shop dreamsign purchases and shop rerolls. Players start each
 quest with 250 essence and a fixed starter deck, then choose a Dreamcaller to
 define the run. By default, quests have a maximum essence cap of 500; any
 essence gained beyond this cap is lost unless the cap has been increased by an
-effect such as a Dream Journey reward. Omens have no cap.
+effect such as a Dream Journey reward. Omens have no cap. Dreamtides does not
+use an explicit rarity system for cards, except for certain powerful cards that
+are designated as legendary cards.
 
 In addition to deck cards, users during a quest will select a Dreamcaller to
 lead their deck and may have some number of Dreamsigns:
@@ -395,9 +397,11 @@ purely a visual cue that a price is attached. When a cost-framed journey is
 accepted, the cost card resolves alongside the benefit, typically with its own
 effect animation, sound effect, and particle effect.
 
-All dream journeys are equally likely to appear: there is no rarity tier and no
-weighting between journey templates. Which journeys show up at a given site is
-determined purely by uniform random sampling from the journey pool.
+All dream journeys are equally likely to appear: there is no normal rarity tier
+or weighting between journey templates. The only explicit rarity-like concept in
+Dreamtides is that certain powerful cards are designated as legendary cards.
+Which journeys show up at a given site is determined purely by uniform random
+sampling from the journey pool.
 
 **UI:** An NPC is shown who performs an animation and displays a speech bubble
 with some dialog when the camera arrives at this site. The journey cards animate
