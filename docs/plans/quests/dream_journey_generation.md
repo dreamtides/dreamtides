@@ -26,9 +26,9 @@ offers from one large global effect bucket.
 The second central decision is that Dream Journey sites are **precommitted**.
 When a dreamscape becomes available on the Dream Atlas, its Dream Journey site,
 if any, is fully generated and frozen. The site's Journey Shape, visible
-options, reveal policy, and relevant random outcomes are determined then and do
-not change when the player later clicks the site. This is necessary for player
-trust, preview stability, deterministic testing, and content debugging.
+options, presentation policy, and relevant random outcomes are determined then
+and do not change when the player later clicks the site. This is necessary for
+player trust, preview stability, deterministic testing, and content debugging.
 
 The third central decision is that the generator should optimize for **run
 texture by stage**, not just local choice quality. Early Journeys should help
@@ -60,10 +60,6 @@ should define those reusable effect lists in more detail.
 - [Battle Rules](../../battle_rules/battle_rules.md) Core battle vocabulary,
   Dreamwell rules, battlefield structure, spark, and dreamsign context
   referenced by some Journey effects.
-- [Dream Journey Generation Appendix](dream_journey_generation_appendix.md)
-  Worked examples, Journey-content classification guidance, testing strategy,
-  telemetry, and operational notes that were split out to keep the core spec
-  focused.
 
 ## Problem And Context
 
@@ -170,9 +166,17 @@ There are a few things that Dreamtides journeys do not do:
 - Dream Journeys are generated when a dreamscape becomes available and then
   frozen.
 - The player must understand the class of consequence they are opting into.
-- Normal Journey sites may show between 1 and 3 root options. Some Journey
-  Shapes may create repeated accept-or-continue flows after entry, but those
-  flows must be explicit, bounded, and inspectable.
+- Normal Journey sites may show between 1 and 3 root options, with the average
+  target being about 2. Some Journey Shapes may create repeated accept-or-
+  continue flows after entry, but those flows must be explicit, bounded, and
+  inspectable.
+- A root option should show dream art, short hover text, and referenced-object
+  popups when needed.
+- If a site presents exactly 1 root option, it is normally forced. Refusal
+  belongs only to `single_offer` and `risk_or_skip`.
+- Sites with 3 root options should usually have an explicit linking property
+  such as shared cost, reward class, target, operation, timing, or motif. Truly
+  unrelated offers should be uncommon and mostly reserved for 2-option sites.
 - The generator may react to broad run signals, but it must not solve the run
   card by card or hand the player obviously perfect content every time.
 - Journey generation must use weighted randomness, not uniform sampling.
@@ -260,7 +264,7 @@ from. They include things such as:
 - targets
 - triggers and timings
 - future hooks
-- reveal styles
+- presentation patterns
 
 Each effect entry should also carry a small set of **site tags** describing what
 the generated site is really doing. V1 should keep this vocabulary broad and
@@ -293,7 +297,7 @@ A Site Manifest is the committed output for one Journey site. It contains:
 - site tag profile
 - chosen effects, targets, and timings
 - preview text
-- reveal policy
+- presentation policy
 - precommitted random outcomes
 - paired-return linkage when relevant
 - generation metadata for replay and debugging
@@ -317,6 +321,27 @@ The shape-first model classifies that material as follows:
 This mapping should be explicit in future content docs so that authors can
 classify new ideas quickly.
 
+## Effect Semantics And Routing
+
+Simple reward-effect entries should be beneficial in at least some reasonable
+run states. If an effect already contains its own downside, uncertainty, or
+tradeoff and no longer reads cleanly as cost plus reward, it should usually be
+authored as a compound entry or as a Journey-Shape-specific fill rule rather
+than pretending to be a simple reward.
+
+Persistent-effect routing should stay consistent:
+
+- persistent positive effects that mainly benefit the player should usually be
+  represented as Dreamsigns, including Journey-specific custom Dreamsigns
+- neutral or negative persistent quest changes should usually be represented as
+  quest statuses
+- positive effects whose main gameplay expression is harming or burdening the
+  opponent during battles should also prefer quest statuses over Dreamsigns
+
+Battlefield slot mutations remain a payload surface rather than a top-level
+shape. If V1 includes them, each battlefield slot may hold at most 1 mutation
+and the UI should represent that mutation with 1 icon on that slot.
+
 ## Canonical Journey Shape Set
 
 This list is the stable top-level catalog for V1. A new Journey idea should
@@ -325,8 +350,8 @@ first ask whether it is an instance of one of these shapes.
 ### random_allocation
 
 The site presents a small deliberately eclectic set of offers without a strong
-symmetry constraint. This shape should be strongly validated, and still
-read as one authored scene rather than as a uniform random grab bag.
+symmetry constraint. This shape should be strongly validated, and still read as
+one authored scene rather than as a uniform random grab bag.
 
 ### same_cost_different_rewards
 
@@ -605,14 +630,39 @@ Trigger and timing lists should prefer memorable structures such as:
 - after two victories
 - at the next dreamscape
 
-### Reveal Styles
+### Magnitude Bands And Trade Matching
 
-V1 reveal styles should include:
+Reward, cost, and burden entries should carry a coarse magnitude band so the
+generator can avoid obviously foolish exchanges. Validation and fill logic
+should reject pairings such as trivial payment for a run-defining reward or an
+extreme price for a tiny cleanup action.
 
-- fully revealed
-- bounded hidden target with visible reward class
-- visible delayed package with visible trigger
-- bounded random within an explicit envelope
+This does not require exact valuation. It only requires a bounded matching rule:
+
+- shared-cost shapes should fill their compared rewards from roughly compatible
+  magnitude bands
+- shared-reward shapes should fill their compared costs from roughly compatible
+  magnitude bands
+- compound entries with internal downside should be compared against the total
+  effective stake of the scene rather than treated as free upside
+
+### Presentation Patterns
+
+Presentation patterns describe how information and choice surface are arranged.
+They are not a separate authored layer and they should not be confused with
+whether randomness is precommitted.
+
+V1 presentation patterns should include:
+
+- direct offer: the root option already specifies the main mechanical result
+- pre-rolled visible outcome: a random result is committed at generation and
+  shown because the exact outcome is the interesting part of the choice
+- class-signaled hidden target: the player sees the reward or cost class and the
+  bounded outcome envelope but not the exact internal target
+- deferred internal choice: the root option tells the player they will make a
+  bounded follow-up choice after entry
+- visible future promise: the root option displays a delayed package and its
+  trigger up front
 
 ### Payload Surfaces With Separate V1 Scope Decisions
 
@@ -629,54 +679,9 @@ When a dreamscape becomes available, the generator should build a Run Context
 Snapshot. The snapshot should contain only the state features needed for
 moderate adaptation.
 
-At minimum it should include:
-
-- run seed
-- generator version
-- content version hash
-- Dreamcaller and selected package identity
-- completion level
-- biome
-- current deck size
-- count of starter cards
-- count of Banes
-- count of transfigured cards
-- current essence
-- current omens
-- dreamsign count
-- active follow-up hooks
-- recent Journey Shape history
-- recent site-tag history
-- remaining atlas outlook known to the run
-
-The generator may derive a small number of synthetic signals such as:
-
-- stage
-- broad run need
-- hook saturation
-- recent shape fatigue
-- recent site-tag fatigue
-
 Moderate adaptation means the generator may react to summary features of the
 run, but it should not attempt to solve the run card by card or hand the player
 an obviously perfect Journey every time.
-
-## Deterministic RNG
-
-The generator should use a versioned RNG tree rather than one flat run stream.
-
-At minimum there should be separate deterministic branches for:
-
-- atlas expansion
-- dreamscape site roster selection
-- desired site-tag selection
-- Journey Shape selection
-- effect filling
-- reveal-policy commitment
-- repair and fallback
-
-This prevents unrelated later rolls from changing already generated sites and
-makes replay practical.
 
 ## Generation Hook
 
@@ -778,7 +783,7 @@ Recommended fill order:
 3. reward effects
 4. costs and burdens
 5. triggers, timings, or future hooks
-6. reveal policy
+6. presentation policy
 7. preview text objects
 
 This order helps prevent incoherent scenes.
@@ -806,7 +811,7 @@ content.
 
 ## Information Contract
 
-Dream Journeys may vary how much they reveal, but the player must understand the
+Dream Journeys may vary how much they show, but the player must understand the
 class of consequence they are choosing.
 
 Good examples:
@@ -819,25 +824,47 @@ Good examples:
 Bad examples:
 
 - accept an unspecified hidden punishment
-- choose an option whose real outcome is rolled after commitment
+- choose an option whose meaningful outcome is concealed until after commitment
 - offer a huge invisible reward range with no clue about the stakes
 
-### Reveal Policies
+### Root Choice Presentation
 
-V1 should support a small set of reveal policies:
+The root site may either present the real comparison directly or present entry
+points into bounded internal choices. Both are valid, but the player must be
+able to tell which kind of scene they are entering.
 
-- fully revealed
-- bounded hidden target with visible reward class
-- visible delayed package with visible trigger
-- bounded random within an explicit envelope
+Good root presentation includes:
 
-V1 should not support deep hidden outcome stacks.
+- a short hover or focus preview that states the core consequence
+- additional popups for referenced cards, Dreamsigns, Banes, or similar objects
+- explicit wording when entry leads to another bounded menu instead of
+  immediately applying the effect
+
+### Presentation Rules
+
+V1 should follow a small set of presentation rules:
+
+- fully reveal the compared object or outcome whenever that is the main
+  strategic question
+- allow a bounded hidden target only when the player still understands the
+  outcome class and stake envelope
+- allow a visible delayed package with a visible trigger
+- allow bounded random outcomes only inside an explicit envelope
+- prefer pre-rolled visible outcomes when showing the exact roll makes the
+  option materially more legible
+
+V1 should not support deep hidden outcome stacks or options whose important
+meaning is concealed until after commitment.
 
 ### Precommitted Randomness
 
 Any randomness that will matter later should already be committed when the site
 is generated. This includes delayed rewards, hidden but bounded outcomes,
 follow-up variants, paired-return branches, and similar structures.
+
+When a random effect could either show a specific pre-rolled result or remain a
+bounded post-entry roll, prefer the visible result when that exact roll is what
+makes the option legible or resonant.
 
 ## Run Texture By Stage
 
@@ -970,100 +997,3 @@ V1 should follow conservative rules:
   `delayed`, `persistent`, and `route` should be downweighted
 - at most two unresolved long-tail hooks should exist at once, and at most one
   of those may be a route-altering structural hook
-
-## Authoring Contract
-
-The content system should have exactly two authored strata.
-
-### 1. Journey Shape Definitions
-
-A Journey Shape definition should specify:
-
-- name
-- one-sentence player-facing promise
-- option count
-- root interaction flow
-- comparison relation
-- supported site tags
-- forbidden site tags if any
-- allowed effect categories
-- allowed fill rules
-- persistence footprint
-- reveal-style allowances
-- invalid-state rules
-- repair preferences
-- preview framing rules
-
-### 2. Effect-List Entries
-
-An effect-list entry should specify:
-
-- payload identity
-- payload description
-- payload category
-- contributed site tags
-- magnitude band
-- compatibility tags
-- exclusion tags
-- target requirements
-- stage availability
-- persistence footprint
-- preview support
-
-### What Authors Should Not Need
-
-Authors should not need to:
-
-- write arbitrary conditional logic
-- manually nest effect trees
-- solve legality by hand
-- understand RNG flow
-- encode whole scenes as mini programs
-
-If a desired scene cannot be expressed through Journey Shapes plus effect-list
-entries, the answer is usually to add a new Journey Shape or a new effect entry,
-not to create another abstraction layer or a DSL. If the idea only changes how
-options are linked inside an existing shape, it should usually become a fill
-rule on that shape rather than a new top-level concept.
-
-## Validation Contract
-
-Validation must be a first-class part of the generation model.
-
-### Legality Checks
-
-Reject sites where:
-
-- the player cannot pay the cost
-- no legal targets exist
-- a delayed hook cannot be tracked
-- the stage rules are violated
-- the content payload is unavailable
-
-### Coherence Checks
-
-Reject or penalize sites where:
-
-- the chosen Journey Shape's promise is broken
-- options compare on multiple axes without the shape explicitly allowing it
-- the site touches too many unrelated gameplay layers
-- the framing and the stakes disagree
-- a supposedly symmetric shape is not actually symmetric
-- a heterogeneous shape still lacks a unifying scene premise
-
-### Choice Checks
-
-Reject or penalize sites where:
-
-- one option obviously dominates
-- two options are redundant
-- the visible relation is too opaque
-- repeated choices have no meaningful stopping points
-
-### Persistence Checks
-
-Reject or penalize sites where:
-
-- too many long-tail effects are stacked
-- a normal-band Journey Shape tries to inject multiple major persistent changes
-- a future-facing shape creates an untrackable or uninspectable promise
