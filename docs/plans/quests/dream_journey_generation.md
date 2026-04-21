@@ -462,8 +462,8 @@ main identity of the scene rather than a secondary fill detail.
 
 The site reveals a bounded menu of rewards and lets the player claim a bounded
 subset of them from one unified scene. The subset size may be fully open (any
-subset), capped (up to N of the visible menu), or fixed (exactly K of N). In
-all variants the scene should read as "open this dream and take what you want,
+subset), capped (up to N of the visible menu), or fixed (exactly K of N). In all
+variants the scene should read as "open this dream and take what you want,
 within the visible limit" rather than as a repeated accept-or-continue loop.
 This is useful for cache-like or stash-like Journeys and for fixed-pick menus
 such as "choose 2 of these 3 offers".
