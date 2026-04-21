@@ -53,25 +53,26 @@ enough metadata to validate where it can appear.
   Dreamcaller package context, and the project-wide rule that gameplay
   configuration should live in TOML whenever reasonable.
 - [Quest Prototype Notes](../../../scripts/quest_prototype/PLAN.md): Current
-  reference for the standalone TypeScript quest prototype. It captures the
-  package-based run model this generator should read from when constructing run
-  context.
+  reference for the existing TypeScript quest prototype. It is relevant only as
+  adjacent context for run-state concepts, not as the required home of this
+  generator.
 - [Current Hardcoded Dream Journeys]
   (../../../scripts/quest_prototype/src/data/dream-journeys.ts): Minimal
-  baseline implementation that proves the surface exists but is far too small
-  and static for the intended system.
+  baseline implementation that proves the surface exists, but this document does
+  not propose extending that file directly.
 - [Atlas Generator]
   (../../../scripts/quest_prototype/src/atlas/atlas-generator.ts): Current
-  TypeScript site-generation logic. It shows the existing completion level
-  staging and deterministic content-pool mindset the journey generator should
-  match.
+  TypeScript site-generation logic. It is a useful reference for completion
+  level staging and deterministic content-pool thinking, not a required module
+  boundary for this generator.
 - [Quest Content Setup]
   (../../../scripts/quest_prototype/scripts/setup-assets.mjs): Existing TOML
-  parsing and normalization conventions in the prototype. The journey generator
-  should follow the same general content-loading approach.
+  parsing and normalization conventions in the prototype. The standalone
+  generator may borrow compatible conventions where that reduces duplicated
+  authoring work.
 - [Prototype Logging](../../../scripts/quest_prototype/src/logging.ts):
-  Structured logging model already used by the TypeScript prototype. The CLI
-  generator should emit similarly machine-readable trace events.
+  Structured logging model already used elsewhere in Dreamtides. The standalone
+  CLI should emit similarly machine-readable trace events.
 
 ## Problem And Context
 
@@ -91,7 +92,7 @@ experience:
 - multi-step structures are sometimes the point of the scene
 
 What is still missing is the implementation contract. A TypeScript developer
-working in `scripts/quest_prototype` needs to know:
+building a standalone Dream Journey CLI needs to know:
 
 - what the generator reads
 - what it outputs
@@ -126,8 +127,8 @@ question.
   rather than random offer bundles.
 - Allow broad payload surfaces in V1 because the prototype is only generating
   preview text, not implementing mechanics.
-- Reuse the existing quest prototype's TypeScript patterns where they are
-  already working well: typed content loading, pure generation functions, and
+- Keep the implementation compatible with proven Dreamtides TypeScript patterns
+  where that is useful: typed content loading, pure generation functions, and
   structured logs.
 - Make the CLI useful for both single-seed inspection and large-sample content
   review.
@@ -186,8 +187,9 @@ system even though many entries will remain `preview only` for a while.
 - Broad payload surfaces are in scope. Text-only support for a payload is enough
   so long as its preview text and placement rules are authorable.
 - The system must be inspectable from the CLI without any UI layer.
-- The implementation should feel structurally similar to the existing quest
-  prototype rather than like a separate technology stack.
+- The implementation is a standalone CLI tool. It may share formats or helper
+  conventions with other TypeScript tooling, but it is not part of
+  `scripts/quest_prototype`.
 
 ## Proposed Design
 
@@ -297,7 +299,7 @@ read and easy to diff.
 ## Journey Shape Catalog
 
 The architecture should support a broad shape catalog, but the initial
-TypeScript prototype should explicitly implement the following shapes:
+standalone TypeScript CLI should explicitly implement the following shapes:
 
 - `same_cost_different_rewards`
 - `same_reward_different_costs`
@@ -540,9 +542,10 @@ The CLI loads all journey TOML content, validates it, resolves references to
 shared quest data, and computes a stable content-version hash over the loaded
 result. That hash is embedded in every manifest.
 
-When shared card or dreamsign data is needed, the prototype may reuse the quest
-prototype's normalized content pipeline rather than creating an unrelated second
-source of truth. Journey-specific configuration still remains TOML-authored.
+When shared card or dreamsign data is needed, the standalone CLI may reuse
+existing normalized Dreamtides content inputs rather than creating an unrelated
+second source of truth. Journey-specific configuration still remains
+TOML-authored.
 
 ### 2. Build The Run Snapshot
 
@@ -838,9 +841,8 @@ The RNG should use stable named branches for at least:
 - repair and fallback
 
 The CLI should also emit structured log events for major steps. The event model
-should match the existing quest prototype's style: stable event names, explicit
-fields, JSON-serializable payloads, and no reliance on console prose for
-debugging.
+should use stable event names, explicit fields, JSON-serializable payloads, and
+no reliance on console prose for debugging.
 
 ## Validation Strategy
 
