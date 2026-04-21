@@ -14,11 +14,18 @@ to keep the core spec focused.
   Journey generation design.
 - [Quest Master Design](quests.md) High-level quest flow and site context that
   this appendix assumes.
+- [Dream Journey TypeScript Shape Contracts]
+  (dream_journey_generation_typescript_shape_contracts.md) Normative shape
+  dossiers for worked examples that are intended to be directly implementable.
 
 ## Worked Examples
 
 The following examples are not canonical content templates. They are examples of
 how the runtime should behave when applying the rules from the main document.
+
+If an example is meant to be implemented directly by the TypeScript CLI, its
+shape-local contract must also exist in
+[dream_journey_generation_typescript_shape_contracts.md](dream_journey_generation_typescript_shape_contracts.md).
 
 ### Example 1: Early Curated Reward Trio
 

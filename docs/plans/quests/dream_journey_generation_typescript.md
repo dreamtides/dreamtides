@@ -73,6 +73,11 @@ enough metadata to validate where it can appear.
 - [Prototype Logging](../../../scripts/quest_prototype/src/logging.ts):
   Structured logging model already used elsewhere in Dreamtides. The standalone
   CLI should emit similarly machine-readable trace events.
+- [Dream Journey TypeScript Shape Contracts]
+  (dream_journey_generation_typescript_shape_contracts.md): Normative
+  shape-level implementation appendix. Any worked example that is intended to be
+  directly implementable by the CLI should have its concrete shape contract,
+  shape-local TOML schema, and fill walkthrough specified there.
 
 ## Problem And Context
 
@@ -383,6 +388,11 @@ The default mapping should follow the current quest design:
 - mid stage: completion levels 2 and 3
 - late stage: completion levels 4 through 6
 
+When a worked example depends on a specific stage-profile interpretation, that
+interpretation must be written down either in the main stage-profile schema or
+in the matching shape dossier. A prose statement such as "scores well early" is
+not enough by itself if the example is meant to drive implementation.
+
 ### Shape Definitions
 
 Each `shape` entry should describe a topology, not specific rewards. It should
@@ -398,6 +408,37 @@ declare:
 - maximum branch width
 - maximum branch depth
 - repair order
+
+### Normative Shape Dossiers
+
+The shape fields above are the minimum schema contract, but they are not always
+enough to implement a specific worked example. Any appendix example that is
+meant to be directly implementable by the TypeScript CLI must also have a
+normative shape dossier.
+
+A shape dossier is a short implementation appendix entry that records the
+shape-specific decisions the main schema intentionally leaves abstract. At
+minimum it must specify:
+
+- the exact root option count for the example, if it is narrower than the
+  general shape range
+- the concrete shared axis or scene motif used to keep the options coherent
+- the exact fill slot list the generator should satisfy for that shape
+- any required option-family distinctness rules
+- any shape-local tag or stage overrides needed by the example
+- any shape-local validation rules that go beyond the global validator
+- at least one concrete TOML snippet showing how the shape and content entries
+  are expected to meet the contract
+
+Worked examples without a corresponding dossier remain illustrative only. They
+may explain intent, but they must not be treated as sufficient implementation
+guidance for CLI code.
+
+For V1, `curated_reward_trio` requires such a dossier because its quality bar
+depends on shape-local coherence rules rather than only on generic node-graph
+mechanics. Example 1 in the appendix is therefore backed by the normative
+contract in
+[dream_journey_generation_typescript_shape_contracts.md](dream_journey_generation_typescript_shape_contracts.md).
 
 ### Content Entries
 
