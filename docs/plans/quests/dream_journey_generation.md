@@ -325,7 +325,7 @@ first ask whether it is an instance of one of these shapes.
 ### random_allocation
 
 The site presents a small deliberately eclectic set of offers without a strong
-symmetry constraint. This shape should be rare, strongly validated, and still
+symmetry constraint. This shape should be strongly validated, and still
 read as one authored scene rather than as a uniform random grab bag.
 
 ### same_cost_different_rewards
