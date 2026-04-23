@@ -147,7 +147,8 @@
 
 - Purge {BANE_NAME}.
 - Transform {BANE_NAME} into a random low-cost card.
-- Seal {BANE_NAME}; after your next victory, purge it and gain 120 essence.
+- {BANE_NAME} has no effect for your next 2 battles, then purge it and gain 120
+  essence.
 
 ## One Card, Three Rewrites
 
