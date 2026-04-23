@@ -231,6 +231,18 @@ The game may vary how much it reveals, but the player must understand the class
 of consequence they are opting into. Hidden randomness is acceptable only inside
 clearly signaled envelopes.
 
+### No Negative-Only Buttons In Positive Scenes
+
+In any Journey Shape whose core promise is choosing among rewards, upgrades, or
+services, every root option must contain a plausible upside in its own right.
+Options do not need perfect parity. Some may be narrower, weaker, or more
+situational than others. What the generator must not do is split a bargain into
+separate buttons where one button is effectively "pay the cost" or "take the
+burden" and another button is "receive the reward." Negative-only root options
+belong only in `choose_your_loss` or other scenes whose entire premise is
+selecting which harm to absorb. A refusal branch is different: it is a neutral
+opt-out from a bargain whose accept branch still needs real upside.
+
 ### Designer Legibility Matters
 
 A designer should be able to understand, author, and review the system without
@@ -357,19 +369,25 @@ one authored scene rather than as a uniform random grab bag.
 
 All visible options ask the player to pay or accept the same price and differ
 mainly in upside. This is one of the cleanest shapes for legible bargains,
-burdened boon menus, and cost-framed offers.
+burdened boon menus, and cost-framed offers. The shared price is framing, not a
+standalone choice; the generator must not fill this shape with one real reward
+and one option that is only the burden.
 
 ### same_reward_different_costs
 
 The payoff class is held mostly constant while the player chooses how much to
 spend or suffer to get it. This is useful when the scene is about calibrating
-ambition rather than comparing unrelated rewards.
+ambition rather than comparing unrelated rewards. Each option still needs to
+deliver a real version of the payoff, not just present one cost next to one
+benefit.
 
 ### service_menu
 
 The player chooses one of several discrete services from the same scene. The
 options may differ in both payload and target domain, but they should still feel
-like one vendor, workshop, shrine, or other unified offering.
+like one vendor, workshop, shrine, or other unified offering. Every listed
+service should be something a rational player could actually want in some
+ordinary run state.
 
 ### shop_row
 
@@ -393,7 +411,10 @@ three-option layout would feel forced.
 
 The site focuses on one chosen or visible target and presents several different
 operations for that same object. This is a core deck-surgery shape for
-transfiguration, duplication, merging, or other precise rewrites.
+transfiguration, duplication, merging, or other precise rewrites. The operations
+must all be plausible things to do to that target class; do not mix "improve
+this object" with "simply damage this object" unless the target is explicitly a
+liability.
 
 ### staged_assembly
 
@@ -491,13 +512,18 @@ subset), capped (up to N of the visible menu), or fixed (exactly K of N). In all
 variants the scene should read as "open this dream and take what you want,
 within the visible limit" rather than as a repeated accept-or-continue loop.
 This is useful for cache-like or stash-like Journeys and for fixed-pick menus
-such as "choose 2 of these 3 offers".
+such as "choose 2 of these 3 offers". If the menu is fully open and every item
+is pure upside, the scene collapses into taking everything, so open-pick
+variants need either a cap, a shared burden, or some other real limiting
+structure.
 
 ### take_up_to_n
 
 The player may accept rewards or burdens repeatedly up to a visible cap, usually
 stopping after each step. This is a core shape for late-run pressure and
-self-regulated greed.
+self-regulated greed. Each additional pick must materially change the stake
+through escalating cost, burden, risk, or diminishing option quality; otherwise
+the stop decision is fake.
 
 ### repeat_to_scale
 
@@ -646,6 +672,27 @@ This does not require exact valuation. It only requires a bounded matching rule:
 - compound entries with internal downside should be compared against the total
   effective stake of the scene rather than treated as free upside
 
+### Choice Quality And Negative-Only Options
+
+Choice quality does not require all options to be equally strong. It does
+require every option in a positive-choice scene to be a real offer.
+
+Validation should reject patterns such as:
+
+- one option that grants a reward and another option that is only the cost or
+  burden from a related bargain
+- one option that upgrades or adds future value and another that simply removes
+  future value with no compensating upside
+- a one-target surgery menu where one button is an upgrade path and another is
+  just self-sabotage on the same target
+- an open-pick or repeatable-pick scene where every additional acceptance is
+  pure upside, making "take everything" the only sensible play
+
+Negative-only options are appropriate only in `choose_your_loss` or scenes whose
+entire premise is selecting which harm to absorb. A `leave` or `refuse` branch
+is not a negative offer; it is a no-op exit from a bargain that still needs a
+real upside on the take path.
+
 ### Presentation Patterns
 
 Presentation patterns describe how information and choice surface are arranged.
@@ -793,6 +840,10 @@ This order helps prevent incoherent scenes.
 Run legality, coherence, choice-quality, information-contract, and persistence
 checks.
 
+Choice-quality validation should explicitly reject dominated menu structures
+where a positive-choice shape contains a root option that is only a downside, or
+where a repeatable scene has no real reason to stop before the cap.
+
 ### 8. Repair
 
 If validation fails, repair in this order:
@@ -826,6 +877,7 @@ Bad examples:
 - accept an unspecified hidden punishment
 - choose an option whose meaningful outcome is concealed until after commitment
 - offer a huge invisible reward range with no clue about the stakes
+- present a reward button next to a separate button that only takes the burden
 
 ### Root Choice Presentation
 

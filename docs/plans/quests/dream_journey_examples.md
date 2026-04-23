@@ -16,7 +16,7 @@
 
 - Duplicate a random event.
 - Gain 2 omens.
-- Remove {SITE} from the next dreamscape.
+- Replace one {SITE} in the next dreamscape with a transfiguration site.
 
 # same_cost_different_rewards
 
@@ -42,9 +42,9 @@
 
 ## Three Ways to Draft
 
-- Draft 1 of 6 legendary cards for 30 essence.
-- Draft 1 of 10 legendary cards for 70 essence.
-- Draft 1 of 14 legendary cards and gain 1 {BANE_NAME}.
+- Draft 1 of 6 cards for 30 essence.
+- Draft 1 of 10 cards for 70 essence.
+- Draft 1 of 14 cards and gain 1 {BANE_NAME}.
 
 ## Three Ways to Cleanse
 
@@ -56,7 +56,7 @@
 
 - Gain a random {DREAMSIGN} for 35 essence.
 - Draft 1 of 3 {DREAMSIGN}s for 70 essence.
-- Gain {DREAMSIGN} and gain 1 {BANE_NAME}.
+- Draft 1 of 5 {DREAMSIGN}s and gain 1 {BANE_NAME}.
 
 # service_menu
 
@@ -69,7 +69,7 @@
 ## Quiet Shrine
 
 - Purge 2 Banes.
-- Remove the transfiguration from a chosen card.
+- Purge a chosen starter card.
 - Restore essence to full.
 
 ## Dreamsmith Counter
@@ -137,21 +137,21 @@
 
 # one_target_many_operations
 
-## One Card, Three Fates
+## One Starter, Three Futures
 
 - Purge {CARDNAME}.
-- Duplicate {CARDNAME}.
 - Apply {TRANSFIGURATION} to {CARDNAME}.
+- Replace {CARDNAME} with 1 of 3 low-cost cards.
 
-## One Dreamsign, Three Fates
+## One Bane, Three Escapes
 
-- Purge {DREAMSIGN}.
-- Gain a copy of {DREAMSIGN}.
-- Transform {DREAMSIGN} into a random dreamsign.
+- Purge {BANE_NAME}.
+- Transform {BANE_NAME} into a random low-cost card.
+- Seal {BANE_NAME}; after your next victory, purge it and gain 120 essence.
 
 ## One Card, Three Rewrites
 
-- Remove the transfiguration from {CARDNAME}.
+- Give {CARDNAME} Reclaim.
 - Give {CARDNAME} Fast.
 - Make {CARDNAME} cost 1 less.
 
@@ -324,7 +324,7 @@
 
 ## Severance Bet
 
-- Purge {CARDNAME} to gain a random legendary card, duplicate it, or gain
+- Purge {CARDNAME} to gain a random {DREAMSIGN}, duplicate {CARDNAME}, or gain
   nothing.
 
 # now_vs_later
@@ -414,7 +414,7 @@
 
 ## Open Cache
 
-- Choose any number:
+- Choose any number. For each reward you take, gain 1 {BANE_NAME}:
   - Gain 40 essence.
   - Purge a Bane.
   - Gain {CARDNAME}.
@@ -441,10 +441,10 @@
   - Draft 1 of 6 cards.
   - Stop here.
 - Second pick:
-  - Draft 1 of 6 cards.
+  - Draft 1 of 6 cards and gain 1 {BANE_NAME}.
   - Stop here.
 - Third pick:
-  - Draft 1 of 6 cards.
+  - Draft 1 of 8 cards and gain 2 {BANE_NAME}.
   - Stop here.
 
 ## Measured Greed
@@ -465,10 +465,10 @@
   - Purge a chosen starter card.
   - Stop here.
 - Second pick:
-  - Purge a chosen card.
+  - Purge a chosen card and pay 40 essence.
   - Stop here.
 - Third pick:
-  - Purge a chosen card.
+  - Purge a chosen card and gain 1 {BANE_NAME}.
   - Stop here.
 
 # repeat_to_scale
@@ -547,7 +547,7 @@
 
 ## One Roll
 
-- Gain one random legendary card.
+- Gain one random {DREAMSIGN}.
 
 ## One Wheel
 
@@ -626,12 +626,12 @@
 ## Deferred Harvest
 
 - Lose 20 essence now to gain 80 essence at the next dreamscape.
-- Gain 1 {BANE_NAME} now to gain a random legendary card at the next dreamscape.
+- Gain 1 {BANE_NAME} now to gain a random {DREAMSIGN} at the next dreamscape.
 - Purge a chosen starter card now to draft 1 of 10 cards at the next dreamscape.
 
 ## Locked Promise
 
-- Skip your next draft site to gain {DREAMSIGN} after that site.
+- Skip your next transfiguration site to gain {DREAMSIGN} after that site.
 - Lose your next shop site to gain a random dreamsign after that site.
 - Gain {BANE_NAME} after your next battle to duplicate {CARDNAME} after that
   battle.
@@ -641,14 +641,14 @@
 ## Change The Next Map
 
 - Add {SITE} to the next dreamscape.
-- Remove {SITE} from the next dreamscape.
+- Replace one {SITE} in the next dreamscape with a shop site.
 - Add a Dream Journey to the next dreamscape.
 
 ## Shape The Route
 
 - Add 2 {SITE} to the next dreamscape.
-- Replace one {SITE} in the next dreamscape with a draft site.
-- Replace one {SITE} in the next dreamscape with a dreamsign site.
+- Replace one {SITE} in the next dreamscape with a transfiguration site.
+- Replace one {SITE} in the next dreamscape with a duplication site.
 
 ## Future Bias
 
