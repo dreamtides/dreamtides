@@ -46,6 +46,12 @@
       "client/Assets/"
     ]
   },
+  "go": {
+    "crate_seeds": [],
+    "path_prefixes": [
+      "prototypes/"
+    ]
+  },
   "constructed_quest_prototype": {
     "crate_seeds": [],
     "path_prefixes": [
@@ -75,6 +81,10 @@
     "test-core",
     "python-test",
     "pyre-check",
+    "go-prototypes-check-format",
+    "go-prototypes-typecheck",
+    "go-prototypes-lint",
+    "go-prototypes-test",
     "parser-test",
     "tv-check",
     "tv-clippy",
@@ -85,7 +95,11 @@
     "build",
     "clippy",
     "test-core",
-    "local-unity-test"
+    "local-unity-test",
+    "go-prototypes-check-format",
+    "go-prototypes-typecheck",
+    "go-prototypes-lint",
+    "go-prototypes-test"
   ],
   "parser_steps": [
     "parser-test"
@@ -101,6 +115,12 @@
   ],
   "csharp_steps": [
     "local-unity-test"
+  ],
+  "go_steps": [
+    "go-prototypes-check-format",
+    "go-prototypes-typecheck",
+    "go-prototypes-lint",
+    "go-prototypes-test"
   ],
   "cqs_steps": [
     "cqs-check"

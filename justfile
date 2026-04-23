@@ -19,9 +19,9 @@ review *args:
         python3 scripts/review/review_runner.py {{args}}
     fi
 
-review-direct: check-snapshots check-format check-python-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check local-unity-test parser-test tv-check tv-clippy tv-test cqs-check
+review-direct: check-snapshots check-format check-python-format check-docs-format check-token-limits build clippy style-validator rlf-lint review-core-test python-test pyre-check local-unity-test parser-test tv-check tv-clippy tv-test cqs-check go-prototypes-check-format go-prototypes-typecheck go-prototypes-lint go-prototypes-test
 
-review-verbose: check-snapshots check-format-verbose check-python-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose local-unity-test review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test cqs-check
+review-verbose: check-snapshots check-format-verbose check-python-format-verbose check-docs-format-verbose check-token-limits-verbose build-verbose clippy-verbose style-validator-verbose rlf-lint-verbose local-unity-test review-core-test-verbose python-test-verbose pyre-check-verbose parser-test tv-check-verbose tv-clippy-verbose tv-test cqs-check go-prototypes-check-format-verbose go-prototypes-typecheck-verbose go-prototypes-lint-verbose go-prototypes-test-verbose
 
 review-scope-plan:
     python3 scripts/review/review_scope.py plan
@@ -540,7 +540,7 @@ insta:
 
 # Reformats code. Requires nightly because several useful options (e.g. imports_granularity) are
 # nightly-only
-fmt: style-validator-fix rlf-fmt fmt-docs fmt-csharp fmt-python
+fmt: style-validator-fix rlf-fmt fmt-docs fmt-csharp fmt-python fmt-go-prototypes
     #!/usr/bin/env bash
     python3 scripts/llms/llm_symlinks.py > /dev/null
     output=$(cd rules_engine && cargo +nightly fmt 2>&1)
@@ -606,6 +606,149 @@ check-format:
 check-format-verbose:
     cd rules_engine && cargo +nightly fmt -- --check
 
+
+fmt-go-prototypes:
+    #!/usr/bin/env bash
+    if [ ! -d prototypes ]; then
+        echo "No prototypes directory found, skipping Go formatting"
+        exit 0
+    fi
+    if [ ! -f prototypes/go.work ]; then
+        echo "No prototypes/go.work found, skipping Go formatting"
+        exit 0
+    fi
+
+    files=$(find prototypes -name '*.go' -type f)
+    if [ -z "$files" ]; then
+        echo "No Go files found"
+        exit 0
+    fi
+
+    gofmt -w $files
+    echo "Go prototypes formatted"
+
+check-go-prototypes-dir:
+    #!/usr/bin/env bash
+    if [ ! -d prototypes ]; then
+        echo "No prototypes directory found, skipping Go checks"
+        exit 0
+    fi
+
+go-prototypes-check-format: check-go-prototypes-dir
+    #!/usr/bin/env bash
+    files=$(find prototypes -name '*.go' -type f)
+    if [ -z "$files" ]; then
+        echo "No Go files found"
+        exit 0
+    fi
+
+    output=$(gofmt -l $files)
+    if [ -z "$output" ]; then
+        echo "Go prototypes format OK"
+    else
+        echo "$output"
+        exit 1
+    fi
+
+go-prototypes-check-format-verbose: check-go-prototypes-dir
+    #!/usr/bin/env bash
+    files=$(find prototypes -name '*.go' -type f)
+    if [ -n "$files" ]; then
+        gofmt -l $files
+    fi
+
+go-prototypes-typecheck: check-go-prototypes-dir
+    #!/usr/bin/env bash
+    modules=$(find prototypes -name 'go.mod' -type f)
+    if [ -z "$modules" ]; then
+        echo "No Go modules found"
+        exit 0
+    fi
+
+    for mod in $modules; do
+        module_dir=$(dirname "$mod")
+        output=$(cd "$module_dir" && go build ./... 2>&1)
+        if [ $? -ne 0 ]; then
+            echo "$output"
+            exit 1
+        fi
+    done
+    echo "Go prototypes typecheck passed"
+
+go-prototypes-typecheck-verbose: check-go-prototypes-dir
+    #!/usr/bin/env bash
+    modules=$(find prototypes -name 'go.mod' -type f)
+    if [ -z "$modules" ]; then
+        echo "No Go modules found"
+        exit 0
+    fi
+
+    for mod in $modules; do
+        module_dir=$(dirname "$mod")
+        (cd "$module_dir" && go build ./...)
+    done
+
+go-prototypes-lint: check-go-prototypes-dir
+    #!/usr/bin/env bash
+    modules=$(find prototypes -name 'go.mod' -type f)
+    if [ -z "$modules" ]; then
+        echo "No Go modules found"
+        exit 0
+    fi
+
+    for mod in $modules; do
+        module_dir=$(dirname "$mod")
+        output=$(cd "$module_dir" && go vet ./... 2>&1)
+        if [ $? -ne 0 ]; then
+            echo "$output"
+            exit 1
+        fi
+    done
+    echo "Go prototypes lint passed"
+
+go-prototypes-lint-verbose: check-go-prototypes-dir
+    #!/usr/bin/env bash
+    modules=$(find prototypes -name 'go.mod' -type f)
+    if [ -z "$modules" ]; then
+        echo "No Go modules found"
+        exit 0
+    fi
+
+    for mod in $modules; do
+        module_dir=$(dirname "$mod")
+        (cd "$module_dir" && go vet ./...)
+    done
+
+go-prototypes-test: check-go-prototypes-dir
+    #!/usr/bin/env bash
+    modules=$(find prototypes -name 'go.mod' -type f)
+    if [ -z "$modules" ]; then
+        echo "No Go modules found"
+        exit 0
+    fi
+
+    for mod in $modules; do
+        module_dir=$(dirname "$mod")
+        output=$(cd "$module_dir" && go test ./... 2>&1)
+        if [ $? -ne 0 ]; then
+            echo "$output"
+            exit 1
+        fi
+    done
+    echo "Go prototypes tests passed"
+
+go-prototypes-test-verbose: check-go-prototypes-dir
+    #!/usr/bin/env bash
+    modules=$(find prototypes -name 'go.mod' -type f)
+    if [ -z "$modules" ]; then
+        echo "No Go modules found"
+        exit 0
+    fi
+
+    for mod in $modules; do
+        module_dir=$(dirname "$mod")
+        (cd "$module_dir" && go test ./...)
+    done
 fmt-python:
     #!/usr/bin/env bash
     output=$(uvx black scripts/ --exclude '\.venv' 2>&1)

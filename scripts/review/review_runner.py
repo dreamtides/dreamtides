@@ -273,6 +273,42 @@ def step_specs() -> list[StepSpec]:
                 ),
             ],
         ),
+        StepSpec(
+            "go-prototypes-check-format",
+            [
+                CommandSpec(
+                    "go-prototypes-check-format",
+                    ["just", "go-prototypes-check-format"],
+                )
+            ],
+        ),
+        StepSpec(
+            "go-prototypes-typecheck",
+            [
+                CommandSpec(
+                    "go-prototypes-typecheck",
+                    ["just", "go-prototypes-typecheck"],
+                )
+            ],
+        ),
+        StepSpec(
+            "go-prototypes-lint",
+            [
+                CommandSpec(
+                    "go-prototypes-lint",
+                    ["just", "go-prototypes-lint"],
+                )
+            ],
+        ),
+        StepSpec(
+            "go-prototypes-test",
+            [
+                CommandSpec(
+                    "go-prototypes-test",
+                    ["just", "go-prototypes-test"],
+                )
+            ],
+        ),
     ]
 
 
