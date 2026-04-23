@@ -8,8 +8,8 @@ import (
 )
 
 type Placement struct {
-	Player model.Player
-	Slots  [model.TotalSlots]string
+	Player model.Player             `json:"player"`
+	Slots  [model.TotalSlots]string `json:"slots"`
 }
 
 func GeneratePlacements(board model.Board, player model.Player) []Placement {
