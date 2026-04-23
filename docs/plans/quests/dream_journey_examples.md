@@ -10,7 +10,7 @@
 
 - Gain {DREAMSIGN}.
 - Apply {TRANSFIGURATION} to a chosen starter card.
-- Add {SITE} to the next dreamscape.
+- Add {SITE} to the current dreamscape.
 
 ## Hard Pivot
 
@@ -22,21 +22,21 @@
 
 ## Crimson Toll
 
-- Gain 1 {BANE_NAME} to draft 1 of 12 cards.
-- Gain 1 {BANE_NAME} to gain {DREAMSIGN}.
-- Gain 1 {BANE_NAME} to purge 2 chosen starter cards.
+- Gain 1 {BANE_NAME}. Draft 1 of 12 cards.
+- Gain 1 {BANE_NAME}. Gain {DREAMSIGN}.
+- Gain 1 {BANE_NAME}. Purge 2 chosen starter cards.
 
 ## Flat Price
 
-- Pay 60 essence to gain 120 essence.
-- Pay 60 essence to draft 1 of 10 fast cards.
-- Pay 60 essence to apply {TRANSFIGURATION} to a chosen card.
+- Pay 60 essence. Gain 120 essence.
+- Pay 60 essence. Draft 1 of 10 fast cards.
+- Pay 60 essence. Apply {TRANSFIGURATION} to a chosen card.
 
 ## Omen Wager
 
-- Pay 2 omens to gain {DREAMSIGN}.
-- Pay 2 omens to duplicate a chosen card.
-- Pay 2 omens to add {SITE} to the next dreamscape.
+- Pay 2 omens. Gain {DREAMSIGN}.
+- Pay 2 omens. Duplicate a chosen card.
+- Pay 2 omens. Add {SITE} to the current dreamscape.
 
 # same_reward_different_costs
 
@@ -44,26 +44,26 @@
 
 - Draft 1 of 6 cards for 30 essence.
 - Draft 1 of 10 cards for 70 essence.
-- Draft 1 of 14 cards and gain 1 {BANE_NAME}.
+- Draft 1 of 14 cards. Gain 1 {BANE_NAME}.
 
 ## Three Ways to Cleanse
 
 - Purge a chosen card for 40 essence.
 - Purge 2 chosen cards for 90 essence.
-- Purge 3 chosen cards and gain 1 {BANE_NAME}.
+- Purge 3 chosen cards. Gain 1 {BANE_NAME}.
 
 ## Three Ways to Sign
 
 - Gain a random {DREAMSIGN} for 35 essence.
 - Draft 1 of 3 {DREAMSIGN}s for 70 essence.
-- Draft 1 of 5 {DREAMSIGN}s and gain 1 {BANE_NAME}.
+- Draft 1 of 5 {DREAMSIGN}s. Gain 1 {BANE_NAME}.
 
 # service_menu
 
 ## Atlas Workshop
 
 - Purge a chosen starter card.
-- Add {SITE} to the next dreamscape.
+- Add {SITE} to the current dreamscape.
 - Gain 80 essence.
 
 ## Quiet Shrine
@@ -96,7 +96,7 @@
 
 - Buy {CARDNAME} for 120 essence.
 - Buy {TRANSFIGURATION} on a chosen card for 120 essence.
-- Buy {SITE} in the next dreamscape for 120 essence.
+- Buy {SITE} in the current dreamscape for 120 essence.
 
 # curated_reward_trio
 
@@ -128,12 +128,12 @@
 ## Draft or Route
 
 - Draft 1 of 15 cards.
-- Add {SITE} to the next dreamscape.
+- Add {SITE} to the current dreamscape.
 
 ## Cleanse or Corrupt
 
 - Purge 2 Banes.
-- Gain 1 {BANE_NAME} to duplicate a chosen card.
+- Gain 1 {BANE_NAME}. Duplicate a chosen card.
 
 # one_target_many_operations
 
@@ -147,8 +147,7 @@
 
 - Purge {BANE_NAME}.
 - Transform {BANE_NAME} into a random low-cost card.
-- {BANE_NAME} has no effect for your next 2 battles, then purge it and gain 120
-  essence.
+- {BANE_NAME} has no effect for your next 2 battles. Purge it. Gain 120 essence.
 
 ## One Card, Three Rewrites
 
@@ -281,24 +280,24 @@
 
 ## Priced Purge
 
-- Pay 90 essence to purge a chosen card.
+- Pay 90 essence. Purge a chosen card.
 - Leave.
 
 ## Hard Trade
 
-- Purge {CARDNAME} to gain {DREAMSIGN}.
+- Purge {CARDNAME}. Gain {DREAMSIGN}.
 - Leave.
 
 ## Bane Bargain
 
-- Gain 1 {BANE_NAME} to duplicate {CARDNAME}.
+- Gain 1 {BANE_NAME}. Duplicate {CARDNAME}.
 - Leave.
 
 # risk_or_skip
 
 ## Cursed Draft
 
-- Draft 1 of 12 cards and gain 1 random {BANE_NAME}.
+- Draft 1 of 12 cards. Gain 1 random {BANE_NAME}.
 - Leave.
 
 ## Unstable Copy
@@ -308,24 +307,23 @@
 
 ## Dark Gift
 
-- Gain {DREAMSIGN} and lose 25% of your essence after each of the next 2
-  battles.
+- Gain {DREAMSIGN}. Lose 25% of your essence after each of the next 2 battles.
 - Leave.
 
 # single_wager
 
 ## Essence Flip
 
-- Pay 100 essence to gain 250 essence, 100 essence, or nothing.
+- Pay 100 essence. Gain 250 essence, 100 essence, or nothing.
 
 ## Bane Toss
 
-- Gain 1 {BANE_NAME} to purge it and gain {DREAMSIGN}, keep it and gain 120
+- Gain 1 {BANE_NAME}. Purge it and gain {DREAMSIGN}, keep it and gain 120
   essence, or keep it and gain nothing.
 
 ## Severance Bet
 
-- Purge {CARDNAME} to gain a random {DREAMSIGN}, duplicate {CARDNAME}, or gain
+- Purge {CARDNAME}. Gain a random {DREAMSIGN}, duplicate {CARDNAME}, or gain
   nothing.
 
 # now_vs_later
@@ -442,10 +440,10 @@
   - Draft 1 of 6 cards.
   - Stop here.
 - Second pick:
-  - Draft 1 of 6 cards and gain 1 {BANE_NAME}.
+  - Draft 1 of 6 cards. Gain 1 {BANE_NAME}.
   - Stop here.
 - Third pick:
-  - Draft 1 of 8 cards and gain 2 {BANE_NAME}.
+  - Draft 1 of 8 cards. Gain 2 {BANE_NAME}.
   - Stop here.
 
 ## Measured Greed
@@ -454,10 +452,10 @@
   - Gain 35 essence.
   - Stop here.
 - Second pick:
-  - Gain 35 essence and 1 {BANE_NAME}.
+  - Gain 35 essence. Gain 1 {BANE_NAME}.
   - Stop here.
 - Third pick:
-  - Gain 35 essence and 2 {BANE_NAME}.
+  - Gain 35 essence. Gain 2 {BANE_NAME}.
   - Stop here.
 
 ## Layered Cleansing
@@ -466,31 +464,31 @@
   - Purge a chosen starter card.
   - Stop here.
 - Second pick:
-  - Purge a chosen card and pay 40 essence.
+  - Purge a chosen card. Pay 40 essence.
   - Stop here.
 - Third pick:
-  - Purge a chosen card and gain 1 {BANE_NAME}.
+  - Purge a chosen card. Gain 1 {BANE_NAME}.
   - Stop here.
 
 # repeat_to_scale
 
 ## Buy More Copies
 
-- Pay 40 essence to duplicate 1 chosen card.
-- Pay 80 essence to duplicate 2 chosen cards.
-- Pay 120 essence to duplicate 3 chosen cards.
+- Pay 40 essence. Duplicate 1 chosen card.
+- Pay 80 essence. Duplicate 2 chosen cards.
+- Pay 120 essence. Duplicate 3 chosen cards.
 
 ## Scale The Draft
 
-- Pay 25 essence to draft 1 of 8 cards.
-- Pay 50 essence to draft 2 of 8 cards.
-- Pay 75 essence to draft 3 of 8 cards.
+- Pay 25 essence. Draft 1 of 8 cards.
+- Pay 50 essence. Draft 2 of 8 cards.
+- Pay 75 essence. Draft 3 of 8 cards.
 
 ## Widen The Rewrite
 
-- Pay 30 essence to apply {TRANSFIGURATION} to 1 chosen card.
-- Pay 60 essence to apply {TRANSFIGURATION} to 2 chosen cards.
-- Pay 90 essence to apply {TRANSFIGURATION} to 3 chosen cards.
+- Pay 30 essence. Apply {TRANSFIGURATION} to 1 chosen card.
+- Pay 60 essence. Apply {TRANSFIGURATION} to 2 chosen cards.
+- Pay 90 essence. Apply {TRANSFIGURATION} to 3 chosen cards.
 
 # push_your_luck
 
@@ -500,10 +498,10 @@
   - Gain 30 essence.
   - Stop here.
 - Second push:
-  - Gain 30 more essence and a 25% chance to gain {BANE_NAME}.
+  - Gain 30 more essence. 25% chance to gain {BANE_NAME}.
   - Stop here.
 - Third push:
-  - Gain 45 more essence and a 50% chance to gain {BANE_NAME}.
+  - Gain 45 more essence. 50% chance to gain {BANE_NAME}.
   - Stop here.
 
 ## Chase The Upgrade
@@ -512,10 +510,10 @@
   - Apply {TRANSFIGURATION} to a chosen starter card.
   - Stop here.
 - Second push:
-  - Apply {TRANSFIGURATION} to a second chosen card and gain 1 {BANE_NAME}.
+  - Apply {TRANSFIGURATION} to a second chosen card. Gain 1 {BANE_NAME}.
   - Stop here.
 - Third push:
-  - Apply {TRANSFIGURATION} to a third chosen card and gain another {BANE_NAME}.
+  - Apply {TRANSFIGURATION} to a third chosen card. Gain 1 {BANE_NAME}.
   - Stop here.
 
 ## Press The Draw
@@ -524,25 +522,25 @@
   - Draft 1 of 5 cards.
   - Stop here.
 - Second push:
-  - Draft 1 of 7 cards and purge a random card.
+  - Draft 1 of 7 cards. Purge a random card.
   - Stop here.
 - Third push:
-  - Draft 1 of 9 cards and purge another random card.
+  - Draft 1 of 9 cards. Purge another random card.
   - Stop here.
 
 # resolved_random_series
 
 ## Coin Cascade
 
-- Flip 3 coins and gain 30 essence for each heads.
+- Flip 3 coins. Gain 30 essence for each heads.
 
 ## Hidden Pack
 
-- Open 3 random packs and gain every card inside.
+- Open 3 random packs. Gain every card inside.
 
 ## Shifting Orbs
 
-- Reveal 3 random dreamsign rewards and gain each one.
+- Reveal 3 random dreamsign rewards. Gain each one.
 
 # single_random_outcome
 
@@ -601,53 +599,53 @@
 ## Deeper Draft
 
 - Search the first layer for 1 of 4 cards.
-- Search deeper for 1 of 7 cards and gain 1 {BANE_NAME}.
-- Search deepest for 1 of 10 cards and gain 2 {BANE_NAME}.
+- Search deeper for 1 of 7 cards. Gain 1 {BANE_NAME}.
+- Search deepest for 1 of 10 cards. Gain 2 {BANE_NAME}.
 
 ## Buried Spark
 
 - Dig for 40 essence.
-- Dig deeper for 80 essence and purge a random card.
-- Dig deepest for 140 essence and purge 2 random cards.
+- Dig deeper for 80 essence. Purge a random card.
+- Dig deepest for 140 essence. Purge 2 random cards.
 
 ## Hidden Sign
 
 - Search the first layer for 1 of 2 dreamsigns.
-- Search deeper for 1 of 4 dreamsigns and pay 40 essence.
-- Search deepest for 1 of 6 dreamsigns and pay maximum essence.
+- Search deeper for 1 of 4 dreamsigns. Pay 40 essence.
+- Search deepest for 1 of 6 dreamsigns. Pay maximum essence.
 
 # commit_now_future_payoff
 
 ## Store Power
 
-- Pay 50 essence to gain {DREAMSIGN} after your next victory.
-- Gain 1 {BANE_NAME} to purge 2 chosen cards after your next victory.
-- Purge {CARDNAME} to gain 2 copies of it after your next victory.
+- Pay 50 essence. Gain {DREAMSIGN} after your next victory.
+- Gain 1 {BANE_NAME}. Purge 2 chosen cards after your next victory.
+- Purge {CARDNAME}. Gain 2 copies of it after your next victory.
 
 ## Deferred Harvest
 
-- Lose 20 essence now to gain 80 essence at the next dreamscape.
-- Gain 1 {BANE_NAME} now to gain a random {DREAMSIGN} at the next dreamscape.
-- Purge a chosen starter card now to draft 1 of 10 cards at the next dreamscape.
+- Lose 20 essence now. Gain 80 essence at the next dreamscape.
+- Gain 1 {BANE_NAME} now. Gain a random {DREAMSIGN} at the next dreamscape.
+- Purge a chosen starter card now. Draft 1 of 10 cards at the next dreamscape.
 
 ## Locked Promise
 
-- Skip your next transfiguration site to gain {DREAMSIGN} after that site.
-- Lose your next shop site to gain a random dreamsign after that site.
-- Gain {BANE_NAME} after your next battle to duplicate {CARDNAME} after that
+- Skip your next transfiguration site. Gain {DREAMSIGN} after that site.
+- Lose your next shop site. Gain a random dreamsign after that site.
+- Gain {BANE_NAME} after your next battle. Duplicate {CARDNAME} after that
   battle.
 
 # alter_future_dreamscape
 
 ## Change The Next Map
 
-- Add {SITE} to the next dreamscape.
+- Add {SITE} to the current dreamscape.
 - Replace one {SITE} in the next dreamscape with a shop site.
-- Add a Dream Journey to the next dreamscape.
+- Add a Dream Journey to the current dreamscape.
 
 ## Shape The Route
 
-- Add 2 {SITE} to the next dreamscape.
+- Add 2 {SITE} to the current dreamscape.
 - Replace one {SITE} in the next dreamscape with a transfiguration site.
 - Replace one {SITE} in the next dreamscape with a duplication site.
 
