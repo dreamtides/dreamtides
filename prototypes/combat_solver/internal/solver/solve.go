@@ -1,6 +1,7 @@
 package solver
 
 import (
+	"math"
 	"sort"
 	"time"
 
@@ -32,6 +33,13 @@ type Result struct {
 	TimedOutAtReply bool        `json:"timed_out_at_reply"`
 }
 
+type rootEvaluation struct {
+	Candidate      Candidate
+	ReplyEvaluated int
+	Complete       bool
+	Evaluated      bool
+}
+
 func Solve(board model.Board, options Options) Result {
 	start := time.Now()
 	deadline := start.Add(resolveBudget(options.Budget))
@@ -39,6 +47,7 @@ func Solve(board model.Board, options Options) Result {
 	rootPlacements := GeneratePlacements(board, perspective)
 	candidates := make([]Candidate, 0, len(rootPlacements))
 	result := Result{Complete: true}
+	var bestRoot *Score
 
 	for _, rootPlacement := range rootPlacements {
 		if timedOut(deadline) {
@@ -47,18 +56,23 @@ func Solve(board model.Board, options Options) Result {
 			break
 		}
 
-		candidate, replyCount, complete := evaluateRoot(board, perspective, rootPlacement, deadline)
-		result.ReplyEvaluated += replyCount
-		if !complete {
+		evaluation := evaluateRoot(board, perspective, rootPlacement, deadline, bestRoot)
+		result.ReplyEvaluated += evaluation.ReplyEvaluated
+		if !evaluation.Complete {
 			result.Complete = false
 			result.TimedOutAtReply = true
 			break
 		}
+		if !evaluation.Evaluated {
+			continue
+		}
 
+		candidate := evaluation.Candidate
 		candidates = append(candidates, candidate)
 		result.RootEvaluated++
 		if result.RootEvaluated == 1 || compareCandidates(candidate, result.Best) < 0 {
 			result.Best = candidate
+			bestRoot = &result.Best.Score
 		}
 	}
 
@@ -75,19 +89,30 @@ func evaluateRoot(
 	perspective model.Player,
 	rootPlacement Placement,
 	deadline time.Time,
-) (Candidate, int, bool) {
+	bestRoot *Score,
+) rootEvaluation {
 	afterRoot := ApplyPlacement(board, rootPlacement)
 	engine.ApplyEndOfTurnSupportGains(&afterRoot, perspective)
 
 	tally := Tally{}
 	AddOutcome(&tally, engine.ResolveJudgment(&afterRoot, perspective.Opponent()))
 
+	if bestRoot != nil && hasCharacters(afterRoot, perspective.Opponent()) {
+		upperBound := optimisticRootScore(afterRoot, perspective, tally)
+		if CompareScore(upperBound, *bestRoot) <= 0 {
+			return rootEvaluation{Complete: true}
+		}
+	}
+
 	opponentPlacements := GeneratePlacements(afterRoot, perspective.Opponent())
 	var worst Candidate
 	replyEvaluated := 0
 	for replyIndex, replyPlacement := range opponentPlacements {
 		if timedOut(deadline) {
-			return Candidate{}, replyEvaluated, false
+			return rootEvaluation{
+				ReplyEvaluated: replyEvaluated,
+				Complete:       false,
+			}
 		}
 
 		afterReply := ApplyPlacement(afterRoot, replyPlacement)
@@ -104,9 +129,81 @@ func evaluateRoot(
 		if replyIndex == 0 || compareOpponentReply(candidate, worst) < 0 {
 			worst = candidate
 		}
+		if bestRoot != nil && CompareScore(worst.Score, *bestRoot) <= 0 {
+			return rootEvaluation{
+				Candidate:      worst,
+				ReplyEvaluated: replyEvaluated,
+				Complete:       true,
+				Evaluated:      true,
+			}
+		}
 	}
 
-	return worst, replyEvaluated, true
+	return rootEvaluation{
+		Candidate:      worst,
+		ReplyEvaluated: replyEvaluated,
+		Complete:       true,
+		Evaluated:      true,
+	}
+}
+
+func optimisticRootScore(board model.Board, perspective model.Player, tally Tally) Score {
+	score := Score{
+		OwnSurvivors:      engine.SurvivingEffectiveSparks(board, perspective),
+		OpponentDissolved: optimisticOpponentDissolved(board, perspective.Opponent(), tally),
+		OwnPoints:         tally.Points[perspective] + optimisticOwnPointGain(board, perspective),
+		OpponentPoints:    tally.Points[perspective.Opponent()],
+	}
+	score.OpponentPointsTerm = -score.OpponentPoints
+	return score
+}
+
+func optimisticOpponentDissolved(
+	board model.Board,
+	opponent model.Player,
+	tally Tally,
+) []int {
+	sparks := dissolvedSparks(tally.Dissolved[opponent])
+	for _, character := range board.Characters {
+		if character.Owner != opponent {
+			continue
+		}
+		sparks = append(sparks, optimisticDissolvedSpark(character))
+	}
+
+	sort.Sort(sort.Reverse(sort.IntSlice(sparks)))
+	return sparks
+}
+
+func optimisticDissolvedSpark(character model.Character) int {
+	if character.StoredSpark > math.MaxInt-4 {
+		return math.MaxInt
+	}
+
+	return character.StoredSpark + 4
+}
+
+func optimisticOwnPointGain(board model.Board, perspective model.Player) int {
+	points := 0
+	for frontIndex := range model.FrontSlots {
+		frontSlot := model.FrontSlot(frontIndex)
+		if _, ok := board.CharacterAt(perspective, frontSlot); !ok {
+			continue
+		}
+		points += engine.EffectiveSpark(board, perspective, frontSlot)
+	}
+
+	return points
+}
+
+func hasCharacters(board model.Board, player model.Player) bool {
+	for _, character := range board.Characters {
+		if character.Owner == player {
+			return true
+		}
+	}
+
+	return false
 }
 
 func rankedCandidates(candidates []Candidate, maxRanked int) []Candidate {
