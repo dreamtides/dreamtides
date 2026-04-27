@@ -30,13 +30,19 @@ func TestBoardIncludesPlayersRowsNamesAndSpark(t *testing.T) {
 
 	output := Board(board)
 	for _, want := range []string{
+		"\x1b[",
 		"Active: Player Two",
 		"Player One",
 		"Player Two",
-		"F0=Ally(spark=3)",
-		"F3=-",
-		"B0=-",
-		"B4=Enemy(spark=5)",
+		"+----------------------+",
+		"F0",
+		"Ally",
+		"spark 3",
+		"F3",
+		"--",
+		"B4",
+		"Enemy",
+		"spark 5",
 	} {
 		if !strings.Contains(output, want) {
 			t.Fatalf("Board() missing %q in:\n%s", want, output)

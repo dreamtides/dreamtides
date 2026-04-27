@@ -47,6 +47,11 @@ func main() {
 	fmt.Print(render.Board(board))
 
 	result := solver.Solve(board, solver.Options{Budget: *budget, MaxRanked: *rank})
+	if len(result.Ranked) > 0 {
+		proposed := solver.ApplyPlacement(board, result.Best.Placement)
+		fmt.Println("\nProposed board")
+		fmt.Print(render.Board(proposed))
+	}
 	fmt.Printf(
 		"\nComplete: %v  Elapsed: %s  Roots: %d  Replies: %d\n",
 		result.Complete,
