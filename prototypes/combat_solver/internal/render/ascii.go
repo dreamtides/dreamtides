@@ -9,6 +9,8 @@ import (
 
 const (
 	cellWidth = 22
+	cellGap   = 2
+	rowOffset = (cellWidth + 2 + cellGap) / 2
 
 	reset     = "\x1b[0m"
 	playerOne = "\x1b[38;5;39m"
@@ -30,8 +32,8 @@ func Board(board model.Board) string {
 
 func renderPlayer(builder *strings.Builder, board model.Board, player model.Player) {
 	fmt.Fprintf(builder, "%s%s%s\n", playerColor(player), playerName(player), reset)
-	renderRow(builder, board, player, "Front", model.FrontSlots, model.FrontSlot)
-	renderRow(builder, board, player, "Back ", model.BackSlots, model.BackSlot)
+	renderRow(builder, board, player, "Front", rowOffset, model.FrontSlots, model.FrontSlot)
+	renderRow(builder, board, player, "Back ", 0, model.BackSlots, model.BackSlot)
 }
 
 func renderRow(
@@ -39,6 +41,7 @@ func renderRow(
 	board model.Board,
 	player model.Player,
 	label string,
+	offset int,
 	count int,
 	slotFor func(int) int,
 ) {
@@ -47,28 +50,32 @@ func renderRow(
 		cells = append(cells, buildSlotCell(board, player, slotFor(index), index))
 	}
 
-	fmt.Fprintf(builder, "%s ", label)
+	renderPrefix(builder, label, offset)
 	renderBorder(builder, cells)
-	fmt.Fprintf(builder, "%s ", strings.Repeat(" ", len(label)))
+	renderPrefix(builder, strings.Repeat(" ", len(label)), offset)
 	renderCellLine(builder, cells, 0)
-	fmt.Fprintf(builder, "%s ", strings.Repeat(" ", len(label)))
+	renderPrefix(builder, strings.Repeat(" ", len(label)), offset)
 	renderCellLine(builder, cells, 1)
-	fmt.Fprintf(builder, "%s ", strings.Repeat(" ", len(label)))
+	renderPrefix(builder, strings.Repeat(" ", len(label)), offset)
 	renderCellLine(builder, cells, 2)
-	fmt.Fprintf(builder, "%s ", strings.Repeat(" ", len(label)))
+	renderPrefix(builder, strings.Repeat(" ", len(label)), offset)
 	renderBorder(builder, cells)
+}
+
+func renderPrefix(builder *strings.Builder, label string, offset int) {
+	fmt.Fprintf(builder, "%s %s", label, strings.Repeat(" ", offset))
 }
 
 func renderBorder(builder *strings.Builder, cells []slotCell) {
 	for _, cell := range cells {
-		fmt.Fprintf(builder, "%s+%s+%s ", cell.Color, strings.Repeat("-", cellWidth), reset)
+		fmt.Fprintf(builder, "%s+%s+%s%s", cell.Color, strings.Repeat("-", cellWidth), reset, strings.Repeat(" ", cellGap))
 	}
 	fmt.Fprint(builder, "\n")
 }
 
 func renderCellLine(builder *strings.Builder, cells []slotCell, line int) {
 	for _, cell := range cells {
-		fmt.Fprintf(builder, "%s|%s|%s ", cell.Color, pad(cell.Lines[line]), reset)
+		fmt.Fprintf(builder, "%s|%s|%s%s", cell.Color, pad(cell.Lines[line]), reset, strings.Repeat(" ", cellGap))
 	}
 	fmt.Fprint(builder, "\n")
 }

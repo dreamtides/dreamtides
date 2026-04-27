@@ -49,3 +49,46 @@ func TestBoardIncludesPlayersRowsNamesAndSpark(t *testing.T) {
 		}
 	}
 }
+
+func TestBoardStaggersBackRowBetweenFrontSlots(t *testing.T) {
+	output := stripANSI(Board(model.Board{}))
+	lines := strings.Split(output, "\n")
+
+	frontLine := firstLineContaining(lines, "Front")
+	backLine := firstLineContaining(lines, "Back ")
+	if frontLine == "" || backLine == "" {
+		t.Fatalf("Board() missing front or back row:\n%s", output)
+	}
+
+	frontStart := strings.Index(frontLine, "+")
+	backStart := strings.Index(backLine, "+")
+	if frontStart-backStart != rowOffset {
+		t.Fatalf("front row offset = %d, want %d\nfront: %q\nback:  %q", frontStart-backStart, rowOffset, frontLine, backLine)
+	}
+}
+
+func firstLineContaining(lines []string, text string) string {
+	for _, line := range lines {
+		if strings.Contains(line, text) {
+			return line
+		}
+	}
+
+	return ""
+}
+
+func stripANSI(value string) string {
+	var builder strings.Builder
+	for index := 0; index < len(value); index++ {
+		if value[index] == '\x1b' && index+1 < len(value) && value[index+1] == '[' {
+			index += 2
+			for index < len(value) && (value[index] < '@' || value[index] > '~') {
+				index++
+			}
+			continue
+		}
+		builder.WriteByte(value[index])
+	}
+
+	return builder.String()
+}
