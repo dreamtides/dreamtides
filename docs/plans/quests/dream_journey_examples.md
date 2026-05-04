@@ -12,12 +12,11 @@
 - Apply {Viridian Transfiguration} to a chosen starter card.
 - Add a {Transfiguration} site to the current dreamscape.
 
-## Hard Pivot
+## Moonless Altar
 
-- Duplicate a random event.
-- Gain 2 omens.
-- Replace the {Purge} site in the current dreamscape with a {Transfiguration}
-  site.
+- Purge {Silver Key}. Gain {Mandrake Root}.
+- Gain 1 {Nightmare}. Gain {Ginger Root}.
+- Gain 1 {Nightmare}. Add a {Dreamsign Offering} site to the current dreamscape.
 
 # same_cost_different_rewards
 
@@ -27,11 +26,11 @@
 - Gain 1 {Nightmare}. Gain {Ginger Root}.
 - Gain 1 {Nightmare}. Purge 3 chosen starter cards.
 
-## Flat Price
+## Shackled Statue
 
-- Pay 60 essence. Gain 120 essence.
-- Pay 60 essence. Draft 1 of 10 fast cards.
-- Pay 60 essence. Apply {Golden Transfiguration} to a chosen card.
+- Gain 1 {Nightmare}. Apply {Bronze Transfiguration} to a chosen character.
+- Gain 1 {Nightmare}. Apply {Scarlet Transfiguration} to a chosen event.
+- Gain 1 {Nightmare}. Apply {Golden Transfiguration} to a chosen fast card.
 
 ## Omen Wager
 
@@ -43,15 +42,14 @@
 
 ## Three Ways to Draft
 
-- Draft 1 of 6 cards for 30 essence.
-- Draft 1 of 10 cards for 70 essence.
-- Draft 1 of 14 cards for 110 essence.
+- Draft 1 of 4 cards for 30 essence.
+- Draft 1 of 8 cards for 70 essence.
+- Draft 1 of 12 cards for 110 essence.
 
-## Three Ways to Cleanse
+## Careful Crossing
 
-- Purge a chosen card for 40 essence.
-- Purge 2 chosen cards for 90 essence.
-- Purge 3 chosen cards for 140 essence.
+- Pay 80 essence. Purge a chosen card.
+- Gain 1 {Nightmare}. Purge a random starter card.
 
 ## Three Ways to Sign
 
@@ -61,11 +59,12 @@
 
 # service_menu
 
-## Atlas Workshop
+## Welcoming Weaver
 
-- Purge a chosen starter card.
-- Add a {Cleanse} site to the current dreamscape.
-- Gain 80 essence.
+- Apply {Viridian Transfiguration} to a chosen starter card.
+- Transform a chosen Dreamsign into you choice of 1 of 3 Dreamsigns.
+- Replace a {Draft} site in the current dreamscape with a {Transfiguration}
+  site.
 
 ## Quiet Shrine
 
@@ -87,11 +86,11 @@
 - Buy {Pyramid Relic} for 80 essence.
 - Buy {Golden Acorn} for 80 essence.
 
-## Omen Rack
+## Designer's Counter
 
-- Buy 1 of 8 fast cards for 2 omens.
-- Buy 1 of 8 characters for 2 omens.
-- Buy 1 of 8 events for 2 omens.
+- Pay 45 essence. Apply {Viridian Transfiguration} to a chosen card.
+- Pay 70 essence. Transform 2 chosen cards.
+- Pay 120 essence. Purge a chosen card and duplicate a chosen card.
 
 ## Premium Goods
 
@@ -105,14 +104,13 @@
 
 - Apply {Viridian Transfiguration} to a chosen starter card.
 - Draft 1 of 8 low-cost cards and apply {Viridian Transfiguration} to it.
-- Gain {Seedling Charm}, a Dreamsign that gives your first materialized
-  character each battle +1 spark.
+- Gain {Seedling Charm}
 
-## Focused Tools
+## Three Carvings
 
-- Draft 1 of 10 characters.
-- Draft 1 of 10 events.
-- Draft 1 of 10 fast cards.
+- Draft 1 of 8 characters and apply {Viridian Transfiguration} to it.
+- Draft 1 of 8 events and apply {Viridian Transfiguration} to it.
+- Draft 1 of 8 fast cards and apply {Viridian Transfiguration} to it.
 
 ## Three Signs
 
@@ -122,15 +120,15 @@
 
 # heterogeneous_pair
 
-## Cash or Craft
+## Ancient Margins
 
-- Gain 120 essence.
-- Apply {Golden Transfiguration} to a chosen card.
+- Purge a chosen starter card.
+- Apply {Viridian Transfiguration} to each starter card.
 
-## Draft or Route
+## Memory Hound
 
-- Draft 1 of 15 cards.
-- Add a {Shop} site to the current dreamscape.
+- Gain {Memory Collar}
+- Draft 1 of 8 low-cost characters and apply {Viridian Transfiguration} to it.
 
 ## Cleanse or Corrupt
 
@@ -149,7 +147,7 @@
 
 - Purge {Nightmare}.
 - Transform {Nightmare} into 1 of 3 low-cost cards.
-- Seal {Nightmare} until the next dreamscape. Then purge it and gain 90 essence.
+- Keepe {Nightmare} until the next dreamscape. Then purge it and gain 90 essence.
 
 ## One Card, Three Rewrites
 
@@ -174,13 +172,34 @@
   - Forceful: characters get +2 spark; events draw 1 card.
   - Echoing: give the card Reclaim.
 
+## Olde Dream Loom
+
+- Choose a frame. Each frame defines how the final reward will be delivered:
+  - Card: create a 1-cost event with a played ability.
+  - Dreamsign: create a Dreamsign that triggers after each of your next 2
+    battles.
+  - Site: add a {Dream Journey} site to the current dreamscape with the chosen
+    reward.
+- Choose a reward package. The package adapts to the chosen frame:
+  - Essence: gain 80 essence when it resolves.
+  - Cleansing: purge a chosen Bane when it resolves.
+  - Transfiguration: apply {Viridian Transfiguration} to a chosen starter card
+    when it resolves.
+- Choose a finish:
+  - Efficient: if Card, reduce its cost by 1, to a minimum of 0; otherwise gain
+    1 omen.
+  - Abundant: increase essence to 130, purge 2 Banes, or apply {Golden
+    Transfiguration} instead.
+  - Echoing: if Card, give it Reclaim; otherwise repeat the reward after your
+    next battle.
+
 # mirrored_operations
 
-## Starter Surgery
+## Reflection Gallery
 
-- Purge a chosen starter card.
-- Duplicate a chosen starter card.
-- Apply {Golden Transfiguration} to a chosen starter card.
+- Duplicate a chosen card.
+- Apply {Golden Transfiguration} to a chosen card.
+- Transform a chosen Dreamsign into 1 of 3 visible Dreamsigns.
 
 ## Event Mirror
 
@@ -202,11 +221,11 @@
 - Duplicate {Tranquil Duelist}.
 - Duplicate {Nocturne}.
 
-## Shared Cut
+## Bloody Margins
 
-- Purge {Aspiring Guardian}.
-- Purge {Tranquil Duelist}.
-- Purge {Nocturne}.
+- Apply {Scarlet Transfiguration} to a chosen character.
+- Apply {Viridian Transfiguration} to a chosen event.
+- Apply {Azure Transfiguration} to a chosen fast card.
 
 ## One Blessing
 
@@ -216,11 +235,11 @@
 
 # choose_your_loss
 
-## Broken Keepsake
+## Falling Through The Dream
 
-- Purge {Beacon of Tomorrow}.
-- Purge {Scrap Reclaimer}.
-- Purge {Evacuation Enforcer}.
+- Purge a random character from your deck.
+- Purge a random event from your deck.
+- Purge a random fast card from your deck.
 
 ## Thin Reserves
 
@@ -244,9 +263,9 @@
 
 - Purge a chosen Bane.
 
-## Quiet Gift
+## Echo Shrine
 
-- Gain {Ginger Root}.
+- Duplicate a chosen card.
 
 # single_offer
 
@@ -255,9 +274,9 @@
 - Pay 90 essence. Purge a chosen card.
 - Leave.
 
-## Hard Trade
+## Shining Light
 
-- Purge {Aspiring Guardian}. Gain {Ginger Root}.
+- Gain 1 {Nightmare}. Apply {Viridian Transfiguration} to 2 random cards.
 - Leave.
 
 ## Bane Bargain
@@ -277,10 +296,9 @@
 - Duplicate {Aspiring Guardian} with a 35% chance to purge it after each battle.
 - Leave.
 
-## Dark Gift
+## Sarcophagus Dreamsign
 
-- Gain {Ginger Root}. After each of your next 2 battles, 35% chance to lose 25%
-  of your essence.
+- Gain {Ginger Root}. 50% chance to gain 1 {Nightmare}.
 - Leave.
 
 # single_wager
@@ -294,17 +312,17 @@
 - Gain 1 {Nightmare}. Purge it and gain {Ginger Root}, keep it and gain 120
   essence, or keep it and gain nothing.
 
-## Severance Bet
+## Chaos Portal
 
-- Purge {Aspiring Guardian}. Gain {Ginger Root}, duplicate {Aspiring Guardian},
-  or gain nothing.
+- Purge a chosen card. Roll for {Beacon of Tomorrow}, {Scrap Reclaimer}, or
+  {Evacuation Enforcer}; gain the result.
 
 # now_vs_later
 
-## Immediate Coin
+## Sleeping Seed
 
-- Gain 100 essence.
-- After 2 battles, gain 220 essence.
+- Gain {Seedling Charm}.
+- After 2 battles, gain {Blooming Charm}.
 
 ## Card Seed
 
@@ -314,8 +332,7 @@
 ## Small Sign
 
 - Gain {Silver Key}.
-- After your next battle, choose 1 of 3 Dreamsigns: {Ginger Root}, {Silver Key},
-  or {Cloud Lens}.
+- After your next battle, choose 1 of 3 Dreamsigns.
 
 # reward_after_trigger
 
@@ -353,15 +370,14 @@
   - Recover the sealed Dreamsign.
   - Transform the sealed Dreamsign into {Mandrake Root}.
 
-## Hidden Cache
+## Unchosen Marks
 
 - First scene:
-  - Stash 150 essence.
-  - Stash {Beacon of Tomorrow}.
-  - Stash {Ginger Root}.
+  - Give {Glimpse of What Was} Reclaim.
+  - Give {Glimpse of What Was} Fast.
+  - Make {Glimpse of What Was} cost 1 less.
 - Later return:
-  - Take the stash back with a 50% bonus.
-  - Trade the stash for {Scrap Reclaimer}.
+  - Apply the two marks you did not choose to {Glimpse of What Was}.
 
 # timed_window_menu
 
@@ -369,19 +385,13 @@
 
 - For the next 3 battles, draw 1 extra card in your opening hand.
 - For the next 3 battles, gain 1 extra energy on turn 1.
-- For the next 3 battles, your leftmost character enters with +2 spark.
+- For the next 3 battles, your first characte each turn enters with +1 spark.
 
 ## After Next Battle
 
 - After your next battle, purge a chosen card.
 - After your next battle, gain 160 essence.
 - After your next battle, gain {Ginger Root}.
-
-## Next Site
-
-- At your next {Draft} site, draft 1 of 8 cards.
-- At your next {Essence} site, gain 220 essence.
-- At your next {Duplication} site, duplicate {Aspiring Guardian}.
 
 # take_any_number
 
@@ -399,25 +409,26 @@
   - Duplicate {Aspiring Guardian}.
   - Apply {Golden Transfiguration} to {Aspiring Guardian}.
 
-## Shared Hoard
+## Troubled Charms
 
-- Choose up to 2:
-  - Gain a random fast card.
-  - Gain a random character.
-  - Gain 1 omen.
+- Choose any number:
+  - Gain 1 {Nightmare}. After 2 battles, purge it and gain {Ginger Root}.
+  - Gain 1 {Despair}. After 2 battles, purge it and gain {Silver Key}.
+  - Gain 1 {Oblivion}. After 2 battles, purge it and apply {Golden
+    Transfiguration} to a chosen card.
 
 # take_up_to_n
 
-## Repeated Drafts
+## Dream Conveyor
 
-- First pick:
-  - Draft 1 of 6 cards.
+- First pull:
+  - Pay 35 essence. Gain 1 omen.
   - Stop here.
-- Second pick:
-  - Draft 1 of 10 cards. Pay 50 essence.
+- Second pull:
+  - Pay 70 essence. Draft 1 of 8 cards.
   - Stop here.
-- Third pick:
-  - Draft 2 of 12 cards. Pay 120 essence.
+- Third pull:
+  - Pay 105 essence. Apply {Golden Transfiguration} to a chosen starter card.
   - Stop here.
 
 ## Measured Greed
@@ -446,11 +457,11 @@
 
 # repeat_to_scale
 
-## Buy More Copies
+## Echoing Fissure
 
-- Pay 40 essence. Duplicate 1 chosen card.
-- Pay 80 essence. Duplicate 2 chosen cards.
-- Pay 120 essence. Duplicate 3 chosen cards.
+- Duplicate 1 chosen card.
+- Gain 1 {Nightmare}. Duplicate a chosen card 2 times.
+- Purge a random card. Duplicate a chosen card 3 times.
 
 ## Scale The Draft
 
@@ -466,22 +477,24 @@
 
 # push_your_luck
 
-## Risk Ladder
+## Haggler's Cache
 
-- First push:
-  - Gain 30 essence.
+- First offer:
+  - Draft 1 of 5 cards from a random visible class: character, event, or fast.
   - Stop here.
-- Second push:
-  - Gain 30 more essence. 25% chance to gain 1 {Nightmare}.
+- Second haggle:
+  - 75% chance to draft 1 of 5 cards from one of the remaining classes.
+    Otherwise, the Journey ends.
   - Stop here.
-- Third push:
-  - Gain 45 more essence. 50% chance to gain 1 {Nightmare}.
+- Third haggle:
+  - 50% chance to draft 1 of 5 cards from the last remaining class. Otherwise,
+    the Journey ends.
   - Stop here.
 
 ## Chase The Upgrade
 
 - First push:
-  - Apply {Viridian Transfiguration} to a chosen starter card.
+  - Apply {Viridian Transfiguration} to a chosen card.
   - Stop here.
 - Second push:
   - Apply {Viridian Transfiguration} to a second chosen card. 30% chance to gain
@@ -510,11 +523,19 @@
 
 - Flip 3 coins. Gain 30 essence for each heads.
 
+## Three Locked Caches
+
+- Choose characters, events, or fast cards. Draft 1 of 6 from that pool.
+- Roll twice. First success lets you draft 1 of 6 from one remaining pool;
+  second success lets you draft 1 of 6 from the last remaining pool.
+
 # single_random_outcome
 
-## One Roll
+## Turning Wheel
 
-- Roll for {Ginger Root}, {Pyramid Relic}, or {Golden Acorn}. Gain the result.
+- Roll for one: gain 160 essence, restore essence to full, apply {Viridian
+  Transfiguration} to a random card, purge a random Bane, gain 1 {Nightmare}, or
+  gain {Ginger Root}.
 
 ## One Wheel
 
@@ -530,13 +551,13 @@
 ## Passing Merchant
 
 - Offer 1:
-  - Sell {Aspiring Guardian} for 80 essence.
+  - Sell {Aspiring Guardian} for 50 essence.
   - Keep your deck unchanged.
 - Offer 2:
   - Sell {Aspiring Guardian} for 65 essence.
   - Keep your deck unchanged.
 - Offer 3:
-  - Sell {Aspiring Guardian} for 50 essence.
+  - Sell {Aspiring Guardian} for 80 essence.
   - Keep your deck unchanged.
 
 ## Three Proposals
@@ -576,6 +597,14 @@
 - Dig for 40 essence.
 - Dig deeper for 80 essence. Purge a random card.
 - Dig deepest for 140 essence. Purge 2 random cards.
+
+## Pollinous Core
+
+- Open the outer bloom for 35 essence. Draft 1 of 5 cards.
+- Press into the bright bloom for 75 essence or gain 1 {Nightmare}. Draft 1 of 8
+  cards.
+- Reach the hidden core for 135 essence or gain 2 copies of {Nightmare}. Gain
+  {Ginger Root}.
 
 # commit_now_future_payoff
 
