@@ -473,8 +473,9 @@ designs than what would be possible with purely random generation.
   legendary card
 - All-gambling setup, e.g. bet X essence to win more with some probability, or
   win some reward with a given probability
-- A single option where the player can take a risk for some reward or skip
-  entirely, e.g. gain a dreamsign with a 50% chance for a bane, or skip
+- A single option where the player can take a guaranteed reward while gambling
+  on whether a random cost applies, or skip entirely, e.g. gain a dreamsign with
+  a 50% chance for a bane, or skip
 - Pairing major quest effects with major rewards, like “you can no longer gain
   essence, transfigure all cards in your deck”
 - PIck one of 3 thematically related cards or dreamsigns

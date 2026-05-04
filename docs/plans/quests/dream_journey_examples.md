@@ -299,7 +299,7 @@
 
 ## Cursed Draft
 
-- Draft 1 of 12 cards. Gain 1 {Nightmare}.
+- Draft 1 of 12 cards. 50% chance to gain 1 {Nightmare}.
 - Leave.
 
 ## Unstable Copy
@@ -309,7 +309,8 @@
 
 ## Dark Gift
 
-- Gain {Ginger Root}. Lose 25% of your essence after each of the next 2 battles.
+- Gain {Ginger Root}. After each of your next 2 battles, 35% chance to lose 25%
+  of your essence.
 - Leave.
 
 # single_wager

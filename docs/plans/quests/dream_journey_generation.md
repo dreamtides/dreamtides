@@ -464,16 +464,20 @@ be.
 
 ### risk_or_skip
 
-The player is offered one tempting non-routine action with a clearly signaled
-downside, uncertainty, or corruption burden and may refuse. This is a compact
+The player is offered one tempting reward and may refuse, with the reward
+guaranteed if accepted but the cost, burden, sacrifice, or corruption outcome
+determined randomly inside a clearly signaled envelope. This is a compact
 high-tension shape for cursed gifts, dangerous boons, and other optional
-temptations that should not read like an ordinary priced service.
+temptations where the player is specifically gambling on whether, which, or how
+much downside applies. If the cost definitely applies, use `single_offer`
+instead.
 
 ### single_wager
 
 The site offers one visible one-shot gamble with a known stake and a bounded
-outcome envelope. Unlike `push_your_luck`, the player commits once and the scene
-does not ask whether to continue.
+outcome envelope. Unlike `risk_or_skip`, the stake or cost is known up front and
+the reward is the uncertain part. Unlike `push_your_luck`, the player commits
+once and the scene does not ask whether to continue.
 
 ### now_vs_later
 
