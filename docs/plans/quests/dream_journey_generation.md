@@ -289,6 +289,7 @@ Useful tag families include:
 - horizon tags such as `immediate`, `delayed`, and `persistent`
 - stake tags such as `risk`, `sacrifice`, and `gamble`
 - intensity tags such as `broad`, `precise`, and `structural`
+- polarity tags such as `positive_site`, `neutral_site`, and `negative_site`
 
 A generated Journey site's tag profile should come mainly from its filled
 effects, costs, and burdens. Journey Shape may contribute a small number of
@@ -354,6 +355,34 @@ Battlefield slot mutations remain a payload surface rather than a top-level
 shape. If V1 includes them, each battlefield slot may hold at most 1 mutation
 and the UI should represent that mutation with 1 icon on that slot.
 
+## Route Effect Polarity
+
+Journey effects that add, remove, or replace atlas sites need their own polarity
+model. A site type is not automatically a reward just because it gives the
+player another click on the map.
+
+Each site type should have a stage-aware route value:
+
+- positive sites are usually things like Purge, Transfiguration, Dreamsign
+  Offering, high-value Shop, Dream Journey, or other sites that clearly improve
+  player agency or deck quality
+- neutral sites are usually context-dependent sites whose value depends heavily
+  on deck state, path pressure, and remaining resources
+- negative sites are sites that usually dilute the route, consume opportunity
+  space, or create forced deck growth without sufficient control
+
+Draft sites should default to neutral or slightly negative in Journey
+generation. They can become positive only when the effect explicitly improves
+the draft, such as "the added Draft site shows 12 cards and lets you skip" or
+"replace a low-value current site with a Dreamsign Draft." This prevents the
+generator from treating "add a Draft site" as a generic prize.
+
+Route effects should also default to the current dreamscape. Current-dreamscape
+edits are visible, concrete, and easier for the player to evaluate. Future
+dreamscape edits are valid only when the future dreamscape is already committed,
+the affected site can be named or shown, or the delay is the main authored
+promise of the scene.
+
 ## Canonical Journey Shape Set
 
 This list is the stable top-level catalog for V1. A new Journey idea should
@@ -380,6 +409,16 @@ spend or suffer to get it. This is useful when the scene is about calibrating
 ambition rather than comparing unrelated rewards. Each option still needs to
 deliver a real version of the payoff, not just present one cost next to one
 benefit.
+
+If the payoff is "draft from more choices," "draft from more Dreamsigns," or a
+similar selection-quality increase, the generator must compare the marginal
+benefit of the wider menu against the marginal cost in essence-equivalent value.
+A Bane or Nightmare is a much larger price than a moderate essence payment, so
+it should not be used merely to buy four more draft choices. If the exact
+Dreamsigns or cards are revealed before the player chooses a price, the scene is
+usually a `shop_row` or `curated_reward_trio`, not this shape; this shape works
+best when the root choice reveals the class, count, and pool bounds while the
+actual draft menu is opened after commitment.
 
 ### service_menu
 
@@ -424,12 +463,24 @@ not standalone offers. This shape is useful when the scene's identity is the
 construction process itself, such as building a custom card or forging a
 composite object from several visible parts.
 
+Assembly choices must be internally compatible. A generated custom card should
+not allow frame, stat, keyword, or ability combinations that produce nonsense,
+such as spark bonuses on non-character cards or redundant Fast text on a card
+that is already Fast. The safest authoring pattern is to let the first stage
+choose a frame with explicit text slots, and let later ability packages adapt to
+that frame.
+
 ### mirrored_operations
 
 The site presents a tightly parallel operation set whose overt symmetry is the
 main promise of the scene. This shape is useful for matched menus such as
 purge-versus-duplicate-versus-transfigure when the mirrored verbs themselves are
 the point, not merely a fill detail.
+
+The operations must share the target's polarity. Destructive operations are
+reasonable for liabilities such as Banes, but a menu aimed at valuable
+Dreamsigns should not include a bare purge option unless that purge is part of a
+clearly compensated exchange.
 
 ### one_operation_many_targets
 
@@ -539,7 +590,10 @@ than `take_up_to_n`.
 
 The player repeatedly risks an increasing downside or uncertain outcome in order
 to chase a stronger result. The stop-or-continue tension is the point of the
-scene.
+scene. The extra downside on later pushes must be probabilistic, uncertain, or
+otherwise not deterministically applied. If every step has a guaranteed
+escalating cost, the scene is usually `take_up_to_n`, `repeat_to_scale`, or
+`escalating_search` rather than push-your-luck.
 
 ### resolved_random_series
 
@@ -571,11 +625,16 @@ The player accepts an immediate commitment that creates a significant future
 return or future scene. This is one of the main structural shapes for delayed
 commitment.
 
-### alter_future_dreamscape
+### alter_dreamscapes
 
-The site changes the composition of one or more future dreamscapes. This is the
-main route-shaping Journey Shape and should remain one of the rarer, more
-structural shapes.
+The site changes the composition of the current dreamscape by default, and may
+change one or more future dreamscapes only when the delayed timing is explicit
+and strategically important. This is the main route-shaping Journey Shape and
+should remain one of the rarer, more structural shapes. Current-dreamscape edits
+are usually more legible because the player can immediately inspect the affected
+route, while future-dreamscape edits should avoid abstract wording such as
+"replace one site later" unless the exact future site is visible or otherwise
+committed.
 
 ## Fill Rules Inside A Journey Shape
 
@@ -660,21 +719,65 @@ Trigger and timing lists should prefer memorable structures such as:
 - after two victories
 - at the next dreamscape
 
-### Magnitude Bands And Trade Matching
+### Essence-Equivalent Value And Trade Matching
 
-Reward, cost, and burden entries should carry a coarse magnitude band so the
-generator can avoid obviously foolish exchanges. Validation and fill logic
-should reject pairings such as trivial payment for a run-defining reward or an
-extreme price for a tiny cleanup action.
+Reward, cost, and burden entries should carry both a coarse magnitude band and
+an **essence-equivalent value** estimate. Essence-equivalent value is a common
+balancing currency used only by the generator and validation tools. It lets the
+system compare unlike things such as 70 essence, a Nightmare, four additional
+draft choices, a chosen purge, and a route change without pretending those
+things feel identical to the player.
 
-This does not require exact valuation. It only requires a bounded matching rule:
+Essence itself is the baseline: 1 essence equals 1 essence-equivalent value.
+Every non-essence entry should define:
+
+- a base essence-equivalent value
+- a marginal curve when quantity or choice breadth scales
+- stage multipliers for early, mid, and late value
+- run-state modifiers for broad conditions such as Bane count, deck size,
+  current essence, and remaining dreamscapes
+- a visibility or uncertainty adjustment when the exact target is hidden,
+  random, delayed, or probabilistic
+
+The estimates do not need to be perfect. They need to prevent obviously bad
+comparisons. A Nightmare or other serious Bane should usually be valued as a
+large negative cost, not as a slightly larger essence payment. The incremental
+value from drafting from 10 cards instead of 6 can justify a moderate essence
+increase. The incremental value from drafting from 14 cards instead of 10 should
+not by itself justify gaining a Nightmare.
+
+Several common payloads need explicit curves:
+
+- Draft breadth has diminishing marginal value. Going from 4 choices to 8 is
+  much more valuable than going from 12 to 16.
+- Additional cards drafted have much higher value than additional cards viewed.
+  "Draft 2 of 12" is not just a wider "Draft 1 of 12."
+- Chosen purge scales with the quality of the target class. Purging a Bane is a
+  reward, purging a starter is usually cleanup, and purging a strong card is a
+  sacrifice.
+- Dreamsign choice breadth should be priced differently depending on whether the
+  exact Dreamsigns are visible before commitment. If they are visible, the site
+  should price the individual offers like a shop or curated trio.
+- Route changes should use a site-delta value. Adding a Draft site is not
+  normally a reward, because Draft sites can dilute or pressure the deck unless
+  the Draft itself is enhanced. Replacing a low-value or unwanted current site
+  with a Purge, Transfiguration, Shop, Dreamsign Offering, or Dream Journey site
+  is usually more plausibly positive.
+
+Validation and fill logic should reject pairings such as trivial payment for a
+run-defining reward or an extreme price for a tiny cleanup action.
+
+This still uses bounded matching rather than exact optimization:
 
 - shared-cost shapes should fill their compared rewards from roughly compatible
-  magnitude bands
-- shared-reward shapes should fill their compared costs from roughly compatible
-  magnitude bands
+  essence-equivalent ranges
+- shared-reward shapes should ensure the increasing cost is justified by the
+  increasing payoff quality, quantity, or reliability
 - compound entries with internal downside should be compared against the total
   effective stake of the scene rather than treated as free upside
+- risky or probabilistic costs should use expected value plus a risk premium,
+  since players experience a chance to gain a Bane as worse than its pure
+  average cost
 
 ### Choice Quality And Negative-Only Options
 
@@ -785,8 +888,8 @@ Examples of hard exclusions:
 - `reward_after_trigger` when the promised hook cannot be tracked
 - `paired_return` when no valid later return site can be reserved
 - `commit_now_future_payoff` when the persistence budget is already full
-- `alter_future_dreamscape` when too few dreamscapes remain for the effect to
-  matter
+- `alter_dreamscapes` when there is no visible or committed site roster for the
+  effect to modify
 
 ### 4. Score Journey Shapes
 
@@ -833,9 +936,10 @@ Recommended fill order:
 2. shared target or shared motif if any
 3. reward effects
 4. costs and burdens
-5. triggers, timings, or future hooks
-6. presentation policy
-7. preview text objects
+5. essence-equivalent value checks and route polarity checks
+6. triggers, timings, or future hooks
+7. presentation policy
+8. preview text objects
 
 This order helps prevent incoherent scenes.
 
@@ -847,6 +951,12 @@ checks.
 Choice-quality validation should explicitly reject dominated menu structures
 where a positive-choice shape contains a root option that is only a downside, or
 where a repeatable scene has no real reason to stop before the cap.
+
+Trade validation should compare each option's effective cost and reward using
+essence-equivalent value. It should reject offers whose marginal price is wildly
+out of step with the marginal payoff, especially when one option escalates from
+essence to Banes or Nightmares. Route validation should reject route edits that
+present neutral or negative site additions as standalone rewards.
 
 ### 8. Repair
 

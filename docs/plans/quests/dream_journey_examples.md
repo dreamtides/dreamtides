@@ -10,21 +10,22 @@
 
 - Gain {Ginger Root}.
 - Apply {Viridian Transfiguration} to a chosen starter card.
-- Add a {Draft} site to the current dreamscape.
+- Add a {Transfiguration} site to the current dreamscape.
 
 ## Hard Pivot
 
 - Duplicate a random event.
 - Gain 2 omens.
-- Replace one {Purge} site in the next dreamscape with a {Transfiguration} site.
+- Replace the {Purge} site in the current dreamscape with a {Transfiguration}
+  site.
 
 # same_cost_different_rewards
 
 ## Crimson Toll
 
-- Gain 1 {Nightmare}. Draft 1 of 12 cards.
+- Gain 1 {Nightmare}. Draft 2 of 12 cards.
 - Gain 1 {Nightmare}. Gain {Ginger Root}.
-- Gain 1 {Nightmare}. Purge 2 chosen starter cards.
+- Gain 1 {Nightmare}. Purge 3 chosen starter cards.
 
 ## Flat Price
 
@@ -36,7 +37,7 @@
 
 - Pay 2 omens. Gain {Ginger Root}.
 - Pay 2 omens. Duplicate a chosen card.
-- Pay 2 omens. Add a {Dreamsign Draft} site to the current dreamscape.
+- Pay 2 omens. Add a {Dreamsign Offering} site to the current dreamscape.
 
 # same_reward_different_costs
 
@@ -44,21 +45,19 @@
 
 - Draft 1 of 6 cards for 30 essence.
 - Draft 1 of 10 cards for 70 essence.
-- Draft 1 of 14 cards. Gain 1 {Nightmare}.
+- Draft 1 of 14 cards for 110 essence.
 
 ## Three Ways to Cleanse
 
 - Purge a chosen card for 40 essence.
 - Purge 2 chosen cards for 90 essence.
-- Purge 3 chosen cards. Gain 1 {Nightmare}.
+- Purge 3 chosen cards for 140 essence.
 
 ## Three Ways to Sign
 
-- Gain {Ginger Root} for 35 essence.
-- Draft 1 of 3 Dreamsigns: {Ginger Root}, {Pyramid Relic}, or {Golden Acorn} for
-  70 essence.
-- Draft 1 of 5 Dreamsigns: {Ginger Root}, {Pyramid Relic}, {Golden Acorn},
-  {Cloud Lens}, or {Silver Key}. Gain 1 {Nightmare}.
+- Pay 35 essence. Enter a Dreamsign draft from 2 random Dreamsigns.
+- Pay 70 essence. Enter a Dreamsign draft from 4 random Dreamsigns.
+- Pay 105 essence. Enter a Dreamsign draft from 6 random Dreamsigns.
 
 # service_menu
 
@@ -104,9 +103,10 @@
 
 ## Early Growth
 
-- Gain 60 essence.
-- Draft 1 of 10 low-cost cards.
-- Purge a chosen starter card.
+- Apply {Viridian Transfiguration} to a chosen starter card.
+- Draft 1 of 8 low-cost cards and apply {Viridian Transfiguration} to it.
+- Gain {Seedling Charm}, a Dreamsign that gives your first materialized
+  character each battle +1 spark.
 
 ## Focused Tools
 
@@ -148,8 +148,8 @@
 ## One Bane, Three Escapes
 
 - Purge {Nightmare}.
-- Transform {Nightmare} into a random low-cost card.
-- {Nightmare} has no effect for your next 2 battles. Purge it. Gain 120 essence.
+- Transform {Nightmare} into 1 of 3 low-cost cards.
+- Seal {Nightmare} until the next dreamscape. Then purge it and gain 90 essence.
 
 ## One Card, Three Rewrites
 
@@ -161,48 +161,18 @@
 
 ## Build a Card
 
-- Choose a frame:
-  - Make it a character.
-  - Make it an event.
-  - Make it a fast event.
-- Choose a keyword:
-  - Give it Fast.
-  - Give it Reclaim.
-  - Give it Foresee 2.
-- Choose a bonus:
-  - Make it cost 1 less.
-  - Give it +2 spark.
-  - When played, gain 20 essence.
-
-## Build a Dreamsign
-
-- Choose a trigger:
-  - Trigger after each battle.
-  - Trigger after your next victory.
-  - Trigger after you play {Aspiring Guardian} 5 times.
-- Choose a reward:
-  - Gain 40 essence.
-  - Draft 1 of 8 cards.
-  - Purge a random Bane.
-- Choose a duration:
-  - End after 1 trigger.
-  - End after 2 triggers.
-  - End after 3 triggers.
-
-## Build a Transfiguration
-
-- Choose a target:
-  - Put it on a chosen starter card.
-  - Put it on a chosen character.
-  - Put it on a chosen event.
-- Choose a stat line:
-  - Give it Fast.
-  - Make it cost 1 less.
-  - Give it +2 spark.
-- Choose a rider:
-  - Add "Foresee 2."
-  - Add "When played, gain 20 essence."
-  - Add "Reclaim."
+- Choose a frame. Each frame defines the card's base stats and text slot:
+  - Character: 2 cost, 3 spark, with a materialized ability.
+  - Event: 1 cost, with a played ability.
+  - Fast event: 2 cost, with a prevent ability.
+- Choose an ability package. The package adapts to the chosen frame:
+  - Foresee: Foresee 2 when the card's ability resolves.
+  - Kindle: Kindle 2 when the card's ability resolves.
+  - Economy: Gain 25 essence when the card's ability resolves.
+- Choose a finish:
+  - Efficient: reduce the card's cost by 1, to a minimum of 0.
+  - Forceful: characters get +2 spark; events draw 1 card.
+  - Echoing: give the card Reclaim.
 
 # mirrored_operations
 
@@ -220,9 +190,9 @@
 
 ## Dreamsign Mirror
 
-- Purge a chosen Dreamsign.
-- Gain a copy of a chosen Dreamsign.
-- Transform a chosen Dreamsign into a random Dreamsign.
+- Duplicate a chosen Dreamsign.
+- Transform a chosen Dreamsign into 1 of 3 visible Dreamsigns.
+- Awaken a chosen Dreamsign, adding a second compatible trigger to it.
 
 # one_operation_many_targets
 
@@ -444,10 +414,10 @@
   - Draft 1 of 6 cards.
   - Stop here.
 - Second pick:
-  - Draft 1 of 6 cards. Gain 1 {Nightmare}.
+  - Draft 1 of 10 cards. Pay 50 essence.
   - Stop here.
 - Third pick:
-  - Draft 1 of 8 cards. Gain 2 copies of {Nightmare}.
+  - Draft 2 of 12 cards. Pay 120 essence.
   - Stop here.
 
 ## Measured Greed
@@ -456,10 +426,10 @@
   - Gain 35 essence.
   - Stop here.
 - Second pick:
-  - Gain 35 essence. Gain 1 {Nightmare}.
+  - Gain 220 essence. Gain 1 {Nightmare}.
   - Stop here.
 - Third pick:
-  - Gain 35 essence. Gain 2 copies of {Nightmare}.
+  - Gain 420 essence. Gain 2 copies of {Nightmare}.
   - Stop here.
 
 ## Layered Cleansing
@@ -471,7 +441,7 @@
   - Purge a chosen card. Pay 40 essence.
   - Stop here.
 - Third pick:
-  - Purge a chosen card. Gain 1 {Nightmare}.
+  - Purge up to 3 chosen cards. Pay 110 essence.
   - Stop here.
 
 # repeat_to_scale
@@ -514,11 +484,12 @@
   - Apply {Viridian Transfiguration} to a chosen starter card.
   - Stop here.
 - Second push:
-  - Apply {Viridian Transfiguration} to a second chosen card. Gain 1
-    {Nightmare}.
+  - Apply {Viridian Transfiguration} to a second chosen card. 30% chance to gain
+    1 {Nightmare}.
   - Stop here.
 - Third push:
-  - Apply {Viridian Transfiguration} to a third chosen card. Gain 1 {Nightmare}.
+  - Apply {Viridian Transfiguration} to a third chosen card. 55% chance to gain
+    1 {Nightmare}.
   - Stop here.
 
 ## Press The Draw
@@ -527,10 +498,10 @@
   - Draft 1 of 5 cards.
   - Stop here.
 - Second push:
-  - Draft 1 of 7 cards. Purge a random card.
+  - Draft 1 of 7 cards. 35% chance to purge a random card.
   - Stop here.
 - Third push:
-  - Draft 1 of 9 cards. Purge another random card.
+  - Draft 1 of 9 cards. 60% chance to purge a random card.
   - Stop here.
 
 # resolved_random_series
@@ -538,14 +509,6 @@
 ## Coin Cascade
 
 - Flip 3 coins. Gain 30 essence for each heads.
-
-## Hidden Pack
-
-- Open 3 random packs. Gain every card inside.
-
-## Shifting Orbs
-
-- Reveal {Ginger Root}, {Silver Key}, and {Cloud Lens}. Gain each one.
 
 # single_random_outcome
 
@@ -605,22 +568,14 @@
 ## Deeper Draft
 
 - Search the first layer for 1 of 4 cards.
-- Search deeper for 1 of 7 cards. Gain 1 {Nightmare}.
-- Search deepest for 1 of 10 cards. Gain 2 copies of {Nightmare}.
+- Search deeper for 1 of 7 cards. Pay 45 essence.
+- Search deepest for 2 of 10 cards. Pay 120 essence.
 
 ## Buried Spark
 
 - Dig for 40 essence.
 - Dig deeper for 80 essence. Purge a random card.
 - Dig deepest for 140 essence. Purge 2 random cards.
-
-## Hidden Sign
-
-- Search the first layer for 1 of 2 Dreamsigns: {Ginger Root} or {Silver Key}.
-- Search deeper for 1 of 4 Dreamsigns: {Ginger Root}, {Silver Key}, {Cloud
-  Lens}, or {Root Staff}. Pay 40 essence.
-- Search deepest for 1 of 6 Dreamsigns: {Ginger Root}, {Silver Key}, {Cloud
-  Lens}, {Root Staff}, {Bestiary}, or {Cracked Mirror}. Pay maximum essence.
 
 # commit_now_future_payoff
 
@@ -643,20 +598,21 @@
 - Gain 1 {Nightmare} after your next battle. Duplicate {Aspiring Guardian} after
   that battle.
 
-# alter_future_dreamscape
+# alter_dreamscapes
 
-## Change The Next Map
+## Change The Current Map
 
 - Add a {Dreamsign Offering} site to the current dreamscape.
-- Replace one {Purge} site in the next dreamscape with a {Shop} site.
+- Replace one {Draft} site in the current dreamscape with a {Shop} site.
 - Add a {Dream Journey} site to the current dreamscape.
 
 ## Shape The Route
 
-- Add 2 {Draft} sites to the current dreamscape.
-- Replace one {Essence} site in the next dreamscape with a {Transfiguration}
+- Replace one {Draft} site in the current dreamscape with a {Transfiguration}
   site.
-- Replace one {Reward Site} in the next dreamscape with a {Duplication} site.
+- Replace one {Essence} site in the current dreamscape with a {Duplication}
+  site.
+- Replace one {Draft} site in the current dreamscape with a {Purge} site.
 
 ## Future Bias
 
