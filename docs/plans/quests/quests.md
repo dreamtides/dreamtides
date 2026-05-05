@@ -531,8 +531,8 @@ Icon: "Copy"
 
 A reward site is a special site for granting the user a fixed reward (a specific
 card or cards, dreamsign, group of dreamsigns, etc). The distinguishing factor
-of reward sites is that these rewards are *known in advance* before selecting a
-dreamscape to activate on the [Dream Atlas](#dream-atlas).
+of reward sites is that the reward is fixed by dreamscape generation rather than
+randomly rolled when the site is visited.
 
 **UI:** The camera pulls in on a scene showing the reward items in question,
 with a purple "accept" button and a gray "decline" button. Accepting the reward
@@ -621,8 +621,8 @@ The Dream Atlas is the world map players navigate after Dreamcaller selection,
 starting deck review, and starting dreamscape review. It shows a 3D map of
 dreamscapes represented as circular miniature "worlds," connected by dotted
 lines. For later dreamscape choices, the player can hover over or long-press a
-dreamscape to preview its biome and reward site, then click it again to zoom the
-camera in to that dreamscape.
+dreamscape to preview its biome and preview site, then click it again to zoom
+the camera in to that dreamscape.
 
 Each dreamscape can be in one of three states:
 
@@ -645,12 +645,11 @@ becomes **Completed**. Any dreamscapes directly connected to it then also become
 In other words, a dreamscape is **Available** only if it is connected to the
 Nexus or to at least one **Completed** dreamscape.
 
-Each dreamscape displays exactly one site icon on the atlas to preview its
-reward. This icon is not a battle or draft site. If the dreamscape has an
-enhanced site, the preview icon is that enhanced site. Otherwise, it is the
-configured reward preview site for that dreamscape. This is also where
-[Reward Site](#reward-site) rewards are shown. Winning the 7th battle causes the
-player to win the quest.
+Each dreamscape displays exactly one site icon on the atlas to preview one site
+contained in that dreamscape. This icon is not a battle or draft site. If the
+dreamscape has an enhanced site, the preview icon is that enhanced site.
+Otherwise, it is the configured preview site for that dreamscape. Winning the
+7th battle causes the player to win the quest.
 
 ### Dream Atlas Generation
 
