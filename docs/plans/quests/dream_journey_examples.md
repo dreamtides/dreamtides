@@ -147,7 +147,8 @@
 
 - Purge {Nightmare}.
 - Transform {Nightmare} into 1 of 3 low-cost cards.
-- Keepe {Nightmare} until the next dreamscape. Then purge it and gain 90 essence.
+- Keepe {Nightmare} until the next dreamscape. Then purge it and gain 90
+  essence.
 
 ## One Card, Three Rewrites
 
