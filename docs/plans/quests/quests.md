@@ -33,13 +33,13 @@ when possible.
 Quests revolve primarily around drafting and refining a deck to bring into
 future battles. Quests use two currencies: "essence" and "omens". Essence is the
 main quest currency and is spent on shops and in various other ways. Omens are
-used only for shop dreamsign purchases and shop rerolls. Players start each
-quest with 250 essence and a fixed starter deck, then choose a Dreamcaller to
-define the run. By default, quests have a maximum essence cap of 500; any
-essence gained beyond this cap is lost unless the cap has been increased by an
-effect such as a Dream Journey reward. Omens have no cap. Dreamtides does not
-use an explicit rarity system for cards, except for certain powerful cards that
-are designated as legendary cards.
+used only for shop dreamsign purchases and shop rerolls. Players begin each
+quest by choosing a Dreamcaller, then review their fixed starter deck and first
+dreamscape. By default, quests have a maximum essence cap of 500; any essence
+gained beyond this cap is lost unless the cap has been increased by an effect
+such as a Dream Journey reward. Omens have no cap. Dreamtides does not use an
+explicit rarity system for cards, except for certain powerful cards that are
+designated as legendary cards.
 
 In addition to deck cards, users during a quest will select a Dreamcaller to
 lead their deck and may have some number of Dreamsigns:
@@ -80,8 +80,9 @@ package-based run setup:
 1. The player is offered 3 Dreamcallers.
 2. Choosing a Dreamcaller resolves a fixed package once for the run.
 3. The starter deck, draft multiset, Dreamsign pool, and atlas are initialized.
-4. The run enters the first dreamscape directly with no intermediate Dreamcaller
-   Draft or tide-pick screen.
+4. The player views the starting deck.
+5. The player views the starting dreamscape and enters it directly, with no
+   dreamscape choice, intermediate Dreamcaller Draft, or tide-pick screen.
 
 The older Unity quest prototype remains useful for some layout exploration, but
 it is no longer the source of truth for quest flow, tide logic, or draft pool
@@ -272,7 +273,9 @@ Selecting a Dreamcaller performs all run bootstrap work immediately:
 - Resolve the Dreamcaller's mandatory and optional package tides into one legal
   selected tide package.
 - Initialize the draft multiset and Dreamsign pool from that package.
-- Generate the initial atlas and enter the first available dreamscape.
+- Generate the initial atlas.
+- Show the starting deck.
+- Show the starting dreamscape, then enter that dreamscape directly.
 
 Dreamcallers should communicate their intended play pattern by surfacing a small
 set of structural/support tides and their rules text, but there is no longer a
@@ -614,11 +617,12 @@ Bane cards generally have negative effects when drawn. Bane cards can be
 
 ## Dream Atlas
 
-The Dream Atlas is the world map players navigate after Dreamcaller selection
-and quest bootstrap. It shows a 3D map of dreamscapes represented as circular
-miniature "worlds," connected by dotted lines. The player can hover over or
-long-press a dreamscape to preview its biome and available sites, then click it
-again to zoom the camera in to that dreamscape.
+The Dream Atlas is the world map players navigate after Dreamcaller selection,
+starting deck review, and starting dreamscape review. It shows a 3D map of
+dreamscapes represented as circular miniature "worlds," connected by dotted
+lines. For later dreamscape choices, the player can hover over or long-press a
+dreamscape to preview its biome and reward site, then click it again to zoom the
+camera in to that dreamscape.
 
 Each dreamscape can be in one of three states:
 
@@ -629,7 +633,9 @@ Each dreamscape can be in one of three states:
 - **Unavailable**: The player cannot choose this dreamscape yet.
 
 The player begins at the center of the Dream Atlas, called the **Nexus**. At the
-start, any dreamscapes connected to the Nexus are **Available**.
+start, the run has exactly one starting dreamscape connected to the Nexus. The
+player views that dreamscape and enters it directly instead of choosing between
+multiple initial dreamscapes.
 
 After the player visits a dreamscape and completes its battle, that dreamscape
 becomes **Completed**. Any dreamscapes directly connected to it then also become
@@ -639,22 +645,23 @@ becomes **Completed**. Any dreamscapes directly connected to it then also become
 In other words, a dreamscape is **Available** only if it is connected to the
 Nexus or to at least one **Completed** dreamscape.
 
-Each dreamscape displays a preview of what sites are available in that location.
-This shows 2-3 site icons, not including "draft" or "battle" sites, allowing the
-user to make an informed decision about which dreamscape to visit next. This is
-also where [Reward Site](#reward-site) rewards are shown. Winning the 7th battle
-causes the player to win the quest.
+Each dreamscape displays exactly one site icon on the atlas to preview its
+reward. This icon is not a battle or draft site. If the dreamscape has an
+enhanced site, the preview icon is that enhanced site. Otherwise, it is the
+configured reward preview site for that dreamscape. This is also where
+[Reward Site](#reward-site) rewards are shown. Winning the 7th battle causes the
+player to win the quest.
 
 ### Dream Atlas Generation
 
 The dream atlas is generated dynamically throughout the quest, with new
 dreamscapes being added as dreamscapes are completed. The new dreamscapes are
-added as 'unavailable' nodes adjacent to the newly 'available' nodes. Around 2-4
-nodes are randomly generated and placed in this manner each time a dreamscape is
-completed, creating a web of interconnected nodes. The atlas is purely additive
-and is never pruned; the player will visit 7 dreamscapes in a typical quest (or
-8 with the battle-skip meta progression unlock). Initial atlas topology is
-configured in TOML.
+added as 'unavailable' nodes adjacent to the newly 'available' nodes. Between 1
+and 2 nodes are randomly generated and placed in this manner each time a
+dreamscape is completed, creating a web of interconnected nodes. The atlas is
+purely additive and is never pruned; the player will visit 7 dreamscapes in a
+typical quest (or 8 with the battle-skip meta progression unlock). Initial atlas
+topology is configured in TOML.
 
 ## Dreamscape Generation
 
@@ -679,11 +686,10 @@ draft sites based on completion level.
 | 2, 3             | 1           |
 | 4+               | 0           |
 
-Battle sites are also distinct: Dreamscapes have one Battle site, or zero if
-this has been modified by [meta progression](meta_progression.md). The opponent
-dreamcaller, dreamsigns, and deck for the battle is selected from a pool of
-opponents defined in TOML for a given completion level. Difficulty scaling is
-configured in TOML.
+Battle sites are also distinct: Each dreamscape has exactly one Battle site. The
+opponent dreamcaller, dreamsigns, and deck for the battle is selected from a
+pool of opponents defined in TOML for a given completion level. Difficulty
+scaling is configured in TOML.
 
 ### Enhanced Sites
 
