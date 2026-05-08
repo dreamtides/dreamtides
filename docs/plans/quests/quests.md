@@ -73,8 +73,8 @@ any battle, the quest ends immediately.
 
 ## Current Quest Prototype
 
-The current reference prototype for quest flow lives in
-`scripts/quest_prototype/` as a standalone web app. It reflects the current
+The current reference prototype for quest flow lives in its own repository at
+`~/quest_prototype/` as a standalone web app. It reflects the current
 package-based run setup:
 
 1. The player is offered 3 Dreamcallers.
@@ -86,8 +86,8 @@ package-based run setup:
 
 The older Unity quest prototype remains useful for some layout exploration, but
 it is no longer the source of truth for quest flow, tide logic, or draft pool
-construction. The documents [current_prototype.md](current_prototype.md) and
-[`docs/quest_prototype/quest_prototype.md`](../../quest_prototype/quest_prototype.md)
+construction. The document [current_prototype.md](current_prototype.md) and the
+prototype's own `docs/quest_prototype/quest_prototype.md` (in `~/quest_prototype/`)
 are the technical references for the live prototype behavior that this design
 document should track.
 
