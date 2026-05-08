@@ -784,17 +784,6 @@ prune-remote-branches:
         git push -d origin "$b" || true
     done
 
-quest-dev:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    lsof -ti:5173 | xargs kill 2>/dev/null || true
-    sleep 0.5
-    cd scripts/quest_prototype
-    npm install
-    npm run setup-assets
-    open http://localhost:5173 &
-    exec npx vite --port 5173 --strictPort
-
 battle-dev:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -816,15 +805,6 @@ constructed-quest-dev:
     npm run setup-assets
     open http://localhost:5173 &
     npx vite --port 5173 --strictPort
-
-qs-typecheck:
-    cd scripts/quest_prototype && npm run typecheck
-
-qs-lint:
-    cd scripts/quest_prototype && npm run lint
-
-qs-test:
-    cd scripts/quest_prototype && npm test
 
 cqs-check:
     #!/usr/bin/env bash
