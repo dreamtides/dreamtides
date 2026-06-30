@@ -197,6 +197,10 @@ class ReviewScopePlannerTests(unittest.TestCase):
             "tv-check",
             "tv-clippy",
             "tv-test",
+            "go-prototypes-check-format",
+            "go-prototypes-typecheck",
+            "go-prototypes-lint",
+            "go-prototypes-test",
         ]
         self.config = review_scope.ScopeConfig(
             required_global_full_triggers=(
@@ -225,6 +229,8 @@ class ReviewScopePlannerTests(unittest.TestCase):
             tv_path_prefixes=("rules_engine/src/tv/", "rules_engine/tests/tv_tests/"),
             csharp_crate_seeds=(),
             csharp_path_prefixes=("client/Assets/",),
+            go_crate_seeds=(),
+            go_path_prefixes=("prototypes/",),
             cqs_crate_seeds=(),
             cqs_path_prefixes=("scripts/constructed_quest_prototype/",),
             always_run_steps=(
@@ -245,6 +251,10 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "rlf-lint",
                 "test-core",
                 "python-test",
+                "go-prototypes-check-format",
+                "go-prototypes-typecheck",
+                "go-prototypes-lint",
+                "go-prototypes-test",
                 "parser-test",
                 "tv-check",
                 "tv-clippy",
@@ -256,11 +266,21 @@ class ReviewScopePlannerTests(unittest.TestCase):
                 "clippy",
                 "test-core",
                 "local-unity-test",
+                "go-prototypes-check-format",
+                "go-prototypes-typecheck",
+                "go-prototypes-lint",
+                "go-prototypes-test",
             ),
             parser_steps=("parser-test",),
             tv_steps=("tv-check", "tv-clippy", "tv-test"),
             python_steps=("python-test",),
             csharp_steps=("local-unity-test",),
+            go_steps=(
+                "go-prototypes-check-format",
+                "go-prototypes-typecheck",
+                "go-prototypes-lint",
+                "go-prototypes-test",
+            ),
             cqs_steps=("cqs-check",),
             core_path_prefixes=(
                 "client/Assets/StreamingAssets/",
@@ -631,6 +651,25 @@ class ReviewScopePlannerTests(unittest.TestCase):
         )
         self.assertNotIn("python-test", decision.skipped_steps)
 
+    def test_go_change_selects_go_prototype_steps(self) -> None:
+        env = {
+            "REVIEW_SCOPE_MODE": "enforce",
+            "REVIEW_SCOPE_CHANGED_FILES": "prototypes/hello_world/main.go",
+        }
+        decision = review_scope.plan_review_scope(
+            self.step_names,
+            env=env,
+            repo_root=Path.cwd(),
+            config=self.config,
+            metadata=self.metadata,
+        )
+        self.assertFalse(decision.forced_full)
+        self.assertIn("go", decision.domains)
+        self.assertIn("go-prototypes-check-format", decision.selected_steps)
+        self.assertIn("go-prototypes-typecheck", decision.selected_steps)
+        self.assertIn("go-prototypes-lint", decision.selected_steps)
+        self.assertIn("go-prototypes-test", decision.selected_steps)
+
     def test_shell_script_change_is_core_not_unmapped(self) -> None:
         env = {
             "REVIEW_SCOPE_MODE": "enforce",
@@ -650,7 +689,9 @@ class ReviewScopePlannerTests(unittest.TestCase):
         self.assertIn("clippy", decision.selected_steps)
         self.assertIn("test-core", decision.selected_steps)
         self.assertNotIn("python-test", decision.selected_steps)
+        self.assertNotIn("go-prototypes-test", decision.selected_steps)
         self.assertIn("python-test", decision.skipped_steps)
+        self.assertIn("go-prototypes-test", decision.skipped_steps)
 
     def test_quest_prototype_change_is_core_not_unmapped(self) -> None:
         env = {

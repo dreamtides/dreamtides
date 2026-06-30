@@ -21,6 +21,7 @@ DEFAULT_LOCAL_SCOPE_STRATEGY = "head-if-dirty"
 MARKDOWN_EXTENSIONS = (".md", ".mdx", ".markdown")
 PYTHON_EXTENSIONS = (".py",)
 SHELL_EXTENSIONS = (".sh",)
+GO_EXTENSIONS = (".go",)
 
 CommandRunner = Callable[[list[str], Path], tuple[int, str, str]]
 
@@ -41,6 +42,8 @@ class ScopeConfig:
     tv_path_prefixes: tuple[str, ...]
     csharp_crate_seeds: tuple[str, ...]
     csharp_path_prefixes: tuple[str, ...]
+    go_crate_seeds: tuple[str, ...]
+    go_path_prefixes: tuple[str, ...]
     cqs_crate_seeds: tuple[str, ...]
     cqs_path_prefixes: tuple[str, ...]
     core_path_prefixes: tuple[str, ...]
@@ -51,6 +54,7 @@ class ScopeConfig:
     tv_steps: tuple[str, ...]
     python_steps: tuple[str, ...]
     csharp_steps: tuple[str, ...]
+    go_steps: tuple[str, ...]
     cqs_steps: tuple[str, ...]
 
 
@@ -338,6 +342,7 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
     parser_section = payload.get("parser", {})
     tv_section = payload.get("tv", {})
     csharp_section = payload.get("csharp", {})
+    go_section = payload.get("go", {})
     cqs_section = payload.get("constructed_quest_prototype", {})
 
     if not isinstance(parser_section, dict):
@@ -346,6 +351,8 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         raise ScopePlannerError("scope config 'tv' must be an object")
     if not isinstance(csharp_section, dict):
         raise ScopePlannerError("scope config 'csharp' must be an object")
+    if not isinstance(go_section, dict):
+        raise ScopePlannerError("scope config 'go' must be an object")
     if not isinstance(cqs_section, dict):
         raise ScopePlannerError(
             "scope config 'constructed_quest_prototype' must be an object"
@@ -395,6 +402,10 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         csharp_path_prefixes=read_rules(
             csharp_section.get("path_prefixes", []), "csharp.path_prefixes"
         ),
+        go_crate_seeds=read_names(go_section.get("crate_seeds", []), "go.crate_seeds"),
+        go_path_prefixes=read_rules(
+            go_section.get("path_prefixes", []), "go.path_prefixes"
+        ),
         cqs_crate_seeds=read_names(
             cqs_section.get("crate_seeds", []),
             "constructed_quest_prototype.crate_seeds",
@@ -420,6 +431,7 @@ def load_scope_config(config_path: Path | None = None) -> ScopeConfig:
         tv_steps=read_names(payload.get("tv_steps", []), "tv_steps"),
         python_steps=read_names(payload.get("python_steps", []), "python_steps"),
         csharp_steps=read_names(payload.get("csharp_steps", []), "csharp_steps"),
+        go_steps=read_names(payload.get("go_steps", []), "go_steps"),
         cqs_steps=read_names(payload.get("cqs_steps", []), "cqs_steps"),
     )
 
@@ -546,6 +558,13 @@ def scoped_domains(config: ScopeConfig) -> tuple[ScopedDomain, ...]:
             path_prefixes=config.csharp_path_prefixes,
             file_extensions=(),
             gated_steps=config.csharp_steps,
+        ),
+        ScopedDomain(
+            name="go",
+            crate_seeds=config.go_crate_seeds,
+            path_prefixes=config.go_path_prefixes,
+            file_extensions=GO_EXTENSIONS,
+            gated_steps=config.go_steps,
         ),
         ScopedDomain(
             name="cqs",
